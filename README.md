@@ -24,12 +24,17 @@ This project uses **CMake** as its build system.
 After the initial configure, you only need:
 
 ```bash
-cmake --build build && ./build/fpv-sim
+cmake -B build -S . &&cmake --build build && ./build/fpv-sim
 ```
 
 Re-run `cmake -B build -S .` only when you:
 - Add/remove `.cpp` files
 - Change `CMakeLists.txt`
+
+**Full command**:
+```bash
+cmake -B build -S . &&cmake --build build && ./build/fpv-sim
+```
 
 ## Project Structure
 
@@ -56,4 +61,5 @@ fpv-sim/
 
 1. Create header: `include/<category>/<module>/<module>.hpp`
 2. Create source: `src/<category>/<module>/<module>.cpp`
-3. Rebuild: `cmake --build build`
+3. Reconfigure: `cmake -S . -B build`
+4. Rebuild: `cmake --build build`
