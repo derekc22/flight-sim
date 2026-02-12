@@ -4,18 +4,16 @@
 #include <algorithm>
 #include <iostream>
 #include <vector>
-#include "simulation/frames/transforms.hpp"
-
+#include "simulation/transforms/transforms.hpp"
+#include "simulation/global/global.hpp"
 
 namespace transforms {
 
-    double deg2rad(double deg){
-        return deg * (M_PI / 180.0);
-    };
+    namespace common {
+        const Eigen::Matrix4d identity_hom = global::I4;
+    }
 
-    double rad2deg(double rad){
-        return rad * (180.0 / M_PI);
-    };
+
 
     Eigen::Matrix3d Rx(double phi) {
         Eigen::Matrix3d Rx;
@@ -41,7 +39,7 @@ namespace transforms {
         return Rz;
     };
 
-    Eigen::Matrix3d eul2rotm_extr(double a, double b, double c, const std::string& order){
+    Eigen::Matrix3d eul2R_extr(double a, double b, double c, const std::string& order){
         if      (order == "ZYX") return Rx(c) * Ry(b) * Rz(a);
         else if (order == "ZXY") return Ry(c) * Rx(b) * Rz(a);
         else if (order == "YZX") return Rx(c) * Rz(b) * Ry(a);
@@ -60,7 +58,11 @@ namespace transforms {
         else throw std::invalid_argument("Unsupported Euler order: " + order);
     };
 
-    Eigen::Matrix3d eul2rotm_intr(double a, double b, double c, const std::string& order){
+    Eigen::Matrix3d eul2C_extr(double a, double b, double c, const std::string& order){
+       return eul2R_extr(a, b, c, order).transpose();
+    };
+
+    Eigen::Matrix3d eul2R_intr(double a, double b, double c, const std::string& order){
         if      (order == "ZYX") return Rz(a) * Ry(b) * Rx(c);
         else if (order == "ZXY") return Rz(a) * Rx(b) * Ry(c);
         else if (order == "YZX") return Ry(a) * Rz(b) * Rx(c);
@@ -79,6 +81,10 @@ namespace transforms {
         else throw std::invalid_argument("Unsupported Euler order: " + order);
     }
 
+    Eigen::Matrix3d eul2C_intr(double a, double b, double c, const std::string& order){
+        return eul2R_intr(a, b, c, order).transpose();
+    };
+
     double clampTo1(double x) {
         // clamps to [-1, 1]
         return std::clamp(x, -1.0, 1.0);
@@ -86,10 +92,10 @@ namespace transforms {
 
     double wrapToPi(double x) {
         // maps to (-pi, pi]
-        return std::remainder(x, 2.0 * M_PI);
+        return std::remainder(x, 2.0 * ::global::pi);
     }
 
-    Eigen::Vector3d rotm2eul_intr(const Eigen::Matrix3d& R, const std::string& order) {
+    std::array<double, 3> R2eul_intr(const Eigen::Matrix3d& R, const std::string& order) {
         double eps = 1e-12;
 
         double a = 0.0, b = 0.0, c = 0.0;
@@ -221,33 +227,39 @@ namespace transforms {
             throw std::invalid_argument("Unsupported Euler order: " + order);
         }
 
-        return Eigen::Vector3d(wrapToPi(a), wrapToPi(b), wrapToPi(c));
+        return {wrapToPi(a), wrapToPi(b), wrapToPi(c)};
 
     }
 
-    Eigen::Vector3d rotm2eul_extr(const Eigen::Matrix3d& R, const std::string& order) {
+    std::array<double, 3> R2eul_extr(const Eigen::Matrix3d& R, const std::string& order) {
         if (order.size() != 3) {
             throw std::invalid_argument("Unsupported Euler order: " + order);
         }
-        const std::string rev(order.rbegin(), order.rend());
-        const Eigen::Vector3d abc_rev = rotm2eul_intr(R, rev);          // (a_rev, b_rev, c_rev)
-        return Eigen::Vector3d(abc_rev[2], abc_rev[1], abc_rev[0]);    // (a,b,c)
+        std::string rev(order.rbegin(), order.rend());
+        std::array<double, 3> abc_rev = R2eul_intr(R, rev);          
+        return {abc_rev[2], abc_rev[1], abc_rev[0]};
     }
 
-    // Call this when you want to rotate the vector by R
-    Eigen::Vector3d active_rot(const Eigen::Matrix3d& R, const Eigen::Vector3d& v){
-        return R * v;
+    std::array<double, 3> C2eul_extr(const Eigen::Matrix3d& C, const std::string& order) {
+        // C_extr(a, b, c) = R_extr(a, b, c).T = R_intr(-a, -b, -c)
+        return R2eul_extr(C.transpose(), order);
     }
 
-    // Call this when you want to rotate the frame by R
-    Eigen::Vector3d passive_rot(const Eigen::Matrix3d& R, const Eigen::Vector3d& v){
-        return R.transpose() * v;
-    };
+    std::array<double, 3> C2eul_intr(const Eigen::Matrix3d& C, const std::string& order) {
+        // C_intr(a, b, c) = R_intr(a, b, c).T = R_extr(-a, -b, -c)
+        return R2eul_intr(C.transpose(), order);
+    }
 
-    // d is passed by the user as a translation in the local frame (before rotation)
-    // along with the frame, d is then rotated
-    // the local frame is then translated along this rotated d
-    Eigen::Matrix4d _make_H_rotate_first(const Eigen::Matrix3d& R, const Eigen::Vector3d& d) {
+
+    Eigen::Matrix3d RfromH(const Eigen::Matrix4d& H){
+        return H.block<3,3>(0,0);
+    }
+
+    Eigen::Vector3d dfromH(const Eigen::Matrix4d& H){
+        return H.block<3,1>(0,3);
+    }
+ 
+    Eigen::Matrix4d _make_HR_translate_first(const Eigen::Matrix3d& R, const Eigen::Vector3d& d) {
         Eigen::Matrix4d H = Eigen::Matrix4d::Zero();
         H.block<3,3>(0,0) = R;
         H.block<3,1>(0,3) = R*d;
@@ -255,10 +267,8 @@ namespace transforms {
         return H;
     };
 
-    // d is passed by the user as a translation in the local frame (before rotation)
-    // only the frame is rotated. d stays un-rotated
-    // the local frame is then translated along the original, un-rotated d
-    Eigen::Matrix4d _make_H_translate_first(const Eigen::Matrix3d& R, const Eigen::Vector3d& d) {
+  
+    Eigen::Matrix4d _make_HR_rotate_first(const Eigen::Matrix3d& R, const Eigen::Vector3d& d) {
         Eigen::Matrix4d H = Eigen::Matrix4d::Zero();
         H.block<3,3>(0,0) = R;
         H.block<3,1>(0,3) = d;
@@ -266,14 +276,37 @@ namespace transforms {
         return H;
     };
 
-    // There is no 'makeH_intr' vs 'makeH_extr'
-    // Whether an H encodes an intrinsic vs extrinsic transformation depends entirely on whether the R used to construct it encoded an intrinsic vs extrinsic rotation
-    // That it, it is entirely determined by the rotation matrix - Thus there are no conflicts here
-    Eigen::Matrix4d makeH(const Eigen::Matrix3d& R, const Eigen::Vector3d& d, const std::string& first) {
-        if (first == "rotate") return _make_H_rotate_first(R, d);
-        else if (first == "translate") return _make_H_translate_first(R, d);
+
+    Eigen::Matrix4d makeHR(const Eigen::Matrix3d& R, const Eigen::Vector3d& d, const std::string& first) {
+        // d is initially provided in the fixed frame (ie the only frame) and stays in the fixed frame (again, the only frame)
+        if (first == "rotate") return _make_HR_rotate_first(R, d);
+        else if (first == "translate") return _make_HR_translate_first(R, d);
         else throw std::invalid_argument("Unsupported argument value: " + first);
     };
+
+    Eigen::Matrix4d _make_HC_rotate_first(const Eigen::Matrix3d& C, const Eigen::Vector3d& d) {
+        Eigen::Matrix4d H = Eigen::Matrix4d::Zero();
+        H.block<3,3>(0,0) = C;
+        H.block<3,1>(0,3) = -d;
+        H(3,3) = 1.0;
+        return H;
+    }
+
+    Eigen::Matrix4d _make_HC_translate_first(const Eigen::Matrix3d& C, const Eigen::Vector3d& d) {
+        Eigen::Matrix4d H = Eigen::Matrix4d::Zero();
+        H.block<3,3>(0,0) = C;
+        H.block<3,1>(0,3) = -C*d;
+        H(3,3) = 1.0;
+        return H;
+    }
+
+    Eigen::Matrix4d makeHC(const Eigen::Matrix3d& C, const Eigen::Vector3d& d, const std::string& first) {
+        // d is initially provided in frame {0} and stays in/attached to frame {0}
+        if (first == "rotate") return _make_HC_rotate_first(C, d);
+        else if (first == "translate") return _make_HC_translate_first(C, d);
+        else throw std::invalid_argument("Unsupported argument value: " + first);
+    }
+
 
     Eigen::Matrix4d make_Hinv(const Eigen::Matrix4d& H) {
         Eigen::Matrix4d H_inv = Eigen::Matrix4d::Zero();
@@ -286,29 +319,33 @@ namespace transforms {
         return H_inv;
     };
 
-    // Call this when you want to transform the vector
-    Eigen::Vector3d active_hom(const Eigen::Matrix4d& H, const Eigen::Vector3d& v) {
+    Eigen::Vector3d apply_hom(const Eigen::Matrix4d& H, const Eigen::Vector3d& v) {
         Eigen::Vector4d P = Eigen::Vector4d::Zero();
         P.head(3) = v;
         P(3) = 1;
         return (H * P).head(3);
     };
 
-    // Call this when you want to transform the frame
-    Eigen::Vector3d passive_hom(const Eigen::Matrix4d& H, const Eigen::Vector3d& v) {
-        Eigen::Vector4d P = Eigen::Vector4d::Zero();
-        P.head(3) = v;
-        P(3) = 1;
-        return (make_Hinv(H) * P).head(3);
-    };
+    // // Call this when you want to transform the vector
+    // Eigen::Vector3d active_hom(const Eigen::Matrix4d& H, const Eigen::Vector3d& v) {
+    //     Eigen::Vector4d P = Eigen::Vector4d::Zero();
+    //     P.head(3) = v;
+    //     P(3) = 1;
+    //     return (H * P).head(3);
+    // };
 
-    Eigen::Matrix4d _identity_hom() {
-        return Eigen::Matrix4d::Identity();
-    }
+    // // Call this when you want to transform the frame
+    // Eigen::Vector3d passive_hom(const Eigen::Matrix4d& H, const Eigen::Vector3d& v) {
+    //     Eigen::Vector4d P = Eigen::Vector4d::Zero();
+    //     P.head(3) = v;
+    //     P(3) = 1;
+    //     return (make_Hinv(H) * P).head(3);
+    // };
+    
 
     // Given the orientation (of the frame/vector) obtained via the nth transformation, how is the n+1 transformation applied
     Eigen::Matrix4d chain_hom_intr(const std::vector<Eigen::Matrix4d>& H_list) {
-        Eigen::Matrix4d Htot = _identity_hom();
+        Eigen::Matrix4d Htot = common::identity_hom;
         for (const auto& H : H_list){
             Htot *= H;
         }
@@ -317,7 +354,7 @@ namespace transforms {
 
     // Given the orientation (of the frame/vector) obtained via the nth transformation, how is the n+1 transformation applied
     Eigen::Matrix4d chain_hom_extr(const std::vector<Eigen::Matrix4d>& H_list) {
-        Eigen::Matrix4d Htot = _identity_hom();
+        Eigen::Matrix4d Htot = common::identity_hom;
 
         for (auto rit = H_list.rbegin(); rit != H_list.rend(); ++rit) {
             Htot *= *rit;
@@ -327,7 +364,7 @@ namespace transforms {
 
     // Given the orientation (of the frame/vector) obtained via the nth rotation, how is the n+1 rotation applied
     Eigen::Matrix3d chain_rot_intr(const std::vector<Eigen::Matrix3d>& R_list) {
-        Eigen::Matrix3d Rtot = Eigen::Matrix3d::Identity();
+        Eigen::Matrix3d Rtot = global::I3;
         for (const auto& R : R_list){
             Rtot *= R;
         }
@@ -336,7 +373,7 @@ namespace transforms {
 
     // Given the orientation (of the frame/vector) obtained via the nth rotation, how is the n+1 rotation applied
     Eigen::Matrix3d chain_rot_extr(const std::vector<Eigen::Matrix3d>& R_list) {
-        Eigen::Matrix3d Rtot = Eigen::Matrix3d::Identity();
+        Eigen::Matrix3d Rtot = global::I3;
 
         for (auto rit = R_list.rbegin(); rit != R_list.rend(); ++rit) {
             Rtot *= *rit;
@@ -344,18 +381,26 @@ namespace transforms {
         return Rtot;
     }
 
-    // Deprecated
-    Eigen::Quaterniond quat_mul(const Eigen::Quaterniond& q1, const Eigen::Quaterniond& q2) {
-        double w1 = q1.w(), x1 = q1.x(), y1 = q1.y(), z1 = q1.z();
-        double w2 = q2.w(), x2 = q2.x(), y2 = q2.y(), z2 = q2.z();
-
-        Eigen::Quaterniond q;
-        q.w() = w1*w2 - x1*x2 - y1*y2 - z1*z2;
-        q.x() = w1*x2 + x1*w2 + y1*z2 - z1*y2;
-        q.y() = w1*y2 - x1*z2 + y1*w2 + z1*x2;
-        q.z() = w1*z2 + x1*y2 - y1*x2 + z1*w2;
-        return q;
+    Eigen::Matrix3d CfromR(const Eigen::Matrix3d& R){
+        return R.transpose();
     }
+
+    Eigen::Matrix3d RfromC(const Eigen::Matrix3d& C){
+        return C.transpose();
+    }
+
+    // // Deprecated
+    // Eigen::Quaterniond quat_mul(const Eigen::Quaterniond& q1, const Eigen::Quaterniond& q2) {
+    //     double w1 = q1.w(), x1 = q1.x(), y1 = q1.y(), z1 = q1.z();
+    //     double w2 = q2.w(), x2 = q2.x(), y2 = q2.y(), z2 = q2.z();
+
+    //     Eigen::Quaterniond q;
+    //     q.w() = w1*w2 - x1*x2 - y1*y2 - z1*z2;
+    //     q.x() = w1*x2 + x1*w2 + y1*z2 - z1*y2;
+    //     q.y() = w1*y2 - x1*z2 + y1*w2 + z1*x2;
+    //     q.z() = w1*z2 + x1*y2 - y1*x2 + z1*w2;
+    //     return q;
+    // }
 
 
 
@@ -374,14 +419,14 @@ namespace transforms {
         return Eigen::Quaterniond(std::cos(h), 0.0, 0.0, std::sin(h));
     }
 
-    Eigen::Quaterniond _normalize_and_canonicalize(Eigen::Quaterniond q) {
+    Eigen::Quaterniond normalize_and_canonicalize(Eigen::Quaterniond q) {
         q.normalize();
         // Canonicalize sign: q and -q represent the same rotation
         if (q.w() < 0.0) q.coeffs() *= -1.0; // coeffs() is (x,y,z,w)
         return q;
     }
 
-    Eigen::Quaterniond eul2quat_extr(double a, double b, double c, const std::string& order) {
+    Eigen::Quaterniond eul2quatR_extr(double a, double b, double c, const std::string& order) {
         Eigen::Quaterniond q;
 
         if      (order == "ZYX") q = qx(c) * qy(b) * qz(a);
@@ -401,10 +446,14 @@ namespace transforms {
 
         else throw std::invalid_argument("Unsupported Euler order: " + order);
 
-        return _normalize_and_canonicalize(q);
+        return normalize_and_canonicalize(q);
     }
 
-    Eigen::Quaterniond eul2quat_intr(double a, double b, double c, const std::string& order) {
+    Eigen::Quaterniond eul2quatC_extr(double a, double b, double c, const std::string& order) {
+        return normalize_and_canonicalize(eul2quatR_extr(a,b,c,order).conjugate());
+    }
+
+    Eigen::Quaterniond eul2quatR_intr(double a, double b, double c, const std::string& order) {
         Eigen::Quaterniond q;
 
         if      (order == "ZYX") q = qz(a) * qy(b) * qx(c);
@@ -424,14 +473,16 @@ namespace transforms {
 
         else throw std::invalid_argument("Unsupported Euler order: " + order);
 
-        return _normalize_and_canonicalize(q);
+        return normalize_and_canonicalize(q);
+    }
+
+    Eigen::Quaterniond eul2quatC_intr(double a, double b, double c, const std::string& order) {
+        return normalize_and_canonicalize(eul2quatR_intr(a,b,c,order).conjugate());
     }
 
 
-
-
     Eigen::Matrix3d quat2rot(const Eigen::Quaterniond& q_in){
-        Eigen::Quaterniond q = _normalize_and_canonicalize(q_in);
+        Eigen::Quaterniond q = normalize_and_canonicalize(q_in);
 
         double w = q.w();
         double x = q.x();
@@ -460,36 +511,45 @@ namespace transforms {
     }
 
 
-    Eigen::Vector3d quat2eul_intr(const Eigen::Quaterniond& q, const std::string& order){
+    std::array<double, 3> quatR2eul_intr(const Eigen::Quaterniond& q, const std::string& order){
         Eigen::Matrix3d R = quat2rot(q);
-        return rotm2eul_intr(R, order);
+        return R2eul_intr(R, order);
     }
 
-    Eigen::Vector3d quat2eul_extr(const Eigen::Quaterniond& q, const std::string& order){
-        Eigen::Matrix3d R = quat2rot(q);
-        return rotm2eul_extr(R, order);
+    std::array<double, 3> quatC2eul_intr(const Eigen::Quaterniond& q, const std::string& order){
+        Eigen::Matrix3d C = quat2rot(q);
+        return C2eul_intr(C, order);
     }
 
-    // Call this when you want to rotate the vector
-    Eigen::Vector3d active_quat(const Eigen::Quaterniond& q, const Eigen::Vector3d& v) {
-        return _normalize_and_canonicalize(q) * v;
-    };
+    std::array<double, 3> quatR2eul_extr(const Eigen::Quaterniond& q, const std::string& order){
+        Eigen::Matrix3d R = quat2rot(q);
+        return R2eul_extr(R, order);
+    }
 
-    // Call this when you want to rotate the frame
-    Eigen::Vector3d passive_quat(const Eigen::Quaterniond& q, const Eigen::Vector3d& v) {
-        Eigen::Quaterniond q_conj = _normalize_and_canonicalize(q).conjugate();
-        return q_conj * v;
-    };
+    std::array<double, 3> quatC2eul_extr(const Eigen::Quaterniond& q, const std::string& order){
+        Eigen::Matrix3d C = quat2rot(q);
+        return C2eul_extr(C, order);
+    }
+
+    // // Call this when you want to rotate the vector
+    // Eigen::Vector3d active_quat(const Eigen::Quaterniond& q, const Eigen::Vector3d& v) {
+    //     return normalize_and_canonicalize(q) * v;
+    // };
+
+    // // Call this when you want to rotate the frame
+    // Eigen::Vector3d passive_quat(const Eigen::Quaterniond& q, const Eigen::Vector3d& v) {
+    //     Eigen::Quaterniond q_conj = normalize_and_canonicalize(q).conjugate();
+    //     return q_conj * v;
+    // };
 
 
     // Given the orientation (of the frame/vector) obtained via the nth rotation, how is the n+1 rotation applied
     Eigen::Quaterniond chain_quat_intr(const std::vector<Eigen::Quaterniond>& q_list) {
         Eigen::Quaterniond qtot = Eigen::Quaterniond::Identity();
         for (const auto& q : q_list){
-            _normalize_and_canonicalize(q);
-            qtot *= q;
+            qtot *= normalize_and_canonicalize(q);
         }
-        return qtot;
+        return normalize_and_canonicalize(qtot);
     }
 
     // Given the orientation (of the frame/vector) obtained via the nth rotation, how is the n+1 rotation applied
@@ -497,12 +557,45 @@ namespace transforms {
         Eigen::Quaterniond qtot = Eigen::Quaterniond::Identity();
 
         for (auto rit = q_list.rbegin(); rit != q_list.rend(); ++rit) {
-            qtot *= _normalize_and_canonicalize(*rit);
+            qtot *= normalize_and_canonicalize(*rit);
         }
-        return qtot;
+        return normalize_and_canonicalize(qtot);
     }
 
 
+
+
+    Eigen::Matrix3d eul2C(double a, double b, double c, const std::string& order, const std::string& type){
+        if (type == "extr") {
+            eul2C_extr(a, b, c, order)
+        } else if (type == "intr") { 
+            eul2C_intr(a, b, c, order)
+        } else throw std::invalid_argument("Unsupported type: " + type);
+    }
+
+    Eigen::Matrix3d eul2R(double a, double b, double c, const std::string& order, const std::string& type){
+        if (type == "extr") {
+            eul2R_extr(a, b, c, order)
+        } else if (type == "intr") { 
+            eul2R_intr(a, b, c, order)
+        } else throw std::invalid_argument("Unsupported type: " + type);
+    }
+
+    Eigen::Quaterniond eul2quatR(double a, double b, double c, const std::string& order, const std::string& type){
+        if (type == "extr") {
+            eul2quatR_extr(a, b, c, order)
+        } else if (type == "intr") { 
+            eul2quatR_intr(a, b, c, order)
+        } else throw std::invalid_argument("Unsupported type: " + type);
+    }
+
+    Eigen::Quaterniond eul2quatC(double a, double b, double c, const std::string& order, const std::string& type){
+        if (type == "extr") {
+            eul2quatC_extr(a, b, c, order)
+        } else if (type == "intr") { 
+            eul2quatC_intr(a, b, c, order)
+        } else throw std::invalid_argument("Unsupported type: " + type);
+    }
 
 }
 

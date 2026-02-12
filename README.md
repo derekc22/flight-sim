@@ -1,6 +1,6 @@
-# FPV Simulator
+# Flight Simulator
 
-A drone FPV simulator built in C++.
+A flight simulator built in C++.
 
 ## Building & Running
 
@@ -17,14 +17,14 @@ This project uses **CMake** as its build system.
 |------|---------|--------------|
 | **1. Configure** | `cmake -B build -S .` | Reads CMakeLists.txt, generates build files |
 | **2. Build** | `cmake --build build` | Compiles all `.cpp` files into executable |
-| **3. Run** | `./build/fpv-sim` | Runs your program |
+| **3. Run** | `./build/flight-sim` | Runs your program |
 
 ### Day-to-Day Workflow
 
 After the initial configure, you only need:
 
 ```bash
-cmake -B build -S . &&cmake --build build && ./build/fpv-sim
+cmake -B build -S . &&cmake --build build && ./build/flight-sim
 ```
 
 Re-run `cmake -B build -S .` only when you:
@@ -33,13 +33,13 @@ Re-run `cmake -B build -S .` only when you:
 
 **Full command**:
 ```bash
-cmake -B build -S . &&cmake --build build && ./build/fpv-sim
+cmake -B build -S . &&cmake --build build && ./build/flight-sim
 ```
 
 ## Project Structure
 
 ```
-fpv-sim/
+flight-sim/
 ├── include/          # Header files (.hpp)
 │   ├── core/
 │   ├── display/

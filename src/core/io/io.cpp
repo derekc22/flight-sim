@@ -1,0 +1,63 @@
+#include <iomanip>
+#include <filesystem>
+#include <fstream>
+#include <vector>
+#include <string>
+#include <Eigen/Dense>
+#include "core/io/io.hpp"
+
+namespace io {
+
+    void createDir(const std::string& dir) {
+        std::filesystem::create_directories(dir);
+    }
+
+    void saveVectorToFile(std::vector<int>& data, std::string fname){
+        std::string path_name = "data/" + fname + ".csv";
+        std::ofstream file_v(path_name);
+        for (size_t i = 0; i < data.size(); i++){
+            file_v << data[i];
+            if (i < data.size() - 1) file_v << ",";  // comma delimiter
+        }
+        file_v.close();
+    }
+
+    // void save(const Eigen::MatrixXd& DM, const std::string& dir, const std::string& fname) {
+    //     std::string path_name = dir + "/" + fname + ".csv";
+    //     std::ofstream file_m(path_name);
+
+    //     for (int i = 0; i < M.rows(); ++i) {
+    //         for (int j = 0; j < M.cols(); ++j) {
+    //             file_m << M(i, j);
+    //             if (j < M.cols() - 1) file_m << ","; // comma delimiter
+    //         }
+    //         file_m << "\n";
+    //     }
+    //     file_m.close();
+    // }
+
+    void DataMatrix::save(const std::string& dir, const std::string& fname) const {
+
+        createDir(dir);
+        const Eigen::MatrixXd& DM = this->data;
+
+        // std::string path_name = dir + "/" + fname + ".csv";
+        auto path_name = std::filesystem::path(dir) / (fname + ".csv");
+
+        std::ofstream file_m(path_name);
+        if (!file_m.is_open()) {
+            throw std::runtime_error("Failed to open file: " + path_name.string());
+        }
+
+        for (int i = 0; i < DM.rows(); ++i) {
+            for (int j = 0; j < DM.cols(); ++j) {
+                file_m << DM(i, j);
+                if (j < DM.cols() - 1) file_m << ","; // comma delimiter
+            }
+            file_m << "\n";
+        }
+        file_m.close();
+    }
+
+
+}
