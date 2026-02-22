@@ -3,13 +3,14 @@
 #include <cmath>
 
 namespace global {
-    const extern double r_earth; // m
+    const extern double r_earth;
+    const extern double gravity;
     const extern double pi;
     const extern double eps;
-    const extern double gravity;
 
     const extern Eigen::Matrix3d I3;
     const extern Eigen::Matrix4d I4;
+    const extern Eigen::Matrix4d HI;
 
 
     double sec(double theta);

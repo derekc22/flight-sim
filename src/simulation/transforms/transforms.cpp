@@ -10,7 +10,6 @@
 namespace transforms {
 
     namespace common {
-        const Eigen::Matrix4d identity_hom = global::I4;
     }
 
 
@@ -40,20 +39,20 @@ namespace transforms {
     };
 
     Eigen::Matrix3d eul2R_extr(double a, double b, double c, const std::string& order){
-        if      (order == "ZYX") return Rx(c) * Ry(b) * Rz(a);
-        else if (order == "ZXY") return Ry(c) * Rx(b) * Rz(a);
-        else if (order == "YZX") return Rx(c) * Rz(b) * Ry(a);
-        else if (order == "YXZ") return Rz(c) * Rx(b) * Ry(a);
-        else if (order == "XZY") return Ry(c) * Rz(b) * Rx(a);
-        else if (order == "XYZ") return Rz(c) * Ry(b) * Rx(a);
+        if (order == "ZYX") return Rx(c) * Ry(b) * Rz(a);
+        if (order == "ZXY") return Ry(c) * Rx(b) * Rz(a);
+        if (order == "YZX") return Rx(c) * Rz(b) * Ry(a);
+        if (order == "YXZ") return Rz(c) * Rx(b) * Ry(a);
+        if (order == "XZY") return Ry(c) * Rz(b) * Rx(a);
+        if (order == "XYZ") return Rz(c) * Ry(b) * Rx(a);
 
         // Proper Euler (repeated axis)
-        else if (order == "ZXZ") return Rz(c) * Rx(b) * Rz(a);
-        else if (order == "ZYZ") return Rz(c) * Ry(b) * Rz(a);
-        else if (order == "XYX") return Rx(c) * Ry(b) * Rx(a);
-        else if (order == "XZX") return Rx(c) * Rz(b) * Rx(a);
-        else if (order == "YXY") return Ry(c) * Rx(b) * Ry(a);
-        else if (order == "YZY") return Ry(c) * Rz(b) * Ry(a);
+        if (order == "ZXZ") return Rz(c) * Rx(b) * Rz(a);
+        if (order == "ZYZ") return Rz(c) * Ry(b) * Rz(a);
+        if (order == "XYX") return Rx(c) * Ry(b) * Rx(a);
+        if (order == "XZX") return Rx(c) * Rz(b) * Rx(a);
+        if (order == "YXY") return Ry(c) * Rx(b) * Ry(a);
+        if (order == "YZY") return Ry(c) * Rz(b) * Ry(a);
 
         else throw std::invalid_argument("Unsupported Euler order: " + order);
     };
@@ -63,20 +62,20 @@ namespace transforms {
     };
 
     Eigen::Matrix3d eul2R_intr(double a, double b, double c, const std::string& order){
-        if      (order == "ZYX") return Rz(a) * Ry(b) * Rx(c);
-        else if (order == "ZXY") return Rz(a) * Rx(b) * Ry(c);
-        else if (order == "YZX") return Ry(a) * Rz(b) * Rx(c);
-        else if (order == "YXZ") return Ry(a) * Rx(b) * Rz(c);
-        else if (order == "XZY") return Rx(a) * Rz(b) * Ry(c);
-        else if (order == "XYZ") return Rx(a) * Ry(b) * Rz(c);
+        if (order == "ZYX") return Rz(a) * Ry(b) * Rx(c);
+        if (order == "ZXY") return Rz(a) * Rx(b) * Ry(c);
+        if (order == "YZX") return Ry(a) * Rz(b) * Rx(c);
+        if (order == "YXZ") return Ry(a) * Rx(b) * Rz(c);
+        if (order == "XZY") return Rx(a) * Rz(b) * Ry(c);
+        if (order == "XYZ") return Rx(a) * Ry(b) * Rz(c);
 
         // Proper Euler (repeated axis)
-        else if (order == "ZXZ") return Rz(a) * Rx(b) * Rz(c);
-        else if (order == "ZYZ") return Rz(a) * Ry(b) * Rz(c);
-        else if (order == "XYX") return Rx(a) * Ry(b) * Rx(c);
-        else if (order == "XZX") return Rx(a) * Rz(b) * Rx(c);
-        else if (order == "YXY") return Ry(a) * Rx(b) * Ry(c);
-        else if (order == "YZY") return Ry(a) * Rz(b) * Ry(c);
+        if (order == "ZXZ") return Rz(a) * Rx(b) * Rz(c);
+        if (order == "ZYZ") return Rz(a) * Ry(b) * Rz(c);
+        if (order == "XYX") return Rx(a) * Ry(b) * Rx(c);
+        if (order == "XZX") return Rx(a) * Rz(b) * Rx(c);
+        if (order == "YXY") return Ry(a) * Rx(b) * Ry(c);
+        if (order == "YZY") return Ry(a) * Rz(b) * Ry(c);
 
         else throw std::invalid_argument("Unsupported Euler order: " + order);
     }
@@ -95,7 +94,7 @@ namespace transforms {
         return std::remainder(x, 2.0 * ::global::pi);
     }
 
-    std::array<double, 3> R2eul_intr(const Eigen::Matrix3d& R, const std::string& order) {
+    Eigen::Vector3d R2eul_intr(const Eigen::Matrix3d& R, const std::string& order) {
         double eps = 1e-12;
 
         double a = 0.0, b = 0.0, c = 0.0;
@@ -227,25 +226,25 @@ namespace transforms {
             throw std::invalid_argument("Unsupported Euler order: " + order);
         }
 
-        return {wrapToPi(a), wrapToPi(b), wrapToPi(c)};
+        return Eigen::Vector3d(wrapToPi(a), wrapToPi(b), wrapToPi(c));
 
     }
 
-    std::array<double, 3> R2eul_extr(const Eigen::Matrix3d& R, const std::string& order) {
+    Eigen::Vector3d R2eul_extr(const Eigen::Matrix3d& R, const std::string& order) {
         if (order.size() != 3) {
             throw std::invalid_argument("Unsupported Euler order: " + order);
         }
         std::string rev(order.rbegin(), order.rend());
-        std::array<double, 3> abc_rev = R2eul_intr(R, rev);          
-        return {abc_rev[2], abc_rev[1], abc_rev[0]};
+        Eigen::Vector3d abc_rev = R2eul_intr(R, rev);          
+        return Eigen::Vector3d{abc_rev(2), abc_rev(1), abc_rev(0)};
     }
 
-    std::array<double, 3> C2eul_extr(const Eigen::Matrix3d& C, const std::string& order) {
+    Eigen::Vector3d C2eul_extr(const Eigen::Matrix3d& C, const std::string& order) {
         // C_extr(a, b, c) = R_extr(a, b, c).T = R_intr(-a, -b, -c)
         return R2eul_extr(C.transpose(), order);
     }
 
-    std::array<double, 3> C2eul_intr(const Eigen::Matrix3d& C, const std::string& order) {
+    Eigen::Vector3d C2eul_intr(const Eigen::Matrix3d& C, const std::string& order) {
         // C_intr(a, b, c) = R_intr(a, b, c).T = R_extr(-a, -b, -c)
         return R2eul_intr(C.transpose(), order);
     }
@@ -257,6 +256,12 @@ namespace transforms {
 
     Eigen::Vector3d dfromH(const Eigen::Matrix4d& H){
         return H.block<3,1>(0,3);
+    }
+
+    Eigen::Vector3d pfromH(const Eigen::Matrix4d& H){
+        Eigen::Vector3d Cd = -H.block<3,1>(0,3);
+        Eigen::Matrix3d C = H.block<3,3>(0,0);
+        return C.transpose() * Cd;
     }
  
     Eigen::Matrix4d _make_HR_translate_first(const Eigen::Matrix3d& R, const Eigen::Vector3d& d) {
@@ -280,8 +285,8 @@ namespace transforms {
     Eigen::Matrix4d makeHR(const Eigen::Matrix3d& R, const Eigen::Vector3d& d, const std::string& first) {
         // d is initially provided in the fixed frame (ie the only frame) and stays in the fixed frame (again, the only frame)
         if (first == "rotate") return _make_HR_rotate_first(R, d);
-        else if (first == "translate") return _make_HR_translate_first(R, d);
-        else throw std::invalid_argument("Unsupported argument value: " + first);
+        if (first == "translate") return _make_HR_translate_first(R, d);
+        throw std::invalid_argument("Unsupported argument value: " + first);
     };
 
     Eigen::Matrix4d _make_HC_rotate_first(const Eigen::Matrix3d& C, const Eigen::Vector3d& d) {
@@ -303,8 +308,8 @@ namespace transforms {
     Eigen::Matrix4d makeHC(const Eigen::Matrix3d& C, const Eigen::Vector3d& d, const std::string& first) {
         // d is initially provided in frame {0} and stays in/attached to frame {0}
         if (first == "rotate") return _make_HC_rotate_first(C, d);
-        else if (first == "translate") return _make_HC_translate_first(C, d);
-        else throw std::invalid_argument("Unsupported argument value: " + first);
+        if (first == "translate") return _make_HC_translate_first(C, d);
+        throw std::invalid_argument("Unsupported argument value: " + first);
     }
 
 
@@ -345,7 +350,7 @@ namespace transforms {
 
     // Given the orientation (of the frame/vector) obtained via the nth transformation, how is the n+1 transformation applied
     Eigen::Matrix4d chain_hom_intr(const std::vector<Eigen::Matrix4d>& H_list) {
-        Eigen::Matrix4d Htot = common::identity_hom;
+        Eigen::Matrix4d Htot = global::HI;
         for (const auto& H : H_list){
             Htot *= H;
         }
@@ -354,7 +359,7 @@ namespace transforms {
 
     // Given the orientation (of the frame/vector) obtained via the nth transformation, how is the n+1 transformation applied
     Eigen::Matrix4d chain_hom_extr(const std::vector<Eigen::Matrix4d>& H_list) {
-        Eigen::Matrix4d Htot = common::identity_hom;
+        Eigen::Matrix4d Htot = global::HI;
 
         for (auto rit = H_list.rbegin(); rit != H_list.rend(); ++rit) {
             Htot *= *rit;
@@ -511,22 +516,22 @@ namespace transforms {
     }
 
 
-    std::array<double, 3> quatR2eul_intr(const Eigen::Quaterniond& q, const std::string& order){
+    Eigen::Vector3d quatR2eul_intr(const Eigen::Quaterniond& q, const std::string& order){
         Eigen::Matrix3d R = quat2rot(q);
         return R2eul_intr(R, order);
     }
 
-    std::array<double, 3> quatC2eul_intr(const Eigen::Quaterniond& q, const std::string& order){
+    Eigen::Vector3d quatC2eul_intr(const Eigen::Quaterniond& q, const std::string& order){
         Eigen::Matrix3d C = quat2rot(q);
         return C2eul_intr(C, order);
     }
 
-    std::array<double, 3> quatR2eul_extr(const Eigen::Quaterniond& q, const std::string& order){
+    Eigen::Vector3d quatR2eul_extr(const Eigen::Quaterniond& q, const std::string& order){
         Eigen::Matrix3d R = quat2rot(q);
         return R2eul_extr(R, order);
     }
 
-    std::array<double, 3> quatC2eul_extr(const Eigen::Quaterniond& q, const std::string& order){
+    Eigen::Vector3d quatC2eul_extr(const Eigen::Quaterniond& q, const std::string& order){
         Eigen::Matrix3d C = quat2rot(q);
         return C2eul_extr(C, order);
     }
@@ -566,36 +571,37 @@ namespace transforms {
 
 
     Eigen::Matrix3d eul2C(double a, double b, double c, const std::string& order, const std::string& type){
-        if (type == "extr") {
-            eul2C_extr(a, b, c, order)
-        } else if (type == "intr") { 
-            eul2C_intr(a, b, c, order)
-        } else throw std::invalid_argument("Unsupported type: " + type);
+        if (type == "extr") return eul2C_extr(a, b, c, order);
+        if (type == "intr") return eul2C_intr(a, b, c, order);
+        throw std::invalid_argument("Unsupported type: " + type);
     }
 
     Eigen::Matrix3d eul2R(double a, double b, double c, const std::string& order, const std::string& type){
-        if (type == "extr") {
-            eul2R_extr(a, b, c, order)
-        } else if (type == "intr") { 
-            eul2R_intr(a, b, c, order)
-        } else throw std::invalid_argument("Unsupported type: " + type);
+        if (type == "extr") return eul2R_extr(a, b, c, order);
+        if (type == "intr") return eul2R_intr(a, b, c, order);
+        throw std::invalid_argument("Unsupported type: " + type);
     }
 
     Eigen::Quaterniond eul2quatR(double a, double b, double c, const std::string& order, const std::string& type){
-        if (type == "extr") {
-            eul2quatR_extr(a, b, c, order)
-        } else if (type == "intr") { 
-            eul2quatR_intr(a, b, c, order)
-        } else throw std::invalid_argument("Unsupported type: " + type);
+        if (type == "extr") return eul2quatR_extr(a, b, c, order);
+        if (type == "intr") return eul2quatR_intr(a, b, c, order);
+        throw std::invalid_argument("Unsupported type: " + type);
     }
 
     Eigen::Quaterniond eul2quatC(double a, double b, double c, const std::string& order, const std::string& type){
-        if (type == "extr") {
-            eul2quatC_extr(a, b, c, order)
-        } else if (type == "intr") { 
-            eul2quatC_intr(a, b, c, order)
-        } else throw std::invalid_argument("Unsupported type: " + type);
+        if (type == "extr") return eul2quatC_extr(a, b, c, order);
+        if (type == "intr") return eul2quatC_intr(a, b, c, order);
+        throw std::invalid_argument("Unsupported type: " + type);
     }
+
+
+
+
+    Eigen::Quaterniond rot2quat(const Eigen::Matrix3d& R) {
+        return transforms::normalize_and_canonicalize(Eigen::Quaterniond(R));
+    }
+
+
 
 }
 

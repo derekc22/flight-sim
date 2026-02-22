@@ -4,13 +4,14 @@ namespace global {
 
     // Constants
     const double r_earth = 6.371e6; // m
+    const double gravity = 9.81; // ms^-2
     const double pi = 3.1415926535897932384626433832795028841971693993751;
     const double eps = 1e-12;
-    const double gravity = 9.81; // ms^-2
 
     // Special Matrices
     const Eigen::Matrix3d I3 = Eigen::Matrix3d::Identity();
     const Eigen::Matrix4d I4 = Eigen::Matrix4d::Identity();
+    const Eigen::Matrix4d HI = Eigen::Matrix4d::Identity(); // Identity homogenous transformation matrix
 
 
     // Trigonometry

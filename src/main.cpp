@@ -9,271 +9,297 @@
 #include "core/io/io.hpp"
 
 
-void q2(){
+void case1(vehicles::Aircraft&  ac, 
+           frames::StepOptions& NEDFrameStepOptions, 
+           frames::StepOptions& BODYFrameNEDStepOptions, 
+           frames::StepOptions& BODYFrameECEFStepOptions){
 
-    // define frames
-    frames::ECEFFrame ECEF;
-    frames::NEDFrame NED;
-    frames::FRDFrame BODY;
-
-    double lat = 0.0, lon = 0.0;
-    Eigen::Matrix3d _CEN = frames::CEN_from_lat_lon(lat, lon);
-    Eigen::Vector3d _pE_NE(global::r_earth, 0, 0);
-    NED.HEN.set(_CEN, _pE_NE);
-
-    Eigen::Matrix3d _CNB = global::I3;
-    Eigen::Vector3d _pN_BN(0, 0, 0);
-    BODY.HNB.set(_CNB, _pN_BN);
-
-    Eigen::Matrix3d _CEB = _CNB * _CEN;
-    Eigen::Vector3d _pE_BE = _CEN.transpose() * _pN_BN + _pE_NE;
-    BODY.HEB.set(_CEB, _pE_BE);
+    // Clear step options
+    NEDFrameStepOptions.clear();
+    BODYFrameNEDStepOptions.clear();
+    BODYFrameECEFStepOptions.clear();
     
-    // create vehicle
-    double mass = 1; // kg
-    BODY.wB_BN.data = Eigen::Vector3d(0, 0, 1); // rad/s
-    vehicles::Aircraft plane{ .BODY = BODY, .mass = mass };
+    // Define external force
+    Eigen::Vector3d gB = ac.BODYFrameNED.gB.data;
+    Eigen::Vector3d FB_g = ac.properties.mass.data * gB;
+    Eigen::Vector3d FB_ext = -FB_g;
+    dynamics::Force FB_net{ FB_ext + FB_g };
 
+    std::cout << gB << std::endl;
+    std::cout << std::endl;
+    std::cout << FB_net.data << std::endl;
 
+    // Define external moment 
+    dynamics::Moment Mnet_B{ Eigen::Vector3d(0, 0, 0) };
 
+    // Define rotation rate
+    Eigen::Vector3d wB_BE(global::deg2rad(30), 0, 0); // rotates about x at 30˚/s
 
+    BODYFrameECEFStepOptions = { .w = wB_BE };
+    ac.BODYFrameECEF.step(BODYFrameECEFStepOptions);
+    std::cout << ac.BODYFrameNED.HNB.p().data << std::endl;
 
+    int tf = 6/dynamics::common::dt; // run for 6 seconds to complete 180˚ rotation about x 
+    for (int t = 0; t < tf; ++t) {
+        dynamics::RigidBodyState xE_t = ac.BODYFrameECEF.RigidBodyState();
+        dynamics::RigidBodyState xE_t1 = dynamics::step_rigid_body(xE_t, ac.properties.mass, ac.properties.J, FB_net, Mnet_B);
+        ac.BODYFrameECEF.step(xE_t1);
 
-
-
-    int t = 0;
-    int Tf = 100;
-
-    Eigen::Vector3d vB_BE(150, 0, 0); // ms^-1
-
-    for (t = 0; t < Tf; ++t){
-
-        Eigen::Vector3d pE_EB = NED.HEN.p().data + BODY.HEN.C().data.transpose() * BODY.HNB.p().data;
-
-        // gravity
-        Eigen::Vector3d gE = frames::common::gECEF(pE_EB); // ms^-2, should be radial
-        Eigen::Vector3d gB = BODY.HEB.C().data * gE;
-        Eigen::Vector3d FgB = mass * gB;
-        Eigen::Vector3d FcounterB = -FgB;
-        Eigen::Vector3d a_netB = (FgB + FcounterB) / plane.mass; // should be 0 vector
-
-
-        // Get new CEN, CEB, CBE from current lat/lon
-        auto [lat, lon, alt] = frames::lat_lon_alt_from_xECEF(pE_BE);
-        Eigen::Matrix3d CEN = frames::CEN_from_lat_lon(lat, lon); // E -> N
-        Eigen::Matrix3d CEB = BODY.HNB.C().data * CEN;            // E -> B
-        Eigen::Matrix3d CBE = CEB.transpose();                    // B -> E
-
-        // orientation
-        dynamics::OrientationMatrix CNB_t1 = dynamics::strap_down_kin(BODY.HNB.C(), BODY.wB_BN);
-
-        // position
-        dynamics::LinearVelocity pN_BN_dot { BODY.HNB.C().data.transpose() * BODY.vB_BN.data };
-        dynamics::Position pN_BN_t1 = dynamics::trans_kin(BODY.HNB.p(), pN_BN_dot, BODY.aB_BN);
-
-        // update
-        BODY.HNB.set(CNB_t1.data, pN_BN_t1.data);
+        std::cout << "t = " << t << std::endl;
+        std::cout << xE_t1.pI_BI.data << std::endl;
+        std::cout << std::endl;
+        std::cout << xE_t1.vB_BI.data << std::endl;
+        std::cout << std::endl;
+        std::cout << xE_t1.qIB.data << std::endl;
+        std::cout << std::endl;
+        std::cout << xE_t1.wB_BI.data << std::endl;
+        std::cout << "--------------------------"<< std::endl;
     }
+
+
 }
-
-// void q2()
-// {
-//     frames::NEDFrame NED;
-//     frames::FRDFrame BODY;
-
-//     // Initial NED at equator, prime meridian
-//     const double lat0 = 0.0, lon0 = 0.0;
-//     const Eigen::Matrix3d CEN0 = frames::CEN_from_lat_lon(lat0, lon0); // E -> N
-//     const Eigen::Vector3d pE_NE0(global::r_earth, 0, 0);
-
-//     NED.HEN.set(CEN0, pE_NE0);
-
-//     // Initial body aligned with NED (FRD aligned with NED axes)
-//     Eigen::Matrix3d CNB = global::I3;                 // N -> B
-//     Eigen::Vector3d pN_BN = Eigen::Vector3d::Zero();  // position in N
-//     BODY.HNB.set(CNB, pN_BN);
-
-//     // Inputs
-//     const double mass = 1.0;
-//     const Eigen::Vector3d wB_BN(0, 0, 1);             // rad/s
-//     Eigen::Vector3d vB_EB(150, 0, 0);                 // m/s, initial velocity in body
-
-//     const double dt = dynamics::common::dt;
-//     const double Tf = 100.0;
-//     const int steps = static_cast<int>(Tf / dt);
-
-//     for (int k = 0; k < steps; ++k)
-//     {
-//         // 1) Attitude update CNB
-//         dynamics::OrientationMatrix CNB_t{CNB};
-//         dynamics::BodyAxisRates w_t{wB_BN};
-//         CNB = dynamics::strap_down_kin(CNB_t, w_t).data;
-
-//         // 2) Gravity computed in E, expressed in B, then perfectly cancelled
-//         const Eigen::Vector3d pE_BE = pE_NE0 + CEN0.transpose() * pN_BN; // p^E_EB = p^E_EN + C_NE p^N_NB
-//         const Eigen::Vector3d gE = frames::common::gECEF(pE_BE);         // radial m/s^2
-
-//         const Eigen::Matrix3d CEB = CNB * CEN0;                          // E -> B
-//         const Eigen::Vector3d gB = CEB * gE;
-
-//         const Eigen::Vector3d FgB = mass * gB;
-//         const Eigen::Vector3d FcounterB = -FgB;
-//         const Eigen::Vector3d aB = (FgB + FcounterB) / mass;             // = 0
-
-//         // 3) Translational dynamics in body
-//         const Eigen::Vector3d vB_dot = aB - wB_BN.cross(vB_EB);
-//         vB_EB += vB_dot * dt;
-
-//         // 4) Translational kinematics in NED
-//         const Eigen::Vector3d vN_EB = CNB.transpose() * vB_EB;            // v^N = C_BN v^B
-//         pN_BN += vN_EB * dt;
-
-//         // 5) Store back into the frame object if you want to use it elsewhere
-//         BODY.HNB.set(CNB, pN_BN);
-//     }
-
-//     std::cout << "Final pN_BN: " << pN_BN.transpose() << "\n";
-// }
-
-// void q2()
-// {
-//     frames::NEDFrame NED;
-//     frames::FRDFrame BODY;
-
-//     // Initial NED at equator, prime meridian
-//     const double lat0 = 0.0, lon0 = 0.0;
-//     const Eigen::Matrix3d CEN0 = frames::CEN_from_lat_lon(lat0, lon0); // E -> N
-//     const Eigen::Vector3d pE_NE0(global::r_earth, 0, 0);
-
-//     NED.HEN.set(CEN0, pE_NE0);
-
-//     // Initial body aligned with NED (FRD aligned with NED axes)
-//     Eigen::Matrix3d CNB = global::I3;                 // N -> B
-//     Eigen::Vector3d pN_BN = Eigen::Vector3d::Zero();  // position in N
-//     BODY.HNB.set(CNB, pN_BN);
-
-//     // Inputs
-//     const double mass = 1.0;
-//     const Eigen::Vector3d wB_BN(0, 0, 1);             // rad/s
-//     Eigen::Vector3d vB_EB(150, 0, 0);                 // m/s, initial velocity in body
-
-//     const double dt = dynamics::common::dt;
-//     const double Tf = 100.0;
-//     const int steps = static_cast<int>(Tf / dt);
-
-//     for (int k = 0; k < steps; ++k)
-//     {
-//         // 1) Attitude update CNB
-//         dynamics::OrientationMatrix CNB_t{CNB};
-//         dynamics::BodyAxisRates w_t{wB_BN};
-//         CNB = dynamics::strap_down_kin(CNB_t, w_t).data;
-
-//         // 2) Gravity computed in E, expressed in B, then perfectly cancelled
-//         const Eigen::Vector3d pE_BE = pE_NE0 + CEN0.transpose() * pN_BN; // p^E_EB = p^E_EN + C_NE p^N_NB
-//         const Eigen::Vector3d gE = frames::common::gECEF(pE_BE);         // radial m/s^2
-
-//         const Eigen::Matrix3d CEB = CNB * CEN0;                          // E -> B
-//         const Eigen::Vector3d gB = CEB * gE;
-
-//         const Eigen::Vector3d FgB = mass * gB;
-//         const Eigen::Vector3d FcounterB = -FgB;
-//         const Eigen::Vector3d aB = (FgB + FcounterB) / mass;             // = 0
-
-//         // 3) Translational dynamics in body
-//         const Eigen::Vector3d vB_dot = aB - wB_BN.cross(vB_EB);
-//         vB_EB += vB_dot * dt;
-
-//         // 4) Translational kinematics in NED
-//         const Eigen::Vector3d vN_EB = CNB.transpose() * vB_EB;            // v^N = C_BN v^B
-//         pN_BN += vN_EB * dt;
-
-//         // 5) Store back into the frame object if you want to use it elsewhere
-//         BODY.HNB.set(CNB, pN_BN);
-//     }
-
-//     std::cout << "Final pN_BN: " << pN_BN.transpose() << "\n";
-// }
-
-
 
 
 int main() {
     
-    // 1a
-    Eigen::Vector3d xE_BE_t0(global::r_earth, 0, 0); // m
-    Eigen::Vector3d xdotB_BE(150, 0, 0); // ms^-1
+    // 6a
 
-    double psi = global::deg2rad(0), theta = global::deg2rad(0), phi = global::deg2rad(0);
-    Eigen::Matrix3d C_BN = transforms::eul2C_intr(psi, theta, phi, "ZYX");
+    // define frames
+    frames::ECEFFrame ECEFFrame;
+    frames::NEDFrameECEF NEDFrame;
+    frames::FRDFrameECEF BODYFrameECEF;
+    frames::FRDFrameNED BODYFrameNED;
 
-    int tf = 1000; //s
-    Eigen::Vector3d xE_BE_t;
+    double lat_0 = 0.0, lon_0 = 0.0;
+    Eigen::Matrix3d CEN_0 = frames::CEN_from_lat_lon(lat_0, lon_0);
+    Eigen::Vector3d pE_NE_0(global::r_earth, 0, 0);
 
+    Eigen::Matrix3d CNB_0 = global::I3;
+    Eigen::Vector3d pN_BN_0(0, 10, 0);
 
-    // 1a.i
-    io::DataMatrix q1aiDM{ Eigen::MatrixXd::Zero(tf, 4) };
+    Eigen::Matrix3d CEB_0 = CNB_0 * CEN_0;
+    Eigen::Vector3d pE_BE_0 = CEN_0.transpose() * pN_BN_0 + pE_NE_0;
 
-    double lat = global::deg2rad(0), lon = global::deg2rad(0);
-    Eigen::Matrix3d C_NE = frames::CEN_from_lat_lon(lat, lon).transpose();
-    Eigen::Matrix3d C_BE = transforms::chain_rot_extr(std::vector<Eigen::Matrix3d>{C_BN, C_NE});
-    Eigen::Vector3d xdotE_BE = C_BE * xdotB_BE;
+    Eigen::Vector3d gE = frames::common::gECEF(pE_BE_0);
+    Eigen::Vector3d gB = CEB_0 * gE;
 
-    // auto [xE_BE_tf, _] = dynamics::fwd_euler(xE_BE_t0, xdotE_BE, dynamics::common::f_cv, tf);
-    // std::cout << xE_BE_tf << std::endl;
-    // std::cout << std::endl;
+    frames::StepOptions NEDFrameStepOptions{
+        .C = CEN_0,
+        .p = pE_NE_0,
+    };
+    frames::StepOptions BODYFrameNEDStepOptions{
+        .C = CNB_0,
+        .p = pN_BN_0,
+        .g = gB
+    };
+    frames::StepOptions BODYFrameECEFrameStepOptions{
+        .C = CEB_0,
+        .p = pE_BE_0,
+        .g = gE
+    };
 
-    xE_BE_t = xE_BE_t0;
-    for (int t = 0; t < tf; ++t){
+    NEDFrame.step(NEDFrameStepOptions);
+    BODYFrameNED.step(BODYFrameNEDStepOptions);
+    BODYFrameECEF.step(BODYFrameECEFrameStepOptions);
 
-        auto [xE_BE_t1, _] = dynamics::fwd_euler(xE_BE_t, xdotE_BE, dynamics::common::f_cv, 1);
-        xE_BE_t = xE_BE_t1;
+    // create vehicle
+    dynamics::Mass mass { 1 }; // kg
+    Eigen::Matrix3d J { Eigen::Matrix3d::Identity() };
+    vehicles::Properties properties{ .mass = mass, .J = J };
+    vehicles::Aircraft ac{ 
+        .NEDFrame = NEDFrame, 
+        .BODYFrameNED = BODYFrameNED, 
+        .BODYFrameECEF = BODYFrameECEF, 
+        .properties = properties 
+    };
 
-        q1aiDM.data(t, 0) = static_cast<double>(t);
-        q1aiDM.data.block<1, 3>(t, 1) = xE_BE_t1.transpose();
-    }
-
-    q1aiDM.save("data/hw3", "q1ai");
-    std::cout << xE_BE_t << std::endl;
-    std::cout << std::endl;
-    std::cout << std::endl;
-
-
-
-    // 1a.ii
-    io::DataMatrix q1aiiDM{ Eigen::MatrixXd::Zero(tf, 4) };
-
-    double lat_t = global::deg2rad(0), lon_t = global::deg2rad(0);
-
-    Eigen::Matrix3d C_NE_t;
-    Eigen::Matrix3d C_BE_t;
-    xE_BE_t = xE_BE_t0;
-    Eigen::Vector3d xdotB_BE_t = xdotB_BE;
-    Eigen::Vector3d xdotE_BE_t;
-
-    for (int t = 0; t < tf; ++t){
-        auto [lat_t, lon_t, alt] = frames::lat_lon_alt_from_xECEF(xE_BE_t);
-
-        C_NE_t = frames::CEN_from_lat_lon(lat_t, lon_t).transpose();
-        C_BE_t = transforms::chain_rot_extr(std::vector<Eigen::Matrix3d>{C_BN, C_NE_t});
-        xdotE_BE_t = C_BE_t * xdotB_BE_t;
-
-        auto [xE_BE_t1, _] = dynamics::fwd_euler(xE_BE_t, xdotE_BE_t, dynamics::common::f_cv, 1);
-
-        xE_BE_t = xE_BE_t1;
-
-        q1aiiDM.data(t, 0) = static_cast<double>(t);
-        q1aiiDM.data.block<1, 3>(t, 1) = xE_BE_t1.transpose();
-    }
-
-    q1aiiDM.save("data/hw3", "q1aii");
-    std::cout << xE_BE_t << std::endl;
-    std::cout << std::endl;
-    std::cout << std::endl;
-
-
-    // 2a
-    q2(true);
-    q2(false);
-
+    // Case 1
+    case1(ac, NEDFrameStepOptions, BODYFrameNEDStepOptions, BODYFrameECEFrameStepOptions);
 
 }
+
+
+// #include <Eigen/Dense>
+// #include <iostream>
+// #include <vector>
+
+// #include "simulation/transforms/transforms.hpp"
+// #include "simulation/dynamics/dynamics.hpp"
+// #include "simulation/global/global.hpp"
+// #include "simulation/frames/frames.hpp"
+// #include "simulation/vehicles/vehicles.hpp"
+// #include "core/io/io.hpp"
+
+// // Helper: print quaternion as w x y z
+// static void print_quat_wxyz(const Eigen::Quaterniond& q, const std::string& name) {
+//     std::cout << name << " (w x y z) = "
+//               << q.w() << " " << q.x() << " " << q.y() << " " << q.z() << "\n";
+// }
+
+// // Helper: print matrix with label
+// static void print_mat3(const Eigen::Matrix3d& M, const std::string& name) {
+//     std::cout << name << " =\n" << M << "\n";
+// }
+
+// // Compute relative quaternion q_rel = q_final * conj(q_initial)
+// // This is correct for the "q maps E->B" convention (passive, frame rotation).
+// static Eigen::Quaterniond relative_q_E_to_B(const Eigen::Quaterniond& q_final,
+//                                            const Eigen::Quaterniond& q_initial) {
+//     Eigen::Quaterniond q_rel = q_final * q_initial.conjugate();
+//     return transforms::normalize_and_canonicalize(q_rel);
+// }
+
+// void case1(vehicles::Aircraft&  ac,
+//            frames::StepOptions& NEDFrameStepOptions,
+//            frames::StepOptions& BODYFrameNEDStepOptions,
+//            frames::StepOptions& BODYFrameECEFStepOptions) {
+
+//     // Clear step options
+//     NEDFrameStepOptions.clear();
+//     BODYFrameNEDStepOptions.clear();
+//     BODYFrameECEFStepOptions.clear();
+
+//     // Net force (should be exactly zero by construction here)
+//     Eigen::Vector3d gB = ac.BODYFrameNED.gB.data;
+//     Eigen::Vector3d FB_g  = ac.properties.mass.data * gB;
+//     Eigen::Vector3d FB_ext = -FB_g;
+//     dynamics::Force FB_net{ FB_ext + FB_g };
+
+//     // Net moment
+//     dynamics::Moment Mnet_B{ Eigen::Vector3d(0, 0, 0) };
+
+//     // Body angular rate about body x
+//     Eigen::Vector3d wB_BE(global::deg2rad(30), 0, 0);
+
+//     // Apply angular rate to BODYFrameECEF
+//     BODYFrameECEFStepOptions = { .w = wB_BE };
+//     ac.BODYFrameECEF.step(BODYFrameECEFStepOptions);
+
+//     // Snapshot initial state BEFORE integration
+//     const dynamics::RigidBodyState xE_0 = ac.BODYFrameECEF.RigidBodyState();
+//     const Eigen::Quaterniond q0 = xE_0.qIB.data;
+
+//     std::cout << "=== Initial diagnostics ===\n";
+//     std::cout << "gB (from BODYFrameNED) =\n" << gB << "\n\n";
+//     std::cout << "FB_net =\n" << FB_net.data << "\n\n";
+
+//     std::cout << "BODYFrameNED HNB.p() (should match pN_BN_0) =\n"
+//               << ac.BODYFrameNED.HNB.p().data << "\n\n";
+
+//     std::cout << "Initial BODYFrameECEF position p (ECEF) =\n"
+//               << xE_0.pI_BI.data << "\n\n";
+
+//     std::cout << "Initial BODYFrameECEF w (body) =\n"
+//               << xE_0.wB_BI.data << "\n\n";
+
+//     print_quat_wxyz(q0, "q0");
+
+//     // Also print the DCM implied by q0, and the frame's stored C
+//     Eigen::Matrix3d C_from_q0 = transforms::quat2rot(q0);
+//     print_mat3(C_from_q0, "C_from_q0 = quat2rot(q0)");
+//     print_mat3(ac.BODYFrameECEF.HEB.C().data, "C_from_frame (HEB.C())");
+//     print_mat3(ac.NEDFrame.HEN.C().data, "C_from_frame (HEN.C())");
+
+//     std::cout << "===========================\n\n";
+
+//     int tf = static_cast<int>(6.0 / dynamics::common::dt); // 6 seconds
+
+//     dynamics::RigidBodyState xE_t1 = xE_0;
+
+//     for (int t = 0; t < tf; ++t) {
+//         dynamics::RigidBodyState xE_t = ac.BODYFrameECEF.RigidBodyState();
+//         xE_t1 = dynamics::step_rigid_body(xE_t, ac.properties.mass, ac.properties.J, FB_net, Mnet_B);
+//         ac.BODYFrameECEF.step(xE_t1);
+
+//         // Keep your per-step prints if you want, but they are noisy.
+//         // Print only final step by default.
+//         if (t == tf - 1) {
+//             std::cout << "=== Final step ===\n";
+//             std::cout << "t = " << t << " (T = " << (t + 1) * dynamics::common::dt << " s)\n\n";
+
+//             std::cout << "p =\n" << xE_t1.pI_BI.data << "\n\n";
+//             std::cout << "vB =\n" << xE_t1.vB_BI.data << "\n\n";
+
+//             const Eigen::Quaterniond qf = xE_t1.qIB.data;
+//             print_quat_wxyz(qf, "qf");
+
+//             // Relative rotation from initial to final (E->B convention)
+//             Eigen::Quaterniond qrel = relative_q_E_to_B(qf, q0);
+//             print_quat_wxyz(qrel, "qrel = qf * conj(q0)");
+
+//             // Matrices from quaternions
+//             Eigen::Matrix3d C_from_qf = transforms::quat2rot(qf);
+//             Eigen::Matrix3d C_from_qrel = transforms::quat2rot(qrel);
+//             print_mat3(C_from_qf, "C_from_qf = quat2rot(qf)");
+//             print_mat3(C_from_qrel, "C_from_qrel = quat2rot(qrel)");
+
+//             // Expected body-x 180 deg rotation matrix
+//             Eigen::Matrix3d Rx_pi = Eigen::Matrix3d::Identity();
+//             Rx_pi(1,1) = -1.0;
+//             Rx_pi(2,2) = -1.0;
+//             print_mat3(Rx_pi, "Expected Rx(pi) about BODY x");
+
+//             // Compare numerically
+//             std::cout << "||C_from_qrel - Rx(pi)||_F = "
+//                       << (C_from_qrel - Rx_pi).norm() << "\n\n";
+
+//             std::cout << "wB =\n" << xE_t1.wB_BI.data << "\n";
+//             std::cout << "==================\n";
+//         }
+//     }
+// }
+
+// int main() {
+//     // Frames
+//     frames::ECEFFrame ECEFFrame;
+//     frames::NEDFrameECEF NEDFrame;
+//     frames::FRDFrameECEF BODYFrameECEF;
+//     frames::FRDFrameNED BODYFrameNED;
+
+//     double lat_0 = 0.0, lon_0 = 0.0;
+//     Eigen::Matrix3d CEN_0 = frames::CEN_from_lat_lon(lat_0, lon_0);
+//     Eigen::Vector3d pE_NE_0(global::r_earth, 0, 0);
+
+//     Eigen::Matrix3d CNB_0 = global::I3;
+//     Eigen::Vector3d pN_BN_0(0, 10, 0);
+
+//     Eigen::Matrix3d CEB_0 = CNB_0 * CEN_0;
+//     Eigen::Vector3d pE_BE_0 = CEN_0.transpose() * pN_BN_0 + pE_NE_0;
+
+//     Eigen::Vector3d gE = frames::common::gECEF(pE_BE_0);
+//     Eigen::Vector3d gB = CEB_0 * gE;
+
+//     frames::StepOptions NEDFrameStepOptions{
+//         .C = CEN_0,
+//         .p = pE_NE_0,
+//     };
+//     frames::StepOptions BODYFrameNEDStepOptions{
+//         .C = CNB_0,
+//         .p = pN_BN_0,
+//         .g = gB
+//     };
+//     frames::StepOptions BODYFrameECEFrameStepOptions{
+//         .C = CEB_0,
+//         .p = pE_BE_0,
+//         .g = gE
+//     };
+
+//     NEDFrame.step(NEDFrameStepOptions);
+//     BODYFrameNED.step(BODYFrameNEDStepOptions);
+//     BODYFrameECEF.step(BODYFrameECEFrameStepOptions);
+
+//     // Vehicle
+//     dynamics::Mass mass { 1 };
+//     Eigen::Matrix3d J { Eigen::Matrix3d::Identity() };
+//     vehicles::Properties properties{ .mass = mass, .J = J };
+
+//     vehicles::Aircraft ac{
+//         .NEDFrame = NEDFrame,
+//         .BODYFrameNED = BODYFrameNED,
+//         .BODYFrameECEF = BODYFrameECEF,
+//         .properties = properties
+//     };
+
+//     // Run case
+//     case1(ac, NEDFrameStepOptions, BODYFrameNEDStepOptions, BODYFrameECEFrameStepOptions);
+// }

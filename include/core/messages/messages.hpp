@@ -1,38 +1,39 @@
-#pragma once
+// #pragma once
+// #include <Eigen/Dense>
+// #include <unsupported/Eigen/CXX11/Tensor>
 
-namespace messages {
+// namespace messages {
 
-class Vector3D {
-    public:
+// class State {
+//     public:
+//     Eigen::Vector3d pos;
+//     Eigen::Vector3d vel;
+//     Eigen::Quaterniond att; 
+//     Eigen::Vector3d omg;
 
-    double x;
-    double y;
-    double z;
+//     State(Eigen::Vector3d& pos, Eigen::Vector3d& vel, Eigen::Quaterniond& att, Eigen::Vector3d& omg);
+// };
 
-    Vector3D();
-    Vector3D(double x, double y, double z);
-};
+// class Frame {
+//     public:
+//     Eigen::Vector3d i;
+//     Eigen::Vector3d j;
+//     Eigen::Vector3d k; 
+//     Eigen::Vector3d origin;
 
-class Quaternion {
-    public:
+//     Frame(Eigen::Vector3d& i, Eigen::Vector3d& j, Eigen::Vector3d& k, Eigen::Vector3d& j, Eigen::Vector3d& origin);
+// };
 
-    double w;
-    double x;
-    double y;
-    double z;
+// class Image {
+//     public:
+//     Eigen::Tensor<double, 3> img(64, 64, 3);
 
-    Quaternion();
-    Quaternion(double w, double x, double y, double z);
-};
+//     Image(Eigen::Tensor<double, 3>& img);
+// }
 
-class DroneState {
-    public:
+// class ControlCommand {
+//     public:
 
-    Vector3D pos;
-    Vector3D vel;
-    Quaternion att;
-    Vector3D omg;
+// }
 
-    DroneState(Vector3D pos, Vector3D vel, Quaternion att, Vector3D omg);
-};
-}
+// }

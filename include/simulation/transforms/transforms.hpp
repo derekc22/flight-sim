@@ -48,8 +48,8 @@ namespace transforms {
     Eigen::Matrix3d eul2R_extr(double roll, double pitch, double yaw, const std::string& order);
     Eigen::Matrix3d eul2R_intr(double roll, double pitch, double yaw, const std::string& order);
 
-    std::array<double, 3> R2eul_extr(const Eigen::Matrix3d& R, const std::string& order);
-    std::array<double, 3> R2eul_intr(const Eigen::Matrix3d& R, const std::string& order);
+    Eigen::Vector3d R2eul_extr(const Eigen::Matrix3d& R, const std::string& order);
+    Eigen::Vector3d R2eul_intr(const Eigen::Matrix3d& R, const std::string& order);
 
     // /**
     // * @brief Performs an active rotation
@@ -148,6 +148,7 @@ namespace transforms {
 
     Eigen::Matrix3d RfromH(const Eigen::Matrix4d& H);
     Eigen::Vector3d dfromH(const Eigen::Matrix4d& H);
+    Eigen::Vector3d pfromH(const Eigen::Matrix4d& H);
 
     Eigen::Vector3d apply_hom(const Eigen::Matrix4d& H, const Eigen::Vector3d& v);
     Eigen::Matrix4d chain_hom_intr(const std::vector<Eigen::Matrix4d>& H_list);
@@ -170,10 +171,10 @@ namespace transforms {
 
     Eigen::Matrix3d quat2rot(const Eigen::Quaterniond& q_in);
 
-    std::array<double, 3> quatR2eul_extr(const Eigen::Quaterniond& q, const std::string& order);
-    std::array<double, 3> quatR2eul_intr(const Eigen::Quaterniond& q, const std::string& order);
-    std::array<double, 3> quatC2eul_extr(const Eigen::Quaterniond& q, const std::string& order);
-    std::array<double, 3> quatC2eul_intr(const Eigen::Quaterniond& q, const std::string& order);
+    Eigen::Vector3d quatR2eul_extr(const Eigen::Quaterniond& q, const std::string& order);
+    Eigen::Vector3d quatR2eul_intr(const Eigen::Quaterniond& q, const std::string& order);
+    Eigen::Vector3d quatC2eul_extr(const Eigen::Quaterniond& q, const std::string& order);
+    Eigen::Vector3d quatC2eul_intr(const Eigen::Quaterniond& q, const std::string& order);
 
     // Eigen::Vector3d active_quat(const Eigen::Quaterniond& q, const Eigen::Vector3d& v);
     // Eigen::Vector3d passive_quat(const Eigen::Quaterniond& q, const Eigen::Vector3d& v);
@@ -186,8 +187,8 @@ namespace transforms {
     Eigen::Matrix4d _make_HR_translate_first(const Eigen::Matrix3d& R, const Eigen::Vector3d& d);
     Eigen::Quaterniond normalize_and_canonicalize(Eigen::Quaterniond q);
 
-    std::array<double, 3> C2eul_extr(const Eigen::Matrix3d& C, const std::string& order);
-    std::array<double, 3> C2eul_intr(const Eigen::Matrix3d& C, const std::string& order);
+    Eigen::Vector3d C2eul_extr(const Eigen::Matrix3d& C, const std::string& order);
+    Eigen::Vector3d C2eul_intr(const Eigen::Matrix3d& C, const std::string& order);
     Eigen::Matrix3d eul2C_extr(double a, double b, double c, const std::string& order);
     Eigen::Matrix3d eul2C_intr(double a, double b, double c, const std::string& order);
 
@@ -201,8 +202,10 @@ namespace transforms {
     Eigen::Quaterniond eul2quatC(double a, double b, double c, const std::string& order, const std::string& type);
 
 
+    Eigen::Quaterniond rot2quat(const Eigen::Matrix3d& R);
+
     namespace common {
-        const extern Eigen::Matrix4d identity_hom;
+        
     }
 
 
