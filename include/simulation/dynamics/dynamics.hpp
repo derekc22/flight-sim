@@ -28,6 +28,7 @@ namespace dynamics {
     struct Gravity;
     struct InertiaTensor;
     struct Mass;
+    struct CenterOfGravity;
     struct Moment;
 
     using DynamicsFunction =
@@ -135,6 +136,10 @@ namespace dynamics {
 
     struct Moment {
         Eigen::Vector3d data; // M [Nm]
+    };
+
+    struct CenterOfGravity {
+        Eigen::Vector3d data; // CG [m]
     };
 
     struct RigidBodyState {

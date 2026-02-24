@@ -1,13 +1,11 @@
-#include "include/messages/messages.hpp"
+// #include <Eigen/Dense>
+// #include "core/messages/messages.hpp"
 
-namespace messages {
+// namespace messages {
 
-Vector3D::Vector3D() : x(0), y(0), z(0) {};
-Vector3D::Vector3D(double x, double y, double z) : x(x), y(y), z(z) {};
+//     State::State(Eigen::Vector3d& pos, Eigen::Vector3d& vel, Eigen::Quaterniond& att, Eigen::Vector3d& omg) : pos(pos), vel(vel), att(att), omg(omg) {};
 
-Quaternion::Quaternion() : w(1), x(0), y(0), z(0) {};
-Quaternion::Quaternion(double w, double x, double y, double z) : w(w), x(x), y(y), z(z) {};
+//     Frame::Frame(Eigen::Vector3d& i, Eigen::Vector3d& j, Eigen::Vector3d& k, Eigen::Vector3d& origin) : i(i), j(j), k(k) origin(origin) {};
 
-DroneState::DroneState(Vector3D pos, Vector3D vel, Quaternion att, Vector3D omg) : pos(pos), vel(vel), att(att), omg(omg) {};
-
-}
+//     Image::Image(Eigen::Tensor<double, 3>& img) : img(img) {};
+// }

@@ -1,15 +1,12 @@
 #pragma once
 #include <Eigen/Dense>
 #include "simulation/frames/frames.hpp"
+#include "simulation/structural/structural.hpp"
+#include "simulation/aerodynamics/aerodynamics.hpp"
 
 
 
 namespace vehicles {
-
-    struct Properties {
-        dynamics::Mass mass;
-        dynamics::InertiaTensor J;
-    };
 
     struct Aircraft {
         frames::NEDFrameECEF NEDFrame;
@@ -18,7 +15,8 @@ namespace vehicles {
         // frames::GenericFrame WindFrame;
         // frames::GenericFrame CustomFrame1;
         // frames::GenericFrame CustomFrame2;
-        Properties properties;
+        structural::StructuralProperties structural;
+        aerodynamics::AerodynamicProperties aerodynamic;
 
 
         // const double detJ = J.data.determinant();

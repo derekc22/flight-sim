@@ -1,5 +1,3 @@
-#pragma once
-
 namespace control{
 
 class PID {

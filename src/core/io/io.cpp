@@ -36,10 +36,14 @@ namespace io {
     //     file_m.close();
     // }
 
-    void DataMatrix::save(const std::string& dir, const std::string& fname) const {
+    DataMatrix::DataMatrix(const Eigen::MatrixXd& d) 
+        : data(d), 
+        n_rows(static_cast<int>(data.rows())), 
+        n_cols(static_cast<int>(data.cols())) {};
+
+    void DataMatrix::write_csv(const std::string& dir, const std::string& fname) const {
 
         createDir(dir);
-        const Eigen::MatrixXd& DM = this->data;
 
         // std::string path_name = dir + "/" + fname + ".csv";
         auto path_name = std::filesystem::path(dir) / (fname + ".csv");
@@ -49,15 +53,26 @@ namespace io {
             throw std::runtime_error("Failed to open file: " + path_name.string());
         }
 
-        for (int i = 0; i < DM.rows(); ++i) {
-            for (int j = 0; j < DM.cols(); ++j) {
-                file_m << DM(i, j);
-                if (j < DM.cols() - 1) file_m << ","; // comma delimiter
+        for (int i = 0; i < n_rows; ++i) {
+            for (int j = 0; j < n_cols; ++j) {
+                file_m << data(i, j);
+                if (j < n_cols - 1) file_m << ","; // comma delimiter
             }
             file_m << "\n";
         }
         file_m.close();
     }
+
+    void DataMatrix::set(int t, const Eigen::VectorXd input, double dt){
+        if (input.cols() > 1) { throw std::runtime_error("io::DataMatrix::set Eigen::Matrix passed for 'input', expected Eigen::Vector"); }
+        if (input.rows() > n_cols-1) { throw std::runtime_error("io::DataMatrix::set Number of rows in 'input' exceeds number of columns in DataMatrix"); }
+        if (t > n_rows-1) { throw std::runtime_error("io::DataMatrix::set Input index 't' exceeds number of rows in DataMatrix"); }
+
+        data(t, 0) = t * dt;
+        Eigen::Index cols_to_copy = data.cols() - 1;
+        data.block(t, 1, 1, cols_to_copy) = input.transpose(); // startRow, startCol, blockRows, blockCols.
+    }
+
 
 
 }

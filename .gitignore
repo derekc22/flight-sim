@@ -1,3 +1,7 @@
 .vscode
 .DS_Store
 build/
+data/
+figures/
+.idea
+**/archive/**

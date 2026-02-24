@@ -19,7 +19,7 @@ void q2(bool remove_omega_cross_v, double init_vel, const std::string& trial) {
     dynamics::Position pN_BN{ Eigen::Vector3d::Zero() };            // p^N_{NB}(0)
 
     // Inputs
-    dynamics::BodyAxisRates wB_BN{ Eigen::Vector3d(0, 0, 1) };       // rad/s, expressed in B
+    dynamics::AngularVelocity wB_BN{ Eigen::Vector3d(0, 0, 1) };       // rad/s, expressed in B
 
     // Initial body velocity
     dynamics::LinearVelocity vB_EB0{ Eigen::Vector3d(init_vel, 0, 0) };   // m/s expressed in B
@@ -35,7 +35,7 @@ void q2(bool remove_omega_cross_v, double init_vel, const std::string& trial) {
 
     for (int t = 0; t < tf; ++t) {
         // 1) Attitude propagation: C_{N->B}(t+dt)
-        CNB = dynamics::strap_down_kin(CNB, wB_BN);
+        CNB = dynamics::rot_kin(CNB, wB_BN);
 
         // 2) Velocity expressed in NED
         dynamics::LinearVelocity vN_EB;
@@ -58,7 +58,7 @@ void q2(bool remove_omega_cross_v, double init_vel, const std::string& trial) {
         q2DM.data.block<1, 3>(t, 1) = pN_BN.data.transpose();
     }
 
-    q2DM.save("data/hw3", "q2" + trial);
+    q2DM.write_csv("data/hw3", "q2" + trial);
     std::cout << "Final pN_BN: " << pN_BN.data.transpose() << "\n";
 }
 
@@ -67,14 +67,14 @@ void q2(bool remove_omega_cross_v, double init_vel, const std::string& trial) {
 int main() {
     
     // 1a
-    Eigen::Vector3d xE_BE_t0(global::r_earth, 0, 0); // m
-    Eigen::Vector3d xdotB_BE(150, 0, 0); // ms^-1
+    Eigen::Vector3d pE_BE_t0(global::r_earth, 0, 0); // m
+    Eigen::Vector3d vB_BE(150, 0, 0); // ms^-1
 
     double psi = global::deg2rad(0), theta = global::deg2rad(0), phi = global::deg2rad(0);
     Eigen::Matrix3d C_BN = transforms::eul2C_intr(psi, theta, phi, "ZYX");
 
     int tf = 1000; //s
-    Eigen::Vector3d xE_BE_t;
+    Eigen::Vector3d pE_BE_t;
 
 
     // 1a.i
@@ -83,24 +83,24 @@ int main() {
     double lat = global::deg2rad(0), lon = global::deg2rad(0);
     Eigen::Matrix3d C_NE = frames::CEN_from_lat_lon(lat, lon).transpose();
     Eigen::Matrix3d C_BE = transforms::chain_rot_extr(std::vector<Eigen::Matrix3d>{C_BN, C_NE});
-    Eigen::Vector3d xdotE_BE = C_BE * xdotB_BE;
+    Eigen::Vector3d vE_BE = C_BE * vB_BE;
 
-    // auto [xE_BE_tf, _] = dynamics::fwd_euler(xE_BE_t0, xdotE_BE, dynamics::common::f_cv, tf);
-    // std::cout << xE_BE_tf << std::endl;
+    // auto [pE_BE_tf, _] = dynamics::fwd_euler(pE_BE_t0, vE_BE, dynamics::common::f_cv, tf);
+    // std::cout << pE_BE_tf << std::endl;
     // std::cout << std::endl;
 
-    xE_BE_t = xE_BE_t0;
+    pE_BE_t = pE_BE_t0;
     for (int t = 0; t < tf; ++t){
 
-        auto [xE_BE_t1, _] = dynamics::fwd_euler(xE_BE_t, xdotE_BE, dynamics::common::f_cv, 1);
-        xE_BE_t = xE_BE_t1;
+        auto [pE_BE_t1, _] = dynamics::fwd_euler(pE_BE_t, vE_BE, dynamics::common::f_cv, 1);
+        pE_BE_t = pE_BE_t1;
 
         q1aiDM.data(t, 0) = t * dynamics::common::dt;
-        q1aiDM.data.block<1, 3>(t, 1) = xE_BE_t1.transpose();
+        q1aiDM.data.block<1, 3>(t, 1) = pE_BE_t1.transpose();
     }
 
-    q1aiDM.save("data/hw3", "q1ai");
-    std::cout << xE_BE_t << std::endl;
+    q1aiDM.write_csv("data/hw3", "q1ai");
+    std::cout << pE_BE_t << std::endl;
     std::cout << std::endl;
     std::cout << std::endl;
 
@@ -113,27 +113,27 @@ int main() {
 
     Eigen::Matrix3d C_NE_t;
     Eigen::Matrix3d C_BE_t;
-    xE_BE_t = xE_BE_t0;
-    Eigen::Vector3d xdotB_BE_t = xdotB_BE;
-    Eigen::Vector3d xdotE_BE_t;
+    pE_BE_t = pE_BE_t0;
+    Eigen::Vector3d vB_BE_t = vB_BE;
+    Eigen::Vector3d vE_BE_t;
 
     for (int t = 0; t < tf; ++t){
-        auto [lat_t, lon_t, alt] = frames::lat_lon_alt_from_xECEF(xE_BE_t);
+        auto [lat_t, lon_t, alt] = frames::lat_lon_alt_from_pECEF(pE_BE_t);
 
         C_NE_t = frames::CEN_from_lat_lon(lat_t, lon_t).transpose();
         C_BE_t = transforms::chain_rot_extr(std::vector<Eigen::Matrix3d>{C_BN, C_NE_t});
-        xdotE_BE_t = C_BE_t * xdotB_BE_t;
+        vE_BE_t = C_BE_t * vB_BE_t;
 
-        auto [xE_BE_t1, _] = dynamics::fwd_euler(xE_BE_t, xdotE_BE_t, dynamics::common::f_cv, 1);
+        auto [pE_BE_t1, _] = dynamics::fwd_euler(pE_BE_t, vE_BE_t, dynamics::common::f_cv, 1);
 
-        xE_BE_t = xE_BE_t1;
+        pE_BE_t = pE_BE_t1;
 
         q1aiiDM.data(t, 0) = t * dynamics::common::dt;
-        q1aiiDM.data.block<1, 3>(t, 1) = xE_BE_t1.transpose();
+        q1aiiDM.data.block<1, 3>(t, 1) = pE_BE_t1.transpose();
     }
 
-    q1aiiDM.save("data/hw3", "q1aii");
-    std::cout << xE_BE_t << std::endl;
+    q1aiiDM.write_csv("data/hw3", "q1aii");
+    std::cout << pE_BE_t << std::endl;
     std::cout << std::endl;
     std::cout << std::endl;
 

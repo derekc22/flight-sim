@@ -103,9 +103,10 @@ namespace frames {
     }
     void Frame::set(const dynamics::OrientationQuaternion& q){
         FrameView fv = view();
-        *fv.q = q;
-        fv.H->set(q); // fv.H->set(transforms::quat2rot(q.data));
-        fv.eul->set(q, "ZYX"); // *fv.eul = dynamics::EulerAngles{ transforms::quatC2eul_intr(q.data, "ZYX") };
+        dynamics::OrientationQuaternion q_{ transforms::normalize_and_canonicalize(q.data) };
+        *fv.q = q_;
+        fv.H->set(q_); // fv.H->set(transforms::quat2rot(q.data));
+        fv.eul->set(q_, "ZYX"); // *fv.eul = dynamics::EulerAngles{ transforms::quatC2eul_intr(q.data, "ZYX") };
     }
     void Frame::set(const dynamics::EulerAngles& eul){
         FrameView fv = view();
@@ -193,6 +194,7 @@ namespace frames {
         if (opts.v)         { set(*opts.v); }
         // if (opts.a)         { set(*opts.a); }
         if (opts.g)         { set(*opts.g); }
+        // opts.clear();
     }
 
     void Frame::step(const StepOptions& opts){
@@ -209,11 +211,12 @@ namespace frames {
         if (opts.v)         { set(dynamics::LinearVelocity{ *opts.v }); }
         // if (opts.a)         { set(dynamics::LinearAcceleration{ *opts.a }); }
         if (opts.g)         { set(dynamics::Gravity{ *opts.g }); }
+        // opts.clear();
     }
 
 
-    void StepOptionsStrict::clear() noexcept { *this = StepOptionsStrict{}; }
-    void StepOptions::clear() noexcept { *this = StepOptions{}; }
+    // void StepOptionsStrict::clear() noexcept { *this = StepOptionsStrict{}; }
+    // void StepOptions::clear() noexcept { *this = StepOptions{}; }
 
 
     namespace common {

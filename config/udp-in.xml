@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<PropertyList>
+  <generic>
+    <input>
+      <line_separator>newline</line_separator>
+      <var_separator>,</var_separator>
+
+      <chunk>
+        <name>aileron</name>
+        <node>/controls/flight/aileron</node>
+        <type>float</type>
+      </chunk>
+
+      <chunk>
+        <name>elevator</name>
+        <node>/controls/flight/elevator</node>
+        <type>float</type>
+      </chunk>
+
+      <chunk>
+        <name>rudder</name>
+        <node>/controls/flight/rudder</node>
+        <type>float</type>
+      </chunk>
+
+      <chunk>
+        <name>throttle</name>
+        <node>/controls/engines/engine/throttle</node>
+        <type>float</type>
+      </chunk>
+    </input>
+  </generic>
+</PropertyList>

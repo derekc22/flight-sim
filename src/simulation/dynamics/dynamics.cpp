@@ -285,8 +285,8 @@ namespace dynamics {
     void HomogenousFrameTransformationMatrix::set(const EulerAngles& eul, const std::string& order) { data = transforms::makeHC(transforms::eul2C_intr(eul.phi(), eul.theta(), eul.psi(), order), p().data, "translate"); }
 
     // void OrientationQuaternion::set(double a, double b, double c, const std::string& order, const std::string& type) { data = transforms::eul2quatC(a, b, c, order, type); }
-    void OrientationQuaternion::set(const OrientationMatrix& C) { data = transforms::rot2quat(C.data); }
-    void OrientationQuaternion::set(const EulerAngles& eul, const std::string& order) { data = transforms::eul2quatC_intr(eul.phi(), eul.theta(), eul.psi(), order); }
+    void OrientationQuaternion::set(const OrientationMatrix& C) { data = transforms::normalize_and_canonicalize(transforms::rot2quat(C.data)); }
+    void OrientationQuaternion::set(const EulerAngles& eul, const std::string& order) { data = transforms::normalize_and_canonicalize(transforms::eul2quatC_intr(eul.phi(), eul.theta(), eul.psi(), order)); }
 
     double EulerAngles::phi() const   { return data[0]; }
     double EulerAngles::theta() const { return data[1]; }

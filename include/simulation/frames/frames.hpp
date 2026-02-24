@@ -25,7 +25,7 @@ namespace frames {
         // std::optional<Eigen::Vector3d> a;
         std::optional<Eigen::Vector3d> g;
 
-        void clear() noexcept;
+        // void clear() noexcept;
     };
 
     struct StepOptionsStrict{
@@ -43,7 +43,7 @@ namespace frames {
         // std::optional<dynamics::LinearAcceleration> a;
         std::optional<dynamics::Gravity> g;
 
-        void clear() noexcept;
+        // void clear() noexcept;
     };
 
     struct FrameView {
@@ -91,7 +91,7 @@ namespace frames {
 
     };
 
-    // {SELF, X} -> {PARENT, Y}
+    // {PARENT, Y} -> {SELF, X}
     struct GenericFrame : Frame {
         Frame& Parent;
         GenericFrame(std::string n, Frame& parent) : Frame(n), Parent(parent) {};
