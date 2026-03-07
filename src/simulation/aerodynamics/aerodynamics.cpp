@@ -31,15 +31,20 @@ namespace aerodynamics {
     }
 
 
-    std::pair<dynamics::Force, dynamics::Moment> step_aero_forces_moments(const AerodynamicProperties& aero, const structural::StructuralProperties& structural, const dynamics::RigidBodyState& rbs, double rho) {
+    std::pair<dynamics::Force, dynamics::Moment> step_aero_forces_moments(
+        const AerodynamicProperties& aerodynamicProperties, 
+        const structural::StructuralProperties& structuralProperties, 
+        const dynamics::RigidBodyState& rigidBodyState, 
+        double rho
+    ) {
         Eigen::Vector3d FB = Eigen::Vector3d::Zero();
         Eigen::Vector3d MB = Eigen::Vector3d::Zero();
 
-        const Eigen::Vector3d vB = rbs.vB_BI.data;     // no wind: V_B_BA = V_B_BE
-        const Eigen::Vector3d wB = rbs.wB_BI.data;
-        const Eigen::Vector3d CG = structural.CG.data;
+        const Eigen::Vector3d vB = rigidBodyState.v.data;     // no wind: V_B_BA = V_B_BE
+        const Eigen::Vector3d wB = rigidBodyState.w.data;
+        const Eigen::Vector3d CG = structuralProperties.CG.data;
 
-        for (const Surface& s : aero.surfaces) {
+        for (const Surface& s : aerodynamicProperties.surfaces) {
             const Eigen::Vector3d r_ac = s.p_ac - CG;          // CG -> AC
             const Eigen::Vector3d v_rel = vB + wB.cross(r_ac); // include rotational component
 
@@ -95,8 +100,8 @@ namespace aerodynamics {
 
 
 
-    AerodynamicState compute_aerodynamic_state(const dynamics::RigidBodyState& rbs){
-        const Eigen::Vector3d& vB = rbs.vB_BI.data;
+    AerodynamicState compute_aerodynamic_state(const dynamics::RigidBodyState& rigidBodyState){
+        const Eigen::Vector3d& vB = rigidBodyState.v.data;
 
         const double Vinf = vB.norm();
 
@@ -120,6 +125,23 @@ namespace aerodynamics {
 
 
 
+    dynamics::OrientationMatrix CBS(const aerodynamics::AngleOfAttack& alpha) {
+        Eigen::Matrix3d CBS;
+        const double a = alpha.data;
+        CBS     <<   std::cos(a),   0,   std::sin(a),
+                               0,   1,             0,
+                    -std::sin(a),   0,    std::cos(a);
+        return dynamics::OrientationMatrix{ CBS };
+    };
+
+    dynamics::OrientationMatrix CSW(const aerodynamics::SideslipAngle& beta) {
+        Eigen::Matrix3d CSW;
+        const double b = beta.data;
+        CSW     <<   std::cos(b),   std::sin(b),   0,
+                    -std::sin(b),   std::cos(b),   0,
+                               0,             0,   1;
+        return dynamics::OrientationMatrix{ CSW };
+    };
 
 
 };

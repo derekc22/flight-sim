@@ -154,8 +154,10 @@ namespace transforms {
     Eigen::Matrix4d chain_hom_intr(const std::vector<Eigen::Matrix4d>& H_list);
     Eigen::Matrix4d chain_hom_extr(const std::vector<Eigen::Matrix4d>& H_list);
 
-    Eigen::Matrix3d chain_rot_intr(const std::vector<Eigen::Matrix3d>& R_list);
-    Eigen::Matrix3d chain_rot_extr(const std::vector<Eigen::Matrix3d>& R_list);
+	/** @deprecated */
+	// Eigen::Matrix3d chain_rot_intr(const std::vector<Eigen::Matrix3d>& R_list);
+    // Eigen::Matrix3d chain_rot_extr(const std::vector<Eigen::Matrix3d>& R_list);
+    Eigen::Matrix3d chain_rot(const std::vector<Eigen::Matrix3d>& R_list);
 
     Eigen::Quaterniond eul2quatR_extr(double a, double b, double c, const std::string& order);
     Eigen::Quaterniond eul2quatR_intr(double a, double b, double c, const std::string& order);
@@ -204,9 +206,6 @@ namespace transforms {
 
     Eigen::Quaterniond rot2quat(const Eigen::Matrix3d& R);
 
-    namespace common {
-        
-    }
 
 
 }

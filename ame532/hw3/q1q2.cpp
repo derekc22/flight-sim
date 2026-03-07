@@ -35,7 +35,7 @@ void q2(bool remove_omega_cross_v, double init_vel, const std::string& trial) {
 
     for (int t = 0; t < tf; ++t) {
         // 1) Attitude propagation: C_{N->B}(t+dt)
-        CNB = dynamics::rot_kin(CNB, wB_BN);
+        CNB = dynamics::_rot_kin(CNB, wB_BN);
 
         // 2) Velocity expressed in NED
         dynamics::LinearVelocity vN_EB;
@@ -52,7 +52,7 @@ void q2(bool remove_omega_cross_v, double init_vel, const std::string& trial) {
         }
 
         // 3) Position propagation in NED
-        pN_BN = dynamics::trans_kin(pN_BN, vN_EB, aN);
+        pN_BN = dynamics::_trans_kin(pN_BN, vN_EB, aN);
 
         q2DM.data(t, 0) = t * dynamics::common::dt;
         q2DM.data.block<1, 3>(t, 1) = pN_BN.data.transpose();

@@ -13,6 +13,12 @@ namespace global {
     const Eigen::Matrix4d I4 = Eigen::Matrix4d::Identity();
     const Eigen::Matrix4d HI = Eigen::Matrix4d::Identity(); // Identity homogenous transformation matrix
 
+    // Special Vectors
+    const Eigen::Vector3d zero = Eigen::Vector3d::Zero();
+    const Eigen::Vector3d i = Eigen::Vector3d(1, 0, 0);
+    const Eigen::Vector3d j = Eigen::Vector3d(0, 1, 0);
+    const Eigen::Vector3d k = Eigen::Vector3d(0, 0, 1);
+
 
     // Trigonometry
     double deg2rad(double deg){

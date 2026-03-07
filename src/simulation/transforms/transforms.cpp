@@ -9,9 +9,6 @@
 
 namespace transforms {
 
-    namespace common {
-    }
-
 
 
     Eigen::Matrix3d Rx(double phi) {
@@ -367,17 +364,32 @@ namespace transforms {
         return Htot;
     }
 
-    // Given the orientation (of the frame/vector) obtained via the nth rotation, how is the n+1 rotation applied
-    Eigen::Matrix3d chain_rot_intr(const std::vector<Eigen::Matrix3d>& R_list) {
-        Eigen::Matrix3d Rtot = global::I3;
-        for (const auto& R : R_list){
-            Rtot *= R;
-        }
-        return Rtot;
-    }
+    /** @deprecated */
+    // // Given the orientation (of the frame/vector) obtained via the nth rotation, how is the n+1 rotation applied
+    // Eigen::Matrix3d chain_rot_intr(const std::vector<Eigen::Matrix3d>& R_list) {
+    //     Eigen::Matrix3d Rtot = global::I3;
+    //     for (const auto& R : R_list){
+    //         Rtot *= R;
+    //     }
+    //     return Rtot;
+    // }
 
-    // Given the orientation (of the frame/vector) obtained via the nth rotation, how is the n+1 rotation applied
-    Eigen::Matrix3d chain_rot_extr(const std::vector<Eigen::Matrix3d>& R_list) {
+    /** @deprecated */
+    // // Given the orientation (of the frame/vector) obtained via the nth rotation, how is the n+1 rotation applied
+    // Eigen::Matrix3d chain_rot_extr(const std::vector<Eigen::Matrix3d>& R_list) {
+    //     Eigen::Matrix3d Rtot = global::I3;
+
+    //     for (auto rit = R_list.rbegin(); rit != R_list.rend(); ++rit) {
+    //         Rtot *= *rit;
+    //     }
+    //     return Rtot;
+    // }
+
+    // Chain vector (as opposed to frame) rotations. This must be an extrinsic rotation. There is no such thing as an "intrinsic" vector rotation. 
+    // All vector rotations (as opposed to frame rotations) are, by definition, extrinsic. The concept of an "intrinsic" rotation only applies to frames
+    // That is, the concept of an "intrinsic" vector rotation does not make sense
+    // Thus, this function is simply called chain_rot and the two prior versions above are @deprecated
+    Eigen::Matrix3d chain_rot(const std::vector<Eigen::Matrix3d>& R_list) {
         Eigen::Matrix3d Rtot = global::I3;
 
         for (auto rit = R_list.rbegin(); rit != R_list.rend(); ++rit) {

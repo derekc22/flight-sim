@@ -12,6 +12,10 @@ namespace global {
     const extern Eigen::Matrix4d I4;
     const extern Eigen::Matrix4d HI;
 
+    const extern Eigen::Vector3d zero;
+    const extern Eigen::Vector3d i;
+    const extern Eigen::Vector3d j;
+    const extern Eigen::Vector3d k;
 
     double sec(double theta);
     double csc(double theta);

@@ -1,73 +1,47 @@
-// #include <Eigen/Dense>
-// #include <iostream>
-// #include <vector>
-// #include "simulation/transforms/transforms.hpp"
-// #include "simulation/dynamics/dynamics.hpp"
-// #include "simulation/global/global.hpp"
-// #include "simulation/frames/frames.hpp"
-// #include "simulation/vehicles/vehicles.hpp"
-// #include "core/io/io.hpp"
-// #include "simulation/atmospheric/atmospheric.hpp"
-// #include "simulation/structural/structural.hpp"
-// #include "simulation/aerodynamics/aerodynamics.hpp"
+#include <Eigen/Dense>
+#include <iostream>
+#include <vector>
+#include "simulation/transforms/transforms.hpp"
+#include "simulation/dynamics/dynamics.hpp"
+#include "simulation/global/global.hpp"
+#include "simulation/frames/frames.hpp"
+#include "simulation/vehicles/vehicles.hpp"
+#include "core/io/io.hpp"
+#include "simulation/atmospheric/atmospheric.hpp"
+#include "simulation/structural/structural.hpp"
+#include "simulation/aerodynamics/aerodynamics.hpp"
+#include "core/io/io.hpp"
 
 
-// void case1(vehicles::Aircraft&  asw28, 
-//            frames::StepOptions& NEDFrameStepOptions, 
-//            frames::StepOptions& BODYFrameNEDStepOptions, 
-//            frames::StepOptions& BODYFrameECEFStepOptions){
+// void run(const vehicles::Aircraft&  ac){
+
+//     // Copy aircraft and declare step options
+//     vehicles::Aircraft asw28 = ac;
+//     frames::SetOptions NEDFrameSetOptions;
+//     frames::SetOptions BODYFrameNEDSetOptions;
+//     frames::SetOptions BODYFrameECEFSetOptions;
     
-//     // std::cout << T << std::endl;
-//     // std::cout << rho << std::endl;
-//     // std::cout << mu << std::endl;
-
-//     // std::cout << gB << std::endl;
-//     // std::cout << std::endl;
-//     // std::cout << FB_net.data << std::endl;
-//     // std::cout << asw28.structural.Mass.data << std::endl;
-//     // std::cout << asw28.structural.CG.data << std::endl;
-//     // std::cout << asw28.structural.J.data << std::endl;
-
-//     // const auto& s3 = asw28.aerodynamic.surfaces[
-//     //     asw28.aerodynamic.surfaceIDs.at("s3")
-//     // ];
-
-//     // std::cout << "chord: " << s3.chord << std::endl;
-//     // std::cout << "span: "  << s3.span  << std::endl;
-//     // std::cout << "p_loc: " << s3.p_ref.transpose() << std::endl;
-//     // std::cout << "n: "     << s3.n.transpose()     << std::endl;
-//     // std::cout << "CL0: " << s3.CL0 << std::endl;
-//     // std::cout << "e: "   << s3.e   << std::endl;
-//     // std::cout << "i: "   << s3.i   << std::endl;
-//     // std::cout << "CD0: " << s3.CD0 << std::endl;
-//     // std::cout << "CDa: " << s3.CDa << std::endl;
-//     // std::cout << "a0: "  << s3.a0  << std::endl;
-//     // std::cout << "CM0: " << s3.CM0 << std::endl;
-//     // std::cout << "CMa: " << s3.CMa << std::endl;
-//     // std::cout << "area: " << s3.area << std::endl;
-//     // std::cout << "AR: "   << s3.AR   << std::endl;
-//     // std::cout << "p_ac: " << s3.p_ac.transpose() << std::endl;
-
-//     // Define external moment 
-//     Eigen::Vector3d MB_ext = Eigen::Vector3d(0, 0, 0);
-
-//     // Define rotation rate
-//     Eigen::Vector3d wB_BE(global::deg2rad(30), 0, 0); // rotates about x at 30˚/s
-
 //     // Define a velocity
 //     Eigen::Vector3d vB_BE(10, 0, 0); // 10 m/s forward
 
-//     BODYFrameECEFStepOptions = { .w = wB_BE, .v = vB_BE };
-//     asw28.BODYFrameECEF.step(BODYFrameECEFStepOptions);
-//     // std::cout << asw28.BODYFrameNED.HNB.p().data << std::endl;
+//     // Define a rotation rate
+//     Eigen::Vector3d wB_BE(global::deg2rad(30), 0, 0); // rotates about x at 30˚/s
 
+//     // Set velocity and rotation rate
+//     BODYFrameECEFSetOptions = { .w = wB_BE, .v = vB_BE };
+//     asw28.BODYFrameECEF.set(BODYFrameECEFSetOptions);
+
+//     // Declare and define useful variables
 //     dynamics::RigidBodyState xE_t;
 //     dynamics::RigidBodyState xE_t1;
-//     structural::StructuralProperties asw28_structural = asw28.structural;
-//     aerodynamics::AerodynamicProperties asw28_aerodynamic = asw28.aerodynamic;
+//     structural::StructuralProperties structuralProperties = asw28.structuralProperties;
+//     aerodynamics::AerodynamicProperties aerodynamicProperties = asw28.aerodynamicProperties;
 
 //     double altitude;
 //     atmospheric::StandardAtmosphere stdAtm;
+
+//     // Define no external moment 
+//     Eigen::Vector3d MB_ext = Eigen::Vector3d(0, 0, 0);
 
 //     dynamics::Force FB_net;
 //     dynamics::Moment MB_net;
@@ -80,7 +54,17 @@
 //     Eigen::Vector3d pE_EB;
 //     Eigen::Matrix3d CEB;
 
-//     int tf = 6/dynamics::common::dt; // run for 6 seconds to complete 180˚ rotation about x 
+//     aerodynamics::AerodynamicState ads;
+
+//     // Run for 6 seconds
+//     int tf = 6/dynamics::common::dt;
+
+//     // Create data matrix
+//     io::DataMatrix positionDM{ Eigen::MatrixXd::Zero(tf, 4) };
+//     io::DataMatrix aeroForceDM{ Eigen::MatrixXd::Zero(tf, 4) };
+//     io::DataMatrix aeroMomentDM{ Eigen::MatrixXd::Zero(tf, 4) };
+//     io::DataMatrix aeroStateDM{ Eigen::MatrixXd::Zero(tf, 4) };
+
 //     for (int t = 0; t < tf; ++t) {
 
 //         // Compute gravity at current position
@@ -90,52 +74,45 @@
 //         gB = CEB * gE;
 
 //         // Define external force to cancel gravity
-//         FB_g = asw28_structural.Mass.data * gB;
+//         FB_g = structuralProperties.Mass.data * gB;
 //         FB_ext = -FB_g;
 
-//         // Compute altitude
+//         // Compute altitude and density
 //         altitude = pE_EB.norm() - global::r_earth;
 //         auto [T, rho, mu] = stdAtm.measure(altitude);
 
-//         // Obtain current rigid body state
-//         xE_t = asw28.BODYFrameECEF.RigidBodyState();
+//         // Compute aerodynamics forces and moments
+//         auto [FB_aero, MB_aero] = step_aero_forces_moments(aerodynamicProperties, structuralProperties, xE_t, rho);
 
-//         aerodynamics::AerodynamicState ads = aerodynamics::compute_aerodynamic_state(xE_t);
-//         auto [FB_aero, MB_aero] = step_aero_forces_moments(asw28_aerodynamic, asw28_structural, xE_t, rho);
-
-
+//         // Compute net forces and moments
 //         FB_net.data = FB_ext + FB_g + FB_aero.data;
 //         MB_net.data = MB_ext + MB_aero.data;
 
-//         xE_t1 = dynamics::step_rigid_body(xE_t, asw28_structural.Mass, asw28_structural.J, FB_net, MB_net);
-//         asw28.BODYFrameECEF.step(xE_t1);
+//         // Step the simulation
+//         xE_t1 = dynamics::step_rigid_body(xE_t, structuralProperties.Mass, structuralProperties.J, FB_net, MB_net);
+//         asw28.BODYFrameECEF.set(xE_t1);
 
-
-//         std::cout << "t = " << t << std::endl;
-//         std::cout << xE_t1.pI_BI.data << std::endl;
-//         std::cout << std::endl;
-//         std::cout << xE_t1.vB_BI.data << std::endl;
-//         std::cout << std::endl;
-//         std::cout << xE_t1.qIB.data << std::endl;
-//         std::cout << std::endl;
-//         std::cout << xE_t1.wB_BI.data << std::endl;
-//         std::cout << ads.Vinf << std::endl;
-//         std::cout << xE_t1.vB_BI.data.norm() << std::endl;
-//         std::cout << ads.alpha << std::endl;
-//         std::cout << ads.beta << std::endl;
-//         std::cout << "--------------------------"<< std::endl;
+//         // Save data
+//         positionDM.set(t, xE_t1.p.data, dynamics::common::dt);
+//         aeroForceDM.set(t, FB_aero.data, dynamics::common::dt);
+//         aeroMomentDM.set(t, MB_aero.data, dynamics::common::dt);
+//         aeroStateDM.set(t, Eigen::Vector3d(ads.Vinf, ads.alpha, ads.beta), dynamics::common::dt);
 //     }
 
-
-
-
+//     // Write data to csv
+//     positionDM.write_csv("data/test/position", "position");
+//     aeroForceDM.write_csv("data/test/aero_force", "aero_force");
+//     aeroMomentDM.write_csv("data/test/aero_moment", "aero_moment");
+//     aeroStateDM.write_csv("data/test/aero_state", "aero_state");
 // }
 
 
-// int main() {
-    
-//     // 6a
 
+
+
+
+int main() {}
+    
 //     // define frames
 //     frames::ECEFFrame ECEFFrame;
 //     frames::NEDFrameECEF NEDFrame;
@@ -152,22 +129,22 @@
 //     Eigen::Matrix3d CEB_0 = CNB_0 * CEN_0;
 //     Eigen::Vector3d pE_BE_0 = CEN_0.transpose() * pN_BN_0 + pE_NE_0;
 
-//     frames::StepOptions NEDFrameStepOptions{
+//     frames::SetOptions NEDFrameSetOptions{
 //         .C = CEN_0,
 //         .p = pE_NE_0,
 //     };
-//     frames::StepOptions BODYFrameNEDStepOptions{
+//     frames::SetOptions BODYFrameNEDSetOptions{
 //         .C = CNB_0,
 //         .p = pN_BN_0,
 //     };
-//     frames::StepOptions BODYFrameECEFrameStepOptions{
+//     frames::SetOptions BODYFrameECEFrameSetOptions{
 //         .C = CEB_0,
 //         .p = pE_BE_0,
 //     };
 
-//     NEDFrame.step(NEDFrameStepOptions);
-//     BODYFrameNED.step(BODYFrameNEDStepOptions);
-//     BODYFrameECEF.step(BODYFrameECEFrameStepOptions);
+//     NEDFrame.set(NEDFrameSetOptions);
+//     BODYFrameNED.set(BODYFrameNEDSetOptions);
+//     BODYFrameECEF.set(BODYFrameECEFrameSetOptions);
 
 //     // define structural and geometric properties
 //     std::vector<structural::Geometry> geometries = {
@@ -183,8 +160,7 @@
 //         { .id = "mot",   .mass =  0.040, .x_size = 0.03,  .y_size = 0.02,  .z_size = 0.02,  .x_loc =  0.02,  .y_loc = 0.0,   .z_loc =  0.01 },  // Motor
 //         { .id = "prop",  .mass =  0.012, .x_size = 0.0,   .y_size = 0.26,  .z_size = 0.025, .x_loc =  0.05,  .y_loc = 0.0,   .z_loc =  0.01 }   // Propeller
 //     };
-//     structural::StructuralProperties structural(geometries);
-
+//     structural::StructuralProperties structuralProperties(geometries);
 
 //     // define aerodynamic properties
 //     std::vector<aerodynamics::Surface> surfaces = {
@@ -193,19 +169,73 @@
 //         { .id = "s2", .chord = 0.075, .span = 0.35, .p_ref = Eigen::Vector3d(-0.76,  0.0,  -0.16), .n = Eigen::Vector3d(0.0, 0.0, -1.0), .CL0 = 0.0,  .e = 0.8, .i = 0.0,  .CD0 = 0.01, .CDa = 1.0, .a0 = 0.0,  .CM0 = 0.0,   .CMa = 0.0 },  // Horizontal Stabilizer (s2) 
 //         { .id = "s3", .chord = 0.08,  .span = 0.18, .p_ref = Eigen::Vector3d(-0.76,  0.0,  -0.09), .n = Eigen::Vector3d(0.0, 1.0,  0.0), .CL0 = 0.0,  .e = 0.8, .i = 0.0,  .CD0 = 0.01, .CDa = 1.0, .a0 = 0.0,  .CM0 = 0.0,   .CMa = 0.0 },  // Vertical Stabilizer (s3)
 //     };
-//     aerodynamics::AerodynamicProperties aerodynamic(surfaces);
+//     aerodynamics::AerodynamicProperties aerodynamicProperties(surfaces);
 
+
+//     // Obtain initial rigid body state
+//     dynamics::RigidBodyState RigidBodyState = BODYFrameECEF.RigidBodyState();
+
+//     // Obtain initial aerodynamic state
+//     aerodynamics::AerodynamicState aerodynamicState = aerodynamics::compute_aerodynamic_state(RigidBodyState);
 
 //     // create vehicle
 //     vehicles::Aircraft asw28{ 
 //         .NEDFrame = NEDFrame, 
 //         .BODYFrameNED = BODYFrameNED, 
 //         .BODYFrameECEF = BODYFrameECEF, 
-//         .structural = structural,
-//         .aerodynamic = aerodynamic
+//         .structuralProperties = structuralProperties,
+//         .aerodynamicProperties = aerodynamicProperties,
+//         .RigidBodyState = RigidBodyState,
+//         .aerodynamicState = aerodynamicState
 //     };
 
-//     // Case 1
-//     case1(asw28, NEDFrameStepOptions, BODYFrameNEDStepOptions, BODYFrameECEFrameStepOptions);
+
+//     // Structural
+//     // std::cout << "Mass: " << asw28.structuralProperties.Mass.data << std::endl;
+//     // std::cout << "CG: " << asw28.structuralProperties.CG.data << std::endl;
+//     // std::cout << "J: " << asw28.structuralProperties.J.data << std::endl;
+
+
+//     // Aerodynamic
+//     // const auto& s3 = asw28.aerodynamicProperties.surfaces[
+//     //     asw28.aerodynamicProperties.surfaceIDs.at("s3")
+//     // ];
+//     // std::cout << "s3, p_loc: " << s3.p_ref.transpose() << std::endl;
+//     // std::cout << "s3, p_ac: " << s3.p_ac.transpose() << std::endl;
+//     // std::cout << "s3, chord: " << s3.chord << std::endl;
+//     // std::cout << "s3, span: "  << s3.span  << std::endl;
+//     // std::cout << "s3, AR: "   << s3.AR   << std::endl;
+
+//     // const auto& s4 = asw28.aerodynamicProperties.surfaces[
+//     //     asw28.aerodynamicProperties.surfaceIDs.at("s4")
+//     // ];
+//     // std::cout << "s4, p_loc: " << s4.p_ref.transpose() << std::endl;
+//     // std::cout << "s4, p_ac: " << s4.p_ac.transpose() << std::endl;
+//     // std::cout << "s4, chord: " << s4.chord << std::endl;
+//     // std::cout << "s4, span: "  << s4.span  << std::endl;
+//     // std::cout << "s4, AR: "   << s4.AR   << std::endl;
+
+//     // const auto& s5 = asw28.aerodynamicProperties.surfaces[
+//     //     asw28.aerodynamicProperties.surfaceIDs.at("s5")
+//     // ];
+//     // std::cout << "s5, p_loc: " << s5.p_ref.transpose() << std::endl;
+//     // std::cout << "s5, p_ac: " << s5.p_ac.transpose() << std::endl;
+//     // std::cout << "s5, chord: " << s5.chord << std::endl;
+//     // std::cout << "s5, span: "  << s5.span  << std::endl;
+//     // std::cout << "s5, AR: "   << s5.AR   << std::endl;
+
+//     // const auto& s2 = asw28.aerodynamicProperties.surfaces[
+//     //     asw28.aerodynamicProperties.surfaceIDs.at("s2")
+//     // ];
+//     // std::cout << "s2, p_loc: " << s2.p_ref.transpose() << std::endl;
+//     // std::cout << "s2, p_ac: " << s2.p_ac.transpose() << std::endl;
+//     // std::cout << "s2, chord: " << s2.chord << std::endl;
+//     // std::cout << "s2, span: "  << s2.span  << std::endl;
+//     // std::cout << "s2, AR: "   << s2.AR   << std::endl;
+
+
+
+//     // Run case
+//     run(asw28);
 
 // }

@@ -8,6 +8,14 @@
 
 namespace aerodynamics {
 
+    struct Vinf;
+    struct LiftCoefficient;
+    struct DragCoefficient;
+    struct MomentCoefficient;
+    struct AngleOfAttack;
+    struct SideslipAngle;
+
+
     struct Surface {
         std::string id;
 
@@ -37,22 +45,46 @@ namespace aerodynamics {
     };
 
 
-    struct AerodynamicState {
-        double Vinf;    // V∞​
-        double alpha;   // angle of attack [rad]
-        double beta;    // sideslip angle [rad]
+    std::pair<dynamics::Force, dynamics::Moment> step_aero_forces_moments(const AerodynamicProperties& aero, const structural::StructuralProperties& structural, const dynamics::RigidBodyState& rbs, double rho);
 
+
+
+    struct Vinf {
+        double data; // freestream velocity, V∞​ [ms^-1]
     };
 
-    std::pair<dynamics::Force, dynamics::Moment> step_aero_forces_moments(const AerodynamicProperties& aero, const structural::StructuralProperties& structural, const dynamics::RigidBodyState& rbs, double rho);
+    struct LiftCoefficient {
+        double data;    // [dimensionless]
+    };
+
+    struct DragCoefficient {
+        double data;    // [dimensionless]
+    };
+
+    struct MomentCoefficient {
+        double data;    // [dimensionless]
+    };
+
+    struct AngleOfAttack {
+        double data;    // [rad]
+    };
+
+    struct SideslipAngle {
+        double data;    // [rad]
+    };
+
+    struct AerodynamicState {
+        Vinf vinf;    
+        AngleOfAttack alpha;   
+        SideslipAngle beta;
+    };
 
 
     AerodynamicState compute_aerodynamic_state(const dynamics::RigidBodyState& rbs);
 
 
-
-
-
+    dynamics::OrientationMatrix CBS(const aerodynamics::AngleOfAttack& alpha);
+    dynamics::OrientationMatrix CSW(const aerodynamics::SideslipAngle& beta);
 
 
 

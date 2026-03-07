@@ -74,7 +74,7 @@ void case2(vehicles::Aircraft& plane){
 
     // Reset initial conditions
     plane.BODY.wB_BN.data = Eigen::Vector3d(0,0,0);
-    plane.BODY.vB_BI.data = Eigen::Vector3d(0,0,0);
+    plane.BODY.v.data = Eigen::Vector3d(0,0,0);
 
     dynamics::Force  FB_net{ Eigen::Vector3d(1.0, 0.0, 0.0) };
     dynamics::Moment Mnet_B{ Eigen::Vector3d(0.0, 0.0, 0.0) };
@@ -93,8 +93,8 @@ void case2(vehicles::Aircraft& plane){
     const double px_exp = 0.5 * a * T * T;                         // 2.0
 
     std::cout << "\n--- Case 2 ---\n";
-    std::cout << "Expected v_x = " << vx_exp << " m/s, Actual v_x = " << xt.vB_BI.data.x() << " m/s\n";
-    std::cout << "Expected p_x = " << px_exp << " m,   Actual p_x = " << xt.pI_BI.data.x() << " m\n";
+    std::cout << "Expected v_x = " << vx_exp << " m/s, Actual v_x = " << xt.v.data.x() << " m/s\n";
+    std::cout << "Expected p_x = " << px_exp << " m,   Actual p_x = " << xt.p.data.x() << " m\n";
 }
 
 // ------------------------------------------------------------
@@ -125,7 +125,7 @@ void case2(vehicles::Aircraft& plane){
 void case3(vehicles::Aircraft& plane){
 
     plane.BODY.wB_BN.data = Eigen::Vector3d(0, 0, global::deg2rad(90.0));
-    plane.BODY.vB_BI.data = Eigen::Vector3d(0, 0, 0);
+    plane.BODY.v.data = Eigen::Vector3d(0, 0, 0);
 
     dynamics::Force  FB_net{ Eigen::Vector3d(0.0, 0.0, 0.0) };
     dynamics::Moment Mnet_B{ Eigen::Vector3d(0.0, 0.0, 0.0) };
@@ -139,7 +139,7 @@ void case3(vehicles::Aircraft& plane){
     }
 
     // Extract yaw from quaternion result for comparison
-    const Eigen::Matrix3d CIB = transforms::quat2rot(xt.qIB.data);
+    const Eigen::Matrix3d CIB = transforms::quat2rot(xt.q.data);
     const double yaw_act = wrap_pi(yaw_from_CIB(CIB));
     const double yaw_exp = wrap_pi(global::deg2rad(90.0) * T);
 

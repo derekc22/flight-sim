@@ -38,11 +38,11 @@ namespace dynamics {
     )>;
 
     struct Position {
-        Eigen::Vector3d data; // pI_BI
+        Eigen::Vector3d data; // e.g. pI_BI
     };
 
     struct OrientationMatrix {
-        Eigen::Matrix3d data; // CIB
+        Eigen::Matrix3d data; // e.g. CIB
     };
 
     struct HomogenousFrameTransformationMatrix {
@@ -57,7 +57,7 @@ namespace dynamics {
     };
 
     struct OrientationQuaternion {
-        Eigen::Quaterniond data; // qIB
+        Eigen::Quaterniond data; // e.g. qIB
         // void set(double a, double b, double c, const std::string& order, const std::string& type);
         void set(const OrientationMatrix& C);
         void set(const EulerAngles& eul, const std::string& order);
@@ -74,20 +74,19 @@ namespace dynamics {
     };
 
     struct OrientationMatrixRate {
-        Eigen::Matrix3d data; // CIB_dot
+        Eigen::Matrix3d data; // e.g. CIB_dot
         void set(const OrientationQuaternionRate& q_dot, const OrientationQuaternion& q, const OrientationMatrix& C);
         void set(const OrientationMatrix& C, const AngularVelocity& w);
     };
 
     struct OrientationQuaternionRate {
-        Eigen::Quaterniond data; // qIB_dot
-        // void set(const Eigen::Matrix3d& C_dot, const Eigen::Matrix3d& C, const Eigen::Quaterniond& q);
-        // void set(const OrientationMatrixRate& C_dot, const OrientationMatrix& C, const OrientationQuaternion& q);
+        Eigen::Quaterniond data; // e.g. qIB_dot
+        void set(const OrientationMatrixRate& C_dot, const OrientationMatrix& C, const OrientationQuaternion& q);
         void set(const OrientationQuaternion& q, const AngularVelocity& w);
     };
 
    struct AngularVelocity {
-        Eigen::Vector3d data; // wB_BI
+        Eigen::Vector3d data; // e.g. wB_BI
         double p() const;
         double q() const;
         double r() const;
@@ -103,19 +102,19 @@ namespace dynamics {
     };
 
     struct AngularVelocityQuaternion {
-        Eigen::Quaterniond data; // wq_BI = [ 0; wB_BI ]
-        AngularVelocity wB_BI() const;
+        Eigen::Quaterniond data; // e.g. wq_BI = [ 0; wB_BI ]
+        AngularVelocity w() const;
         // void set(const Eigen::Vector3d& wB_BI);
-        void set(const AngularVelocity& wB_BI);
+        void set(const AngularVelocity& w);
 
     };
 
     struct LinearVelocity {
-        Eigen::Vector3d data; // pB_BI_dot
+        Eigen::Vector3d data; // e.g. pB_BI_dot
     };
 
     struct LinearAcceleration {
-        Eigen::Vector3d data; // pB_BI_ddot
+        Eigen::Vector3d data; // e.g. pB_BI_ddot
     };
 
     struct Force {
@@ -143,67 +142,74 @@ namespace dynamics {
     };
 
     struct RigidBodyState {
-        // Must genuinely store values WRT the inertial frame (ECEF) ONLY
-        Position pI_BI;
-        LinearVelocity vB_BI;
-        OrientationQuaternion qIB;
-        AngularVelocity wB_BI;
+        dynamics::Position p;               // e.g. pI_BI
+        dynamics::LinearVelocity v;         // e.g. vB_BI
+        dynamics::OrientationQuaternion q;  // e.g. qIB
+        dynamics::AngularVelocity w;        // e.g. wB_BI
     };
 
+    /** @deprecated */
+    // struct InertialRigidBodyState : RigidBodyState{
+    // };
 
 
 
+    /** @warning Function signatures with an 'I' indicate that arguments MUST be specified WRT an inertial frame
+        In this codebase, 'inertial' is used as a strict synonym for the ECEF frame
+        However, as implemented in this codebase, the NED frame is technically also an inertial frame, so the NED frame could technically also be used with these functions
+        This is because, as implemented in this codebase, the NED frame remains fixed for the duration of the flight - as opposed to translating/re-orienting as the aircraft moves (which would be non-inertial behavior)
+        For simplicity, however, we strictly assume that 'I' and 'inertial' refer to the ECEF frame in the below dynamics functions
+        This may change in the future, but, for now, always assume inertial <=> ECEF and NEVER pass arguments corresponding to other frames to the below dynamics functions
+    */
 
-    
     std::array<Eigen::Vector3d, 2> fwd_euler(Eigen::Vector3d xt, Eigen::Vector3d xt_dot, DynamicsFunction f, double tf);
-    EulerAngleRates wB_BI_2_eul_dot(const EulerAngles& eul, const AngularVelocity& wB_BI);
-    Position trans_kin(const Position& xt, const LinearVelocity& xt_dot, const LinearAcceleration& xt_ddot);
-    EulerAngles eul_kin(const EulerAngles& eul_t, const EulerAngleRates& eul_dot_t);
+    EulerAngleRates _wB_BI_2_eul_dot(const EulerAngles& eul, const AngularVelocity& wB_BI);
+    Position _trans_kin(const Position& xt, const LinearVelocity& xt_dot, const LinearAcceleration& xt_ddot);
+    EulerAngles _eul_kin(const EulerAngles& eul_t, const EulerAngleRates& eul_dot_t);
 
-    OrientationMatrixRate ddt_CIB(const OrientationMatrix& CIB, const AngularVelocity& wB_BI);
-    OrientationMatrix rot_kin(const OrientationMatrix& CIB_t, const AngularVelocity& wB_BI_t);
-    OrientationQuaternion quat_kin(const OrientationQuaternion& qIB_t, const AngularVelocity& wB_BI_t);
-    OrientationQuaternionRate quat_kin_vel(const OrientationQuaternion& qIB_t, const AngularVelocity& wB_BI_t);
+    OrientationMatrixRate _ddt_CIB(const OrientationMatrix& CIB, const AngularVelocity& wB_BI);
+    OrientationMatrix _rot_kin(const OrientationMatrix& CIB_t, const AngularVelocity& wB_BI_t);
+    OrientationQuaternion _quat_kin(const OrientationQuaternion& qIB_t, const AngularVelocity& wB_BI_t);
+    OrientationQuaternionRate _quat_kin_vel(const OrientationQuaternion& qIB_t, const AngularVelocity& wB_BI_t);
 
     /**
     * @brief Returns the body derivative of body-expressed linear velocity
     */
-    LinearAcceleration ddtB_vB_BI(const LinearVelocity& vB, const AngularVelocity& wB_BI, const Mass& mass, const Force& FB_net);
+    LinearAcceleration _ddtB_vB_BI(const LinearVelocity& vB, const AngularVelocity& wB_BI, const Mass& mass, const Force& FB_net);
     
     /**
     * @brief Returns the body derivative of body-expressed angular velocity
     */
-    Eigen::Vector3d ddtB_wB_BI(const AngularVelocity& wB_BI, const InertiaTensor& J, const Moment& MB_net);
+    Eigen::Vector3d _ddtB_wB_BI(const AngularVelocity& wB_BI, const InertiaTensor& J, const Moment& MB_net);
 
 
     /**
     * @brief Converts a body derivative to an inertial derivative
     */
-    Eigen::Vector3d ddtB_to_ddtI(const Eigen::Vector3d& ddtB_v, const Eigen::Vector3d& v, const Eigen::Vector3d& w);
+    Eigen::Vector3d _ddtB_to_ddtI(const Eigen::Vector3d& ddtB_v, const Eigen::Vector3d& v, const Eigen::Vector3d& w);
 
 
-    LinearVelocity trans_dyn_vel(const LinearVelocity& vB_t, const AngularVelocity& wB_BI_t, const Mass& mass, const Force& FB_net_t);
-    AngularVelocity rot_dyn(const AngularVelocity& wB_BI_t, const InertiaTensor& J, const Moment& MB_net_t);
-    RigidBodyState step_rigid_body(const RigidBodyState& xt, const Mass& mass, const InertiaTensor& J, const Force& FB_net_t, const Moment& MB_net_t);
+    LinearVelocity _trans_dyn_vel(const LinearVelocity& vB_t, const AngularVelocity& wB_BI_t, const Mass& mass, const Force& FB_net_t);
+    AngularVelocity _rot_dyn(const AngularVelocity& wB_BI_t, const InertiaTensor& J, const Moment& MB_net_t);
+    RigidBodyState step_rigid_body(const RigidBodyState& xB_BI_t, const Mass& mass, const InertiaTensor& J, const Force& FB_net_t, const Moment& MB_net_t);
 
-    AngularVelocity CIB_dot2wB_BI(const OrientationMatrixRate& CIB_dot, const OrientationMatrix& CIB);
-    OrientationQuaternionRate CIB_dot2qIB_dot(const OrientationMatrixRate& CIB_dot, const OrientationMatrix& CIB, const OrientationQuaternion& qIB);
-    AngularVelocity qIB_dot2wB_BI(const OrientationQuaternionRate& qIB_dot, const OrientationQuaternion& qIB);
-    OrientationMatrixRate qIB_dot2CIB_dot(const OrientationQuaternionRate& qIB_dot, const OrientationQuaternion& qIB, const OrientationMatrix& CIB);
-    AngularVelocity eul_dot2wB_BI(const EulerAngleRates& eul_dot, const EulerAngles& eul);
-    EulerAngleRates wB_BI2eul_dot(const AngularVelocity& wB_BI, const EulerAngles& eul);
+    AngularVelocity _CIB_dot2wB_BI(const OrientationMatrixRate& CIB_dot, const OrientationMatrix& CIB);
+    OrientationQuaternionRate _CIB_dot2qIB_dot(const OrientationMatrixRate& CIB_dot, const OrientationMatrix& CIB, const OrientationQuaternion& qIB);
+    AngularVelocity _qIB_dot2wB_BI(const OrientationQuaternionRate& qIB_dot, const OrientationQuaternion& qIB);
+    OrientationMatrixRate _qIB_dot2CIB_dot(const OrientationQuaternionRate& qIB_dot, const OrientationQuaternion& qIB, const OrientationMatrix& CIB);
+    AngularVelocity _eul_dot2wB_BI(const EulerAngleRates& eul_dot, const EulerAngles& eul);
+    EulerAngleRates _wB_BI2eul_dot(const AngularVelocity& wB_BI, const EulerAngles& eul);
 
 
     namespace common {
         const extern double dt; // s
 
-        Eigen::Vector3d f_cv(Eigen::Vector3d xt, Eigen::Vector3d xt_dot); // constant velocity
-
-        Eigen::Matrix3d eul_dot2wB_BI_mat(double theta, double phi);
-
-        Eigen::Matrix3d wB_BI2eul_dot_mat(double theta, double phi);
-
-
     }
+
+    Eigen::Vector3d f_cv(Eigen::Vector3d xt, Eigen::Vector3d xt_dot); // constant velocity
+
+    Eigen::Matrix3d _eul_dot2wB_BI_mat(double theta, double phi);
+
+    Eigen::Matrix3d _wB_BI2eul_dot_mat(double theta, double phi);
 
 }

@@ -17,16 +17,16 @@ void case1(const vehicles::Aircraft&  ac){
 
     // Copy aircraft and declare step options
     vehicles::Aircraft asw28 = ac;
-    frames::StepOptions NEDFrameStepOptions;
-    frames::StepOptions BODYFrameNEDStepOptions;
-    frames::StepOptions BODYFrameECEFStepOptions;
+    frames::SetOptions NEDFrameSetOptions;
+    frames::SetOptions BODYFrameNEDSetOptions;
+    frames::SetOptions BODYFrameECEFSetOptions;
     
     // Define a velocity
     Eigen::Vector3d vB_BE(10, 0, 0); // 10 m/s forward
 
     // Set velocity
-    BODYFrameECEFStepOptions = { .v = vB_BE };
-    asw28.BODYFrameECEF.step(BODYFrameECEFStepOptions);
+    BODYFrameECEFSetOptions = { .v = vB_BE };
+    asw28.BODYFrameECEF.step(BODYFrameECEFSetOptions);
 
     // Declare and define useful variables
     dynamics::RigidBodyState xE_t;
@@ -94,7 +94,7 @@ void case1(const vehicles::Aircraft&  ac){
         asw28.BODYFrameECEF.step(xE_t1);
 
         // Save data
-        positionDM.set(t, xE_t1.pI_BI.data, dynamics::common::dt);
+        positionDM.set(t, xE_t1.p.data, dynamics::common::dt);
         aeroForceDM.set(t, FB_aero.data, dynamics::common::dt);
         aeroMomentDM.set(t, MB_aero.data, dynamics::common::dt);
         aeroStateDM.set(t, Eigen::Vector3d(ads.Vinf, ads.alpha, ads.beta), dynamics::common::dt);
@@ -119,16 +119,16 @@ void case2(const vehicles::Aircraft&  ac){
 
     // Copy aircraft and declare step options
     vehicles::Aircraft asw28 = ac;
-    frames::StepOptions NEDFrameStepOptions;
-    frames::StepOptions BODYFrameNEDStepOptions;
-    frames::StepOptions BODYFrameECEFStepOptions;
+    frames::SetOptions NEDFrameSetOptions;
+    frames::SetOptions BODYFrameNEDSetOptions;
+    frames::SetOptions BODYFrameECEFSetOptions;
     
     // Define a rotation rate
     Eigen::Vector3d wB_BE(global::deg2rad(30), 0, 0); // rotates about x at 30˚/s
 
     // Set velocity and rotation rate
-    BODYFrameECEFStepOptions = { .w = wB_BE };
-    asw28.BODYFrameECEF.step(BODYFrameECEFStepOptions);
+    BODYFrameECEFSetOptions = { .w = wB_BE };
+    asw28.BODYFrameECEF.step(BODYFrameECEFSetOptions);
 
     // Declare and define useful variables
     dynamics::RigidBodyState xE_t;
@@ -196,7 +196,7 @@ void case2(const vehicles::Aircraft&  ac){
         asw28.BODYFrameECEF.step(xE_t1);
 
         // Save data
-        positionDM.set(t, xE_t1.pI_BI.data, dynamics::common::dt);
+        positionDM.set(t, xE_t1.p.data, dynamics::common::dt);
         aeroForceDM.set(t, FB_aero.data, dynamics::common::dt);
         aeroMomentDM.set(t, MB_aero.data, dynamics::common::dt);
         aeroStateDM.set(t, Eigen::Vector3d(ads.Vinf, ads.alpha, ads.beta), dynamics::common::dt);
@@ -221,9 +221,9 @@ void case3(const vehicles::Aircraft&  ac){
 
     // Copy aircraft and declare step options
     vehicles::Aircraft asw28 = ac;
-    frames::StepOptions NEDFrameStepOptions;
-    frames::StepOptions BODYFrameNEDStepOptions;
-    frames::StepOptions BODYFrameECEFStepOptions;
+    frames::SetOptions NEDFrameSetOptions;
+    frames::SetOptions BODYFrameNEDSetOptions;
+    frames::SetOptions BODYFrameECEFSetOptions;
     
     // Define a velocity
     Eigen::Vector3d vB_BE(10, 0, 0); // 10 m/s forward
@@ -232,8 +232,8 @@ void case3(const vehicles::Aircraft&  ac){
     Eigen::Vector3d wB_BE(global::deg2rad(30), 0, 0); // rotates about x at 30˚/s
 
     // Set velocity and rotation rate
-    BODYFrameECEFStepOptions = { .w = wB_BE, .v = vB_BE };
-    asw28.BODYFrameECEF.step(BODYFrameECEFStepOptions);
+    BODYFrameECEFSetOptions = { .w = wB_BE, .v = vB_BE };
+    asw28.BODYFrameECEF.step(BODYFrameECEFSetOptions);
 
     // Declare and define useful variables
     dynamics::RigidBodyState xE_t;
@@ -301,7 +301,7 @@ void case3(const vehicles::Aircraft&  ac){
         asw28.BODYFrameECEF.step(xE_t1);
 
         // Save data
-        positionDM.set(t, xE_t1.pI_BI.data, dynamics::common::dt);
+        positionDM.set(t, xE_t1.p.data, dynamics::common::dt);
         aeroForceDM.set(t, FB_aero.data, dynamics::common::dt);
         aeroMomentDM.set(t, MB_aero.data, dynamics::common::dt);
         aeroStateDM.set(t, Eigen::Vector3d(ads.Vinf, ads.alpha, ads.beta), dynamics::common::dt);
@@ -344,22 +344,22 @@ int main() {
     Eigen::Matrix3d CEB_0 = CNB_0 * CEN_0;
     Eigen::Vector3d pE_BE_0 = CEN_0.transpose() * pN_BN_0 + pE_NE_0;
 
-    frames::StepOptions NEDFrameStepOptions{
+    frames::SetOptions NEDFrameSetOptions{
         .C = CEN_0,
         .p = pE_NE_0,
     };
-    frames::StepOptions BODYFrameNEDStepOptions{
+    frames::SetOptions BODYFrameNEDSetOptions{
         .C = CNB_0,
         .p = pN_BN_0,
     };
-    frames::StepOptions BODYFrameECEFrameStepOptions{
+    frames::SetOptions BODYFrameECEFrameSetOptions{
         .C = CEB_0,
         .p = pE_BE_0,
     };
 
-    NEDFrame.step(NEDFrameStepOptions);
-    BODYFrameNED.step(BODYFrameNEDStepOptions);
-    BODYFrameECEF.step(BODYFrameECEFrameStepOptions);
+    NEDFrame.step(NEDFrameSetOptions);
+    BODYFrameNED.step(BODYFrameNEDSetOptions);
+    BODYFrameECEF.step(BODYFrameECEFrameSetOptions);
 
     // define structural and geometric properties
     std::vector<structural::Geometry> geometries = {
@@ -397,54 +397,54 @@ int main() {
     };
 
 
-    // // Question 3
-    // std::cout << "Mass: " << asw28.structural.Mass.data << std::endl;
-    // std::cout << "CG: " << asw28.structural.CG.data << std::endl;
-    // std::cout << "J: " << asw28.structural.J.data << std::endl;
+    // Question 3
+    std::cout << "Mass: " << asw28.structural.Mass.data << std::endl;
+    std::cout << "CG: " << asw28.structural.CG.data << std::endl;
+    std::cout << "J: " << asw28.structural.J.data << std::endl;
 
 
-    // // Question 4
-    // const auto& s3 = asw28.aerodynamic.surfaces[
-    //     asw28.aerodynamic.surfaceIDs.at("s3")
-    // ];
-    // std::cout << "s3, p_loc: " << s3.p_ref.transpose() << std::endl;
-    // std::cout << "s3, p_ac: " << s3.p_ac.transpose() << std::endl;
-    // std::cout << "s3, chord: " << s3.chord << std::endl;
-    // std::cout << "s3, span: "  << s3.span  << std::endl;
-    // std::cout << "s3, AR: "   << s3.AR   << std::endl;
+    // Question 4
+    const auto& s3 = asw28.aerodynamic.surfaces[
+        asw28.aerodynamic.surfaceIDs.at("s3")
+    ];
+    std::cout << "s3, p_loc: " << s3.p_ref.transpose() << std::endl;
+    std::cout << "s3, p_ac: " << s3.p_ac.transpose() << std::endl;
+    std::cout << "s3, chord: " << s3.chord << std::endl;
+    std::cout << "s3, span: "  << s3.span  << std::endl;
+    std::cout << "s3, AR: "   << s3.AR   << std::endl;
 
-    // const auto& s4 = asw28.aerodynamic.surfaces[
-    //     asw28.aerodynamic.surfaceIDs.at("s4")
-    // ];
-    // std::cout << "s4, p_loc: " << s4.p_ref.transpose() << std::endl;
-    // std::cout << "s4, p_ac: " << s4.p_ac.transpose() << std::endl;
-    // std::cout << "s4, chord: " << s4.chord << std::endl;
-    // std::cout << "s4, span: "  << s4.span  << std::endl;
-    // std::cout << "s4, AR: "   << s4.AR   << std::endl;
+    const auto& s4 = asw28.aerodynamic.surfaces[
+        asw28.aerodynamic.surfaceIDs.at("s4")
+    ];
+    std::cout << "s4, p_loc: " << s4.p_ref.transpose() << std::endl;
+    std::cout << "s4, p_ac: " << s4.p_ac.transpose() << std::endl;
+    std::cout << "s4, chord: " << s4.chord << std::endl;
+    std::cout << "s4, span: "  << s4.span  << std::endl;
+    std::cout << "s4, AR: "   << s4.AR   << std::endl;
 
-    // const auto& s5 = asw28.aerodynamic.surfaces[
-    //     asw28.aerodynamic.surfaceIDs.at("s5")
-    // ];
-    // std::cout << "s5, p_loc: " << s5.p_ref.transpose() << std::endl;
-    // std::cout << "s5, p_ac: " << s5.p_ac.transpose() << std::endl;
-    // std::cout << "s5, chord: " << s5.chord << std::endl;
-    // std::cout << "s5, span: "  << s5.span  << std::endl;
-    // std::cout << "s5, AR: "   << s5.AR   << std::endl;
+    const auto& s5 = asw28.aerodynamic.surfaces[
+        asw28.aerodynamic.surfaceIDs.at("s5")
+    ];
+    std::cout << "s5, p_loc: " << s5.p_ref.transpose() << std::endl;
+    std::cout << "s5, p_ac: " << s5.p_ac.transpose() << std::endl;
+    std::cout << "s5, chord: " << s5.chord << std::endl;
+    std::cout << "s5, span: "  << s5.span  << std::endl;
+    std::cout << "s5, AR: "   << s5.AR   << std::endl;
 
-    // const auto& s2 = asw28.aerodynamic.surfaces[
-    //     asw28.aerodynamic.surfaceIDs.at("s2")
-    // ];
-    // std::cout << "s2, p_loc: " << s2.p_ref.transpose() << std::endl;
-    // std::cout << "s2, p_ac: " << s2.p_ac.transpose() << std::endl;
-    // std::cout << "s2, chord: " << s2.chord << std::endl;
-    // std::cout << "s2, span: "  << s2.span  << std::endl;
-    // std::cout << "s2, AR: "   << s2.AR   << std::endl;
+    const auto& s2 = asw28.aerodynamic.surfaces[
+        asw28.aerodynamic.surfaceIDs.at("s2")
+    ];
+    std::cout << "s2, p_loc: " << s2.p_ref.transpose() << std::endl;
+    std::cout << "s2, p_ac: " << s2.p_ac.transpose() << std::endl;
+    std::cout << "s2, chord: " << s2.chord << std::endl;
+    std::cout << "s2, span: "  << s2.span  << std::endl;
+    std::cout << "s2, AR: "   << s2.AR   << std::endl;
 
 
 
     // Run cases
-    // case1(asw28);
-    // case2(asw28);
-    // case3(asw28);
+    case1(asw28);
+    case2(asw28);
+    case3(asw28);
 
 }
