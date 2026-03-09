@@ -132,13 +132,7 @@ namespace frames {
         /** @deprecated */
         // void set(const dynamics::RigidBodyState& rigidBodyState);
         // dynamics::RigidBodyState RigidBodyState();
-
-        /** @brief Obtains the rotation matrix from the root (ECEFFrame) to the frame F */
-        dynamics::OrientationMatrix CRF(const Frame& F);
         
-        /** @brief Rotates vector vA from frame {A} to frame {B}, producing vB */
-        Eigen::Vector3d rotate_vec(const Eigen::Vector3d& vA, const Frame& A, const Frame& B);
-
         std::unordered_set<Frame*> dependents;
         std::unordered_set<Frame*> dependent_on;
         void add_as_direct_dependent(Frame* p);
@@ -279,5 +273,12 @@ namespace frames {
         // dynamics::OrientationMatrix CSW(const aerodynamics::SideslipAngle& beta) const;
     };
 
+
+
+    /** @brief Obtains the rotation matrix from the root (ECEFFrame) to the frame F */
+    dynamics::OrientationMatrix CRF(const Frame& F);
+
+    /** @brief Rotates vector vA from frame {A} to frame {B}, producing vB */
+    Eigen::Vector3d rotate_vec(const Eigen::Vector3d& vA, const Frame& A, const Frame& B);
 
 }

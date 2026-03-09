@@ -2,6 +2,7 @@
 #include <Eigen/Dense>
 #include <cmath>
 #include <vector>
+#include "simulation/dynamics/dynamics.hpp"
 
 
 namespace geography {

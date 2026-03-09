@@ -2,6 +2,7 @@
 #include <Eigen/Dense>
 #include <format>
 #include <string>
+#include <iostream>
 #include <stdexcept>
 #include <queue>
 #include <unordered_set>
@@ -130,6 +131,14 @@ namespace vehicles {
             throw std::invalid_argument(err_msg);
         }
         return aerodynamics::compute_aerodynamic_state(rigidBodyState(F));
+    }
+
+    atmospheric::AtmosphericState Aircraft::atmosphericState(const frames::Frame& F) {
+        if (F.parent != nullptr) {
+            std::string err_msg = std::format("vehicles::Aircraft::atmosphericState: Invalid frame input, the parent of {} must be ECEFFrame", F.name);
+            throw std::invalid_argument(err_msg);
+        }
+        return atmospheric::std_atmosphere(geographicState(F).alt);
     }
 
 
@@ -303,8 +312,8 @@ namespace vehicles {
         }
 
         // Defaults
-        NEDFrameECEFSetOpts.C_dot = dynamics::OrientationMatrixRate{ Eigen::Matrix3d::Zero() };
-        NEDFrameECEFSetOpts.v = dynamics::LinearVelocity{ Eigen::Vector3d::Zero() };
+        NEDFrameECEFSetOpts.C_dot = dynamics::OrientationMatrixRate{ global::Zero3x3 };
+        NEDFrameECEFSetOpts.v = dynamics::LinearVelocity{ global::Zero3 };
         // NEDFrameECEFSetOpts.g = geography::gN();
 
         F.set(NEDFrameECEFSetOpts); 
@@ -414,7 +423,7 @@ namespace vehicles {
         else {
             dynamics::Position p{ NEDFrameECEF.HEN.C().data.transpose() * FRDFrameNED.HNB.p().data + NEDFrameECEF.HEN.p().data };
             FRDFrameECEFSetOpts.p = p;
-            dynamics::OrientationMatrix C{ NEDFrameECEF.HEN.C().data * FRDFrameNED.HNB.C().data };
+            dynamics::OrientationMatrix C{ FRDFrameNED.HNB.C().data * NEDFrameECEF.HEN.C().data };
             FRDFrameECEFSetOpts.C = C;
             FRDFrameECEFSetOpts.w = FRDFrameNED.wB_BN;
             FRDFrameECEFSetOpts.v = FRDFrameNED.vB_BN;
@@ -514,8 +523,8 @@ namespace vehicles {
         }
 
         else {
-            FRDFrameNEDSetOpts.p = dynamics::Position{ NEDFrameECEF.HEN.C().data * FRDFrameECEF.HEB.p().data - NEDFrameECEF.HEN.p().data };
-            dynamics::OrientationMatrix C{ NEDFrameECEF.HEN.C().data.transpose() * FRDFrameECEF.HEB.C().data };
+            FRDFrameNEDSetOpts.p = dynamics::Position{ NEDFrameECEF.HEN.C().data * (FRDFrameECEF.HEB.p().data - NEDFrameECEF.HEN.p().data) };
+            dynamics::OrientationMatrix C{ FRDFrameECEF.HEB.C().data *  NEDFrameECEF.HEN.C().data.transpose() };
             FRDFrameNEDSetOpts.C = C;
             FRDFrameNEDSetOpts.w = FRDFrameECEF.wB_BE;
             FRDFrameNEDSetOpts.v = FRDFrameECEF.vB_BE;
@@ -571,9 +580,9 @@ namespace vehicles {
         }
 
         // Defaults
-        STABFrameFRDSetOpts.p = dynamics::Position{ Eigen::Vector3d::Zero() };
-        STABFrameFRDSetOpts.C_dot = dynamics::OrientationMatrixRate{ Eigen::Matrix3d::Zero() };
-        STABFrameFRDSetOpts.v = dynamics::LinearVelocity{ Eigen::Vector3d::Zero() };
+        STABFrameFRDSetOpts.p = dynamics::Position{ global::Zero3 };
+        STABFrameFRDSetOpts.C_dot = dynamics::OrientationMatrixRate{ global::Zero3x3 };
+        STABFrameFRDSetOpts.v = dynamics::LinearVelocity{ global::Zero3 };
 
         F.set(STABFrameFRDSetOpts); 
     }
@@ -624,9 +633,9 @@ namespace vehicles {
         }
 
         // Defaults
-        WINDFrameSTABSetOpts.p = dynamics::Position{ Eigen::Vector3d::Zero() };
-        WINDFrameSTABSetOpts.C_dot = dynamics::OrientationMatrixRate{ Eigen::Matrix3d::Zero() };
-        WINDFrameSTABSetOpts.v = dynamics::LinearVelocity{ Eigen::Vector3d::Zero() };
+        WINDFrameSTABSetOpts.p = dynamics::Position{ global::Zero3 };
+        WINDFrameSTABSetOpts.C_dot = dynamics::OrientationMatrixRate{ global::Zero3x3 };
+        WINDFrameSTABSetOpts.v = dynamics::LinearVelocity{ global::Zero3 };
 
         F.set(WINDFrameSTABSetOpts); 
     }
@@ -728,16 +737,18 @@ namespace vehicles {
         throw std::invalid_argument(err_msg);
 
     }
-    void set(const dynamics::RigidBodyState& rigidBodyState, frames::NEDFrameECEF& F){
-        F.set(rigidBodyState.p);
-        F.set(rigidBodyState.v);
-        F.set(rigidBodyState.q);
-        F.set(rigidBodyState.w);
-    }
 
-    void set(const geography::GeographicState& geographicState, frames::NEDFrameECEF& F){
-        F.set( geography::pE_from_lat_lon_alt(geographicState));
-    }
+    /** @deprecated */
+    // void Aircraft::set(const dynamics::RigidBodyState& rigidBodyState, frames::NEDFrameECEF& F){
+    //     F.set(rigidBodyState.p);
+    //     F.set(rigidBodyState.v);
+    //     F.set(rigidBodyState.q);
+    //     F.set(rigidBodyState.w);
+    // }
+
+    // void Aircraft::set(const geography::GeographicState& geographicState, frames::NEDFrameECEF& F){
+    //     F.set( geography::pE_from_lat_lon_alt(geographicState));
+    // }
 
     _StepOptions::operator bool() const {
         return
@@ -796,9 +807,9 @@ namespace vehicles {
         // Set default values
         frames::SetOptions initStepOptions = {
             .H = dynamics::HomogenousFrameTransformationMatrix{ global::HI },
-            .w = dynamics::AngularVelocity{ global::zero },
-            .v = dynamics::LinearVelocity{ global::zero },
-            .g = dynamics::Gravity{ global::zero }
+            .w = dynamics::AngularVelocity{ global::Zero3 },
+            .v = dynamics::LinearVelocity{ global::Zero3 },
+            .g = dynamics::Gravity{ global::Zero3 }
         };
 
         NEDFrameECEF.set(initStepOptions);
@@ -807,7 +818,7 @@ namespace vehicles {
         STABFrameFRD.set(initStepOptions);
         WINDFrameSTAB.set(initStepOptions);
 
-        // Set dependents, {C} -depends-on-> {P}
+        // Set dependents, {X} -depends-on-> {Y}
         NEDFrameECEF.add_as_direct_dependent(&FRDFrameNED);    // {FRDFrameNED} -> {NEDFrameECEF}
     
         FRDFrameECEF.add_as_direct_dependent(&FRDFrameNED);    // {FRDFrameNED} -> {FRDFrameECEF}
@@ -831,6 +842,31 @@ namespace vehicles {
     {
         _init_frames();
     }
+
+
+    void Aircraft::print_state(int t) {
+        const dynamics::RigidBodyState rbs = rigidBodyState(FRDFrameNED);
+        const geography::GeographicState gps = geographicState(FRDFrameECEF);
+        const aerodynamics::AerodynamicState ads = aerodynamicState(FRDFrameNED);
+
+        const Eigen::Vector3d& p = rbs.p.data;
+        const dynamics::EulerAngles& eul = FRDFrameNED.eulNB;
+        const Eigen::Vector3d& v = rbs.v.data;
+        const Eigen::Vector3d& w = rbs.w.data;
+        const Eigen::Vector3d& g = FRDFrameNED.gB.data;
+
+        std::cout
+            << "t: " << t * global::dt << " [s]" << "\n\n"
+            << "p: " << p.x() << ", " << p.y() << ", " << p.z() << " [m]" << "\n\n"
+            << "eul: " << global::rad_to_deg(eul.psi()) << ", " << global::rad_to_deg(eul.theta()) << ", " << global::rad_to_deg(eul.psi()) << " [deg]" << "\n\n"
+            << "v: " << v.x() << ", " << v.y() << ", " << v.z() << " [ms^-1]" << "\n\n"
+            << "w: " << global::rad_to_deg(w.x()) << ", " << global::rad_to_deg(w.y()) << ", " << global::rad_to_deg(w.z()) << " [deg/s]" << "\n\n"
+            << "g: " << g.x() << ", " << g.y() << ", " << g.z() << " [ms^-2]" << "\n\n"
+            << "lat: " << global::rad_to_deg(gps.lat.data) << ", lon: " << global::rad_to_deg(gps.lon.data) << " [deg]" << ", alt: " << gps.alt.data << " [m]" << "\n\n"
+            << "alpha: " <<  global::rad_to_deg(ads.alpha.data) << ", beta: " <<  global::rad_to_deg(ads.beta.data) << " [deg]" << "\n\n"
+            << "-------------------------------------------------------------------------------" << "\n\n";
+    }
+
 
 
 

@@ -3,12 +3,15 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include <cmath>
+#include <algorithm>
 #include "simulation/structural/structural.hpp"
 #include <simulation/dynamics/dynamics.hpp>
+#include <simulation/atmospheric/atmospheric.hpp>
 
 namespace aerodynamics {
 
-    struct Vinf;
+    struct FreeStreamVelocity;
     struct LiftCoefficient;
     struct DragCoefficient;
     struct MomentCoefficient;
@@ -45,11 +48,10 @@ namespace aerodynamics {
     };
 
 
-    std::pair<dynamics::Force, dynamics::Moment> step_aero_forces_moments(const AerodynamicProperties& aero, const structural::StructuralProperties& structural, const dynamics::RigidBodyState& rbs, double rho);
+    dynamics::Wrench step_aero_forces_moments(const AerodynamicProperties& aerodynamicProperties, const structural::StructuralProperties& structuralProperties, const dynamics::RigidBodyState& rigidBodyState, const atmospheric::Density& rho);
 
 
-
-    struct Vinf {
+    struct FreeStreamVelocity {
         double data; // freestream velocity, V∞​ [ms^-1]
     };
 
@@ -74,7 +76,7 @@ namespace aerodynamics {
     };
 
     struct AerodynamicState {
-        Vinf vinf;    
+        FreeStreamVelocity Vinf;    
         AngleOfAttack alpha;   
         SideslipAngle beta;
     };

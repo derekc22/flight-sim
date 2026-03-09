@@ -30,6 +30,8 @@ namespace dynamics {
     struct Mass;
     struct CenterOfGravity;
     struct Moment;
+    struct Wrench;
+    struct Twist;
 
     using DynamicsFunction =
     std::function<Eigen::Vector3d(
@@ -53,23 +55,23 @@ namespace dynamics {
         void set(const OrientationMatrix& C);
         void set(const Position& p);
         void set(const OrientationQuaternion& q);
-        void set(const EulerAngles& eul, const std::string& order);
+        void set(const EulerAngles& eul);
     };
 
     struct OrientationQuaternion {
         Eigen::Quaterniond data; // e.g. qIB
         // void set(double a, double b, double c, const std::string& order, const std::string& type);
         void set(const OrientationMatrix& C);
-        void set(const EulerAngles& eul, const std::string& order);
+        void set(const EulerAngles& eul);
     };
 
     struct EulerAngles {
-        Eigen::Vector3d data; // eul ("ZYX", intrinsic)
-        double phi() const;
-        double theta() const;
-        double psi() const;
-        void set(const OrientationMatrix& C, const std::string& order);
-        void set(const OrientationQuaternion& q, const std::string& order);
+        Eigen::Vector3d data;   // eul ("ZYX", intrinsic)
+        double psi() const;     // yaw
+        double theta() const;   // pitch
+        double phi() const;     // roll
+        void set(const OrientationMatrix& C);
+        void set(const OrientationQuaternion& q);
 
     };
 
@@ -152,6 +154,16 @@ namespace dynamics {
     // struct InertialRigidBodyState : RigidBodyState{
     // };
 
+    struct Wrench {
+        dynamics::Force F;          
+        dynamics::Moment M;         
+    };
+
+    struct Twist {
+        dynamics::LinearVelocity v;         // e.g. vB_BI
+        dynamics::AngularVelocity w;        // e.g. wB_BI
+    };
+
 
 
     /** @warning Function signatures with an 'I' indicate that arguments MUST be specified WRT an inertial frame
@@ -200,11 +212,6 @@ namespace dynamics {
     AngularVelocity _eul_dot2wB_BI(const EulerAngleRates& eul_dot, const EulerAngles& eul);
     EulerAngleRates _wB_BI2eul_dot(const AngularVelocity& wB_BI, const EulerAngles& eul);
 
-
-    namespace common {
-        const extern double dt; // s
-
-    }
 
     Eigen::Vector3d f_cv(Eigen::Vector3d xt, Eigen::Vector3d xt_dot); // constant velocity
 

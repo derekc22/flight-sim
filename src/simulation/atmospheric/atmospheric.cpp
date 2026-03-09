@@ -1,11 +1,14 @@
 #include <array>
 #include "simulation/atmospheric/atmospheric.hpp"
+#include "simulation/geography/geography.hpp"
 
 namespace atmospheric {
 
 
 
-    std::array<double, 3> StandardAtmosphere::measure(double height){
+    AtmosphericState std_atmosphere(const geography::Altitude& height){
+
+        double h = height.data;
 
         // Sea-level conditions
         constexpr double density_SL = 1.225;     // kg/m^3
@@ -24,21 +27,21 @@ namespace atmospheric {
         double density = 0.0;       // ρ [kg/m^3]
 
         // Gradient region
-        if (height <= 11000.0) {
-            temperature = temperature_SL + lapse_rate * height;
+        if (h <= 11000.0) {
+            temperature = temperature_SL + lapse_rate * h;
             density = density_SL * std::pow(temperature / temperature_SL, -((g / (lapse_rate * gas_constant)) + 1.0));
         }
         // Isothermal region
         else {
             temperature = temperature_11;
-            density = density_11 * std::exp(-g * ((height - 11000.0) / (gas_constant * temperature_11)));
+            density = density_11 * std::exp(-g * ((h - 11000.0) / (gas_constant * temperature_11)));
         }
 
         // Viscosity
         const double viscosity = 1.54 * (1.0 + 0.0039 * (temperature - 250.0)) * 1e-5;  // μ [kg/m·s]
 
  
-        return { temperature, density, viscosity };
+        return AtmosphericState{ temperature, density, viscosity };
     }
 
 

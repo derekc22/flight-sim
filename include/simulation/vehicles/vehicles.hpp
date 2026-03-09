@@ -5,6 +5,7 @@
 #include "simulation/dynamics/dynamics.hpp"
 #include "simulation/aerodynamics/aerodynamics.hpp"
 #include "simulation/geography/geography.hpp"
+#include "simulation/atmospheric/atmospheric.hpp"
 
 
 
@@ -324,8 +325,7 @@ namespace vehicles {
         structural::StructuralProperties structuralProperties;
         aerodynamics::AerodynamicProperties aerodynamicProperties;
 
-        /** @warning The parent of F must be an inertial frame: ECEFFrame or NEDFrameECEF */
-        aerodynamics::AerodynamicState aerodynamicState(const frames::Frame& F);
+        Aircraft(const structural::StructuralProperties& structuralProperties, const aerodynamics::AerodynamicProperties& aerodynamicProperties);
 
         /** @warning The parent of F must be an inertial frame: ECEFFrame or NEDFrameECEF */
         dynamics::RigidBodyState rigidBodyState(const frames::Frame& F);
@@ -333,6 +333,11 @@ namespace vehicles {
         /** @warning The parent of F must the ECEFFrame */
         geography::GeographicState geographicState(const frames::Frame& F);
 
+        /** @warning The parent of F must be an inertial frame: ECEFFrame or NEDFrameECEF */
+        aerodynamics::AerodynamicState aerodynamicState(const frames::Frame& F);
+
+        /** @warning The parent of F must the ECEFFrame */
+        atmospheric::AtmosphericState atmosphericState(const frames::Frame& F);
 
         void step(const StepOptions& opts);
         void _step(frames::NEDFrameECEF& F, const _StepOptions& opts);
@@ -346,13 +351,11 @@ namespace vehicles {
 
         void _init_frames();
 
-        void _set(const dynamics::RigidBodyState& rigidBodyState, frames::Frame& F);
-        void _set(const geography::GeographicState& geographicState, frames::Frame& F);
+        /** @deprecated */
+        // void _set(const dynamics::RigidBodyState& rigidBodyState, frames::Frame& F);
+        // void _set(const geography::GeographicState& geographicState, frames::Frame& F);
 
-
-        Aircraft(const structural::StructuralProperties& structuralProperties, const aerodynamics::AerodynamicProperties& aerodynamicProperties);
-
-
+        void print_state(int t);
 
     };
 

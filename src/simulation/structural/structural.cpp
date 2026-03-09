@@ -27,7 +27,7 @@ namespace structural {
     }
 
     Eigen::Vector3d StructuralProperties::compute_CG() {
-        Eigen::Vector3d cg = Eigen::Vector3d::Zero();
+        Eigen::Vector3d cg = global::Zero3;
         for (const Geometry& geom : geometries) {
             cg(0) += geom.mass * geom.x_loc;
             cg(1) += geom.mass * geom.y_loc;
@@ -38,7 +38,7 @@ namespace structural {
     }
 
     Eigen::Matrix3d StructuralProperties::compute_J() {
-        Eigen::Matrix3d j = Eigen::Matrix3d::Zero();
+        Eigen::Matrix3d j = global::Zero3x3;
 
         for (const Geometry& geom : geometries) {
             double m = geom.mass;

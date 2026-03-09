@@ -11,11 +11,6 @@
 
 namespace dynamics {
 
-    namespace common {
-        const double dt = 0.01;
-
-    }
-
     Eigen::Vector3d f_cv(Eigen::Vector3d xt, Eigen::Vector3d xt_dot){
         return Eigen::Vector3d(0, 0, 0);
     }
@@ -37,13 +32,13 @@ namespace dynamics {
     }
 
     std::array<Eigen::Vector3d, 2> fwd_euler(Eigen::Vector3d xt, Eigen::Vector3d xt_dot, DynamicsFunction f, double tf){
-        int steps = static_cast<int>(std::floor(tf / common::dt));
+        int steps = static_cast<int>(std::floor(tf / global::dt));
         Eigen::Vector3d xt_ddot;
 
         for (int i = 0; i < steps; ++i){
             xt_ddot = f(xt, xt_dot);
-            xt += xt_dot * common::dt;
-            xt_dot += xt_ddot * common::dt;
+            xt += xt_dot * global::dt;
+            xt_dot += xt_ddot * global::dt;
         }
         return std::array<Eigen::Vector3d, 2>{xt, xt_dot};
     }
@@ -53,19 +48,19 @@ namespace dynamics {
 
     // TODO make sure every _kin function returns both velocity and position
     Position _trans_kin(const Position& xt, const LinearVelocity& xt_dot, const LinearAcceleration& xt_ddot){
-        const Eigen::Vector3d xt1 = xt.data + xt_dot.data * common::dt + 0.5 * xt_ddot.data * (common::dt * common::dt);
+        const Eigen::Vector3d xt1 = xt.data + xt_dot.data * global::dt + 0.5 * xt_ddot.data * (global::dt * global::dt);
 
         return Position { xt1 };
     }
 
     LinearVelocity trans_kin_vel(const LinearVelocity& xt_dot, const LinearAcceleration& xt_ddot){
-        const Eigen::Vector3d xt_dot1 = xt_dot.data + xt_ddot.data * common::dt;
+        const Eigen::Vector3d xt_dot1 = xt_dot.data + xt_ddot.data * global::dt;
 
         return LinearVelocity { xt_dot1 };
     }
 
     EulerAngles _eul_kin(const EulerAngles& eul_t, const EulerAngleRates& eul_dot_t){
-        const Eigen::Vector3d eul_t1 = eul_t.data + eul_dot_t.data * common::dt;
+        const Eigen::Vector3d eul_t1 = eul_t.data + eul_dot_t.data * global::dt;
 
         return EulerAngles { eul_t1 };
     }
@@ -92,7 +87,7 @@ namespace dynamics {
         else {
             const Eigen::Vector3d w_hat = wB_BI_t.data/Omega;
             Eigen::Matrix3d w_hat_skew = global::hat(w_hat);
-            exp_term = global::I3 - std::sin(Omega * common::dt) * w_hat_skew + (1 - std::cos(Omega * common::dt)) * w_hat_skew * w_hat_skew;
+            exp_term = global::I3 - std::sin(Omega * global::dt) * w_hat_skew + (1 - std::cos(Omega * global::dt)) * w_hat_skew * w_hat_skew;
         }
 
         const Eigen::Matrix3d CIB_t1 = exp_term * CIB_t.data;
@@ -107,8 +102,8 @@ namespace dynamics {
             dq = Eigen::Quaterniond::Identity();
         } else {
             const Eigen::Vector3d w_hat = wB_BI_t.data/Omega;
-            dq.w() = std::cos(Omega * common::dt / 2);
-            dq.vec() = -w_hat * std::sin(Omega * common::dt / 2);  // minus for qIB convention
+            dq.w() = std::cos(Omega * global::dt / 2);
+            dq.vec() = -w_hat * std::sin(Omega * global::dt / 2);  // minus for qIB convention
         }
 
         const Eigen::Quaterniond qIB_t1 = dq * qIB_t.data;
@@ -148,7 +143,7 @@ namespace dynamics {
     LinearVelocity _trans_dyn_vel(const LinearVelocity& vB_BI_t, const AngularVelocity& wB_BI_t, const Mass& mass, const Force& FB_net_t){
         const LinearAcceleration vB_BI_dot_t = _ddtB_vB_BI(vB_BI_t, wB_BI_t, mass, FB_net_t);
 
-        const Eigen::Vector3d vB_BI_t1 = vB_BI_t.data + vB_BI_dot_t.data * common::dt;
+        const Eigen::Vector3d vB_BI_t1 = vB_BI_t.data + vB_BI_dot_t.data * global::dt;
         return LinearVelocity { vB_BI_t1 };
     }
 
@@ -177,7 +172,7 @@ namespace dynamics {
     AngularVelocity _rot_dyn(const AngularVelocity& wB_BI_t, const InertiaTensor& J, const Moment& MB_net_t){
         const Eigen::Vector3d wB_BI_dot_t = _ddtB_wB_BI(wB_BI_t, J, MB_net_t);
 
-        const Eigen::Vector3d wB_BI_t1 = wB_BI_t.data + wB_BI_dot_t * common::dt;
+        const Eigen::Vector3d wB_BI_t1 = wB_BI_t.data + wB_BI_dot_t * global::dt;
         return AngularVelocity { wB_BI_t1 };
     }
 
@@ -276,23 +271,23 @@ namespace dynamics {
 
 
 
-    OrientationMatrix HomogenousFrameTransformationMatrix::C() const { return OrientationMatrix { transforms::RfromH(data) }; }
+    OrientationMatrix HomogenousFrameTransformationMatrix::C() const { return OrientationMatrix { transforms::CfromH(data) }; }
     Position HomogenousFrameTransformationMatrix::p() const { return Position { transforms::pfromH(data) }; }
     void HomogenousFrameTransformationMatrix::set(const OrientationMatrix& C, const Position& p) { data = transforms::makeHC(C.data, p.data, "translate"); }
     void HomogenousFrameTransformationMatrix::set(const OrientationMatrix& C) { data = transforms::makeHC(C.data, p().data, "translate"); }
     void HomogenousFrameTransformationMatrix::set(const Position& p) { data = transforms::makeHC(C().data, p.data, "translate"); }
     void HomogenousFrameTransformationMatrix::set(const OrientationQuaternion& q){ data = transforms::makeHC(transforms::quat2rot(q.data), p().data, "translate"); }
-    void HomogenousFrameTransformationMatrix::set(const EulerAngles& eul, const std::string& order) { data = transforms::makeHC(transforms::eul2C_intr(eul.phi(), eul.theta(), eul.psi(), order), p().data, "translate"); }
+    void HomogenousFrameTransformationMatrix::set(const EulerAngles& eul) { data = transforms::makeHC(transforms::eul2C(eul.psi(), eul.theta(), eul.phi(), "ZYX", "intr"), p().data, "translate"); }
 
     // void OrientationQuaternion::set(double a, double b, double c, const std::string& order, const std::string& type) { data = transforms::eul2quatC(a, b, c, order, type); }
     void OrientationQuaternion::set(const OrientationMatrix& C) { data = transforms::normalize_and_canonicalize(transforms::rot2quat(C.data)); }
-    void OrientationQuaternion::set(const EulerAngles& eul, const std::string& order) { data = transforms::normalize_and_canonicalize(transforms::eul2quatC_intr(eul.phi(), eul.theta(), eul.psi(), order)); }
+    void OrientationQuaternion::set(const EulerAngles& eul) { data = transforms::normalize_and_canonicalize(transforms::eul2quatC(eul.psi(), eul.theta(), eul.phi(), "ZYX", "intr")); }
 
-    double EulerAngles::phi() const   { return data[0]; }
+    double EulerAngles::psi() const   { return data[0]; }
     double EulerAngles::theta() const { return data[1]; }
-    double EulerAngles::psi() const   { return data[2]; }
-    void EulerAngles::set(const OrientationMatrix& C, const std::string& order) { data = transforms::C2eul_intr(C.data, order); }
-    void EulerAngles::set(const OrientationQuaternion& q, const std::string& order) { data = transforms::quatC2eul_intr(q.data, order); }
+    double EulerAngles::phi() const   { return data[2]; }
+    void EulerAngles::set(const OrientationMatrix& C) { data = transforms::C2eul(C.data, "ZYX", "intr"); }
+    void EulerAngles::set(const OrientationQuaternion& q) { data = transforms::quatC2eul(q.data, "ZYX", "intr"); }
 
     void OrientationMatrixRate::set(const OrientationQuaternionRate& q_dot, const OrientationQuaternion& q, const OrientationMatrix& C) { data = dynamics::_qIB_dot2CIB_dot(q_dot, q, C).data; }
     void OrientationMatrixRate::set(const OrientationMatrix& C, const AngularVelocity& w) { data = dynamics::_ddt_CIB(C, w).data; }

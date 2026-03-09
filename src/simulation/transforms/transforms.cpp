@@ -58,6 +58,10 @@ namespace transforms {
        return eul2R_extr(a, b, c, order).transpose();
     };
 
+    // All vector rotations (as opposed to frame rotations) are, by definition, extrinsic. The concept of an "intrinsic" rotation only applies to frames
+    // That is, the concept of an "intrinsic" vector rotation is not defined
+    // So the function 'eul2R_intr' does not technically make sense
+    // However, for consistency with the extrinsic case, it is still implemented since transposing the result of this function indeed gives the correct result for an intrinsic frame rotation
     Eigen::Matrix3d eul2R_intr(double a, double b, double c, const std::string& order){
         if (order == "ZYX") return Rz(a) * Ry(b) * Rx(c);
         if (order == "ZXY") return Rz(a) * Rx(b) * Ry(c);
@@ -247,6 +251,10 @@ namespace transforms {
     }
 
 
+    Eigen::Matrix3d CfromH(const Eigen::Matrix4d& H){
+        return H.block<3,3>(0,0);
+    }
+
     Eigen::Matrix3d RfromH(const Eigen::Matrix4d& H){
         return H.block<3,3>(0,0);
     }
@@ -345,8 +353,14 @@ namespace transforms {
     // };
     
 
+    // Given the orientation (of the frame/vector) obtained via the nth rotation, how is the n+1 rotation applied
+    // Whether the net homogenous transformation matrix represents an intrinsic or extrinsic rotation depends on whether the homogenous transformation matrices passed to the function represent active rotations (ie vector rotations) or passive rotations (ie frame rotations/coordinate transformations)
+    // Active: extrinsic -> pre-multiply, intrinsic -> not defined
+    // Passive: extrinsic -> post-multiply, intrinsic -> pre-multiply
+    // All vector rotations (as opposed to frame rotations) are, by definition, extrinsic. The concept of an "intrinsic" rotation only applies to frames
+    // That is, the concept of an "intrinsic" vector rotation is not defined
     // Given the orientation (of the frame/vector) obtained via the nth transformation, how is the n+1 transformation applied
-    Eigen::Matrix4d chain_hom_intr(const std::vector<Eigen::Matrix4d>& H_list) {
+    Eigen::Matrix4d chain_hom_post(const std::vector<Eigen::Matrix4d>& H_list) {
         Eigen::Matrix4d Htot = global::HI;
         for (const auto& H : H_list){
             Htot *= H;
@@ -355,7 +369,7 @@ namespace transforms {
     }
 
     // Given the orientation (of the frame/vector) obtained via the nth transformation, how is the n+1 transformation applied
-    Eigen::Matrix4d chain_hom_extr(const std::vector<Eigen::Matrix4d>& H_list) {
+    Eigen::Matrix4d chain_hom_pre(const std::vector<Eigen::Matrix4d>& H_list) {
         Eigen::Matrix4d Htot = global::HI;
 
         for (auto rit = H_list.rbegin(); rit != H_list.rend(); ++rit) {
@@ -364,38 +378,30 @@ namespace transforms {
         return Htot;
     }
 
-    /** @deprecated */
-    // // Given the orientation (of the frame/vector) obtained via the nth rotation, how is the n+1 rotation applied
-    // Eigen::Matrix3d chain_rot_intr(const std::vector<Eigen::Matrix3d>& R_list) {
-    //     Eigen::Matrix3d Rtot = global::I3;
-    //     for (const auto& R : R_list){
-    //         Rtot *= R;
-    //     }
-    //     return Rtot;
-    // }
 
-    /** @deprecated */
-    // // Given the orientation (of the frame/vector) obtained via the nth rotation, how is the n+1 rotation applied
-    // Eigen::Matrix3d chain_rot_extr(const std::vector<Eigen::Matrix3d>& R_list) {
-    //     Eigen::Matrix3d Rtot = global::I3;
-
-    //     for (auto rit = R_list.rbegin(); rit != R_list.rend(); ++rit) {
-    //         Rtot *= *rit;
-    //     }
-    //     return Rtot;
-    // }
-
-    // Chain vector (as opposed to frame) rotations. This must be an extrinsic rotation. There is no such thing as an "intrinsic" vector rotation. 
+    // Given the orientation (of the frame/vector) obtained via the nth rotation, how is the n+1 rotation applied
+    // Whether the net matrix represents an intrinsic or extrinsic rotation depends on whether the matrices passed to the function represent active rotations (ie vector rotations) or passive rotations (ie frame rotations/coordinate transformations)
+    // Active: extrinsic -> pre-multiply, intrinsic -> not defined
+    // Passive: extrinsic -> post-multiply, intrinsic -> pre-multiply
     // All vector rotations (as opposed to frame rotations) are, by definition, extrinsic. The concept of an "intrinsic" rotation only applies to frames
-    // That is, the concept of an "intrinsic" vector rotation does not make sense
-    // Thus, this function is simply called chain_rot and the two prior versions above are @deprecated
-    Eigen::Matrix3d chain_rot(const std::vector<Eigen::Matrix3d>& R_list) {
-        Eigen::Matrix3d Rtot = global::I3;
-
-        for (auto rit = R_list.rbegin(); rit != R_list.rend(); ++rit) {
-            Rtot *= *rit;
+    // That is, the concept of an "intrinsic" vector rotation is not defined
+    // Given the orientation (of the frame/vector) obtained via the nth rotation, how is the n+1 rotation applied
+    Eigen::Matrix3d chain_rot_post(const std::vector<Eigen::Matrix3d>& rot_list) {
+        Eigen::Matrix3d rot_tot = global::I3;
+        for (const auto& rot : rot_list){
+            rot_tot *= rot;
         }
-        return Rtot;
+        return rot_tot;
+    }
+
+    // Given the orientation (of the frame/vector) obtained via the nth rotation, how is the n+1 rotation applied
+    Eigen::Matrix3d chain_rot_pre(const std::vector<Eigen::Matrix3d>& rot_list) {
+        Eigen::Matrix3d rot_tot = global::I3;
+
+        for (auto rit = rot_list.rbegin(); rit != rot_list.rend(); ++rit) {
+            rot_tot *= *rit;
+        }
+        return rot_tot;
     }
 
     Eigen::Matrix3d CfromR(const Eigen::Matrix3d& R){
@@ -498,34 +504,35 @@ namespace transforms {
     }
 
 
-    Eigen::Matrix3d quat2rot(const Eigen::Quaterniond& q_in){
-        Eigen::Quaterniond q = normalize_and_canonicalize(q_in);
+    /** @deprecated */
+    // Eigen::Matrix3d quat2rot(const Eigen::Quaterniond& q_in){
+    //     Eigen::Quaterniond q = normalize_and_canonicalize(q_in);
 
-        double w = q.w();
-        double x = q.x();
-        double y = q.y();
-        double z = q.z();
+    //     double w = q.w();
+    //     double x = q.x();
+    //     double y = q.y();
+    //     double z = q.z();
 
-        Eigen::Matrix3d R;
+    //     Eigen::Matrix3d R;
 
-        double xx = x*x, yy = y*y, zz = z*z;
-        double xy = x*y, xz = x*z, yz = y*z;
-        double wx = w*x, wy = w*y, wz = w*z;
+    //     double xx = x*x, yy = y*y, zz = z*z;
+    //     double xy = x*y, xz = x*z, yz = y*z;
+    //     double wx = w*x, wy = w*y, wz = w*z;
 
-        R(0,0) = 1.0 - 2.0*(yy + zz);
-        R(0,1) = 2.0*(xy - wz);
-        R(0,2) = 2.0*(xz + wy);
+    //     R(0,0) = 1.0 - 2.0*(yy + zz);
+    //     R(0,1) = 2.0*(xy - wz);
+    //     R(0,2) = 2.0*(xz + wy);
 
-        R(1,0) = 2.0*(xy + wz);
-        R(1,1) = 1.0 - 2.0*(xx + zz);
-        R(1,2) = 2.0*(yz - wx);
+    //     R(1,0) = 2.0*(xy + wz);
+    //     R(1,1) = 1.0 - 2.0*(xx + zz);
+    //     R(1,2) = 2.0*(yz - wx);
 
-        R(2,0) = 2.0*(xz - wy);
-        R(2,1) = 2.0*(yz + wx);
-        R(2,2) = 1.0 - 2.0*(xx + yy);
+    //     R(2,0) = 2.0*(xz - wy);
+    //     R(2,1) = 2.0*(yz + wx);
+    //     R(2,2) = 1.0 - 2.0*(xx + yy);
 
-        return R;
-    }
+    //     return R;
+    // }
 
 
     Eigen::Vector3d quatR2eul_intr(const Eigen::Quaterniond& q, const std::string& order){
@@ -561,7 +568,12 @@ namespace transforms {
 
 
     // Given the orientation (of the frame/vector) obtained via the nth rotation, how is the n+1 rotation applied
-    Eigen::Quaterniond chain_quat_intr(const std::vector<Eigen::Quaterniond>& q_list) {
+    // Whether the net quaternion represents an intrinsic or extrinsic rotation depends on whether the quaternions passed to the function represent active rotations (ie vector rotations) or passive rotations (ie frame rotations/coordinate transformations)
+    // Active: extrinsic -> pre-multiply, intrinsic -> not defined
+    // Passive: extrinsic -> post-multiply, intrinsic -> pre-multiply
+    // All vector rotations (as opposed to frame rotations) are, by definition, extrinsic. The concept of an "intrinsic" rotation only applies to frames
+    // That is, the concept of an "intrinsic" vector rotation is not defined
+    Eigen::Quaterniond chain_quat_post(const std::vector<Eigen::Quaterniond>& q_list) {
         Eigen::Quaterniond qtot = Eigen::Quaterniond::Identity();
         for (const auto& q : q_list){
             qtot *= normalize_and_canonicalize(q);
@@ -570,7 +582,7 @@ namespace transforms {
     }
 
     // Given the orientation (of the frame/vector) obtained via the nth rotation, how is the n+1 rotation applied
-    Eigen::Quaterniond chain_quat_extr(const std::vector<Eigen::Quaterniond>& q_list) {
+    Eigen::Quaterniond chain_quat_pre(const std::vector<Eigen::Quaterniond>& q_list) {
         Eigen::Quaterniond qtot = Eigen::Quaterniond::Identity();
 
         for (auto rit = q_list.rbegin(); rit != q_list.rend(); ++rit) {
@@ -606,11 +618,25 @@ namespace transforms {
         throw std::invalid_argument("Unsupported type: " + type);
     }
 
+    Eigen::Vector3d quatC2eul(const Eigen::Quaterniond& qC, const std::string& order, const std::string& type) {
+        if (type == "extr") return quatC2eul_extr(qC, order);
+        if (type == "intr") return quatC2eul_intr(qC, order);
+        throw std::invalid_argument("Unsupported type: " + type);
+    }
 
+    Eigen::Vector3d C2eul(const Eigen::Matrix3d& C, const std::string& order, const std::string& type) {
+        if (type == "extr") return C2eul_extr(C, order);
+        if (type == "intr") return C2eul_intr(C, order);
+        throw std::invalid_argument("Unsupported type: " + type);
+    }
 
 
     Eigen::Quaterniond rot2quat(const Eigen::Matrix3d& R) {
         return transforms::normalize_and_canonicalize(Eigen::Quaterniond(R));
+    }
+
+    Eigen::Matrix3d quat2rot(const Eigen::Quaterniond& q) {
+        return Eigen::Matrix3d(transforms::normalize_and_canonicalize(q));
     }
 
 

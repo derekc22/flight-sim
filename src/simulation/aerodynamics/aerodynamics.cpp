@@ -6,6 +6,7 @@
 #include "simulation/aerodynamics/aerodynamics.hpp"
 #include "simulation/structural/structural.hpp"
 #include <simulation/dynamics/dynamics.hpp>
+#include <simulation/atmospheric/atmospheric.hpp>
 
 namespace aerodynamics {
 
@@ -31,14 +32,14 @@ namespace aerodynamics {
     }
 
 
-    std::pair<dynamics::Force, dynamics::Moment> step_aero_forces_moments(
+    dynamics::Wrench step_aero_forces_moments(
         const AerodynamicProperties& aerodynamicProperties, 
         const structural::StructuralProperties& structuralProperties, 
         const dynamics::RigidBodyState& rigidBodyState, 
-        double rho
+        const atmospheric::Density& rho
     ) {
-        Eigen::Vector3d FB = Eigen::Vector3d::Zero();
-        Eigen::Vector3d MB = Eigen::Vector3d::Zero();
+        Eigen::Vector3d FB = global::Zero3;
+        Eigen::Vector3d MB = global::Zero3;
 
         const Eigen::Vector3d vB = rigidBodyState.v.data;     // no wind: V_B_BA = V_B_BE
         const Eigen::Vector3d wB = rigidBodyState.w.data;
@@ -51,15 +52,14 @@ namespace aerodynamics {
             const double V = v_rel.norm();
             if (V < 1e-9) { continue; }
 
-            const double q = 0.5 * rho * V * V;
+            const double q = 0.5 * rho.data * V * V;
 
-            const Eigen::Vector3d n_hat = (s.n.norm() > 1e-12) ? (s.n.normalized()) : Eigen::Vector3d::Zero();
+            const Eigen::Vector3d n_hat = (s.n.norm() > 1e-12) ? (s.n.normalized()) : global::Zero3;
 
-            // alpha^{S_i} = i^{S_i} + asin( (V dot n) / ||V|| )
-            // double arg = v_rel.dot(n_hat) / V; // <- THIS IS WRONG
-            double arg = -v_rel.dot(n_hat) / V;   // <- THIS IS RIGHT
+            // alpha^{S_i} = i^{S_i} - asin( (V dot n) / ||V|| )
+            double arg = v_rel.dot(n_hat) / V;
             arg = std::max(-1.0, std::min(1.0, arg));
-            const double alpha = s.i + std::asin(arg);
+            const double alpha = s.i - std::asin(arg);
 
             // C_{Lalpha}^{S_i} = 2*pi * AR/(2+AR)
             const double CLalpha = 2.0 * M_PI * (s.AR / (2.0 + s.AR));
@@ -82,7 +82,8 @@ namespace aerodynamics {
             const Eigen::Vector3d Fi = L * l_dir + D * d_hat;
 
             // pitching moment axis (perp to plane of drag and lift)
-            Eigen::Vector3d m_hat = d_hat.cross(l_dir);
+            // Eigen::Vector3d m_hat = d_hat.cross(l_dir); // <- THIS IS WRONG
+            Eigen::Vector3d m_hat = l_dir.cross(d_hat); // <- THIS IS RIGHT
             const double mn = m_hat.norm();
             if (mn > 1e-12) { m_hat /= mn; } else { m_hat.setZero(); }
 
@@ -92,7 +93,7 @@ namespace aerodynamics {
             MB += Mi;
         }
 
-        return { dynamics::Force{ FB }, dynamics::Moment{ MB } };
+        return dynamics::Wrench{ dynamics::Force{ FB }, dynamics::Moment{ MB } };
     }
 
 

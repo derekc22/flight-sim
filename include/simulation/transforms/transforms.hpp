@@ -6,9 +6,6 @@
 
 namespace transforms {
 
-    double deg2rad(double deg);
-    double rad2deg(double rad);
-
     /**
     * @brief Returns a rotation matrix about the "x" axis
     *
@@ -146,18 +143,17 @@ namespace transforms {
     Eigen::Matrix3d CfromR(const Eigen::Matrix3d& R);
     Eigen::Matrix3d RfromC(const Eigen::Matrix3d& C);
 
+    Eigen::Matrix3d CfromH(const Eigen::Matrix4d& H);
     Eigen::Matrix3d RfromH(const Eigen::Matrix4d& H);
     Eigen::Vector3d dfromH(const Eigen::Matrix4d& H);
     Eigen::Vector3d pfromH(const Eigen::Matrix4d& H);
 
     Eigen::Vector3d apply_hom(const Eigen::Matrix4d& H, const Eigen::Vector3d& v);
-    Eigen::Matrix4d chain_hom_intr(const std::vector<Eigen::Matrix4d>& H_list);
-    Eigen::Matrix4d chain_hom_extr(const std::vector<Eigen::Matrix4d>& H_list);
+    Eigen::Matrix4d chain_hom_post(const std::vector<Eigen::Matrix4d>& H_list);
+    Eigen::Matrix4d chain_hom_pre(const std::vector<Eigen::Matrix4d>& H_list);
 
-	/** @deprecated */
-	// Eigen::Matrix3d chain_rot_intr(const std::vector<Eigen::Matrix3d>& R_list);
-    // Eigen::Matrix3d chain_rot_extr(const std::vector<Eigen::Matrix3d>& R_list);
-    Eigen::Matrix3d chain_rot(const std::vector<Eigen::Matrix3d>& R_list);
+    Eigen::Matrix3d chain_rot_post(const std::vector<Eigen::Matrix3d>& rot_list);
+    Eigen::Matrix3d chain_rot_pre(const std::vector<Eigen::Matrix3d>& rot_list);
 
     Eigen::Quaterniond eul2quatR_extr(double a, double b, double c, const std::string& order);
     Eigen::Quaterniond eul2quatR_intr(double a, double b, double c, const std::string& order);
@@ -171,7 +167,7 @@ namespace transforms {
     // Eigen::Quaterniond quat_mul(const Eigen::Quaterniond& q1, const Eigen::Quaterniond& q2);
 
 
-    Eigen::Matrix3d quat2rot(const Eigen::Quaterniond& q_in);
+    Eigen::Matrix3d quat2rot(const Eigen::Quaterniond& q);
 
     Eigen::Vector3d quatR2eul_extr(const Eigen::Quaterniond& q, const std::string& order);
     Eigen::Vector3d quatR2eul_intr(const Eigen::Quaterniond& q, const std::string& order);
@@ -181,8 +177,8 @@ namespace transforms {
     // Eigen::Vector3d active_quat(const Eigen::Quaterniond& q, const Eigen::Vector3d& v);
     // Eigen::Vector3d passive_quat(const Eigen::Quaterniond& q, const Eigen::Vector3d& v);
 
-    Eigen::Quaterniond chain_quat_intr(const std::vector<Eigen::Quaterniond>& q_list);
-    Eigen::Quaterniond chain_quat_extr(const std::vector<Eigen::Quaterniond>& q_list);
+    Eigen::Quaterniond chain_quat_post(const std::vector<Eigen::Quaterniond>& q_list);
+    Eigen::Quaterniond chain_quat_pre(const std::vector<Eigen::Quaterniond>& q_list);
 
     // Internal
     Eigen::Matrix4d _make_HR_rotate_first(const Eigen::Matrix3d& R, const Eigen::Vector3d& d);
@@ -205,6 +201,9 @@ namespace transforms {
 
 
     Eigen::Quaterniond rot2quat(const Eigen::Matrix3d& R);
+
+    Eigen::Vector3d quatC2eul(const Eigen::Quaterniond& qC, const std::string& order, const std::string& type);
+    Eigen::Vector3d C2eul(const Eigen::Matrix3d& C, const std::string& order, const std::string& type);
 
 
 

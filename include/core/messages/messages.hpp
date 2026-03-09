@@ -1,39 +1,23 @@
-// #pragma once
-// #include <Eigen/Dense>
-// #include <unsupported/Eigen/CXX11/Tensor>
+#pragma once
+#include <Eigen/Dense>
+#include "simulation/dynamics/dynamics.hpp"
 
-// namespace messages {
+namespace messages {
 
-// class State {
-//     public:
-//     Eigen::Vector3d pos;
-//     Eigen::Vector3d vel;
-//     Eigen::Quaterniond att; 
-//     Eigen::Vector3d omg;
+struct FlightGearMessageIn {
+    double altitude;    // [ft]
+    double latitude;    // [deg]
+    double longitude;   // [deg]
+    double roll;        // [deg]
+    double pitch;       // [deg]
+    double heading;     // [deg]
+};
 
-//     State(Eigen::Vector3d& pos, Eigen::Vector3d& vel, Eigen::Quaterniond& att, Eigen::Vector3d& omg);
-// };
+struct FlightGearMessageOut {
+    float wind_heading;  // [deg] 
+    float wind_speed;    // [kt]
+};
 
-// class Frame {
-//     public:
-//     Eigen::Vector3d i;
-//     Eigen::Vector3d j;
-//     Eigen::Vector3d k; 
-//     Eigen::Vector3d origin;
 
-//     Frame(Eigen::Vector3d& i, Eigen::Vector3d& j, Eigen::Vector3d& k, Eigen::Vector3d& j, Eigen::Vector3d& origin);
-// };
 
-// class Image {
-//     public:
-//     Eigen::Tensor<double, 3> img(64, 64, 3);
-
-//     Image(Eigen::Tensor<double, 3>& img);
-// }
-
-// class ControlCommand {
-//     public:
-
-// }
-
-// }
+}

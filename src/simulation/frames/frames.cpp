@@ -154,7 +154,7 @@ namespace frames {
         MutableFrameView mfv = view();
         mfv.H->set(C);
         mfv.q->set(C); // *mfv.q = dynamics::OrientationQuaternion{ transforms::rot2quat(C.data) };
-        mfv.eul->set(C, "ZYX"); // *mfv.eul = dynamics::EulerAngles{ transforms::C2eul_intr(C.data, "ZYX") };
+        mfv.eul->set(C); // *mfv.eul = dynamics::EulerAngles{ transforms::C2eul_intr(C.data, "ZYX") };
     }
     void Frame::set(const dynamics::Position& p){
         MutableFrameView mfv = view();
@@ -165,12 +165,12 @@ namespace frames {
         dynamics::OrientationQuaternion q_{ transforms::normalize_and_canonicalize(q.data) };
         *mfv.q = q_;
         mfv.H->set(q_); // mfv.H->set(transforms::quat2rot(q.data));
-        mfv.eul->set(q_, "ZYX"); // *mfv.eul = dynamics::EulerAngles{ transforms::quatC2eul_intr(q.data, "ZYX") };
+        mfv.eul->set(q_); // *mfv.eul = dynamics::EulerAngles{ transforms::quatC2eul_intr(q.data, "ZYX") };
     }
     void Frame::set(const dynamics::EulerAngles& eul){
         MutableFrameView mfv = view();
-        mfv.H->set(eul, "ZYX"); // mfv.H->set(transforms::eul2C_intr(eul.psi(), eul.theta(), eul.phi(), "ZYX"));
-        mfv.q->set(eul, "ZYX"); // *mfv.q = dynamics::OrientationQuaternion{ transforms::eul2quatC_intr(eul.psi(), eul.theta(), eul.phi(), "ZYX") };
+        mfv.H->set(eul); // mfv.H->set(transforms::eul2C_intr(eul.psi(), eul.theta(), eul.phi(), "ZYX"));
+        mfv.q->set(eul); // *mfv.q = dynamics::OrientationQuaternion{ transforms::eul2quatC_intr(eul.psi(), eul.theta(), eul.phi(), "ZYX") };
         *mfv.eul = eul;
     }
     void Frame::set(const dynamics::OrientationMatrixRate& C_dot){
@@ -334,7 +334,7 @@ namespace frames {
     STABFrameFRD::STABFrameFRD(FRDFrameNED* pFRDFrameNED) : Frame("STABFrameFRD", pFRDFrameNED) {};
     WINDFrameSTAB::WINDFrameSTAB(STABFrameFRD* pSTABFrameFRD) : Frame("WINDFrameSTAB", pSTABFrameFRD) {};
 
-    dynamics::OrientationMatrix Frame::CRF(const Frame& F) {
+    dynamics::OrientationMatrix CRF(const Frame& F) {
         Eigen::Matrix3d C = Eigen::Matrix3d::Identity();
         const Frame* pF = &F;
         while (pF != nullptr){
@@ -344,7 +344,7 @@ namespace frames {
         return dynamics::OrientationMatrix{ C };
     }
 
-    Eigen::Vector3d Frame::rotate_vec(const Eigen::Vector3d& vA, const Frame& A, const Frame& B) {
+    Eigen::Vector3d rotate_vec(const Eigen::Vector3d& vA, const Frame& A, const Frame& B) {
         Eigen::Matrix3d CRA = CRF(A).data;
         Eigen::Matrix3d CRB = CRF(B).data;
         Eigen::Vector3d vB = CRB * CRA.transpose() * vA;

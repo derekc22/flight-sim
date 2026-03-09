@@ -10,11 +10,12 @@ parser.add_argument("--ext", "-e", type=str, help="Plot extension", default="pdf
 parser.add_argument("--labels", "-l", nargs="+", type=str ,help="List of data labels")
 parser.add_argument("--title", "-t", type=str, help="Title")
 args = parser.parse_args() 
+
 # usage: 
-# python3 scripts/subplot.py -d hw5/position -l "x(t) [m]" "y(t) [m]" "z(t) [m]" -t "position vs time";
-# python3 scripts/subplot.py -d hw5/aero_force -l "Fx(t) [N]" "Fy(t) [N]" "Fz(t) [N]" -t "aero force vs time";
-# python3 scripts/subplot.py -d hw5/aero_moment -l "Mx(t) [Nm]" "My(t) [Nm]" "Mz(t) [Nm]" -t "aero moment vs time";
-# python3 scripts/subplot.py -d hw5/aero_state -l "Vinf(t) [m/s]" "α(t) [rad]" "β(t) [rad]" -t "aero properties vs time";
+# python3 scripts/subplot.py -d test/position -l "x(t) [m]" "y(t) [m]" "z(t) [m]" -t "position vs time";
+# python3 scripts/subplot.py -d test/aero_force -l "Fx(t) [N]" "Fy(t) [N]" "Fz(t) [N]" -t "aero force vs time";
+# python3 scripts/subplot.py -d test/aero_moment -l "Mx(t) [Nm]" "My(t) [Nm]" "Mz(t) [Nm]" -t "aero moment vs time";
+# python3 scripts/subplot.py -d test/aero_state -l "Vinf(t) [m/s]" "α(t) [rad]" "β(t) [rad]" -t "aero properties vs time";
 
 
 data_dir = f"data/{args.data}"
