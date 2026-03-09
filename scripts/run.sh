@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-DIR="/Users/derekchibuzor/Documents/VSCodeProjects/flight-sim"
+source .env
 
 cd "$DIR" || exit 1
 

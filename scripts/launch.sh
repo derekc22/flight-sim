@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-FG="/Applications/FlightGear.app/Contents/MacOS/FlightGear"
+source .env
 
 "$FG" \
 --ignore-autosave \

@@ -1,7 +1,9 @@
 #!/bin/bash
 set -e
 
-SRC="/Users/derekchibuzor/Documents/VSCodeProjects/flight-sim/config/udp-out.xml"
-DEST="/Users/derekchibuzor/Library/Application Support/FlightGear/fgdata_2024_1/Protocol/udp-out.xml"
+source .env
 
-cp "$SRC" "$DEST"
+SRC_OUT="${SRC}/udp-out.xml"
+DEST_OUT="${DEST}/udp-out.xml"
+
+cp "$SRC_OUT" "$DEST_OUT"

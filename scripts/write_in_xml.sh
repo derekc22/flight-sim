@@ -1,7 +1,9 @@
 #!/bin/bash
 set -e
 
-SRC="/Users/derekchibuzor/Documents/VSCodeProjects/flight-sim/config/udp-in.xml"
-DEST="/Users/derekchibuzor/Library/Application Support/FlightGear/fgdata_2024_1/Protocol/udp-in.xml"
+source .env
 
-cp "$SRC" "$DEST"
+SRC_IN="${SRC}/udp-in.xml"
+DEST_IN="${DEST}/udp-in.xml"
+
+cp "$SRC_IN" "$DEST_IN"
