@@ -200,7 +200,7 @@ namespace transforms {
     Eigen::Quaterniond eul2quatC(double a, double b, double c, const std::string& order, const std::string& type);
 
 
-    Eigen::Quaterniond rot2quat(const Eigen::Matrix3d& R);
+    Eigen::Quaterniond rot2quat(const Eigen::Matrix3d& rot);
 
     Eigen::Vector3d quatC2eul(const Eigen::Quaterniond& qC, const std::string& order, const std::string& type);
     Eigen::Vector3d C2eul(const Eigen::Matrix3d& C, const std::string& order, const std::string& type);

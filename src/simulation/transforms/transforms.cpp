@@ -631,8 +631,8 @@ namespace transforms {
     }
 
 
-    Eigen::Quaterniond rot2quat(const Eigen::Matrix3d& R) {
-        return transforms::normalize_and_canonicalize(Eigen::Quaterniond(R));
+    Eigen::Quaterniond rot2quat(const Eigen::Matrix3d& rot) {
+        return transforms::normalize_and_canonicalize(Eigen::Quaterniond(rot));
     }
 
     Eigen::Matrix3d quat2rot(const Eigen::Quaterniond& q) {

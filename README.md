@@ -1,6 +1,6 @@
-# Flight Simulator
+# flight-sim
 
-A flight simulator built in C++
+Flight simulator built in C++ with FlightGear integration
 
 ## Installation
 https://www.flightgear.org/download/
@@ -18,7 +18,7 @@ https://www.flightgear.org/download/
   
 - Run `scripts/run.sh` from the project root to start the simulator
 
-- Run `python3 scripts/subplot.py -d <data> -l <labels> -t <title>` to visualize data
+- Run `python3 scripts/subplot.py -d <data> -e <extension> -l <labels> -t <title>` to visualize data
 
 ## References:
 https://hopsan.github.io/tutorials/tutorial_flightgear.pdf
