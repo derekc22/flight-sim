@@ -7,7 +7,7 @@ namespace global {
     const double gravity = 9.81;    // [ms^-2]
     const double pi = 3.1415926535897932384626433832795028841971693993751;
     const double eps = 1e-12;
-    const double dt = 0.02;        // [s]
+    const double dt = 0.005;        // [s]
 
     // Special Matrices
     const Eigen::Matrix3d I3 = Eigen::Matrix3d::Identity();
@@ -78,7 +78,21 @@ namespace global {
     }
 
 
+    Eigen::Vector3d norm(const Eigen::Vector3d& v) {
+        const double n = v.norm();
+        if (n < global::eps) { return global::Zero3; }
+        return v / n;
+    }
 
+    double clampTo1(double x) {
+        // clamps to [-1, 1]
+        return std::clamp(x, -1.0, 1.0);
+    }
+
+    double wrapToPi(double x) {
+        // maps to (-pi, pi]
+        return std::remainder(x, 2.0 * ::global::pi);
+    }
 
 
 }

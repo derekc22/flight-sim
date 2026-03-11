@@ -12,10 +12,10 @@ parser.add_argument("--title", "-t", type=str, help="Title")
 args = parser.parse_args() 
 
 # usage: 
-# python3 scripts/subplot.py -d test/position -l "x(t) [m]" "y(t) [m]" "z(t) [m]" -t "position vs time";
-# python3 scripts/subplot.py -d test/aero_force -l "Fx(t) [N]" "Fy(t) [N]" "Fz(t) [N]" -t "aero force vs time";
-# python3 scripts/subplot.py -d test/aero_moment -l "Mx(t) [Nm]" "My(t) [Nm]" "Mz(t) [Nm]" -t "aero moment vs time";
-# python3 scripts/subplot.py -d test/aero_state -l "Vinf(t) [m/s]" "α(t) [rad]" "β(t) [rad]" -t "aero properties vs time";
+# python3 scripts/subplot.py -d hw6/p -l "x(t) [m]" "y(t) [m]" "z(t) [m]" -t "position vs time";
+# python3 scripts/subplot.py -d hw6/eul -l "psi(t) [rad]" "theta(t) [rad]" "phi(t) [rad]" -t "orientation vs time";
+# python3 scripts/subplot.py -d hw6/w -l "p(t) [rad/s]" "q(t) [rad/s]" "r(t) [rad/s]" -t "angular velocity vs time";
+# python3 scripts/subplot.py -d hw6/v -l "vx(t) [m/s]" "vy(t) [m/s]" "vz(t) [m/s]" -t "linear velocity vs time";
 
 
 data_dir = f"data/{args.data}"
@@ -35,7 +35,7 @@ for fname in os.listdir(data_dir):
     nplots = data.shape[1] - 1
     labels = args.labels[:nplots]
 
-    plt.figure()
+    plt.figure(figsize=(10, 3 * nplots))
 
     for i in range(nplots):
         plt.subplot(nplots, 1, i + 1)

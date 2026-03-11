@@ -85,25 +85,14 @@ namespace transforms {
         return eul2R_intr(a, b, c, order).transpose();
     };
 
-    double clampTo1(double x) {
-        // clamps to [-1, 1]
-        return std::clamp(x, -1.0, 1.0);
-    }
-
-    double wrapToPi(double x) {
-        // maps to (-pi, pi]
-        return std::remainder(x, 2.0 * ::global::pi);
-    }
-
     Eigen::Vector3d R2eul_intr(const Eigen::Matrix3d& R, const std::string& order) {
-        double eps = 1e-12;
 
         double a = 0.0, b = 0.0, c = 0.0;
 
         if (order == "ZYX") {
-            b = std::asin(clampTo1(-R(2,0)));
+            b = std::asin(global::clampTo1(-R(2,0)));
             double cb = std::cos(b);
-            if (std::abs(cb) > eps) {
+            if (std::abs(cb) > global::eps) {
                 a = std::atan2(R(1,0), R(0,0));
                 c = std::atan2(R(2,1), R(2,2));
             } else {
@@ -111,9 +100,9 @@ namespace transforms {
                 c = 0.0;
             }
         } else if (order == "ZXY") {
-            b = std::asin(clampTo1(R(2,1)));
+            b = std::asin(global::clampTo1(R(2,1)));
             double cb = std::cos(b);
-            if (std::abs(cb) > eps) {
+            if (std::abs(cb) > global::eps) {
                 a = std::atan2(-R(0,1), R(1,1));
                 c = std::atan2(-R(2,0), R(2,2));
             } else {
@@ -121,9 +110,9 @@ namespace transforms {
                 c = 0.0;
             }
         } else if (order == "YZX") {
-            b = std::asin(clampTo1(R(1,0)));
+            b = std::asin(global::clampTo1(R(1,0)));
             double cb = std::cos(b);
-            if (std::abs(cb) > eps) {
+            if (std::abs(cb) > global::eps) {
                 a = std::atan2(-R(2,0), R(0,0));
                 c = std::atan2(-R(1,2), R(1,1));
             } else {
@@ -131,9 +120,9 @@ namespace transforms {
                 c = 0.0;
             }
         } else if (order == "YXZ") {
-            b = std::asin(clampTo1(-R(1,2)));
+            b = std::asin(global::clampTo1(-R(1,2)));
             double cb = std::cos(b);
-            if (std::abs(cb) > eps) {
+            if (std::abs(cb) > global::eps) {
                 a = std::atan2(R(0,2), R(2,2));
                 c = std::atan2(R(1,0), R(1,1));
             } else {
@@ -141,9 +130,9 @@ namespace transforms {
                 c = 0.0;
             }
         } else if (order == "XZY") {
-            b = std::asin(clampTo1(-R(0,1)));
+            b = std::asin(global::clampTo1(-R(0,1)));
             double cb = std::cos(b);
-            if (std::abs(cb) > eps) {
+            if (std::abs(cb) > global::eps) {
                 a = std::atan2(R(2,1), R(1,1));
                 c = std::atan2(R(0,2), R(0,0));
             } else {
@@ -151,9 +140,9 @@ namespace transforms {
                 c = 0.0;
             }
         } else if (order == "XYZ") {
-            b = std::asin(clampTo1(R(0,2)));
+            b = std::asin(global::clampTo1(R(0,2)));
             double cb = std::cos(b);
-            if (std::abs(cb) > eps) {
+            if (std::abs(cb) > global::eps) {
                 a = std::atan2(-R(1,2), R(2,2));
                 c = std::atan2(-R(0,1), R(0,0));
             } else {
@@ -163,9 +152,9 @@ namespace transforms {
 
         // Proper Euler (repeated axis)
         } else if (order == "ZXZ") {
-            b = std::acos(clampTo1(R(2,2)));
+            b = std::acos(global::clampTo1(R(2,2)));
             double sb = std::sin(b);
-            if (std::abs(sb) > eps) {
+            if (std::abs(sb) > global::eps) {
                 a = std::atan2(R(0,2), -R(1,2));
                 c = std::atan2(R(2,0),  R(2,1));
             } else {
@@ -173,9 +162,9 @@ namespace transforms {
                 c = 0.0;
             }
         } else if (order == "ZYZ") {
-            b = std::acos(clampTo1(R(2,2)));
+            b = std::acos(global::clampTo1(R(2,2)));
             double sb = std::sin(b);
-            if (std::abs(sb) > eps) {
+            if (std::abs(sb) > global::eps) {
                 a = std::atan2(R(1,2),  R(0,2));
                 c = std::atan2(R(2,1), -R(2,0));
             } else {
@@ -183,9 +172,9 @@ namespace transforms {
                 c = 0.0;
             }
         } else if (order == "XYX") {
-            b = std::acos(clampTo1(R(0,0)));
+            b = std::acos(global::clampTo1(R(0,0)));
             double sb = std::sin(b);
-            if (std::abs(sb) > eps) {
+            if (std::abs(sb) > global::eps) {
                 a = std::atan2(R(1,0), -R(2,0));
                 c = std::atan2(R(0,1),  R(0,2));
             } else {
@@ -193,9 +182,9 @@ namespace transforms {
                 c = 0.0;
             }
         } else if (order == "XZX") {
-            b = std::acos(clampTo1(R(0,0)));
+            b = std::acos(global::clampTo1(R(0,0)));
             double sb = std::sin(b);
-            if (std::abs(sb) > eps) {
+            if (std::abs(sb) > global::eps) {
                 a = std::atan2(R(2,0),  R(1,0));
                 c = std::atan2(R(0,2), -R(0,1));
             } else {
@@ -203,9 +192,9 @@ namespace transforms {
                 c = 0.0;
             }
         } else if (order == "YXY") {
-            b = std::acos(clampTo1(R(1,1)));
+            b = std::acos(global::clampTo1(R(1,1)));
             double sb = std::sin(b);
-            if (std::abs(sb) > eps) {
+            if (std::abs(sb) > global::eps) {
                 a = std::atan2(R(0,1),  R(2,1));
                 c = std::atan2(R(1,0), -R(1,2));
             } else {
@@ -213,9 +202,9 @@ namespace transforms {
                 c = 0.0;
             }
         } else if (order == "YZY") {
-            b = std::acos(clampTo1(R(1,1)));
+            b = std::acos(global::clampTo1(R(1,1)));
             double sb = std::sin(b);
-            if (std::abs(sb) > eps) {
+            if (std::abs(sb) > global::eps) {
                 a = std::atan2(R(2,1), -R(0,1));
                 c = std::atan2(R(1,2),  R(1,0));
             } else {
@@ -227,7 +216,7 @@ namespace transforms {
             throw std::invalid_argument("Unsupported Euler order: " + order);
         }
 
-        return Eigen::Vector3d(wrapToPi(a), wrapToPi(b), wrapToPi(c));
+        return Eigen::Vector3d(global::wrapToPi(a), global::wrapToPi(b), global::wrapToPi(c));
 
     }
 
@@ -476,6 +465,10 @@ namespace transforms {
         return normalize_and_canonicalize(eul2quatR_extr(a,b,c,order).conjugate());
     }
 
+    // All vector rotations (as opposed to frame rotations) are, by definition, extrinsic. The concept of an "intrinsic" rotation only applies to frames
+    // That is, the concept of an "intrinsic" vector rotation is not defined
+    // So, as with eul2R_intr, the function 'eul2quatR_intr' does not technically make sense
+    // However, for consistency with the extrinsic case, it is still implemented since transposing the result of this function indeed gives the correct result for an intrinsic frame rotation
     Eigen::Quaterniond eul2quatR_intr(double a, double b, double c, const std::string& order) {
         Eigen::Quaterniond q;
 

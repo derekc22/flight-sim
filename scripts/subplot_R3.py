@@ -28,6 +28,8 @@ for fname in os.listdir(data_dir):
     data = np.loadtxt(data_path, delimiter=",")
     t = np.linspace(0, data[-1, 0], data.shape[0])
 
+    plt.figure(figsize=(10, 9))
+
     plt.subplot(3,1,1)
     plt.plot(t, data[:, 1], linewidth=2)
     plt.xlabel("t [s]")

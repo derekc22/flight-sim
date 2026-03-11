@@ -166,6 +166,7 @@ namespace frames {
         // geography::GeographicState lat_lon_alt_from_pE(const dynamics::Position & pE);
         // dynamics::Position pE_from_lat_lon_alt(const geography::GeographicState& geographicState);
     }; 
+    inline const ECEFFrame ECEF {};
 
     // {ECEF} -> {NED}
     struct NEDFrameECEF : Frame {
@@ -276,9 +277,26 @@ namespace frames {
 
 
     /** @brief Obtains the rotation matrix from the root (ECEFFrame) to the frame F */
-    dynamics::OrientationMatrix CRF(const Frame& F);
+    Eigen::Matrix3d CRF(const Frame& F);
 
     /** @brief Rotates vector vA from frame {A} to frame {B}, producing vB */
     Eigen::Vector3d rotate_vec(const Eigen::Vector3d& vA, const Frame& A, const Frame& B);
+
+    Eigen::Vector3d rotate_vec(const Eigen::Vector3d& vA, const Frame& A, const ECEFFrame&);
+
+    Eigen::Vector3d rotate_vec(const Eigen::Vector3d& vA, const ECEFFrame&, const Frame& B);
+
+    /** @brief Transforms point/position vector pA from frame {A} to frame {B}, producing pB
+    If you have a point pA in one frame, transform_point(pA, A, B) re-expresses that same point in frame B */
+    Eigen::Vector3d transform_point(const Eigen::Vector3d& pA, const Frame& A, const Frame& B);
+
+    Eigen::Vector3d transform_point(const Eigen::Vector3d& pA, const Frame& A, const ECEFFrame&);
+
+    Eigen::Vector3d transform_point(const Eigen::Vector3d& pA, const ECEFFrame&, const Frame& B);
+
+    Eigen::Matrix4d HRF(const Frame& F);
+    Eigen::Vector3d pRF(const Frame& F);
+
+
 
 }

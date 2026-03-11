@@ -279,6 +279,7 @@ namespace vehicles {
         std::optional<WINDFrameSTABStepOptions> WINDFrameSTABStepOpts;
 
         static void _validate(const StepOptions& opts);
+        void _clear() noexcept;
     };
 
     struct _StepOptions {
@@ -334,12 +335,12 @@ namespace vehicles {
         geography::GeographicState geographicState(const frames::Frame& F);
 
         /** @warning The parent of F must be an inertial frame: ECEFFrame or NEDFrameECEF */
-        aerodynamics::AerodynamicState aerodynamicState(const frames::Frame& F);
+        aerodynamics::AerodynamicState aerodynamicState(const frames::Frame& F, const atmospheric::Wind& windB);
 
         /** @warning The parent of F must the ECEFFrame */
         atmospheric::AtmosphericState atmosphericState(const frames::Frame& F);
 
-        void step(const StepOptions& opts);
+        void step(StepOptions& opts);
         void _step(frames::NEDFrameECEF& F, const _StepOptions& opts);
         void _step(frames::FRDFrameNED& F, const _StepOptions& opts);
         void _step(frames::FRDFrameECEF& F, const _StepOptions& opts);
@@ -355,7 +356,7 @@ namespace vehicles {
         // void _set(const dynamics::RigidBodyState& rigidBodyState, frames::Frame& F);
         // void _set(const geography::GeographicState& geographicState, frames::Frame& F);
 
-        void print_state(int t);
+        void print_state(int t, atmospheric::Wind wind);
 
     };
 

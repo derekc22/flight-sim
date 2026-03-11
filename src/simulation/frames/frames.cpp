@@ -11,6 +11,27 @@
 
 namespace frames {
 
+
+    Eigen::Vector3d pRF(const Frame& F) {
+        Eigen::Vector3d p = global::Zero3;
+        const Frame* pF = &F;
+        while (pF != nullptr) {
+            const FrameView fv = pF->view();
+            p = fv.H->C().data.transpose() * p + fv.H->p().data;
+            pF = pF->parent;
+        }
+        return p;
+    }
+
+    // Eigen::Matrix4d HRF(const ECEFFrame&) {
+    //     return global::HI;
+    // }
+
+    Eigen::Matrix4d HRF(const Frame& F) {
+        return transforms::makeHC(CRF(F), pRF(F), "translate");
+    }
+
+
     /** @deprecated */
     // dynamics::OrientationMatrix NEDFrameECEF::CEN_from_lat_lon(const geography::Latitude& lat, const geography::Longitude& lon) {
     //     Eigen::Matrix3d CEN;
@@ -334,23 +355,83 @@ namespace frames {
     STABFrameFRD::STABFrameFRD(FRDFrameNED* pFRDFrameNED) : Frame("STABFrameFRD", pFRDFrameNED) {};
     WINDFrameSTAB::WINDFrameSTAB(STABFrameFRD* pSTABFrameFRD) : Frame("WINDFrameSTAB", pSTABFrameFRD) {};
 
-    dynamics::OrientationMatrix CRF(const Frame& F) {
+    Eigen::Matrix3d CRF(const Frame& F) {
         Eigen::Matrix3d C = Eigen::Matrix3d::Identity();
         const Frame* pF = &F;
         while (pF != nullptr){
-            C = pF->view().H->C().data * C;
+            C *= pF->view().H->C().data;
             pF = pF->parent;
         }
-        return dynamics::OrientationMatrix{ C };
+        return C ;
     }
 
     Eigen::Vector3d rotate_vec(const Eigen::Vector3d& vA, const Frame& A, const Frame& B) {
-        Eigen::Matrix3d CRA = CRF(A).data;
-        Eigen::Matrix3d CRB = CRF(B).data;
+        Eigen::Matrix3d CRA = CRF(A);
+        Eigen::Matrix3d CRB = CRF(B);
         Eigen::Vector3d vB = CRB * CRA.transpose() * vA;
         return vB;
     }
 
+    Eigen::Vector3d rotate_vec(const Eigen::Vector3d& vA, const Frame& A, const ECEFFrame&) {
+        Eigen::Matrix3d CRA = CRF(A);
+        Eigen::Vector3d vB = CRA.transpose() * vA;
+        return vB;
+    }
+
+    Eigen::Vector3d rotate_vec(const Eigen::Vector3d& vA, const ECEFFrame&, const Frame& B) {
+        Eigen::Matrix3d CRB = CRF(B);
+        Eigen::Vector3d vB = CRB * vA;
+        return vB;
+    }
+
+    /*
+    Eigen::Vector3d transform_point(const Eigen::Vector3d& pA, const Frame& A, const Frame& B) {
+        const Eigen::Matrix3d CRA = CRF(A);
+        const Eigen::Matrix3d CRB = CRF(B);
+        return CRB * (CRA.transpose() * pA + pRF(A) - pRF(B));
+    }
+
+    Eigen::Vector3d transform_point(const Eigen::Vector3d& pA, const Frame& A, const ECEFFrame&) {
+        const Eigen::Matrix3d CRA = CRF(A);
+        return CRA.transpose() * pA + pRF(A);
+    }
+
+    Eigen::Vector3d transform_point(const Eigen::Vector3d& pA, const ECEFFrame&, const Frame& B) {
+        const Eigen::Matrix3d CRB = CRF(B);
+        return CRB * (pA - pRF(B));
+    }
+    */
+
+    Eigen::Vector3d transform_point(const Eigen::Vector3d& pA, const Frame& A, const Frame& B) {
+        Eigen::Matrix4d HRA = HRF(A);
+        Eigen::Matrix4d HRB = HRF(B);
+        Eigen::Vector3d pB = transforms::apply_hom(HRB * transforms::make_Hinv(HRA), pA);
+        return pB;
+    }
+
+    Eigen::Vector3d transform_point(const Eigen::Vector3d& pA, const Frame& A, const ECEFFrame&) {
+        Eigen::Matrix4d HRA = HRF(A);
+        Eigen::Vector3d pB = transforms::apply_hom(transforms::make_Hinv(HRA), pA);
+        return pB;
+    }
+
+    Eigen::Vector3d transform_point(const Eigen::Vector3d& pA, const ECEFFrame&, const Frame& B) {
+        Eigen::Matrix4d HRB = HRF(B);
+        Eigen::Vector3d pB = transforms::apply_hom(HRB, pA);
+        return pB;
+    }
+
+    // Eigen::Vector3d transform_point(const Eigen::Vector3d& pA, const Frame& A, const Frame& B) {
+    //     return transforms::apply_hom(HRF(B) * transforms::make_Hinv(HRF(A)), pA);
+    // }
+
+    // Eigen::Vector3d transform_point(const Eigen::Vector3d& pA, const Frame& A, const ECEFFrame&) {
+    //     return transforms::apply_hom(transforms::make_Hinv(HRF(A)), pA);
+    // }
+
+    // Eigen::Vector3d transform_point(const Eigen::Vector3d& pA, const ECEFFrame&, const Frame& B) {
+    //     return transforms::apply_hom(HRF(B), pA);
+    // }
 
 
 

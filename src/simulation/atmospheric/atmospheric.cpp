@@ -15,7 +15,7 @@ namespace atmospheric {
         constexpr double temperature_SL = 288.0; // K
 
         // Constants
-        constexpr double g = 9.81;              // m/s^2
+        constexpr double g = 9.81;              // m/s^2    // DO NOT SET TO ZERO WHEN RUNNING GRAVITY-FREE TESTS! WHILE RIGID BODY DYNAMICS CAN BE SIMULATED WITHOUT GRAVITY, THIS ATMOSPHERE MODEL CANNOT - THUS, THIS VALUE MUST BE MAINTAINED INDEPENDENTLY OF global::gravity
         constexpr double lapse_rate = -0.0065;  // K/m
         constexpr double gas_constant = 287.0;  // J/(kg·K)
 

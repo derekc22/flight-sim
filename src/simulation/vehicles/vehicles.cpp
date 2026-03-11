@@ -125,12 +125,12 @@ namespace vehicles {
         return geography::lat_lon_alt_from_pE(fv.H->p());
     }
 
-    aerodynamics::AerodynamicState Aircraft::aerodynamicState(const frames::Frame& F) {
+    aerodynamics::AerodynamicState Aircraft::aerodynamicState(const frames::Frame& F, const atmospheric::Wind& windB) {
         if (F.parent != nullptr && F.parent->name != "NEDFrameECEF") {
             std::string err_msg = std::format("vehicles::Aircraft::aerodynamicState: Invalid frame input, the parent of {} must be an inertial frame: ECEFFrame or NEDFrameECEF", F.name);
             throw std::invalid_argument(err_msg);
         }
-        return aerodynamics::compute_aerodynamic_state(rigidBodyState(F));
+        return aerodynamics::compute_aerodynamic_state(rigidBodyState(F), windB);
     }
 
     atmospheric::AtmosphericState Aircraft::atmosphericState(const frames::Frame& F) {
@@ -142,7 +142,7 @@ namespace vehicles {
     }
 
 
-    void Aircraft::step(const StepOptions& opts) {
+    void Aircraft::step(StepOptions& opts) {
 
         StepOptions::_validate(opts);
 
@@ -262,6 +262,9 @@ namespace vehicles {
 
         // Sync all gravity vectors
         _step_gravity();
+
+        // Clear options
+        opts._clear();
     }
 
 
@@ -844,10 +847,10 @@ namespace vehicles {
     }
 
 
-    void Aircraft::print_state(int t) {
+    void Aircraft::print_state(int t, atmospheric::Wind wind) {
         const dynamics::RigidBodyState rbs = rigidBodyState(FRDFrameNED);
         const geography::GeographicState gps = geographicState(FRDFrameECEF);
-        const aerodynamics::AerodynamicState ads = aerodynamicState(FRDFrameNED);
+        const aerodynamics::AerodynamicState ads = aerodynamicState(FRDFrameNED, wind);
 
         const Eigen::Vector3d& p = rbs.p.data;
         const dynamics::EulerAngles& eul = FRDFrameNED.eulNB;
@@ -867,6 +870,8 @@ namespace vehicles {
             << "-------------------------------------------------------------------------------" << "\n\n";
     }
 
+
+    void StepOptions::_clear() noexcept { *this = StepOptions{}; }
 
 
 

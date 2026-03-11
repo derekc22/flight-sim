@@ -6,7 +6,7 @@ namespace atmospheric {
 
 
     struct Wind {
-        
+        Eigen::Vector3d data;
     };
 
 

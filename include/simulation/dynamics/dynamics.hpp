@@ -66,7 +66,7 @@ namespace dynamics {
     };
 
     struct EulerAngles {
-        Eigen::Vector3d data;   // eul ("ZYX", intrinsic)
+        Eigen::Vector3d data;   // eul ("ZYX", intrinsic). Stored as [z, y, x]
         double psi() const;     // yaw
         double theta() const;   // pitch
         double phi() const;     // roll

@@ -35,5 +35,8 @@ namespace global {
     Eigen::Matrix3d hat(const Eigen::Vector3d& v);
     Eigen::Vector3d vee(const Eigen::Matrix3d& S);
 
+    Eigen::Vector3d norm(const Eigen::Vector3d& v);
+    double clampTo1(double x);
+    double wrapToPi(double x);
 
 }

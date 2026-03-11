@@ -31,22 +31,8 @@ structural::StructuralProperties get_structural_properties() {
         { .id = "mot",   .mass =  0.040, .x_size = 0.03,  .y_size = 0.02,  .z_size = 0.02,  .x_loc =  0.02,  .y_loc = 0.0,   .z_loc =  0.01 },  // Motor
         { .id = "prop",  .mass =  0.012, .x_size = 0.0,   .y_size = 0.26,  .z_size = 0.025, .x_loc =  0.05,  .y_loc = 0.0,   .z_loc =  0.01 }   // Propeller
     };
-    // std::vector<structural::Geometry> geometries = {
-    //     { .id = "s4",    .mass = 45.00, .x_size = 0.700, .y_size = 7.500, .z_size = 0.120, .x_loc = -1.740, .y_loc =  3.44, .z_loc =  0.000 },  // Right Wing + Servo (s4)
-    //     { .id = "s5",    .mass = 45.00, .x_size = 0.700, .y_size = 7.500, .z_size = 0.120, .x_loc = -1.740, .y_loc = -3.44, .z_loc =  0.000 },  // Left Wing + Servo (s5)
-    //     { .id = "s2",    .mass =  8.00, .x_size = 0.600, .y_size = 2.600, .z_size = 0.100, .x_loc = -5.940, .y_loc =  0.00, .z_loc = -1.250 },  // Horizontal Stabilizer (s2)
-    //     { .id = "s3",    .mass =  6.00, .x_size = 0.900, .y_size = 0.120, .z_size = 1.350, .x_loc = -5.940, .y_loc =  0.00, .z_loc = -0.700 },  // Vertical Stabilizer (s3)
-    //     { .id = "bat",   .mass =  8.00, .x_size = 0.250, .y_size = 0.120, .z_size = 0.100, .x_loc = -0.380, .y_loc =  0.00, .z_loc =  0.200 },  // Battery
-    //     { .id = "fus",   .mass = 131.0, .x_size = 6.580, .y_size = 0.650, .z_size = 1.100, .x_loc = -3.030, .y_loc =  0.00, .z_loc =  0.000 },  // Fuselage
-    //     { .id = "mctrl", .mass =  5.00, .x_size = 0.250, .y_size = 0.180, .z_size = 0.080, .x_loc = -0.380, .y_loc =  0.00, .z_loc =  0.150 },  // Motor Controller
-    //     { .id = "rad",   .mass =  3.00, .x_size = 0.180, .y_size = 0.100, .z_size = 0.060, .x_loc = -0.760, .y_loc =  0.00, .z_loc =  0.150 },  // Radio
-    //     { .id = "serv",  .mass =  4.00, .x_size = 0.250, .y_size = 0.080, .z_size = 0.080, .x_loc = -0.110, .y_loc =  0.00, .z_loc =  0.000 },  // 2 Servos
-    //     { .id = "mot",   .mass =  0.00, .x_size = 0.000, .y_size = 0.000, .z_size = 0.000, .x_loc =  0.000, .y_loc =  0.00, .z_loc =  0.000 },  // Motor
-    //     { .id = "prop",  .mass =  0.00, .x_size = 0.000, .y_size = 0.000, .z_size = 0.000, .x_loc =  0.000, .y_loc =  0.00, .z_loc =  0.000 }   // Propeller
-    // };
     return structural::StructuralProperties{ geometries };
 }
-
 
 aerodynamics::AerodynamicProperties get_aerodynamic_properties() {
     // define aerodynamic properties
@@ -56,64 +42,25 @@ aerodynamics::AerodynamicProperties get_aerodynamic_properties() {
         { .id = "s2", .chord = 0.075, .span = 0.35, .p_ref = Eigen::Vector3d(-0.76,  0.0,  -0.16), .n = Eigen::Vector3d(0.0, 0.0, -1.0), .CL0 = 0.0,  .e = 0.8, .i = 0.0,  .CD0 = 0.01, .CDa = 1.0, .a0 = 0.0,  .CM0 = 0.0,   .CMa = 0.0 },  // Horizontal Stabilizer (s2) 
         { .id = "s3", .chord = 0.08,  .span = 0.18, .p_ref = Eigen::Vector3d(-0.76,  0.0,  -0.09), .n = Eigen::Vector3d(0.0, 1.0,  0.0), .CL0 = 0.0,  .e = 0.8, .i = 0.0,  .CD0 = 0.01, .CDa = 1.0, .a0 = 0.0,  .CM0 = 0.0,   .CMa = 0.0 },  // Vertical Stabilizer (s3)
     };
-    // std::vector<aerodynamics::Surface> surfaces = {
-    //     { .id = "s4", .chord = 0.7, .span = 7.50, .p_ref = Eigen::Vector3d(-1.74,  3.44,  0.00), .n = Eigen::Vector3d(0.0, 0.0, -1.0), .CL0 = 0.2, .e = 0.95, .i = 0.03, .CD0 = 0.012, .CDa = 1.0, .a0 = -0.03, .CM0 = -0.08, .CMa = 0.0 },  // Right Wing (s4)
-    //     { .id = "s5", .chord = 0.7, .span = 7.50, .p_ref = Eigen::Vector3d(-1.74, -3.44,  0.00), .n = Eigen::Vector3d(0.0, 0.0, -1.0), .CL0 = 0.2, .e = 0.95, .i = 0.03, .CD0 = 0.012, .CDa = 1.0, .a0 = -0.03, .CM0 = -0.08, .CMa = 0.0 },  // Left Wing (s5)
-    //     { .id = "s2", .chord = 0.6, .span = 2.60, .p_ref = Eigen::Vector3d(-5.94,  0.00, -1.25), .n = Eigen::Vector3d(0.0, 0.0, -1.0), .CL0 = 0.0, .e = 0.90, .i = 0.00, .CD0 = 0.010, .CDa = 1.0, .a0 = 0.000, .CM0 = 0.000, .CMa = 0.0 },  // Horizontal Stabilizer (s2) 
-    //     { .id = "s3", .chord = 0.9, .span = 1.35, .p_ref = Eigen::Vector3d(-5.94,  0.00, -0.70), .n = Eigen::Vector3d(0.0, 1.0,  0.0), .CL0 = 0.0, .e = 0.90, .i = 0.00, .CD0 = 0.010, .CDa = 1.0, .a0 = 0.000, .CM0 = 0.000, .CMa = 0.0 },  // Vertical Stabilizer (s3)
-    // };
     return aerodynamics::AerodynamicProperties{ surfaces };
 }
 
 
-
-
-
-vehicles::Aircraft load() {
-
-    // create vehicle
-    vehicles::Aircraft asw28{ 
-        get_structural_properties(), 
-        get_aerodynamic_properties(),
-    };
-
+vehicles::NEDFrameECEFStepOptions get_NED_init() {
     // define initial NED state
     geography::Latitude lat_0{ global::deg_to_rad(64.0) };
     geography::Longitude lon_0{ global::deg_to_rad(-22.0) };
     geography::Altitude alt_0{ 0.0 };
-    vehicles::NEDFrameECEFStepOptions NEDFrameECEFStepOpts = {
+
+    return vehicles::NEDFrameECEFStepOptions {
         .lat_NE = lat_0,
         .lon_NE = lon_0,
         .alt_NE = alt_0
     };
-
-    // define initial FRD state
-    dynamics::OrientationMatrix CNB_0{ global::I3 };
-    dynamics::Position pN_BN_0{ Eigen::Vector3d(0.0, 0.0, -750.0) };
-    dynamics::AngularVelocity wB_BN_0{ Eigen::Vector3d(0.0, 0.0, 0.0) };
-    dynamics::LinearVelocity vB_BN_0{ Eigen::Vector3d(10.0, 0.0, 0.0) };
-    vehicles::FRDFrameNEDStepOptions FRDFrameNEDStepOpts = {
-        .CNB = CNB_0,
-        .pN_BN = pN_BN_0,
-        .wB_BN = wB_BN_0,
-        .vB_BN = vB_BN_0
-    };
-
-    // initialize simulation
-    vehicles::StepOptions StepOpts = {
-        .NEDFrameECEFStepOpts = NEDFrameECEFStepOpts,
-        .FRDFrameNEDStepOpts = FRDFrameNEDStepOpts,
-    };
-    asw28.step(StepOpts);
-
-    return asw28;
 }
 
 
-
-
-
-void run(vehicles::Aircraft& asw28) {
+void run(vehicles::Aircraft& asw28, const dynamics::Force& FB_ext, const dynamics::Moment& MB_ext, const std::string& case_num) {
 
     // define StepOptions
     vehicles::StepOptions StepOpts;
@@ -126,14 +73,11 @@ void run(vehicles::Aircraft& asw28) {
     dynamics::Mass mass = structuralProperties.Mass;
     dynamics::InertiaTensor J = structuralProperties.J;
 
-    // define no external moment 
-    Eigen::Vector3d MB_ext = global::Zero3;;
-
     // initialize rigid body state
     dynamics::RigidBodyState xN_t = asw28.rigidBodyState(asw28.FRDFrameNED);
 
-    // run for 10 seconds
-    const int tf = static_cast<int>(10.0 / global::dt);
+    // run for 20 seconds
+    const int tf = static_cast<int>(20.0 / global::dt);
 
     // create data matrix
     io::DataMatrix p_DM{ Eigen::MatrixXd::Zero(tf, 3+1) };
@@ -155,11 +99,7 @@ void run(vehicles::Aircraft& asw28) {
         next += std::chrono::duration_cast<clock::duration>(
             std::chrono::duration<double>(global::dt)
         );
-
-        // define external force to cancel gravity
-        Eigen::Vector3d FB_g = mass.data * asw28.FRDFrameNED.gB.data;
-        Eigen::Vector3d FB_ext = -FB_g;
-
+  
         // compute density at current altitude
         atmospheric::Density rho = asw28.atmosphericState(asw28.FRDFrameECEF).rho;
 
@@ -178,8 +118,9 @@ void run(vehicles::Aircraft& asw28) {
         dynamics::Moment MB_aero = LB_aero.M;
 
         // compute net forces and moments
-        dynamics::Force FB_net{ FB_ext + FB_g + FB_aero.data };
-        dynamics::Moment MB_net{ MB_ext + MB_aero.data };
+        Eigen::Vector3d FB_g = mass.data * asw28.FRDFrameNED.gB.data;
+        dynamics::Force FB_net{ FB_ext.data + FB_g + FB_aero.data };
+        dynamics::Moment MB_net{ MB_ext.data + MB_aero.data };
 
         // compute rigid-body dynamics
         xN_t = dynamics::step_rigid_body(xN_t, mass, J, FB_net, MB_net);
@@ -222,20 +163,232 @@ void run(vehicles::Aircraft& asw28) {
     }
 
     // write data to csv
-    p_DM.write_csv("data/example", "p");
-    eul_DM.write_csv("data/example", "eul");
-    w_DM.write_csv("data/example", "w");
-    v_DM.write_csv("data/example", "v");
+    // p_DM.write_csv("data/hw6/p",     "p_"   + case_num);
+    // eul_DM.write_csv("data/hw6/eul", "eul_" + case_num);
+    // w_DM.write_csv("data/hw6/w",     "w_"   + case_num);
+    // v_DM.write_csv("data/hw6/v",     "v_"   + case_num);
 }
 
 
 
+/** @brief Case 1: Unstable axis  */
+void case1() {
+
+    // create vehicle
+    vehicles::Aircraft asw28{ 
+        get_structural_properties(), 
+        get_aerodynamic_properties(),
+    };
+
+    // step NED frame
+    vehicles::StepOptions StepOpts = { .NEDFrameECEFStepOpts = get_NED_init() };
+    asw28.step(StepOpts);
+
+    // initialize FRD
+    dynamics::EulerAngles eulNB_0{ global::Zero3 };
+    dynamics::Position pN_BN_0{ Eigen::Vector3d(0.0, 0.0, -750) };
+    vehicles::FRDFrameNEDStepOptions FRDFrameNEDStepOpts = {
+        .eulNB = eulNB_0,
+        .pN_BN = pN_BN_0,
+    };
+    StepOpts = { .FRDFrameNEDStepOpts = FRDFrameNEDStepOpts };
+    asw28.step(StepOpts);
+
+    dynamics::AngularVelocity wB_BE_0{ Eigen::Vector3d(1.0, 1e-2, 1e-2) };
+    dynamics::LinearVelocity vB_BE_0{ global::Zero3 };
+    vehicles::FRDFrameECEFStepOptions FRDFrameECEFStepOpts = {
+        .wB_BE = wB_BE_0,
+        .vB_BE = vB_BE_0,
+    };
+    StepOpts = { .FRDFrameECEFStepOpts = FRDFrameECEFStepOpts };
+    asw28.step(StepOpts);
+
+    // define no external force 
+    dynamics::Force FB_ext{ global::Zero3 };
+
+    // define no external moment 
+    dynamics::Moment MB_ext{ global::Zero3 };
+
+    // run simulation
+    run(asw28, FB_ext, MB_ext, "case1");
+}
+
+/** @brief Case 2: Outside loop  */
+void case2() {
+
+    // create vehicle
+    vehicles::Aircraft asw28{ 
+        get_structural_properties(), 
+        get_aerodynamic_properties(),
+    };
+
+    // step NED frame
+    vehicles::StepOptions StepOpts = { .NEDFrameECEFStepOpts = get_NED_init() };
+    asw28.step(StepOpts);
+
+    // initialize FRD
+    dynamics::EulerAngles eulNB_0{ global::Zero3 };
+    dynamics::Position pN_BN_0{ Eigen::Vector3d(0.0, 0.0, -750) };
+    vehicles::FRDFrameNEDStepOptions FRDFrameNEDStepOpts = {
+        .eulNB = eulNB_0,
+        .pN_BN = pN_BN_0,
+    };
+    StepOpts = { .FRDFrameNEDStepOpts = FRDFrameNEDStepOpts };
+    asw28.step(StepOpts);
+
+    dynamics::AngularVelocity wB_BE_0{ Eigen::Vector3d(0.0, 1.0, 0.0) };
+    dynamics::LinearVelocity vB_BE_0{ Eigen::Vector3d(13, 0, 0) };
+    vehicles::FRDFrameECEFStepOptions FRDFrameECEFStepOpts = {
+        .wB_BE = wB_BE_0,
+        .vB_BE = vB_BE_0,
+    };
+    StepOpts = { .FRDFrameECEFStepOpts = FRDFrameECEFStepOpts };
+    asw28.step(StepOpts);
+
+    // define external force
+    dynamics::Force FB_ext{ Eigen::Vector3d(0, 0, -7) };
+
+    // define no external moment 
+    dynamics::Moment MB_ext{ global::Zero3 };
+
+    // run simulation
+    run(asw28, FB_ext, MB_ext, "case2");
+}
+
+/** @brief Case 3: Force field  */
+void case3() {
+
+    // create vehicle
+    vehicles::Aircraft asw28{ 
+        get_structural_properties(), 
+        get_aerodynamic_properties(),
+    };
+
+    // step NED frame
+    vehicles::StepOptions StepOpts = { .NEDFrameECEFStepOpts = get_NED_init() };
+    asw28.step(StepOpts);
+
+    // define initial FRD state
+    dynamics::EulerAngles eulNB_0{ global::Zero3 };
+    dynamics::Position pN_BN_0{ Eigen::Vector3d(0.0, 0.0, -750) };
+    vehicles::FRDFrameNEDStepOptions FRDFrameNEDStepOpts = {
+        .eulNB = eulNB_0,
+        .pN_BN = pN_BN_0,
+    };
+    StepOpts = { .FRDFrameNEDStepOpts = FRDFrameNEDStepOpts };
+    asw28.step(StepOpts);
+
+    dynamics::AngularVelocity wB_BE_0{ Eigen::Vector3d(0.0, 0.0, 0.0) };
+    dynamics::LinearVelocity vB_BE_0{ Eigen::Vector3d(13, 0, 0.25) };
+    vehicles::FRDFrameECEFStepOptions FRDFrameECEFStepOpts = {
+        .wB_BE = wB_BE_0,
+        .vB_BE = vB_BE_0,
+    };
+    StepOpts = { .FRDFrameECEFStepOpts = FRDFrameECEFStepOpts };
+    asw28.step(StepOpts);
+
+    // define external force
+    dynamics::Force FB_ext{ Eigen::Vector3d(0, 0, -4.7088) };
+
+    // define no external moment 
+    dynamics::Moment MB_ext{ global::Zero3 };
+
+    // run simulation
+    run(asw28, FB_ext, MB_ext, "case3");
+}
+
+/** @brief Case 4 */
+void case4() {
+
+    // create vehicle
+    vehicles::Aircraft asw28{ 
+        get_structural_properties(), 
+        get_aerodynamic_properties(),
+    };
+
+    // step NED frame
+    vehicles::StepOptions StepOpts = { .NEDFrameECEFStepOpts = get_NED_init() };
+    asw28.step(StepOpts);
+
+    // define initial FRD state
+    dynamics::EulerAngles eulNB_0{ global::Zero3 };
+    dynamics::Position pN_BN_0{ Eigen::Vector3d(0.0, 0.0, -750) };
+    vehicles::FRDFrameNEDStepOptions FRDFrameNEDStepOpts = {
+        .eulNB = eulNB_0,
+        .pN_BN = pN_BN_0,
+    };
+    StepOpts = { .FRDFrameNEDStepOpts = FRDFrameNEDStepOpts };
+    asw28.step(StepOpts);
+
+    dynamics::AngularVelocity wB_BE_0{ Eigen::Vector3d(0.0, 0.0, 0.25) };
+    dynamics::LinearVelocity vB_BE_0{ Eigen::Vector3d(0.0, 0.0, 0.0) };
+    vehicles::FRDFrameECEFStepOptions FRDFrameECEFStepOpts = {
+        .wB_BE = wB_BE_0,
+        .vB_BE = vB_BE_0,
+    };
+    StepOpts = { .FRDFrameECEFStepOpts = FRDFrameECEFStepOpts };
+    asw28.step(StepOpts);
+
+    // define external force
+    dynamics::Force FB_ext{ global::Zero3 };
+
+    // define no external moment 
+    dynamics::Moment MB_ext{ global::Zero3 };
+
+    // run simulation
+    run(asw28, FB_ext, MB_ext, "case4");
+}
+
+
+/** @brief Case 5 */
+void case5() {
+
+    // create vehicle
+    vehicles::Aircraft asw28{ 
+        get_structural_properties(), 
+        get_aerodynamic_properties(),
+    };
+
+    // step NED frame
+    vehicles::StepOptions StepOpts = { .NEDFrameECEFStepOpts = get_NED_init() };
+    asw28.step(StepOpts);
+
+    // define initial FRD state
+    dynamics::EulerAngles eulNB_0{ Eigen::Vector3d(0, global::pi/4, 0) };
+    dynamics::Position pN_BN_0{ Eigen::Vector3d(0.0, 0.0, -750) };
+    vehicles::FRDFrameNEDStepOptions FRDFrameNEDStepOpts = {
+        .eulNB = eulNB_0,
+        .pN_BN = pN_BN_0,
+    };
+    StepOpts = { .FRDFrameNEDStepOpts = FRDFrameNEDStepOpts };
+    asw28.step(StepOpts);
+
+    dynamics::AngularVelocity wB_BE_0{ Eigen::Vector3d(0.0, 0.0, 0.25) };
+    dynamics::LinearVelocity vB_BE_0{ Eigen::Vector3d(0.0, 0.0, 0.0) };
+    vehicles::FRDFrameECEFStepOptions FRDFrameECEFStepOpts = {
+        .wB_BE = wB_BE_0,
+        .vB_BE = vB_BE_0,
+    };
+    StepOpts = { .FRDFrameECEFStepOpts = FRDFrameECEFStepOpts };
+    asw28.step(StepOpts);
+
+    // define external force
+    dynamics::Force FB_ext{ global::Zero3 };
+
+    // define no external moment 
+    dynamics::Moment MB_ext{ global::Zero3 };
+
+    // run simulation
+    run(asw28, FB_ext, MB_ext, "case5");
+}
+
 
 
 int main() {
-    // load vehicle
-    vehicles::Aircraft asw28 = load();
-
-    // run case
-    run(asw28);
+    // run cases
+    // case1();
+    // case2();
+    // case3();
+    // case4();
+    case5();
 }

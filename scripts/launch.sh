@@ -3,7 +3,7 @@ set -e
 
 source .env
 
-"$FG" \
+exec "$FG" \
 --ignore-autosave \
 --generic=socket,out,100,127.0.0.1,5510,udp,udp-out \
 --generic=socket,in,100,127.0.0.1,5511,udp,udp-in \
@@ -13,5 +13,5 @@ source .env
 --graphics-preset=minimal-quality \
 --aircraft=ASW28 \
 --prop:/sim/current-view/view-number-raw=1 \
---disable-real-weather-fetch
-# --prop:/devices/status/mice/mouse[0]/mode=2 \
+--disable-real-weather-fetch \
+--geometry=800x700

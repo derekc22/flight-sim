@@ -2,15 +2,18 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
-#include <iostream>
+#include <optional>
+#include <algorithm>
+#include <cmath>
 #include "simulation/aerodynamics/aerodynamics.hpp"
 #include "simulation/structural/structural.hpp"
 #include <simulation/dynamics/dynamics.hpp>
 #include <simulation/atmospheric/atmospheric.hpp>
+#include "simulation/global/global.hpp"
 
 namespace aerodynamics {
 
-    AerodynamicProperties::AerodynamicProperties(std::vector<Surface> s) : surfaces(s) {
+    AerodynamicProperties::AerodynamicProperties(std::vector<Surface> s) : surfaces(std::move(s)) {
         compute_aero_properties();
         surfaceIDs = build_IDs();
     }
@@ -25,75 +28,143 @@ namespace aerodynamics {
 
     std::unordered_map<std::string, size_t> AerodynamicProperties::build_IDs() {
         std::unordered_map<std::string, size_t> m;
-        for (size_t i = 0; i < surfaces.size(); ++i){
+        for (size_t i = 0; i < surfaces.size(); ++i) {
             m[surfaces[i].id] = i;
         }
         return m;
     }
 
 
-    dynamics::Wrench step_aero_forces_moments(
-        const AerodynamicProperties& aerodynamicProperties, 
-        const structural::StructuralProperties& structuralProperties, 
-        const dynamics::RigidBodyState& rigidBodyState, 
-        const atmospheric::Density& rho
+    SurfaceKinematics compute_surface_kinematics(
+        const Surface& s,
+        const structural::StructuralProperties& structuralProperties,
+        const dynamics::RigidBodyState& rigidBodyState,
+        const atmospheric::Density& rho,
+        const atmospheric::Wind& windB
+    ) {
+        SurfaceKinematics out;
+
+        const Eigen::Vector3d vB = rigidBodyState.v.data;
+        const Eigen::Vector3d wB = rigidBodyState.w.data;
+        const Eigen::Vector3d CG = structuralProperties.CG.data;
+
+        out.r_ac_B  = s.p_ac - CG;
+        out.v_rel_B = (vB - windB.data) + wB.cross(out.r_ac_B);
+        out.V = out.v_rel_B.norm();
+
+        if (out.V < global::eps) {
+            out.alpha = 0.0;
+            out.qbar  = 0.0;
+            out.p_hat = 0.0;
+            out.q_hat = 0.0;
+            out.r_hat = 0.0;
+            return out;
+        }
+
+        const Eigen::Vector3d n_hat = global::norm(s.n);
+        const double arg = global::clampTo1(out.v_rel_B.dot(n_hat) / out.V);
+
+        // alpha_i = i_i - asin( (V dot n) / |V| )
+        out.alpha = s.i - std::asin(arg);
+
+        out.qbar = 0.5 * rho.data * out.V * out.V;
+
+        out.p_hat = rigidBodyState.w.p() * s.span  / (2.0 * out.V);
+        out.q_hat = rigidBodyState.w.q() * s.chord / (2.0 * out.V);
+        out.r_hat = rigidBodyState.w.r() * s.span  / (2.0 * out.V);
+
+
+        return out;
+    }
+
+
+
+    SurfaceCoefficients compute_surface_coefficients(const Surface& s, const SurfaceKinematics& sk, const ControlInputs& u) {
+        SurfaceCoefficients out;
+
+        const double CLalpha = 2.0 * M_PI * (s.AR / (2.0 + s.AR));
+
+        out.CL.data = s.CL0 + CLalpha * sk.alpha;
+        out.CM.data = s.CM0 + s.CMa * sk.alpha;
+
+        double dCD_extra = 0.0;
+
+        // dynamic derivatives
+        out.CL.data += s.dyn.CL_phat * sk.p_hat + s.dyn.CL_qhat * sk.q_hat + s.dyn.CL_rhat * sk.r_hat;
+
+        out.CM.data += s.dyn.CM_phat * sk.p_hat + s.dyn.CM_qhat * sk.q_hat + s.dyn.CM_rhat * sk.r_hat;
+
+        dCD_extra += s.dyn.CD_phat * sk.p_hat + s.dyn.CD_qhat * sk.q_hat + s.dyn.CD_rhat * sk.r_hat;
+
+        // control increments
+        out.CL.data += s.dCL_de * u.elevator + s.dCL_da * u.aileron + s.dCL_dr * u.rudder + s.dCL_df * u.flap + s.dCL_ds * u.spoiler;
+
+        out.CM.data += s.dCM_de * u.elevator + s.dCM_da * u.aileron + s.dCM_dr * u.rudder + s.dCM_df * u.flap + s.dCM_ds * u.spoiler;
+
+        dCD_extra += s.dCD_de * std::abs(u.elevator) + s.dCD_da * std::abs(u.aileron) + s.dCD_dr * std::abs(u.rudder) + s.dCD_df * std::abs(u.flap) + s.dCD_ds * std::abs(u.spoiler);
+
+        out.CD.data = s.CD0 + s.CDa * (sk.alpha - s.a0) * (sk.alpha - s.a0) + (out.CL.data * out.CL.data) / (M_PI * s.e * s.AR) + dCD_extra;
+
+        return out;
+    }
+
+    AerodynamicLoad compute_surface_loads(const Surface& s,const SurfaceKinematics& sk,const SurfaceCoefficients& sc) {
+        if (sk.V < global::eps) {
+            return AerodynamicLoad{ 
+                dynamics::Force{ global::Zero3 }, 
+                dynamics::Moment{ global::Zero3 } 
+            };
+        }
+
+        const Eigen::Vector3d n_hat = global::norm(s.n);
+
+        // drag points opposite local relative velocity
+        const Eigen::Vector3d d_hat = -sk.v_rel_B / sk.V;
+
+        // lift direction is surface normal projected into plane normal to drag
+        Eigen::Vector3d l_hat = n_hat - n_hat.dot(d_hat) * d_hat;
+        l_hat = global::norm(l_hat);
+
+        // moment axis consistent with positive CM convention used in your model
+        Eigen::Vector3d m_hat = l_hat.cross(d_hat);
+        m_hat = global::norm(m_hat);
+
+        const double L = sk.qbar * s.area * sc.CL.data;
+        const double D = sk.qbar * s.area * sc.CD.data;
+        const double Mmag = sk.qbar * s.area * s.chord * sc.CM.data;
+
+        const Eigen::Vector3d FB = L * l_hat + D * d_hat;
+        const Eigen::Vector3d MB = sk.r_ac_B.cross(FB) + Mmag * m_hat;
+
+        return AerodynamicLoad{
+            dynamics::Force{ FB },
+            dynamics::Moment{ MB }
+        };
+    }
+
+
+    AerodynamicLoad step_aero_forces_moments(
+        const AerodynamicProperties& aerodynamicProperties,
+        const structural::StructuralProperties& structuralProperties,
+        const dynamics::RigidBodyState& rigidBodyState,
+        const atmospheric::Density& rho,
+        const ControlInputs& u,
+        const atmospheric::Wind& windB
     ) {
         Eigen::Vector3d FB = global::Zero3;
         Eigen::Vector3d MB = global::Zero3;
 
-        const Eigen::Vector3d vB = rigidBodyState.v.data;     // no wind: V_B_BA = V_B_BE
-        const Eigen::Vector3d wB = rigidBodyState.w.data;
-        const Eigen::Vector3d CG = structuralProperties.CG.data;
-
         for (const Surface& s : aerodynamicProperties.surfaces) {
-            const Eigen::Vector3d r_ac = s.p_ac - CG;          // CG -> AC
-            const Eigen::Vector3d v_rel = vB + wB.cross(r_ac); // include rotational component
+            SurfaceKinematics sk = compute_surface_kinematics(s, structuralProperties, rigidBodyState, rho, windB);
 
-            const double V = v_rel.norm();
-            if (V < 1e-9) { continue; }
+            SurfaceCoefficients sc = compute_surface_coefficients(s, sk, u);
+            AerodynamicLoad loads = compute_surface_loads(s, sk, sc);
 
-            const double q = 0.5 * rho.data * V * V;
-
-            const Eigen::Vector3d n_hat = (s.n.norm() > 1e-12) ? (s.n.normalized()) : global::Zero3;
-
-            // alpha^{S_i} = i^{S_i} - asin( (V dot n) / ||V|| )
-            double arg = v_rel.dot(n_hat) / V;
-            arg = std::max(-1.0, std::min(1.0, arg));
-            const double alpha = s.i - std::asin(arg);
-
-            // C_{Lalpha}^{S_i} = 2*pi * AR/(2+AR)
-            const double CLalpha = 2.0 * M_PI * (s.AR / (2.0 + s.AR));
-
-            const double CL = s.CL0 + CLalpha * alpha;
-            const double CD = s.CD0 + s.CDa * (alpha - s.a0) * (alpha - s.a0) + (CL * CL) / (M_PI * s.e * s.AR);
-            const double CM = s.CM0 + s.CMa * alpha;
-
-            const double L = q * s.area * CL;
-            const double D = q * s.area * CD;
-            const double Mmag = q * s.area * s.chord * CM;
-
-            const Eigen::Vector3d d_hat = -v_rel / V; // drag along -V
-
-            // lift direction: component of n orthogonal to drag, normalized
-            Eigen::Vector3d l_dir = n_hat - (n_hat.dot(d_hat)) * d_hat;
-            const double ln = l_dir.norm();
-            if (ln > 1e-12) { l_dir /= ln; } else { l_dir.setZero(); }
-
-            const Eigen::Vector3d Fi = L * l_dir + D * d_hat;
-
-            // pitching moment axis (perp to plane of drag and lift)
-            // Eigen::Vector3d m_hat = d_hat.cross(l_dir); // <- THIS IS WRONG
-            Eigen::Vector3d m_hat = l_dir.cross(d_hat); // <- THIS IS RIGHT
-            const double mn = m_hat.norm();
-            if (mn > 1e-12) { m_hat /= mn; } else { m_hat.setZero(); }
-
-            Eigen::Vector3d Mi = r_ac.cross(Fi) + Mmag * m_hat;
-
-            FB += Fi;
-            MB += Mi;
+            FB += loads.F.data;
+            MB += loads.M.data;
         }
 
-        return dynamics::Wrench{ dynamics::Force{ FB }, dynamics::Moment{ MB } };
+        return AerodynamicLoad{ dynamics::Force{ FB }, dynamics::Moment{ MB } };
     }
 
 
@@ -101,27 +172,26 @@ namespace aerodynamics {
 
 
 
-    AerodynamicState compute_aerodynamic_state(const dynamics::RigidBodyState& rigidBodyState){
-        const Eigen::Vector3d& vB = rigidBodyState.v.data;
+    AerodynamicState compute_aerodynamic_state(const dynamics::RigidBodyState& rigidBodyState, const atmospheric::Wind& windB){
+        const Eigen::Vector3d vB_rel = rigidBodyState.v.data - windB.data;
 
-        const double Vinf = vB.norm();
+        const double Vinf = vB_rel.norm();
 
         double alpha = 0.0;
         double beta  = 0.0;
 
-        if (Vinf > 1e-9) {
-            const double v1 = vB.x();
-            const double v2 = vB.y();
-            const double v3 = vB.z();
+        if (Vinf > global::eps) {
+            const double v1 = vB_rel.x();
+            const double v2 = vB_rel.y();
+            const double v3 = vB_rel.z();
 
             alpha = std::atan2(v3, v1);
 
-            double arg = v2 / Vinf;
-            arg = std::max(-1.0, std::min(1.0, arg));
+            double arg = global::clampTo1(v2 / Vinf);
             beta = std::asin(arg);
         }
 
-        return AerodynamicState{ Vinf, alpha, beta };
+        return AerodynamicState{ FreeStreamVelocity{ Vinf }, AngleOfAttack{ alpha }, SideslipAngle{ beta } };
     }
 
 
