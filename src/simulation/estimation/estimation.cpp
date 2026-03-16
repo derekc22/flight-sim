@@ -49,27 +49,25 @@ namespace estimation {
     }
 
     KalmanState KalmanFilter::_predict(const Eigen::VectorXd& u) {
-        std::string u_err_msg = std::format("estimation::KalmanFilter: Incorrect shape for control input, u. Must be ({} x 1)", m);
-        if (!(u.rows() == m && u.cols() == 1)) throw std::invalid_argument(u_err_msg);
 
         Eigen::VectorXd xt1_bar = A * xt + B * u;
+
         Eigen::MatrixXd Pt1_bar = A * Pt * A.transpose() + Rt;
+
         return KalmanState { xt1_bar, Pt1_bar };
     }
 
     KalmanState KalmanFilter::_correct(const KalmanState& pred, const Eigen::VectorXd& zt) {
-        std::string zt_err_msg = std::format("estimation::KalmanFilter: Incorrect shape for measurement, zt. Must be ({} x 1)", k);
-        if (!(zt.rows() == k && zt.cols() == 1)) throw std::invalid_argument(zt_err_msg);
 
-        Eigen::MatrixXd Kt = pred.Pt * C.transpose() * (C * pred.Pt * C.transpose() + Qt).inverse(); // Kalman gain
+        Eigen::MatrixXd Kt = pred.P * C.transpose() * (C * pred.P * C.transpose() + Qt).inverse(); // Kalman gain
 
-        Eigen::VectorXd y = zt - C * pred.xt; // Innovation
+        Eigen::VectorXd y = zt - C * pred.x; // Innovation
 
-        Eigen::VectorXd xt1 = pred.xt + Kt * y;
+        Eigen::VectorXd xt1 = pred.x + Kt * y;
 
         Eigen::MatrixXd Inxn = Eigen::MatrixXd::Identity(n, n);
 
-        Eigen::MatrixXd Pt1 = ( Inxn - Kt * C ) * pred.Pt * ( Inxn - Kt * C ).transpose() + Kt * Qt * Kt.transpose();
+        Eigen::MatrixXd Pt1 = ( Inxn - Kt * C ) * pred.P * ( Inxn - Kt * C ).transpose() + Kt * Qt * Kt.transpose();
 
         xt = xt1;
         Pt = Pt1;
@@ -77,9 +75,15 @@ namespace estimation {
         return KalmanState{ xt1, Pt1 };
     }
 
-    KalmanState KalmanFilter::step(const Eigen::VectorXd& u, const Eigen::VectorXd& zt) {
-        KalmanState pred = _predict(u);
-        return _correct(pred, zt);
+    KalmanState KalmanFilter::step(const Eigen::VectorXd& zt, const Eigen::VectorXd& u) {
+
+        std::string zt_err_msg = std::format("estimation::KalmanFilter::step: Incorrect shape for measurement, zt. Must be ({} x 1)", k);
+        if (!(zt.rows() == k && zt.cols() == 1)) throw std::invalid_argument(zt_err_msg);
+
+        std::string u_err_msg = std::format("estimation::KalmanFilter::step: Incorrect shape for control input, u. Must be ({} x 1)", m);
+        if (!(u.rows() == m && u.cols() == 1)) throw std::invalid_argument(u_err_msg);
+
+        return _correct(_predict(u), zt);
     }
 
 

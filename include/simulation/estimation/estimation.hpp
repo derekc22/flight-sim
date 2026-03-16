@@ -6,8 +6,8 @@
 namespace estimation {
 
     struct KalmanState {
-        Eigen::VectorXd xt;
-        Eigen::MatrixXd Pt;
+        Eigen::VectorXd x;
+        Eigen::MatrixXd P;
     };
 
 
@@ -39,7 +39,7 @@ namespace estimation {
 
         KalmanState _correct(const KalmanState& pred, const Eigen::VectorXd& zt);
 
-        KalmanState step(const Eigen::VectorXd& u, const Eigen::VectorXd& zt);
+        KalmanState step(const Eigen::VectorXd& zt, const Eigen::VectorXd& u);
 
         
 

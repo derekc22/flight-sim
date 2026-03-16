@@ -16,7 +16,7 @@ trap 'kill "$FG_PID" 2>/dev/null || true' EXIT
 sleep 10
 
 rm -rf build
-cmake -B build -S .
+cmake -B build -S . -DCMAKE_PREFIX_PATH="$CONDA_PREFIX"
 cmake --build build
 
 ./build/flight-sim

@@ -52,3 +52,4 @@ for fname in os.listdir(data_dir):
     plt.tight_layout()
     plt.savefig(save_fpath)
     plt.close()
+    print("Plots saved successfully")
