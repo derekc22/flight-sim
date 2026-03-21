@@ -6,10 +6,13 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Find Eigen3
-find_package(Eigen3 REQUIRED)
+find_package(Eigen3 CONFIG REQUIRED)
 
 # Find casadi
 find_package(casadi CONFIG REQUIRED)
+
+# Find nlohmann_json
+find_package(nlohmann_json CONFIG REQUIRED)
 
 # Collect all source files
 file(GLOB_RECURSE SOURCES "src/*.cpp")
@@ -20,8 +23,9 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 # Add include directory
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
-# Link Eigen and casadi to the executable
+# Link Eigen, casadi, and nlohmann_json to the executable
 target_link_libraries(${PROJECT_NAME} 
     Eigen3::Eigen
     casadi::casadi
+    nlohmann_json::nlohmann_json
 )

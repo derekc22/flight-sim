@@ -1,13 +1,60 @@
 #pragma once
+#include <filesystem>
+#include <optional>
 #include <vector>
 #include <string>
 #include <Eigen/Dense>
+#include <nlohmann/json.hpp>
+#include "simulation/aerodynamics/aerodynamics.hpp"
+#include "simulation/structural/structural.hpp"
+#include "simulation/vehicles/vehicles.hpp"
 
 namespace io {
 
-    void createDir(const std::string& dir);
-    void saveVectorToFile(std::vector<int>& data, std::string fname);
+    Eigen::Vector3d parse_vector3d(const nlohmann::json& values);
+    Eigen::Vector4d parse_vector4d(const nlohmann::json& values);
+    Eigen::Matrix3d parse_matrix3d(const nlohmann::json& values);
+    Eigen::Matrix4d parse_matrix4d(const nlohmann::json& values);
+    Eigen::Quaterniond parse_quaterniond(const nlohmann::json& values);
 
+    struct ParsedStepOptions {
+        std::optional<dynamics::HomogenousFrameTransformationMatrix> H;
+        std::optional<dynamics::OrientationMatrix> C;
+        std::optional<dynamics::Position> p;
+        std::optional<dynamics::OrientationQuaternion> q;
+        std::optional<dynamics::EulerAngles> eul;
+        std::optional<dynamics::OrientationMatrixRate> C_dot;
+        std::optional<dynamics::OrientationQuaternionRate> q_dot;
+        std::optional<dynamics::AngularVelocity> w;
+        std::optional<dynamics::EulerAngleRates> eul_dot;
+        std::optional<dynamics::AngularVelocityQuaternion> wq;
+        std::optional<dynamics::LinearVelocity> v;
+        std::optional<geography::Latitude> lat;
+        std::optional<geography::Longitude> lon;
+        std::optional<geography::Altitude> alt;
+        std::optional<aerodynamics::AngleOfAttack> alpha;
+        std::optional<aerodynamics::SideslipAngle> beta;
+    };
+
+    ParsedStepOptions parse_step_options(const nlohmann::json& frame_json);
+    vehicles::NEDFrameECEFStepOptions parse_NEDFrameECEF_step_options(const nlohmann::json& frame_json);
+    vehicles::FRDFrameECEFStepOptions parse_FRDFrameECEF_step_options(const nlohmann::json& frame_json);
+    vehicles::FRDFrameNEDStepOptions parse_FRDFrameNED_step_options(const nlohmann::json& frame_json);
+    vehicles::STABFrameFRDStepOptions parse_STABFrameFRD_step_options(const nlohmann::json& frame_json);
+    vehicles::WINDFrameSTABStepOptions parse_WINDFrameSTAB_step_options(const nlohmann::json& frame_json);
+
+    aerodynamics::DynamicDerivatives parse_dynamic_derivatives(const nlohmann::json& dyn_json);
+    aerodynamics::ControlDerivatives parse_control_derivatives(const nlohmann::json& ctrl_json);
+
+    nlohmann::json read_json_file(const std::filesystem::path& path);
+    std::filesystem::path resolve_config_path(const std::filesystem::path& run_path, const std::string& config_path);
+    std::filesystem::path resolve_run_config_entry_path(const std::string& key);
+
+    void create_dir(const std::string& dir);
+    void save_vector_to_file(std::vector<int>& data, std::string fname);
+    aerodynamics::AerodynamicProperties parse_aerodynamics_config();
+    vehicles::StepOptions parse_init_options_config();
+    structural::StructuralProperties parse_structural_config();
 
     struct DataMatrix {
         Eigen::MatrixXd data;

@@ -1,0 +1,5 @@
+{
+    "aerodynamics_config_path": "aerodynamics/real.json",
+    "structural_config_path": "structural/real.json",
+    "init_options_config_path": "init/real.json"
+}

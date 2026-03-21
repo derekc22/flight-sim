@@ -78,8 +78,7 @@ namespace aerodynamics {
     }
 
 
-
-    SurfaceCoefficients compute_surface_coefficients(const Surface& s, const SurfaceKinematics& sk, const ControlInputs& u) {
+    SurfaceCoefficients compute_surface_coefficients(const Surface& s, const SurfaceKinematics& sk, const ControlSurfaceInputs& u) {
         SurfaceCoefficients out;
 
         const double CLalpha = 2.0 * M_PI * (s.AR / (2.0 + s.AR));
@@ -97,11 +96,11 @@ namespace aerodynamics {
         dCD_extra += s.dyn.CD_phat * sk.p_hat + s.dyn.CD_qhat * sk.q_hat + s.dyn.CD_rhat * sk.r_hat;
 
         // control increments
-        out.CL.data += s.dCL_de * u.elevator + s.dCL_da * u.aileron + s.dCL_dr * u.rudder + s.dCL_df * u.flap + s.dCL_ds * u.spoiler;
+        out.CL.data += s.ctrl.dCL_de * u.elevator + s.ctrl.dCL_da * u.aileron + s.ctrl.dCL_dr * u.rudder + s.ctrl.dCL_df * u.flap + s.ctrl.dCL_ds * u.spoiler;
 
-        out.CM.data += s.dCM_de * u.elevator + s.dCM_da * u.aileron + s.dCM_dr * u.rudder + s.dCM_df * u.flap + s.dCM_ds * u.spoiler;
+        out.CM.data += s.ctrl.dCM_de * u.elevator + s.ctrl.dCM_da * u.aileron + s.ctrl.dCM_dr * u.rudder + s.ctrl.dCM_df * u.flap + s.ctrl.dCM_ds * u.spoiler;
 
-        dCD_extra += s.dCD_de * std::abs(u.elevator) + s.dCD_da * std::abs(u.aileron) + s.dCD_dr * std::abs(u.rudder) + s.dCD_df * std::abs(u.flap) + s.dCD_ds * std::abs(u.spoiler);
+        dCD_extra += s.ctrl.dCD_de * std::abs(u.elevator) + s.ctrl.dCD_da * std::abs(u.aileron) + s.ctrl.dCD_dr * std::abs(u.rudder) + s.ctrl.dCD_df * std::abs(u.flap) + s.ctrl.dCD_ds * std::abs(u.spoiler);
 
         out.CD.data = s.CD0 + s.CDa * (sk.alpha - s.a0) * (sk.alpha - s.a0) + (out.CL.data * out.CL.data) / (M_PI * s.e * s.AR) + dCD_extra;
 
@@ -125,7 +124,7 @@ namespace aerodynamics {
         Eigen::Vector3d l_hat = n_hat - n_hat.dot(d_hat) * d_hat;
         l_hat = global::norm(l_hat);
 
-        // moment axis consistent with positive CM convention used in your model
+        // moment axis consistent with positive CM convention
         Eigen::Vector3d m_hat = l_hat.cross(d_hat);
         m_hat = global::norm(m_hat);
 
@@ -148,7 +147,7 @@ namespace aerodynamics {
         const structural::StructuralProperties& structuralProperties,
         const dynamics::RigidBodyState& rigidBodyState,
         const atmospheric::Density& rho,
-        const ControlInputs& u,
+        const ControlSurfaceInputs& u,
         const atmospheric::Wind& windB
     ) {
         Eigen::Vector3d FB = global::Zero3;

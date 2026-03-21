@@ -142,7 +142,7 @@ namespace vehicles {
     }
 
 
-    void Aircraft::step(StepOptions& opts) {
+    void Aircraft::step(const StepOptions& opts) {
 
         StepOptions::_validate(opts);
 
@@ -263,8 +263,8 @@ namespace vehicles {
         // Sync all gravity vectors
         _step_gravity();
 
-        // Clear options
-        opts._clear();
+        // // Clear options
+        // opts._clear();
     }
 
 
@@ -644,70 +644,6 @@ namespace vehicles {
     }
 
 
-    // void Aircraft::_step_dependents(const frames::SetOptions& root_opts, frames::Frame& root) {
-    //     std::queue<frames::Frame*> queue;
-    //     if (root) queue.push(root);
-
-    //     frames:Frame* curr;
-
-    //     while (!queue.empty()) {
-    //         curr = queue.front();
-    //         cout << curr->val << endl;
-    //         queue.pop();
-
-    //         if (curr->left) queue.push(curr->left);
-    //         if (curr->right) queue.push(curr->right);
-    //     }
-    // }
-    // void Aircraft::_step_dependents(const frames::SetOptions& opts_parent, frames::Frame& F_parent) {
-    //     for (frames::Frame* pf : F_parent.dependents) {
-    //         frames::Frame f = *pf;
-    //         f.
-    //     } 
-    // }
-
-
-
-    // void Aircraft::_step_dependents(const frames::SetOptions& root_opts, frames::Frame& root) {
-    //     std::queue<frames::Frame*> q;
-    //     std::unordered_set<frames::Frame*> visited;
-
-    //     q.push(&root);
-    //     visited.insert(&root);
-
-    //     while (!q.empty()) {
-    //         frames::Frame* curr = q.front();
-    //         q.pop();
-
-    //         for (frames::Frame* dep : curr->dependents) {
-    //             if (!dep) continue; // if a frame has no dependents, continue
-    //             if (visited.insert(dep).second) q.push(dep); // if a dependent has not already been visited, add it to the queue
-    //         }
-    //     }
-    // }
-
-    // void Aircraft::_step_dependents(frames::Frame& root) {
-    //     std::queue<frames::Frame*> q;
-    //     std::unordered_set<frames::Frame*> visited;
-
-    //     visited.insert(&root);
-
-    //     for (frames::Frame* dep : root.dependents) { // iterate through all of the current frame's dependents
-    //         if (dep && visited.insert(dep).second) q.push(dep); // if a dependent exists and has not already been visited, add it to the queue and mark it as visited
-    //     }
-
-    //     while (!q.empty()) {
-    //         frames::Frame* curr = q.front();
-    //         q.pop();
-
-    //         // step curr here
-
-    //         for (frames::Frame* dep : curr->dependents) {
-    //             if (dep && visited.insert(dep).second) q.push(dep); // if a dependent exists and has not already been visited, add it to the queue and mark it as visited
-    //         }
-    //     }
-    // }
-
     void Aircraft::_step_dependents(frames::Frame& root) {
         std::queue<frames::Frame*> q;
         std::unordered_set<frames::Frame*> visited;
@@ -871,7 +807,7 @@ namespace vehicles {
     }
 
 
-    void StepOptions::_clear() noexcept { *this = StepOptions{}; }
+    // void StepOptions::_clear() noexcept { *this = StepOptions{}; }
 
 
 

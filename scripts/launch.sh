@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+AIRCRAFT="${1:?usage: ./scripts/launch.sh <AIRCRAFT>}"
+
 source .env
 
 exec "$FG" \
@@ -11,7 +13,7 @@ exec "$FG" \
 --timeofday=noon \
 --prop:/sim/time/warp=43200 \
 --graphics-preset=minimal-quality \
---aircraft=ASW28 \
+--aircraft="$AIRCRAFT" \
 --prop:/sim/current-view/view-number-raw=1 \
 --disable-real-weather-fetch \
 --geometry=800x700
