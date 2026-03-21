@@ -19,7 +19,6 @@
 
 
 vehicles::Aircraft load() {
-
     // create vehicle from config
     vehicles::Aircraft aircraft { 
         io::parse_structural_config(), 
@@ -35,7 +34,6 @@ vehicles::Aircraft load() {
 
 
 void run(vehicles::Aircraft& aircraft) {
-
     // get aircraft properties
     structural::StructuralProperties structuralProperties = aircraft.structuralProperties;
     aerodynamics::AerodynamicProperties aerodynamicProperties = aircraft.aerodynamicProperties;
@@ -51,13 +49,13 @@ void run(vehicles::Aircraft& aircraft) {
     dynamics::RigidBodyState xN_t = aircraft.rigidBodyState(aircraft.FRDFrameNED);
 
     // run for 10 seconds
-    const int tf = static_cast<int>(100.0 / global::dt);
+    const int tf = static_cast<int>(10.0 / global::dt);
 
     // create data matrix
-    // io::DataMatrix p_DM{ Eigen::MatrixXd::Zero(tf, 3+1) };
-    // io::DataMatrix eul_DM{ Eigen::MatrixXd::Zero(tf, 3+1) };
-    // io::DataMatrix w_DM{ Eigen::MatrixXd::Zero(tf, 3+1) };
-    // io::DataMatrix v_DM{ Eigen::MatrixXd::Zero(tf, 3+1) };
+    io::DataMatrix p_DM{ Eigen::MatrixXd::Zero(tf, 3+1) };
+    io::DataMatrix eul_DM{ Eigen::MatrixXd::Zero(tf, 3+1) };
+    io::DataMatrix w_DM{ Eigen::MatrixXd::Zero(tf, 3+1) };
+    io::DataMatrix v_DM{ Eigen::MatrixXd::Zero(tf, 3+1) };
 
     // initialize udp connections
     connection::UDPOut udp_out(5510);
@@ -115,10 +113,10 @@ void run(vehicles::Aircraft& aircraft) {
         aircraft.step(StepOpts);
 
         // save data
-        // p_DM.set(t, xN_t.p.data, global::dt);
-        // eul_DM.set(t, transforms::quatC2eul(xN_t.q.data, "ZYX", "intr"), global::dt);
-        // w_DM.set(t, xN_t.w.data, global::dt);
-        // v_DM.set(t, xN_t.v.data, global::dt);
+        p_DM.set(t, xN_t.p.data, global::dt);
+        eul_DM.set(t, transforms::quatC2eul(xN_t.q.data, "ZYX", "intr"), global::dt);
+        w_DM.set(t, xN_t.w.data, global::dt);
+        v_DM.set(t, xN_t.v.data, global::dt);
 
         // fill in_pkt from the simulation state
         geography::GeographicState geo_state = aircraft.geographicState(aircraft.FRDFrameECEF);
@@ -139,14 +137,14 @@ void run(vehicles::Aircraft& aircraft) {
         std::this_thread::sleep_until(next);
 
         // print state for debugging
-        // aircraft.print_state(t, wind);
+        aircraft.print_state(t, wind);
     }
 
     // write data to csv
-    // p_DM.write_csv("data/example", "p");
-    // eul_DM.write_csv("data/example", "eul");
-    // w_DM.write_csv("data/example", "w");
-    // v_DM.write_csv("data/example", "v");
+    p_DM.write_csv("data/example", "p");
+    eul_DM.write_csv("data/example", "eul");
+    w_DM.write_csv("data/example", "w");
+    v_DM.write_csv("data/example", "v");
 }
 
 
