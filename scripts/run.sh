@@ -1,7 +1,8 @@
 #!/bin/bash
 set -e
 
-AIRCRAFT="${1:?usage: ./scripts/run.sh <AIRCRAFT>}"
+AIRCRAFT="${1:?usage: ./scripts/run.sh <AIRCRAFT> <TIME>}"
+TIME="${2:?usage: ./scripts/run.sh <AIRCRAFT> <TIME>}"
 
 source .env
 
@@ -24,4 +25,4 @@ rm -rf build
 cmake -B build -S . -DCMAKE_PREFIX_PATH="$CONDA_PREFIX"
 cmake --build build
 
-./build/flight-sim
+./build/flight-sim "$TIME"

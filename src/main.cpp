@@ -1,7 +1,10 @@
 #include <Eigen/Dense>
+#include <algorithm>
+#include <cmath>
 #include <iostream>
 #include <vector>
 #include <chrono>
+#include <stdexcept>
 #include <thread>
 #include "simulation/transforms/transforms.hpp"
 #include "simulation/dynamics/dynamics.hpp"
@@ -33,7 +36,7 @@ vehicles::Aircraft load() {
 
 
 
-void run(vehicles::Aircraft& aircraft) {
+void run(vehicles::Aircraft& aircraft, double time_sec) {
     // get aircraft properties
     structural::StructuralProperties structuralProperties = aircraft.structuralProperties;
     aerodynamics::AerodynamicProperties aerodynamicProperties = aircraft.aerodynamicProperties;
@@ -48,8 +51,8 @@ void run(vehicles::Aircraft& aircraft) {
     // initialize rigid body state
     dynamics::RigidBodyState xN_t = aircraft.rigidBodyState(aircraft.FRDFrameNED);
 
-    // run for 10 seconds
-    const int tf = static_cast<int>(10.0 / global::dt);
+    // run for user-specified seconds
+    const int tf = std::max(1, static_cast<int>(std::ceil(time_sec / global::dt)));
 
     // create data matrix
     io::DataMatrix p_DM{ Eigen::MatrixXd::Zero(tf, 3+1) };
@@ -151,12 +154,19 @@ void run(vehicles::Aircraft& aircraft) {
 
 
 
-int main() {
+int main(int argc, char* argv[]) {
+    if (argc != 2) { std::cerr << "usage: " << argv[0] << " <TIME_SEC>" << std::endl; return 1; }
+    
+    double time_sec = 0.0;
+    try { time_sec = std::stod(argv[1]); } 
+    catch (const std::exception&) {std::cerr << "invalid time: " << argv[1] << std::endl; return 1; }
+    if (!std::isfinite(time_sec) || time_sec <= 0.0) { std::cerr << "TIME_SEC must be > 0" << std::endl; return 1;}
+
     // load vehicle
     vehicles::Aircraft aircraft = load();
 
     // run case
-    run(aircraft);
+    run(aircraft, time_sec);
 
     // temporary casadi test
     // autopilot::test_casadi();

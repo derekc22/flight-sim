@@ -29,8 +29,9 @@ Flight simulator built in C++ with FlightGear integration
   - `structural_config_path`: Path to the structural properties JSON
   - `initial_conditions_config_path`: Path to the initial conditions JSON
   
-- Run `scripts/run.sh <AIRCRAFT>` from the project root to start the simulator
-  - `AIRCRAFT`: Name of the aircraft to simulate (e.g. ASW28)
+- Run `scripts/run.sh <AIRCRAFT> <TIME_SEC>` from the project root to start the simulator
+  - `AIRCRAFT`: Aircraft to simulate (e.g. ASW28)
+  - `TIME_SEC`: Simulation time in seconds
 
 - Run `python3 scripts/subplot.py -d <DATA> -e <EXTENSION> -l <LABELS> -t <TITLE>` to visualize data
 
