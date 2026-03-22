@@ -27,7 +27,8 @@ Flight simulator built in C++ with FlightGear integration
 - Edit the following JSON configuration file paths in `config/run.json`:
   - `aerodynamics_config_path`: Path to the aerodynamic properties JSON
   - `structural_config_path`: Path to the structural properties JSON
-  - `initial_conditions_config_path`: Path to the initial conditions JSON
+  - `control_config_path`: Path to the control properties JSON
+  - `initialization_config_path`: Path to the initial conditions JSON
   
 - Run `scripts/run.sh <AIRCRAFT> <TIME_SEC>` from the project root to start the simulator
   - `AIRCRAFT`: Aircraft to simulate (e.g. ASW28)

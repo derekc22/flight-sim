@@ -4,6 +4,7 @@
 #include "simulation/structural/structural.hpp"
 #include "simulation/dynamics/dynamics.hpp"
 #include "simulation/aerodynamics/aerodynamics.hpp"
+#include "simulation/control/control.hpp"
 #include "simulation/geography/geography.hpp"
 #include "simulation/atmospheric/atmospheric.hpp"
 
@@ -201,8 +202,13 @@ namespace vehicles {
         frames::WINDFrameSTAB WINDFrameSTAB;
         structural::StructuralProperties structuralProperties;
         aerodynamics::AerodynamicProperties aerodynamicProperties;
+        control::ControlProperties controlProperties;
 
-        Aircraft(const structural::StructuralProperties& structuralProperties, const aerodynamics::AerodynamicProperties& aerodynamicProperties);
+        Aircraft(
+            const structural::StructuralProperties& structuralProperties,
+            const aerodynamics::AerodynamicProperties& aerodynamicProperties,
+            const control::ControlProperties& controlProperties
+        );
 
         /** @warning The parent of F must be an inertial frame: ECEFFrame or NEDFrameECEF */
         dynamics::RigidBodyState rigidBodyState(const frames::Frame& F);

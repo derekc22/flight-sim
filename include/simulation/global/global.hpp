@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 #include <Eigen/Dense>
 #include <cmath>
 
@@ -36,7 +37,9 @@ namespace global {
     Eigen::Vector3d vee(const Eigen::Matrix3d& S);
 
     Eigen::Vector3d norm(const Eigen::Vector3d& v);
-    double clampTo1(double x);
-    double wrapToPi(double x);
+    double clamp_symmetric(double x, double max_abs);
+    double clamp_positive(double x, double max_value);
+    double clamp_to_1(double x);
+    double wrap_to_pi(double x);
 
 }

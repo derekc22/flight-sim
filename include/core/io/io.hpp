@@ -6,6 +6,7 @@
 #include <Eigen/Dense>
 #include <nlohmann/json.hpp>
 #include "simulation/aerodynamics/aerodynamics.hpp"
+#include "simulation/control/control.hpp"
 #include "simulation/structural/structural.hpp"
 #include "simulation/vehicles/vehicles.hpp"
 
@@ -45,6 +46,8 @@ namespace io {
 
     aerodynamics::DynamicDerivatives parse_dynamic_derivatives(const nlohmann::json& dyn_json);
     aerodynamics::ControlDerivatives parse_control_derivatives(const nlohmann::json& ctrl_json);
+    control::ControlSurfaceLimits parse_control_surface_limits(const nlohmann::json& limits_json);
+    control::ControlProperties parse_control_properties(const nlohmann::json& control_json);
 
     nlohmann::json read_json_file(const std::filesystem::path& path);
     std::filesystem::path resolve_config_path(const std::filesystem::path& run_path, const std::string& config_path);
@@ -53,6 +56,7 @@ namespace io {
     void create_dir(const std::string& dir);
     void save_vector_to_file(std::vector<int>& data, std::string fname);
     aerodynamics::AerodynamicProperties parse_aerodynamics_config();
+    control::ControlProperties parse_control_config();
     vehicles::StepOptions parse_init_options_config();
     structural::StructuralProperties parse_structural_config();
 

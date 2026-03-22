@@ -62,7 +62,7 @@ namespace aerodynamics {
         }
 
         const Eigen::Vector3d n_hat = global::norm(s.n);
-        const double arg = global::clampTo1(out.v_rel_B.dot(n_hat) / out.V);
+        const double arg = global::clamp_to_1(out.v_rel_B.dot(n_hat) / out.V);
 
         // alpha_i = i_i - asin( (V dot n) / |V| )
         out.alpha = s.i - std::asin(arg);
@@ -78,8 +78,21 @@ namespace aerodynamics {
     }
 
 
-    SurfaceCoefficients compute_surface_coefficients(const Surface& s, const SurfaceKinematics& sk, const ControlSurfaceInputs& u) {
+    SurfaceCoefficients compute_surface_coefficients(
+        const Surface& s,
+        const SurfaceKinematics& sk,
+        const control::ControlSurfaceInputs& u,
+        const control::ControlProperties& cp
+    ) {
         SurfaceCoefficients out;
+
+        const control::ControlSurfaceInputs u_clipped{
+            .elevator = global::clamp_symmetric(u.elevator, cp.limits.elevator_max),
+            .aileron = global::clamp_symmetric(u.aileron, cp.limits.aileron_max),
+            .rudder = global::clamp_symmetric(u.rudder, cp.limits.rudder_max),
+            .flap = global::clamp_positive(u.flap, cp.limits.flap_max),
+            .spoiler = global::clamp_positive(u.spoiler, cp.limits.spoiler_max),
+        };
 
         const double CLalpha = 2.0 * M_PI * (s.AR / (2.0 + s.AR));
 
@@ -96,11 +109,11 @@ namespace aerodynamics {
         dCD_extra += s.dyn.CD_phat * sk.p_hat + s.dyn.CD_qhat * sk.q_hat + s.dyn.CD_rhat * sk.r_hat;
 
         // control increments
-        out.CL.data += s.ctrl.dCL_de * u.elevator + s.ctrl.dCL_da * u.aileron + s.ctrl.dCL_dr * u.rudder + s.ctrl.dCL_df * u.flap + s.ctrl.dCL_ds * u.spoiler;
+        out.CL.data += s.ctrl.dCL_de * u_clipped.elevator + s.ctrl.dCL_da * u_clipped.aileron + s.ctrl.dCL_dr * u_clipped.rudder + s.ctrl.dCL_df * u_clipped.flap + s.ctrl.dCL_ds * u_clipped.spoiler;
 
-        out.CM.data += s.ctrl.dCM_de * u.elevator + s.ctrl.dCM_da * u.aileron + s.ctrl.dCM_dr * u.rudder + s.ctrl.dCM_df * u.flap + s.ctrl.dCM_ds * u.spoiler;
+        out.CM.data += s.ctrl.dCM_de * u_clipped.elevator + s.ctrl.dCM_da * u_clipped.aileron + s.ctrl.dCM_dr * u_clipped.rudder + s.ctrl.dCM_df * u_clipped.flap + s.ctrl.dCM_ds * u_clipped.spoiler;
 
-        dCD_extra += s.ctrl.dCD_de * std::abs(u.elevator) + s.ctrl.dCD_da * std::abs(u.aileron) + s.ctrl.dCD_dr * std::abs(u.rudder) + s.ctrl.dCD_df * std::abs(u.flap) + s.ctrl.dCD_ds * std::abs(u.spoiler);
+        dCD_extra += s.ctrl.dCD_de * std::abs(u_clipped.elevator) + s.ctrl.dCD_da * std::abs(u_clipped.aileron) + s.ctrl.dCD_dr * std::abs(u_clipped.rudder) + s.ctrl.dCD_df * std::abs(u_clipped.flap) + s.ctrl.dCD_ds * std::abs(u_clipped.spoiler);
 
         out.CD.data = s.CD0 + s.CDa * (sk.alpha - s.a0) * (sk.alpha - s.a0) + (out.CL.data * out.CL.data) / (M_PI * s.e * s.AR) + dCD_extra;
 
@@ -147,7 +160,8 @@ namespace aerodynamics {
         const structural::StructuralProperties& structuralProperties,
         const dynamics::RigidBodyState& rigidBodyState,
         const atmospheric::Density& rho,
-        const ControlSurfaceInputs& u,
+        const control::ControlSurfaceInputs& u,
+        const control::ControlProperties& cp,
         const atmospheric::Wind& windB
     ) {
         Eigen::Vector3d FB = global::Zero3;
@@ -156,7 +170,7 @@ namespace aerodynamics {
         for (const Surface& s : aerodynamicProperties.surfaces) {
             SurfaceKinematics sk = compute_surface_kinematics(s, structuralProperties, rigidBodyState, rho, windB);
 
-            SurfaceCoefficients sc = compute_surface_coefficients(s, sk, u);
+            SurfaceCoefficients sc = compute_surface_coefficients(s, sk, u, cp);
             AerodynamicLoad loads = compute_surface_loads(s, sk, sc);
 
             FB += loads.F.data;
@@ -186,7 +200,7 @@ namespace aerodynamics {
 
             alpha = std::atan2(v3, v1);
 
-            double arg = global::clampTo1(v2 / Vinf);
+            double arg = global::clamp_to_1(v2 / Vinf);
             beta = std::asin(arg);
         }
 

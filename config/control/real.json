@@ -1,0 +1,9 @@
+{
+    "control_surface_limits": {
+        "elevator_max": 20.0,
+        "aileron_max": 20.0,
+        "rudder_max": 31.0,
+        "flap_max": 0.0,
+        "spoiler_max": 90.0
+    }
+}

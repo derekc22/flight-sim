@@ -769,15 +769,19 @@ namespace vehicles {
 
     }
 
-    Aircraft::Aircraft(const structural::StructuralProperties& structuralProperties,
-                       const aerodynamics::AerodynamicProperties& aerodynamicProperties) : 
+    Aircraft::Aircraft(
+        const structural::StructuralProperties& structuralProperties,
+        const aerodynamics::AerodynamicProperties& aerodynamicProperties,
+        const control::ControlProperties& controlProperties
+    ) :
         NEDFrameECEF{},
         FRDFrameECEF{},
         FRDFrameNED{&NEDFrameECEF},
         STABFrameFRD{&FRDFrameNED},
         WINDFrameSTAB{&STABFrameFRD},
         structuralProperties(structuralProperties),
-        aerodynamicProperties(aerodynamicProperties)
+        aerodynamicProperties(aerodynamicProperties),
+        controlProperties(controlProperties)
     {
         _init_frames();
     }
@@ -797,7 +801,7 @@ namespace vehicles {
         std::cout
             << "t: " << t * global::dt << " [s]" << "\n\n"
             << "p: " << p.x() << ", " << p.y() << ", " << p.z() << " [m]" << "\n\n"
-            << "eul: " << global::rad_to_deg(eul.psi()) << ", " << global::rad_to_deg(eul.theta()) << ", " << global::rad_to_deg(eul.psi()) << " [deg]" << "\n\n"
+            << "eul: " << global::rad_to_deg(eul.psi()) << ", " << global::rad_to_deg(eul.theta()) << ", " << global::rad_to_deg(eul.phi()) << " [deg]" << "\n\n"
             << "v: " << v.x() << ", " << v.y() << ", " << v.z() << " [ms^-1]" << "\n\n"
             << "w: " << global::rad_to_deg(w.x()) << ", " << global::rad_to_deg(w.y()) << ", " << global::rad_to_deg(w.z()) << " [deg/s]" << "\n\n"
             << "g: " << g.x() << ", " << g.y() << ", " << g.z() << " [ms^-2]" << "\n\n"

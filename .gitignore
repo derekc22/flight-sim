@@ -1,7 +1,11 @@
-.vscode
+.vscode/
 .DS_Store
 build/
 data/
 figures/
-.idea
+.idea/
 **/archive/**
+AGENTS.md
+.github/
+CMakeFiles/
+CMakeCache.txt

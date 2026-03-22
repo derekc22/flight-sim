@@ -26,6 +26,7 @@ vehicles::Aircraft load() {
     vehicles::Aircraft aircraft { 
         io::parse_structural_config(), 
         io::parse_aerodynamics_config(),
+        io::parse_control_config(),
     };
 
     // set initial conditions from config
@@ -40,6 +41,7 @@ void run(vehicles::Aircraft& aircraft, double time_sec) {
     // get aircraft properties
     structural::StructuralProperties structuralProperties = aircraft.structuralProperties;
     aerodynamics::AerodynamicProperties aerodynamicProperties = aircraft.aerodynamicProperties;
+    control::ControlProperties controlProperties = aircraft.controlProperties;
 
     // declare and define useful variables
     dynamics::Mass mass = structuralProperties.Mass;
@@ -89,10 +91,18 @@ void run(vehicles::Aircraft& aircraft, double time_sec) {
         atmospheric::Wind wind{ global::Zero3 }; // no wind for now
 
         // define control input
-        aerodynamics::ControlSurfaceInputs u{ .aileron = 1, .elevator = -0.25 };
+        control::ControlSurfaceInputs u{ .aileron = 1, .elevator = -0.25 };
 
         // compute aerodynamics forces and moments
-        aerodynamics::AerodynamicLoad LB_aero = step_aero_forces_moments(aerodynamicProperties, structuralProperties, xN_t, rho, u, wind);
+        aerodynamics::AerodynamicLoad LB_aero = step_aero_forces_moments(
+            aerodynamicProperties,
+            structuralProperties,
+            xN_t,
+            rho,
+            u,
+            controlProperties,
+            wind
+        );
         dynamics::Force FB_aero = LB_aero.F;
         dynamics::Moment MB_aero = LB_aero.M;
 

@@ -229,6 +229,26 @@ namespace io {
         };
     }
 
+    control::ControlSurfaceLimits parse_control_surface_limits(const nlohmann::json& limits_json) {
+        return control::ControlSurfaceLimits{
+            .elevator_max = global::deg_to_rad(limits_json.value("elevator_max", 0.0)),
+            .aileron_max = global::deg_to_rad(limits_json.value("aileron_max", 0.0)),
+            .rudder_max = global::deg_to_rad(limits_json.value("rudder_max", 0.0)),
+            .flap_max = global::deg_to_rad(limits_json.value("flap_max", 0.0)),
+            .spoiler_max = global::deg_to_rad(limits_json.value("spoiler_max", 0.0)),
+        };
+    }
+
+    control::ControlProperties parse_control_properties(const nlohmann::json& control_json) {
+        control::ControlProperties control_properties{};
+
+        if (control_json.contains("control_surface_limits")) {
+            control_properties.limits = parse_control_surface_limits(control_json.at("control_surface_limits"));
+        }
+
+        return control_properties;
+    }
+
     nlohmann::json read_json_file(const std::filesystem::path& path) {
         std::ifstream file(path);
         if (!file.is_open()) {
@@ -312,8 +332,14 @@ namespace io {
         return aerodynamics::AerodynamicProperties{ surfaces };
     }
 
+    control::ControlProperties parse_control_config() {
+        const auto control_path = resolve_run_config_entry_path("control_config_path");
+        const auto cfg = read_json_file(control_path);
+        return parse_control_properties(cfg);
+    }
+
     vehicles::StepOptions parse_init_options_config() {
-        const auto init_path = resolve_run_config_entry_path("init_options_config_path");
+        const auto init_path = resolve_run_config_entry_path("initialization_config_path");
         const auto cfg = read_json_file(init_path);
 
         vehicles::StepOptions opts;
@@ -368,20 +394,6 @@ namespace io {
 
         return structural::StructuralProperties{ geometries };
     }
-
-    // void save(const Eigen::MatrixXd& DM, const std::string& dir, const std::string& fname) {
-    //     std::string path_name = dir + "/" + fname + ".csv";
-    //     std::ofstream file_m(path_name);
-
-    //     for (int i = 0; i < M.rows(); ++i) {
-    //         for (int j = 0; j < M.cols(); ++j) {
-    //             file_m << M(i, j);
-    //             if (j < M.cols() - 1) file_m << ","; // comma delimiter
-    //         }
-    //         file_m << "\n";
-    //     }
-    //     file_m.close();
-    // }
 
     DataMatrix::DataMatrix(const Eigen::MatrixXd& d) : data(d), n_rows(static_cast<int>(data.rows())), n_cols(static_cast<int>(data.cols())) {};
 

@@ -84,12 +84,22 @@ namespace global {
         return v / n;
     }
 
-    double clampTo1(double x) {
+    double clamp_symmetric(double x, double max_abs) {
+        if (max_abs <= 0.0) return 0.0;
+        return std::clamp(x, -max_abs, max_abs);
+    }
+
+    double clamp_positive(double x, double max_value) {
+        if (max_value <= 0.0) return 0.0;
+        return std::clamp(x, 0.0, max_value);
+    }
+
+    double clamp_to_1(double x) {
         // clamps to [-1, 1]
         return std::clamp(x, -1.0, 1.0);
     }
 
-    double wrapToPi(double x) {
+    double wrap_to_pi(double x) {
         // maps to (-pi, pi]
         return std::remainder(x, 2.0 * ::global::pi);
     }

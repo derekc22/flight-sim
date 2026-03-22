@@ -6,6 +6,7 @@
 #include <cmath>
 #include <algorithm>
 #include "simulation/structural/structural.hpp"
+#include "simulation/control/control.hpp"
 #include <simulation/dynamics/dynamics.hpp>
 #include <simulation/atmospheric/atmospheric.hpp>
 
@@ -40,26 +41,6 @@ namespace aerodynamics {
         AngleOfAttack alpha;   
         SideslipAngle beta;
     };
-
-
-    struct ControlSurfaceInputs {
-        // u ∈ [−umax​, +umax​]
-        double elevator = 0.0;  // rad
-        double aileron = 0.0;   // rad
-        double rudder = 0.0;    // rad
-        // u ∈ [0, +umax​]
-        double flap = 0.0;      // rad
-        double spoiler = 0.0;   // rad
-    };
-
-    // struct ControlSurfaceLimits { // Assume symmetric limits
-    //     double elevator_max = 0.0;  // rad
-    //     double aileron_max = 0.0;   // rad
-    //     double rudder_max = 0.0;    // rad
-    //     double flap_max = 0.0;      // rad
-    //     double spoiler_max = 0.0;   // rad
-    // };
-
 
     struct DynamicDerivatives {
         // coefficient derivatives with respect to normalized body rates
@@ -165,7 +146,12 @@ namespace aerodynamics {
         const atmospheric::Wind& windB
     );
 
-    SurfaceCoefficients compute_surface_coefficients(const Surface& s, const SurfaceKinematics& sk, const ControlSurfaceInputs& u);
+    SurfaceCoefficients compute_surface_coefficients(
+        const Surface& s,
+        const SurfaceKinematics& sk,
+        const control::ControlSurfaceInputs& u,
+        const control::ControlProperties& cp
+    );
 
     AerodynamicLoad compute_surface_loads(const Surface& s,const SurfaceKinematics& sk,const SurfaceCoefficients& sc);
 
@@ -174,7 +160,8 @@ namespace aerodynamics {
         const structural::StructuralProperties& structuralProperties,
         const dynamics::RigidBodyState& rigidBodyState,
         const atmospheric::Density& rho,
-        const ControlSurfaceInputs& u,
+        const control::ControlSurfaceInputs& u,
+        const control::ControlProperties& cp,
         const atmospheric::Wind& windB
     );
     

@@ -90,7 +90,7 @@ namespace transforms {
         double a = 0.0, b = 0.0, c = 0.0;
 
         if (order == "ZYX") {
-            b = std::asin(global::clampTo1(-R(2,0)));
+            b = std::asin(global::clamp_to_1(-R(2,0)));
             double cb = std::cos(b);
             if (std::abs(cb) > global::eps) {
                 a = std::atan2(R(1,0), R(0,0));
@@ -100,7 +100,7 @@ namespace transforms {
                 c = 0.0;
             }
         } else if (order == "ZXY") {
-            b = std::asin(global::clampTo1(R(2,1)));
+            b = std::asin(global::clamp_to_1(R(2,1)));
             double cb = std::cos(b);
             if (std::abs(cb) > global::eps) {
                 a = std::atan2(-R(0,1), R(1,1));
@@ -110,7 +110,7 @@ namespace transforms {
                 c = 0.0;
             }
         } else if (order == "YZX") {
-            b = std::asin(global::clampTo1(R(1,0)));
+            b = std::asin(global::clamp_to_1(R(1,0)));
             double cb = std::cos(b);
             if (std::abs(cb) > global::eps) {
                 a = std::atan2(-R(2,0), R(0,0));
@@ -120,7 +120,7 @@ namespace transforms {
                 c = 0.0;
             }
         } else if (order == "YXZ") {
-            b = std::asin(global::clampTo1(-R(1,2)));
+            b = std::asin(global::clamp_to_1(-R(1,2)));
             double cb = std::cos(b);
             if (std::abs(cb) > global::eps) {
                 a = std::atan2(R(0,2), R(2,2));
@@ -130,7 +130,7 @@ namespace transforms {
                 c = 0.0;
             }
         } else if (order == "XZY") {
-            b = std::asin(global::clampTo1(-R(0,1)));
+            b = std::asin(global::clamp_to_1(-R(0,1)));
             double cb = std::cos(b);
             if (std::abs(cb) > global::eps) {
                 a = std::atan2(R(2,1), R(1,1));
@@ -140,7 +140,7 @@ namespace transforms {
                 c = 0.0;
             }
         } else if (order == "XYZ") {
-            b = std::asin(global::clampTo1(R(0,2)));
+            b = std::asin(global::clamp_to_1(R(0,2)));
             double cb = std::cos(b);
             if (std::abs(cb) > global::eps) {
                 a = std::atan2(-R(1,2), R(2,2));
@@ -152,7 +152,7 @@ namespace transforms {
 
         // Proper Euler (repeated axis)
         } else if (order == "ZXZ") {
-            b = std::acos(global::clampTo1(R(2,2)));
+            b = std::acos(global::clamp_to_1(R(2,2)));
             double sb = std::sin(b);
             if (std::abs(sb) > global::eps) {
                 a = std::atan2(R(0,2), -R(1,2));
@@ -162,7 +162,7 @@ namespace transforms {
                 c = 0.0;
             }
         } else if (order == "ZYZ") {
-            b = std::acos(global::clampTo1(R(2,2)));
+            b = std::acos(global::clamp_to_1(R(2,2)));
             double sb = std::sin(b);
             if (std::abs(sb) > global::eps) {
                 a = std::atan2(R(1,2),  R(0,2));
@@ -172,7 +172,7 @@ namespace transforms {
                 c = 0.0;
             }
         } else if (order == "XYX") {
-            b = std::acos(global::clampTo1(R(0,0)));
+            b = std::acos(global::clamp_to_1(R(0,0)));
             double sb = std::sin(b);
             if (std::abs(sb) > global::eps) {
                 a = std::atan2(R(1,0), -R(2,0));
@@ -182,7 +182,7 @@ namespace transforms {
                 c = 0.0;
             }
         } else if (order == "XZX") {
-            b = std::acos(global::clampTo1(R(0,0)));
+            b = std::acos(global::clamp_to_1(R(0,0)));
             double sb = std::sin(b);
             if (std::abs(sb) > global::eps) {
                 a = std::atan2(R(2,0),  R(1,0));
@@ -192,7 +192,7 @@ namespace transforms {
                 c = 0.0;
             }
         } else if (order == "YXY") {
-            b = std::acos(global::clampTo1(R(1,1)));
+            b = std::acos(global::clamp_to_1(R(1,1)));
             double sb = std::sin(b);
             if (std::abs(sb) > global::eps) {
                 a = std::atan2(R(0,1),  R(2,1));
@@ -202,7 +202,7 @@ namespace transforms {
                 c = 0.0;
             }
         } else if (order == "YZY") {
-            b = std::acos(global::clampTo1(R(1,1)));
+            b = std::acos(global::clamp_to_1(R(1,1)));
             double sb = std::sin(b);
             if (std::abs(sb) > global::eps) {
                 a = std::atan2(R(2,1), -R(0,1));
@@ -216,7 +216,7 @@ namespace transforms {
             throw std::invalid_argument("Unsupported Euler order: " + order);
         }
 
-        return Eigen::Vector3d(global::wrapToPi(a), global::wrapToPi(b), global::wrapToPi(c));
+        return Eigen::Vector3d(global::wrap_to_pi(a), global::wrap_to_pi(b), global::wrap_to_pi(c));
 
     }
 
