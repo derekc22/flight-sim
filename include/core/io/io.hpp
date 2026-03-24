@@ -52,12 +52,17 @@ namespace io {
     nlohmann::json read_json_file(const std::filesystem::path& path);
     std::filesystem::path resolve_config_path(const std::filesystem::path& run_path, const std::string& config_path);
     std::filesystem::path resolve_run_config_entry_path(const std::string& key);
+    void _validate_init_options_config(const nlohmann::json& cfg, bool trim_bool);
+    void _validate_NEDFrameECEF_init_options_config(const nlohmann::json& frame_json);
+    void _validate_FRDFrameECEF_init_options_config(const nlohmann::json& frame_json);
+    void _validate_FRDFrameNED_init_options_config(const nlohmann::json& frame_json);
+    void _validate_WINDFrameSTAB_init_options_config(const nlohmann::json& frame_json);
 
     void create_dir(const std::string& dir);
     void save_vector_to_file(std::vector<int>& data, std::string fname);
     aerodynamics::AerodynamicProperties parse_aerodynamics_config();
     control::ControlProperties parse_control_config();
-    vehicles::StepOptions parse_init_options_config();
+    vehicles::StepOptions parse_init_options_config(bool trim_enabled);
     structural::StructuralProperties parse_structural_config();
 
     struct DataMatrix {
@@ -70,4 +75,6 @@ namespace io {
         void set(int t, const Eigen::VectorXd data, double dt);
 
     };
+
+    std::string get_datetime();
 }

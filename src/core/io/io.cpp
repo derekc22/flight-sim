@@ -11,9 +11,7 @@
 namespace io {
 
     Eigen::Vector3d parse_vector3d(const nlohmann::json& values) {
-        if (!values.is_array() || values.size() != 3) {
-            throw std::runtime_error("expected a 3-element array");
-        }
+        if (!values.is_array() || values.size() != 3) { throw std::runtime_error("expected a 3-element array"); }
 
         return Eigen::Vector3d(
             values.at(0).get<double>(),
@@ -23,9 +21,7 @@ namespace io {
     }
 
     Eigen::Vector4d parse_vector4d(const nlohmann::json& values) {
-        if (!values.is_array() || values.size() != 4) {
-            throw std::runtime_error("expected a 4-element array");
-        }
+        if (!values.is_array() || values.size() != 4) { throw std::runtime_error("expected a 4-element array"); }
 
         return Eigen::Vector4d(
             values.at(0).get<double>(),
@@ -36,16 +32,12 @@ namespace io {
     }
 
     Eigen::Matrix3d parse_matrix3d(const nlohmann::json& values) {
-        if (!values.is_array() || values.size() != 3) {
-            throw std::runtime_error("expected a 3x3 array");
-        }
+        if (!values.is_array() || values.size() != 3) { throw std::runtime_error("expected a 3x3 array"); }
 
         Eigen::Matrix3d out;
         for (int row = 0; row < 3; ++row) {
             const auto& row_values = values.at(row);
-            if (!row_values.is_array() || row_values.size() != 3) {
-                throw std::runtime_error("expected a 3x3 array");
-            }
+            if (!row_values.is_array() || row_values.size() != 3) { throw std::runtime_error("expected a 3x3 array"); }
 
             for (int col = 0; col < 3; ++col) {
                 out(row, col) = row_values.at(col).get<double>();
@@ -56,16 +48,12 @@ namespace io {
     }
 
     Eigen::Matrix4d parse_matrix4d(const nlohmann::json& values) {
-        if (!values.is_array() || values.size() != 4) {
-            throw std::runtime_error("expected a 4x4 array");
-        }
+        if (!values.is_array() || values.size() != 4) { throw std::runtime_error("expected a 4x4 array"); }
 
         Eigen::Matrix4d out;
         for (int row = 0; row < 4; ++row) {
             const auto& row_values = values.at(row);
-            if (!row_values.is_array() || row_values.size() != 4) {
-                throw std::runtime_error("expected a 4x4 array");
-            }
+            if (!row_values.is_array() || row_values.size() != 4) { throw std::runtime_error("expected a 4x4 array"); }
 
             for (int col = 0; col < 4; ++col) {
                 out(row, col) = row_values.at(col).get<double>();
@@ -251,9 +239,7 @@ namespace io {
 
     nlohmann::json read_json_file(const std::filesystem::path& path) {
         std::ifstream file(path);
-        if (!file.is_open()) {
-            throw std::runtime_error("failed to open file: " + path.string());
-        }
+        if (!file.is_open()) { throw std::runtime_error("failed to open file: " + path.string()); }
 
         nlohmann::json cfg;
         file >> cfg;
@@ -278,6 +264,89 @@ namespace io {
         return resolve_config_path(run_path, run_config.at(key).get<std::string>());
     }
 
+    void _validate_init_options_config(const nlohmann::json& cfg, bool trim_bool) {
+        if (!cfg.contains("NEDFrameECEF") && !cfg.contains("FRDFrameECEF")) { throw std::runtime_error("io::_validate_init_options_config: One of NEDFrameECEF, FRDFrameECEF required"); }
+        if (!cfg.contains("FRDFrameECEF") && !cfg.contains("FRDFrameNED")) { throw std::runtime_error("io::_validate_init_options_config: One of FRDFrameECEF, FRDFrameNED required"); }
+        if (cfg.contains("STABFrameFRD")) { throw std::runtime_error("io::_validate_init_options_config: STABFrameFRD initialization not allowed"); }
+        
+        if (!trim_bool && cfg.contains("WINDFrameSTAB")) { throw std::runtime_error("io::_validate_init_options_config: WINDFrameSTAB requires trim to be enabled"); }
+        if (trim_bool && !cfg.contains("WINDFrameSTAB")) { throw std::runtime_error("io::_validate_init_options_config: trim requires WINDFrameSTAB"); }
+        if (trim_bool && !cfg.contains("FRDFrameNED")) { throw std::runtime_error("io::_validate_init_options_config: FRDFrameNED required for trim"); }
+
+        if (cfg.contains("NEDFrameECEF")) { _validate_NEDFrameECEF_init_options_config(cfg.at("NEDFrameECEF")); }
+        if (cfg.contains("FRDFrameECEF")) { _validate_FRDFrameECEF_init_options_config(cfg.at("FRDFrameECEF")); }
+        if (cfg.contains("FRDFrameNED")) { _validate_FRDFrameNED_init_options_config(cfg.at("FRDFrameNED")); }
+        if (cfg.contains("WINDFrameSTAB")) { _validate_WINDFrameSTAB_init_options_config(cfg.at("WINDFrameSTAB")); }
+    }
+
+    void _validate_NEDFrameECEF_init_options_config(const nlohmann::json& frame_json) {
+        const ParsedStepOptions fields = parse_step_options(frame_json);
+
+        if (!fields.lat.has_value() || !fields.lon.has_value() || !fields.alt.has_value()) { throw std::runtime_error("io::_validate_NEDFrameECEF_init_options_config: lat, lon, alt required"); }
+    }
+
+    void _validate_FRDFrameECEF_init_options_config(const nlohmann::json& frame_json) {
+        const ParsedStepOptions fields = parse_step_options(frame_json);
+
+        const bool has_H = fields.H.has_value();
+        const bool has_C = fields.C.has_value();
+        const bool has_p = fields.p.has_value();
+        const bool has_q = fields.q.has_value();
+        const bool has_eul = fields.eul.has_value();
+        const bool has_C_dot = fields.C_dot.has_value();
+        const bool has_q_dot = fields.q_dot.has_value();
+        const bool has_w = fields.w.has_value();
+        const bool has_eul_dot = fields.eul_dot.has_value();
+        const bool has_wq = fields.wq.has_value();
+        const bool has_v = fields.v.has_value();
+        const bool has_lat = fields.lat.has_value();
+        const bool has_lon = fields.lon.has_value();
+        const bool has_alt = fields.alt.has_value();
+
+        const bool has_geo_all = (has_lat && has_lon && has_alt);
+        const bool has_position = (has_H || has_p || has_geo_all);
+        const bool has_orientation = (has_H || has_C || has_q || has_eul);
+        const bool has_linear_velocity = has_v;
+        const bool has_angular_velocity = (has_C_dot || has_q_dot || has_w || has_eul_dot || has_wq);
+
+        if (!has_position) { throw std::runtime_error("io::_validate_FRDFrameECEF_init_options_config: one position representation required"); }
+        if (!has_orientation) { throw std::runtime_error("io::_validate_FRDFrameECEF_init_options_config: one orientation representation required"); }
+        if (!has_linear_velocity) { throw std::runtime_error("io::_validate_FRDFrameECEF_init_options_config: v required"); }
+        if (!has_angular_velocity) { throw std::runtime_error("io::_validate_FRDFrameECEF_init_options_config: one angular velocity representation required"); }
+    }
+
+    void _validate_FRDFrameNED_init_options_config(const nlohmann::json& frame_json) {
+        const ParsedStepOptions fields = parse_step_options(frame_json);
+
+        const bool has_H = fields.H.has_value();
+        const bool has_C = fields.C.has_value();
+        const bool has_p = fields.p.has_value();
+        const bool has_q = fields.q.has_value();
+        const bool has_eul = fields.eul.has_value();
+        const bool has_C_dot = fields.C_dot.has_value();
+        const bool has_q_dot = fields.q_dot.has_value();
+        const bool has_w = fields.w.has_value();
+        const bool has_eul_dot = fields.eul_dot.has_value();
+        const bool has_wq = fields.wq.has_value();
+        const bool has_v = fields.v.has_value();
+
+        const bool has_position = (has_H || has_p);
+        const bool has_orientation = (has_H || has_C || has_q || has_eul);
+        const bool has_linear_velocity = has_v;
+        const bool has_angular_velocity = (has_C_dot || has_q_dot || has_w || has_eul_dot || has_wq);
+
+        if (!has_position) { throw std::runtime_error("io::_validate_FRDFrameNED_init_options_config: one position representation required"); }
+        if (!has_orientation) { throw std::runtime_error("io::_validate_FRDFrameNED_init_options_config: one orientation representation required"); }
+        if (!has_linear_velocity) { throw std::runtime_error("io::_validate_FRDFrameNED_init_options_config: v required"); }
+        if (!has_angular_velocity) { throw std::runtime_error("io::_validate_FRDFrameNED_init_options_config: one angular velocity representation required"); }
+    }
+
+    void _validate_WINDFrameSTAB_init_options_config(const nlohmann::json& frame_json) {
+        const ParsedStepOptions fields = parse_step_options(frame_json);
+
+        if (!fields.beta.has_value()) { throw std::runtime_error("io::_validate_WINDFrameSTAB_init_options_config: beta required"); }
+    }
+
 
     void create_dir(const std::string& dir) {
         std::filesystem::create_directories(dir);
@@ -298,9 +367,7 @@ namespace io {
         const auto cfg = read_json_file(aerodynamics_path);
 
         const auto& surfaces_json = cfg.at("surfaces");
-        if (!surfaces_json.is_array()) {
-            throw std::runtime_error("io::parse_aerodynamics_config expected 'surfaces' to be an array");
-        }
+        if (!surfaces_json.is_array()) { throw std::runtime_error("io::parse_aerodynamics_config expected 'surfaces' to be an array"); }
 
         std::vector<aerodynamics::Surface> surfaces;
         surfaces.reserve(surfaces_json.size());
@@ -338,9 +405,10 @@ namespace io {
         return parse_control_properties(cfg);
     }
 
-    vehicles::StepOptions parse_init_options_config() {
+    vehicles::StepOptions parse_init_options_config(bool trim_bool) {
         const auto init_path = resolve_run_config_entry_path("initialization_config_path");
         const auto cfg = read_json_file(init_path);
+        _validate_init_options_config(cfg, trim_bool);
 
         vehicles::StepOptions opts;
 
@@ -372,9 +440,7 @@ namespace io {
         const auto cfg = read_json_file(structural_path);
 
         const auto& geometries_json = cfg.at("geometries");
-        if (!geometries_json.is_array()) {
-            throw std::runtime_error("io::parse_structural_config expected 'geometries' to be an array");
-        }
+        if (!geometries_json.is_array()) { throw std::runtime_error("io::parse_structural_config expected 'geometries' to be an array"); }
 
         std::vector<structural::Geometry> geometries;
         geometries.reserve(geometries_json.size());
@@ -405,9 +471,7 @@ namespace io {
         auto path_name = std::filesystem::path(dir) / (fname + ".csv");
 
         std::ofstream file_m(path_name);
-        if (!file_m.is_open()) {
-            throw std::runtime_error("Failed to open file: " + path_name.string());
-        }
+        if (!file_m.is_open()) { throw std::runtime_error("Failed to open file: " + path_name.string()); }
 
         for (int i = 0; i < n_rows; ++i) {
             for (int j = 0; j < n_cols; ++j) {
@@ -417,6 +481,7 @@ namespace io {
             file_m << "\n";
         }
         file_m.close();
+        std::cout << "Data saved successfully" << std::endl;
     }
 
     void DataMatrix::set(int t, const Eigen::VectorXd input, double dt){
@@ -429,6 +494,14 @@ namespace io {
         data.block(t, 1, 1, cols_to_copy) = input.transpose(); // startRow, startCol, blockRows, blockCols.
     }
 
+
+    std::string get_datetime() {
+        std::time_t std_tm = std::time(nullptr);
+        char buf[32];
+        std::strftime(buf, sizeof(buf), "%Y%b%d_%H-%M-%S", std::localtime(&std_tm));
+        std::string dtn = buf;
+        return dtn;
+    }
 
 
 }

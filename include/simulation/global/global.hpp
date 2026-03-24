@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <Eigen/Dense>
 #include <cmath>
+#include <cppad/cppad.hpp>
 
 namespace global {
     const extern double r_earth;
@@ -42,4 +43,28 @@ namespace global {
     double clamp_to_1(double x);
     double wrap_to_pi(double x);
 
+    double sin(double x);
+    double cos(double x);
+    double tan(double x);
+    double asin(double x);
+    double atan2(double y, double x);
+    double sqrt(double x);
+    double abs(double x);
+
+    CppAD::AD<double> sin(const CppAD::AD<double>& x);
+    CppAD::AD<double> cos(const CppAD::AD<double>& x);
+    CppAD::AD<double> tan(const CppAD::AD<double>& x);
+    CppAD::AD<double> asin(const CppAD::AD<double>& x);
+    CppAD::AD<double> atan2(const CppAD::AD<double>& y, const CppAD::AD<double>& x);
+    CppAD::AD<double> sqrt(const CppAD::AD<double>& x);
+    CppAD::AD<double> abs(const CppAD::AD<double>& x);
+
+    CppAD::AD<double> clamp_symmetric(const CppAD::AD<double>& x, double max_abs);
+    CppAD::AD<double> clamp_positive(const CppAD::AD<double>& x, double max_value);
+    CppAD::AD<double> clamp_to_1(const CppAD::AD<double>& x);
+
+    double vector_norm(const Eigen::Vector3d& v);
+    CppAD::AD<double> vector_norm(const Eigen::Matrix<CppAD::AD<double>, 3, 1>& v);
+
+    Eigen::Matrix<CppAD::AD<double>, 3, 1> norm(const Eigen::Matrix<CppAD::AD<double>, 3, 1>& v);
 }

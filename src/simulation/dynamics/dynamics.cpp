@@ -16,19 +16,11 @@ namespace dynamics {
     }
 
     Eigen::Matrix3d _eul_dot2wB_BI_mat(double theta, double phi){
-        Eigen::Matrix3d T;
-        T << 1, 0, -std::sin(theta),
-            0, std::cos(phi),  std::sin(phi) * std::cos(theta),
-            0, -std::sin(phi), std::cos(phi) * std::cos(theta);
-        return T;
+        return _eul_dot2wB_BI_mat_T(theta, phi);
     }
 
     Eigen::Matrix3d _wB_BI2eul_dot_mat(double theta, double phi) {
-        Eigen::Matrix3d T;
-        T <<    1,   std::sin(phi) * std::tan(theta),    std::cos(phi) * std::tan(theta),
-                0,                           std::cos(phi),                           -std::sin(phi),
-                0,  std::sin(phi) * global::sec(theta),   std::cos(phi) * global::sec(theta);
-        return T;
+        return _wB_BI2eul_dot_mat_T(theta, phi);
     }
 
     std::array<Eigen::Vector3d, 2> fwd_euler(Eigen::Vector3d xt, Eigen::Vector3d xt_dot, DynamicsFunction f, double tf){
@@ -133,11 +125,7 @@ namespace dynamics {
     // Inputs at t0: FB_net(t0), wB_BI(t0), vB(t0)
     // Output: vB(t0 + dt)
     LinearAcceleration _ddtB_vB_BI(const LinearVelocity& vB_BI, const AngularVelocity& wB_BI, const Mass& mass, const Force& FB_net){
-
-        const Eigen::Vector3d w_cross_v = global::hat(wB_BI.data) * vB_BI.data;   // w x v
-        const Eigen::Vector3d vB_BI_dot = (1.0 / mass.data) * FB_net.data - w_cross_v;
-
-        return LinearAcceleration { vB_BI_dot };
+        return LinearAcceleration{ _ddtB_vB_BI_T<double>(vB_BI.data, wB_BI.data, mass.data, FB_net.data) };
     }
 
     LinearVelocity _trans_dyn_vel(const LinearVelocity& vB_BI_t, const AngularVelocity& wB_BI_t, const Mass& mass, const Force& FB_net_t){
@@ -148,9 +136,7 @@ namespace dynamics {
     }
 
     Eigen::Vector3d _ddtB_to_ddtI(const Eigen::Vector3d& ddtB_v, const Eigen::Vector3d& v, const Eigen::Vector3d& w){
-        const Eigen::Vector3d w_cross_v = global::hat(w) * v;
-        const Eigen::Vector3d ddtI_v = ddtB_v + w_cross_v;
-        return ddtI_v;
+        return _ddtB_to_ddtI_T<double>(ddtB_v, v, w);
     }
 
 
@@ -162,11 +148,7 @@ namespace dynamics {
     // Inputs at t0: M(t0), J, w(t0)
     // Output: w(t0 + dt)
     Eigen::Vector3d _ddtB_wB_BI(const AngularVelocity& wB_BI, const InertiaTensor& J, const Moment& MB_net){
-
-        const Eigen::Vector3d w_cross_Jw = global::hat(wB_BI.data) * (J.data * wB_BI.data);       // w x (J*w)
-        const Eigen::Vector3d rhs = MB_net.data - w_cross_Jw;
-
-        return J.data.ldlt().solve(rhs);
+        return _ddtB_wB_BI_T<double>(wB_BI.data, J.data, MB_net.data);
     }
 
     AngularVelocity _rot_dyn(const AngularVelocity& wB_BI_t, const InertiaTensor& J, const Moment& MB_net_t){
@@ -246,19 +228,13 @@ namespace dynamics {
     AngularVelocity _eul_dot2wB_BI(const EulerAngleRates& eul_dot, const EulerAngles& eul) {
         double theta = eul.theta();
         double phi = eul.phi();
-        Eigen::Matrix3d T = _eul_dot2wB_BI_mat(theta, phi);
-        Eigen::Vector3d wB_BI = T * eul_dot.data;
-        
-        return AngularVelocity { wB_BI };
+        return AngularVelocity{ _eul_dot2wB_BI_T<double>(eul_dot.data, theta, phi) };
     }
 
     EulerAngleRates _wB_BI2eul_dot(const AngularVelocity& wB_BI, const EulerAngles& eul) {
         double theta = eul.theta();
         double phi = eul.phi();
-        Eigen::Matrix3d T = _wB_BI2eul_dot_mat(theta, phi);
-        Eigen::Vector3d eul_dot = T * wB_BI.data;
-
-        return EulerAngleRates { eul_dot };
+        return EulerAngleRates{ _wB_BI2eul_dot_T<double>(wB_BI.data, theta, phi) };
     }
 
 
@@ -269,7 +245,8 @@ namespace dynamics {
 
 
 
-
+    void OrientationMatrix::set(const OrientationQuaternion& q){ data = transforms::quat2rot(q.data); }
+    void OrientationMatrix::set(const EulerAngles& eul) { data = transforms::eul2C(eul.psi(), eul.theta(), eul.phi(), "ZYX", "intr"); }
 
     OrientationMatrix HomogenousFrameTransformationMatrix::C() const { return OrientationMatrix { transforms::CfromH(data) }; }
     Position HomogenousFrameTransformationMatrix::p() const { return Position { transforms::pfromH(data) }; }

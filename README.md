@@ -12,9 +12,8 @@ Flight simulator built in C++ with FlightGear integration
   - `conda activate ame532`
 
 - Install dependencies:
-  - `conda install -c conda-forge casadi`
-  - `sudo apt install libeigen3-dev nlohmann-json3-dev` (Linux)
-  - `brew install eigen nlohmann-json` (macOS)
+  - `sudo apt install libeigen3-dev libcppad-dev nlohmann-json3-dev` (Linux)
+  - `brew install eigen cppad nlohmann-json` (macOS)
 
 ## Usage
 
@@ -30,11 +29,16 @@ Flight simulator built in C++ with FlightGear integration
   - `control_config_path`: Path to the control properties JSON
   - `initialization_config_path`: Path to the initial conditions JSON
   
-- Run `scripts/run.sh <AIRCRAFT> <TIME_SEC>` from the project root to start the simulator
-  - `AIRCRAFT`: Aircraft to simulate (e.g. ASW28)
-  - `TIME_SEC`: Simulation time in seconds
+- Run `scripts/run.sh -a <AIRCRAFT> -t <TIME_SEC> [-r <TRIM>] [-v <VERBOSE>] [-d <DATA>] [-f <FOLDER>]`
+  - `-a AIRCRAFT`: Aircraft to simulate (e.g. ASW28)
+  - `-t TIME_SEC`: Simulation time in seconds
+  - `-r TRIM`: Enable trim
+  - `-v VERBOSE`: Enable verbose output
+  - `-d DATA`: Enable data logging
+  - `-f FOLDER`: Folder to save data
 
-- Run `python3 scripts/subplot.py -d <DATA> -e <EXTENSION> -l <LABELS> -t <TITLE>` to visualize data
+- Run `scripts/plot.sh <FOLDER>`
+  - `FOLDER`: Folder with saved data
 
 ## References:
 https://hopsan.github.io/tutorials/tutorial_flightgear.pdf

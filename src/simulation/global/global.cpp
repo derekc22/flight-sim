@@ -7,7 +7,7 @@ namespace global {
     const double gravity = 9.81;    // [ms^-2]
     const double pi = 3.1415926535897932384626433832795028841971693993751;
     const double eps = 1e-12;
-    const double dt = 0.005;        // [s]
+    const double dt = 0.001;        // [s]
 
     // Special Matrices
     const Eigen::Matrix3d I3 = Eigen::Matrix3d::Identity();
@@ -104,5 +104,98 @@ namespace global {
         return std::remainder(x, 2.0 * ::global::pi);
     }
 
+    double sin(double x) {
+        return std::sin(x);
+    }
+
+    double cos(double x) {
+        return std::cos(x);
+    }
+
+    double tan(double x) {
+        return std::tan(x);
+    }
+
+    double asin(double x) {
+        return std::asin(x);
+    }
+
+    double atan2(double y, double x) {
+        return std::atan2(y, x);
+    }
+
+    double sqrt(double x) {
+        return std::sqrt(x);
+    }
+
+    double abs(double x) {
+        return std::abs(x);
+    }
+
+    CppAD::AD<double> sin(const CppAD::AD<double>& x) {
+        return CppAD::sin(x);
+    }
+
+    CppAD::AD<double> cos(const CppAD::AD<double>& x) {
+        return CppAD::cos(x);
+    }
+
+    CppAD::AD<double> tan(const CppAD::AD<double>& x) {
+        return CppAD::tan(x);
+    }
+
+    CppAD::AD<double> asin(const CppAD::AD<double>& x) {
+        return CppAD::asin(x);
+    }
+
+    CppAD::AD<double> atan2(const CppAD::AD<double>& y, const CppAD::AD<double>& x) {
+        return CppAD::atan2(y, x);
+    }
+
+    CppAD::AD<double> sqrt(const CppAD::AD<double>& x) {
+        return CppAD::sqrt(x);
+    }
+
+    CppAD::AD<double> abs(const CppAD::AD<double>& x) {
+        return CppAD::abs(x);
+    }
+
+    CppAD::AD<double> clamp_symmetric(const CppAD::AD<double>& x, double max_abs) {
+        if (max_abs <= 0.0) return CppAD::AD<double>(0.0);
+        const CppAD::AD<double> max_t(max_abs);
+        if (x > max_t) return max_t;
+        if (x < -max_t) return -max_t;
+        return x;
+    }
+
+    CppAD::AD<double> clamp_positive(const CppAD::AD<double>& x, double max_value) {
+        if (max_value <= 0.0) return CppAD::AD<double>(0.0);
+        const CppAD::AD<double> max_t(max_value);
+        if (x < CppAD::AD<double>(0.0)) return CppAD::AD<double>(0.0);
+        if (x > max_t) return max_t;
+        return x;
+    }
+
+    CppAD::AD<double> clamp_to_1(const CppAD::AD<double>& x) {
+        if (x > CppAD::AD<double>(1.0)) return CppAD::AD<double>(1.0);
+        if (x < CppAD::AD<double>(-1.0)) return CppAD::AD<double>(-1.0);
+        return x;
+    }
+
+    double vector_norm(const Eigen::Vector3d& v) {
+        return sqrt(v.dot(v));
+    }
+
+    CppAD::AD<double> vector_norm(const Eigen::Matrix<CppAD::AD<double>, 3, 1>& v) {
+        return sqrt(v.dot(v));
+    }
+
+    Eigen::Matrix<CppAD::AD<double>, 3, 1> norm(const Eigen::Matrix<CppAD::AD<double>, 3, 1>& v) {
+        const CppAD::AD<double> n = vector_norm(v);
+        if (n < CppAD::AD<double>(global::eps)) {
+            return Eigen::Matrix<CppAD::AD<double>, 3, 1>::Zero();
+        }
+        return v / n;
+    }
 
 }

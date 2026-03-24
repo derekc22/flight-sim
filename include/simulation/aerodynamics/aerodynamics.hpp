@@ -7,6 +7,7 @@
 #include <algorithm>
 #include "simulation/structural/structural.hpp"
 #include "simulation/control/control.hpp"
+#include "simulation/global/global.hpp"
 #include <simulation/dynamics/dynamics.hpp>
 #include <simulation/atmospheric/atmospheric.hpp>
 
@@ -138,9 +139,71 @@ namespace aerodynamics {
 
     };
 
+    template <typename T>
+    using Vector3_T = Eigen::Matrix<T, 3, 1>;
+
+    template <typename T>
+    struct ControlSurfaceInputs_T {
+        T elevator = T(0);
+        T aileron = T(0);
+        T rudder = T(0);
+        T flap = T(0);
+        T spoiler = T(0);
+    };
+
+    template <typename T>
+    struct SurfaceKinematics_T {
+        Vector3_T<T> r_ac_B = Vector3_T<T>::Zero();
+        Vector3_T<T> v_rel_B = Vector3_T<T>::Zero();
+        T V = T(0);
+        T qbar = T(0);
+        T alpha = T(0);
+        T p_hat = T(0);
+        T q_hat = T(0);
+        T r_hat = T(0);
+    };
+
+    template <typename T>
+    struct SurfaceCoefficients_T {
+        T CL = T(0);
+        T CD = T(0);
+        T CM = T(0);
+    };
+
+    template <typename T>
+    struct AerodynamicLoad_T {
+        Vector3_T<T> F = Vector3_T<T>::Zero();
+        Vector3_T<T> M = Vector3_T<T>::Zero();
+    };
+
+    template <typename T>
+    struct AerodynamicState_T {
+        T Vinf = T(0);
+        T alpha = T(0);
+        T beta = T(0);
+    };
+
+    template <typename T>
+    ControlSurfaceInputs_T<T> clamp_control_inputs_T(const ControlSurfaceInputs_T<T>& u, const control::ControlProperties& cp);
+
+    template <typename T>
+    SurfaceKinematics_T<T> compute_surface_kinematics_T(const Surface& s, const structural::StructuralProperties& structural_properties, const dynamics::Twist_T<T>& twist, const atmospheric::Density& rho, const atmospheric::Wind& windB);
+
+    template <typename T>
+    SurfaceCoefficients_T<T> compute_surface_coefficients_T(const Surface& s, const SurfaceKinematics_T<T>& sk, const ControlSurfaceInputs_T<T>& u, const control::ControlProperties& cp, bool clamp_controls = true);
+
+    template <typename T>
+    AerodynamicLoad_T<T> compute_surface_loads_T(const Surface& s, const SurfaceKinematics_T<T>& sk, const SurfaceCoefficients_T<T>& sc);
+
+    template <typename T>
+    AerodynamicLoad_T<T> step_aero_forces_moments_T(const AerodynamicProperties& aerodynamic_properties, const structural::StructuralProperties& structural_properties, const dynamics::Twist_T<T>& twist, const atmospheric::Density& rho, const ControlSurfaceInputs_T<T>& u, const control::ControlProperties& cp, const atmospheric::Wind& windB, bool clamp_controls = true);
+
+    template <typename T>
+    AerodynamicState_T<T> compute_aerodynamic_state_T(const dynamics::Twist_T<T>& twist, const atmospheric::Wind& windB);
+
     SurfaceKinematics compute_surface_kinematics(
         const Surface& s,
-        const structural::StructuralProperties& structuralProperties,
+        const structural::StructuralProperties& structural_properties,
         const dynamics::RigidBodyState& rigidBodyState,
         const atmospheric::Density& rho,
         const atmospheric::Wind& windB
@@ -156,8 +219,8 @@ namespace aerodynamics {
     AerodynamicLoad compute_surface_loads(const Surface& s,const SurfaceKinematics& sk,const SurfaceCoefficients& sc);
 
     AerodynamicLoad step_aero_forces_moments(
-        const AerodynamicProperties& aerodynamicProperties,
-        const structural::StructuralProperties& structuralProperties,
+        const AerodynamicProperties& aerodynamic_properties,
+        const structural::StructuralProperties& structural_properties,
         const dynamics::RigidBodyState& rigidBodyState,
         const atmospheric::Density& rho,
         const control::ControlSurfaceInputs& u,
@@ -171,7 +234,6 @@ namespace aerodynamics {
 
     dynamics::OrientationMatrix CBS(const aerodynamics::AngleOfAttack& alpha);
     dynamics::OrientationMatrix CSW(const aerodynamics::SideslipAngle& beta);
-
-
-
 }
+
+#include "simulation/aerodynamics/aerodynamics.tpp"

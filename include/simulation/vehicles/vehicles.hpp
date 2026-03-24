@@ -200,14 +200,14 @@ namespace vehicles {
         frames::FRDFrameECEF FRDFrameECEF;
         frames::STABFrameFRD STABFrameFRD;
         frames::WINDFrameSTAB WINDFrameSTAB;
-        structural::StructuralProperties structuralProperties;
-        aerodynamics::AerodynamicProperties aerodynamicProperties;
-        control::ControlProperties controlProperties;
+        structural::StructuralProperties structural_properties;
+        aerodynamics::AerodynamicProperties aerodynamic_properties;
+        control::ControlProperties control_properties;
 
         Aircraft(
-            const structural::StructuralProperties& structuralProperties,
-            const aerodynamics::AerodynamicProperties& aerodynamicProperties,
-            const control::ControlProperties& controlProperties
+            const structural::StructuralProperties& structural_properties,
+            const aerodynamics::AerodynamicProperties& aerodynamic_properties,
+            const control::ControlProperties& control_properties
         );
 
         /** @warning The parent of F must be an inertial frame: ECEFFrame or NEDFrameECEF */

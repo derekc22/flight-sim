@@ -770,18 +770,18 @@ namespace vehicles {
     }
 
     Aircraft::Aircraft(
-        const structural::StructuralProperties& structuralProperties,
-        const aerodynamics::AerodynamicProperties& aerodynamicProperties,
-        const control::ControlProperties& controlProperties
+        const structural::StructuralProperties& structural_properties,
+        const aerodynamics::AerodynamicProperties& aerodynamic_properties,
+        const control::ControlProperties& control_properties
     ) :
         NEDFrameECEF{},
         FRDFrameECEF{},
         FRDFrameNED{&NEDFrameECEF},
         STABFrameFRD{&FRDFrameNED},
         WINDFrameSTAB{&STABFrameFRD},
-        structuralProperties(structuralProperties),
-        aerodynamicProperties(aerodynamicProperties),
-        controlProperties(controlProperties)
+        structural_properties(structural_properties),
+        aerodynamic_properties(aerodynamic_properties),
+        control_properties(control_properties)
     {
         _init_frames();
     }

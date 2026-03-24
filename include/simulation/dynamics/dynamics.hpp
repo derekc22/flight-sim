@@ -8,6 +8,7 @@
 #include <tuple> // For std::tuple
 #include <array>
 #include <functional>
+#include "simulation/global/global.hpp"
 #include "simulation/transforms/transforms.hpp"
 
 namespace dynamics {
@@ -45,6 +46,8 @@ namespace dynamics {
 
     struct OrientationMatrix {
         Eigen::Matrix3d data; // e.g. CIB
+        void set(const OrientationQuaternion& q);
+        void set(const EulerAngles& eul);
     };
 
     struct HomogenousFrameTransformationMatrix {
@@ -164,6 +167,39 @@ namespace dynamics {
         dynamics::AngularVelocity w;        // e.g. wB_BI
     };
 
+    template <typename T>
+    using Vector3_T = Eigen::Matrix<T, 3, 1>;
+
+    template <typename T>
+    struct Twist_T {
+        Vector3_T<T> v = Vector3_T<T>::Zero();
+        Vector3_T<T> w = Vector3_T<T>::Zero();
+    };
+
+    template <typename T>
+    using Matrix3_T = Eigen::Matrix<T, 3, 3>;
+
+    template <typename T>
+    Matrix3_T<T> _eul_dot2wB_BI_mat_T(const T& theta, const T& phi);
+
+    template <typename T>
+    Matrix3_T<T> _wB_BI2eul_dot_mat_T(const T& theta, const T& phi);
+
+    template <typename T>
+    Vector3_T<T> _ddtB_vB_BI_T(const Vector3_T<T>& vB, const Vector3_T<T>& wB_BI, double mass, const Vector3_T<T>& FB_net);
+
+    template <typename T>
+    Vector3_T<T> _ddtB_wB_BI_T(const Vector3_T<T>& wB_BI, const Eigen::Matrix3d& J, const Vector3_T<T>& MB_net);
+
+    template <typename T>
+    Vector3_T<T> _ddtB_to_ddtI_T(const Vector3_T<T>& ddtB_v, const Vector3_T<T>& v, const Vector3_T<T>& w);
+
+    template <typename T>
+    Vector3_T<T> _eul_dot2wB_BI_T(const Vector3_T<T>& eul_dot, const T& theta, const T& phi);
+
+    template <typename T>
+    Vector3_T<T> _wB_BI2eul_dot_T(const Vector3_T<T>& wB_BI, const T& theta, const T& phi);
+
 
 
     /** @warning Function signatures with an 'I' indicate that arguments MUST be specified WRT an inertial frame
@@ -218,5 +254,6 @@ namespace dynamics {
     Eigen::Matrix3d _eul_dot2wB_BI_mat(double theta, double phi);
 
     Eigen::Matrix3d _wB_BI2eul_dot_mat(double theta, double phi);
-
 }
+
+#include "simulation/dynamics/dynamics.tpp"
