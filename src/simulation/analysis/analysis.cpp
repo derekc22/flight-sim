@@ -1,7 +1,19 @@
 #include "simulation/analysis/analysis.hpp"
+#include <Eigen/Eigenvalues>
+#include <array>
+#include <iomanip>
 #include <sstream>
+#include <stdexcept>
 
 namespace analysis {
+
+    static std::string format_complex(const std::complex<double>& z, int precision = 6) {
+        std::ostringstream out;
+        out << std::fixed << std::setprecision(precision) << z.real();
+        if (z.imag() < 0.0) out << " - " << std::abs(z.imag()) << "i";
+        else out << " + " << z.imag() << "i";
+        return out.str();
+    }
 
     TrimLinearization linearize_trim_dynamics(const autopilot::TrimState<double>& x, const autopilot::TrimInput<double>& u, const autopilot::TrimModel& model, const autopilot::TrimConditions& conditions) {
         const autopilot::TrimVariableVector_T<double> z = autopilot::pack_trim_variables_T<double>(x, u);
@@ -43,10 +55,40 @@ namespace analysis {
         return linearize_trim_dynamics(trim.state, trim.input, model, trim.conditions);
     }
 
-    std::string print_linerization_solution(const TrimLinearization& lin) {
+    TrimEigenAnalysis trim_linearization_eigen_analysis(const TrimLinearization& lin) {
+        Eigen::EigenSolver<TrimStateJacobian> solver(lin.A);
+        if (solver.info() != Eigen::Success) {
+            throw std::runtime_error("analysis::trim_linearization_eigen_analysis: eigenvalue computation failed");
+        }
+
+        return TrimEigenAnalysis{
+            .eigenvalues = solver.eigenvalues(),
+            .eigenvectors = solver.eigenvectors(),
+        };
+    }
+
+    std::string print_linearization_solution(const TrimLinearization& lin) {
         std::ostringstream out;
         out << "A:\n" << lin.A << "\n";
         out << "B:\n" << lin.B << "\n";
+        return out.str();
+    }
+
+    std::string print_eigen_analysis(const TrimEigenAnalysis& eig) {
+        std::ostringstream out;
+        for (int mode = 0; mode < autopilot::trim_state_dofs; ++mode) {
+            out << "mode " << mode << ":\n";
+            out << "lambda: " << format_complex(eig.eigenvalues(mode)) << "\n";
+            out << "  vx: " << format_complex(eig.eigenvectors(0, mode)) << "\n";
+            out << "  vy: " << format_complex(eig.eigenvectors(1, mode)) << "\n";
+            out << "  vz: " << format_complex(eig.eigenvectors(2, mode)) << "\n";
+            out << "  p: " << format_complex(eig.eigenvectors(3, mode)) << "\n";
+            out << "  q: " << format_complex(eig.eigenvectors(4, mode)) << "\n";
+            out << "  r: " << format_complex(eig.eigenvectors(5, mode)) << "\n";
+            out << "  phi: " << format_complex(eig.eigenvectors(6, mode)) << "\n";
+            out << "  theta: " << format_complex(eig.eigenvectors(7, mode)) << "\n";
+            if (mode + 1 < autopilot::trim_state_dofs) out << "\n";
+        }
         return out.str();
     }
 }

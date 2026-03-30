@@ -29,16 +29,17 @@ Flight simulator built in C++ with FlightGear integration
   - `control_config`: Path to the control properties JSON
   - `initialization_config`: Path to the initial conditions JSON
   
-- Run `scripts/run.sh -a <AIRCRAFT> -t <TIME_SEC> [-r <TRIM>] [-v <VERBOSE>] [-d <DATA>] [-o <OUT_DIR>]`
+- To run the simulation: `scripts/run.sh -a <AIRCRAFT> -t <TIME_SEC> [-r <TRIM>] [-v <VERBOSE>] [-d <DATA>] [-o <OUT_DIR>] [-p <PLOT>]`
   - `-a AIRCRAFT`: Aircraft to simulate (e.g. ASW28)
   - `-t TIME_SEC`: Simulation time in seconds
   - `-r TRIM`: Enable trim
   - `-v VERBOSE`: Enable verbose output
   - `-d DATA`: Enable data logging
   - `-o OUT_DIR`: Output directory
+  - `-p PLOT`: Enable automatic plotting
 
-- Run `scripts/plot.sh <OUT_DIR>`
-  - `OUT_DIR`: Ouput directory from  simulation run
+- To plot manually: `scripts/plot.sh <OUT_DIR>`
+  - `OUT_DIR`: Ouput directory specified at simulation runtime
 
 ## References:
 https://hopsan.github.io/tutorials/tutorial_flightgear.pdf

@@ -2,11 +2,11 @@
 set -e
 
 usage() {
-  echo "USAGE: $0 -a <AIRCRAFT> -t <TIME_SEC> [-r <TRIM_BOOL>] [-v <VERBOSE_BOOL>] [-d <DATA_BOOL>] [-o <OUT_DIR>]" >&2
+  echo "USAGE: $0 -a <AIRCRAFT> -t <TIME_SEC> [-r <TRIM_BOOL>] [-v <VERBOSE_BOOL>] [-d <DATA_BOOL>] [-o <OUT_DIR>] [-p <PLOT>]" >&2
   exit 1
 }
 
-while getopts "a:t:o:rvdh" opt; do
+while getopts "a:t:o:rvdph" opt; do
   case "$opt" in
     a) AIRCRAFT="$OPTARG" ;;
     t) TIME_SEC="$OPTARG" ;;
@@ -14,6 +14,7 @@ while getopts "a:t:o:rvdh" opt; do
     v) VERBOSE_BOOL=1 ;;
     d) DATA_BOOL=1 ;;
     o) OUT_DIR="$OPTARG" ;;
+    p) PLOT=1 ;;
     h) usage ;;
     ?) usage ;;
   esac
@@ -23,6 +24,7 @@ done
 : "${TRIM_BOOL:=0}"
 : "${VERBOSE_BOOL:=0}"
 : "${DATA_BOOL:=0}"
+: "${PLOT:=0}"
 : "${OUT_DIR:=$(date +"%Y%b%d_%H-%M-%S")}"
 
 # required args check
@@ -47,3 +49,7 @@ cmake -B build -S .
 cmake --build build
 
 ./build/flight-sim "$TIME_SEC" "$TRIM_BOOL" "$VERBOSE_BOOL" "$DATA_BOOL" "$OUT_DIR"
+
+if [ "$PLOT" -eq 1 ]; then
+  ./scripts/plot.sh "$OUT_DIR"
+fi

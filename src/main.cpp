@@ -36,10 +36,9 @@ struct SimulationOutput {
     std::optional<io::DataMatrix> eul_DM;
     std::optional<io::DataMatrix> w_DM;
     std::optional<io::DataMatrix> v_DM;
-    std::string trim_sol_str;
-    std::string lin_sol_str;
     autopilot::TrimSolution trim_sol;
     analysis::TrimLinearization lin_sol;
+    analysis::TrimEigenAnalysis eig_sol;
 }; 
 
 
@@ -67,10 +66,15 @@ void cleanup(const SimulationInput& sim_in, const SimulationOutput& sim_out) {
         sim_out.w_DM->write_csv(out_dir_path, "w");
         sim_out.v_DM->write_csv(out_dir_path, "v");
         
-        // log trim and linearization
+        // log trim
         if (sim_in.trim_bool){
-            io::write_txt(sim_out.trim_sol_str, out_dir_path, "trim_sol");
-            if (sim_out.trim_sol.converged) io::write_txt(sim_out.lin_sol_str, out_dir_path, "lin_sol");
+            io::write_txt(autopilot::print_trim_solution(sim_out.trim_sol), out_dir_path, "trim_sol");
+            
+            // log linearization and eigenanalysis
+            if (sim_out.trim_sol.converged) {
+                io::write_txt(analysis::print_linearization_solution(sim_out.lin_sol), out_dir_path, "lin_sol");
+                io::write_txt(analysis::print_eigen_analysis(sim_out.eig_sol), out_dir_path, "eig_sol");
+            }
         }
 
         // dump configs
@@ -163,7 +167,6 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
         if (sim_in.trim_bool && !trim_sol.attempted) {
             trim_sol = autopilot::inspect_trim(aircraft, wind);
             sim_out.trim_sol = trim_sol;
-            sim_out.trim_sol_str = autopilot::print_trim_solution(trim_sol);
 
             if (trim_sol.converged){
                 // obtain full state from trim solution
@@ -185,8 +188,9 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
 
                 // linearize
                 const analysis::TrimLinearization lin_sol = analysis::linearize_trim_solution(aircraft, trim_sol);
+                const analysis::TrimEigenAnalysis eig_sol = analysis::trim_linearization_eigen_analysis(lin_sol);
                 sim_out.lin_sol = lin_sol;
-                sim_out.lin_sol_str = analysis::print_linerization_solution(lin_sol);
+                sim_out.eig_sol = eig_sol;
             }            
         }
 
