@@ -44,6 +44,12 @@ namespace aerodynamics {
         out.CL = T(s.CL0) + T(CLalpha) * sk.alpha;
         out.CM = T(s.CM0) + T(s.CMa) * sk.alpha;
 
+        const T elevator_abs = global::smooth_abs(u_eval.elevator);
+        const T aileron_abs = global::smooth_abs(u_eval.aileron);
+        const T rudder_abs = global::smooth_abs(u_eval.rudder);
+        const T flap_abs = global::smooth_abs(u_eval.flap);
+        const T spoiler_abs = global::smooth_abs(u_eval.spoiler);
+
         T dCD_extra = T(0);
 
         out.CL += T(s.dyn.CL_phat) * sk.p_hat + T(s.dyn.CL_qhat) * sk.q_hat + T(s.dyn.CL_rhat) * sk.r_hat;
@@ -52,7 +58,7 @@ namespace aerodynamics {
 
         out.CL += T(s.ctrl.dCL_de) * u_eval.elevator + T(s.ctrl.dCL_da) * u_eval.aileron + T(s.ctrl.dCL_dr) * u_eval.rudder + T(s.ctrl.dCL_df) * u_eval.flap + T(s.ctrl.dCL_ds) * u_eval.spoiler;
         out.CM += T(s.ctrl.dCM_de) * u_eval.elevator + T(s.ctrl.dCM_da) * u_eval.aileron + T(s.ctrl.dCM_dr) * u_eval.rudder + T(s.ctrl.dCM_df) * u_eval.flap + T(s.ctrl.dCM_ds) * u_eval.spoiler;
-        dCD_extra += T(s.ctrl.dCD_de) * global::abs(u_eval.elevator) + T(s.ctrl.dCD_da) * global::abs(u_eval.aileron) + T(s.ctrl.dCD_dr) * global::abs(u_eval.rudder) + T(s.ctrl.dCD_df) * global::abs(u_eval.flap) + T(s.ctrl.dCD_ds) * global::abs(u_eval.spoiler);
+        dCD_extra += T(s.ctrl.dCD_de) * elevator_abs + T(s.ctrl.dCD_da) * aileron_abs + T(s.ctrl.dCD_dr) * rudder_abs + T(s.ctrl.dCD_df) * flap_abs + T(s.ctrl.dCD_ds) * spoiler_abs;
 
         out.CD = T(s.CD0) + T(s.CDa) * (sk.alpha - T(s.a0)) * (sk.alpha - T(s.a0)) + (out.CL * out.CL) / T(global::pi * s.e * s.AR) + dCD_extra;
         return out;

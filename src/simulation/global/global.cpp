@@ -6,7 +6,7 @@ namespace global {
     const double r_earth = 6.371e6; // [m]
     const double gravity = 9.81;    // [ms^-2]
     const double pi = 3.1415926535897932384626433832795028841971693993751;
-    const double eps = 1e-12;
+    const double eps = 1e-9;
     const double dt = 0.001;        // [s]
 
     // Special Matrices
@@ -99,6 +99,11 @@ namespace global {
         return std::clamp(x, -1.0, 1.0);
     }
 
+    double clamp_inside_1(double x) {
+        // clamps to [-1+eps, 1-eps]
+        return std::clamp(x, -1.0 + global::eps, 1.0 - global::eps);
+    }
+
     double wrap_to_pi(double x) {
         // maps to (-pi, pi]
         return std::remainder(x, 2.0 * ::global::pi);
@@ -132,6 +137,14 @@ namespace global {
         return std::abs(x);
     }
 
+    double smooth_abs(double x) {
+        return sqrt(x * x + global::eps * global::eps) - global::eps;
+    }
+
+    double vector_norm(const Eigen::Vector3d& v) {
+        return sqrt(v.dot(v));
+    }
+
     CppAD::AD<double> sin(const CppAD::AD<double>& x) {
         return CppAD::sin(x);
     }
@@ -160,6 +173,11 @@ namespace global {
         return CppAD::abs(x);
     }
 
+    CppAD::AD<double> smooth_abs(const CppAD::AD<double>& x) {
+        const CppAD::AD<double> eps_t(global::eps);
+        return sqrt(x * x + eps_t * eps_t) - eps_t;
+    }
+
     CppAD::AD<double> clamp_symmetric(const CppAD::AD<double>& x, double max_abs) {
         if (max_abs <= 0.0) return CppAD::AD<double>(0.0);
         const CppAD::AD<double> max_t(max_abs);
@@ -180,10 +198,6 @@ namespace global {
         if (x > CppAD::AD<double>(1.0)) return CppAD::AD<double>(1.0);
         if (x < CppAD::AD<double>(-1.0)) return CppAD::AD<double>(-1.0);
         return x;
-    }
-
-    double vector_norm(const Eigen::Vector3d& v) {
-        return sqrt(v.dot(v));
     }
 
     CppAD::AD<double> vector_norm(const Eigen::Matrix<CppAD::AD<double>, 3, 1>& v) {

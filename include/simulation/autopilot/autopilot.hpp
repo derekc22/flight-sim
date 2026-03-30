@@ -1,8 +1,8 @@
 #pragma once
 
 #include <cstddef>
-#include <stdexcept>
-#include <vector>
+#include <utility> // For std::pair
+#include <Eigen/Dense>
 #include "simulation/aerodynamics/aerodynamics.hpp"
 #include "simulation/atmospheric/atmospheric.hpp"
 #include "simulation/control/control.hpp"
@@ -16,14 +16,26 @@ namespace autopilot { // to encompass autonomy and trim
     inline constexpr std::size_t trim_state_dofs = 8;
     inline constexpr std::size_t trim_input_dofs = 3;
     inline constexpr std::size_t trim_variable_dofs = trim_state_dofs + trim_input_dofs;
+    inline constexpr std::size_t trim_dynamics_dofs = trim_state_dofs;
     inline constexpr std::size_t trim_residual_dofs = 11;
+
+    template <typename T>
+    using TrimVariableVector_T = Eigen::Matrix<T, trim_variable_dofs, 1>;
+
+    template <typename T>
+    using TrimDynamicsVector_T = Eigen::Matrix<T, trim_dynamics_dofs, 1>;
+
+    template <typename T>
+    using TrimResidualVector_T = Eigen::Matrix<T, trim_residual_dofs, 1>;
+
+    using TrimResidualJacobian = Eigen::Matrix<double, trim_residual_dofs, trim_variable_dofs>;
 
     struct TrimFixedControls {
         double flap = 0.0;
         double spoiler = 0.0;
     };
 
-    struct TrimModelContext {
+    struct TrimModel {
         const structural::StructuralProperties& structural;
         const aerodynamics::AerodynamicProperties& aerodynamic;
         const control::ControlProperties& control;
@@ -85,6 +97,20 @@ namespace autopilot { // to encompass autonomy and trim
     };
 
     template <typename T>
+    struct TrimDynamics {
+        T vx_dot = T(0);
+        T vy_dot = T(0);
+        T vz_dot = T(0);
+
+        T p_dot = T(0);
+        T q_dot = T(0);
+        T r_dot = T(0);
+
+        T phi_dot = T(0);
+        T theta_dot = T(0);
+    };
+
+    template <typename T>
     struct TrimResidual {
         T vx_dot = T(0);
         T vy_dot = T(0);
@@ -104,8 +130,10 @@ namespace autopilot { // to encompass autonomy and trim
     struct TrimSolution {
         TrimState<double> state;
         TrimInput<double> input;
+        TrimConditions conditions;
         TrimResidual<double> residual;
-        std::vector<double> variables;
+        TrimVariableVector_T<double> variables = TrimVariableVector_T<double>::Zero();
+        bool attempted = false;
         bool converged = false;
         std::size_t iterations = 0;
         double residual_norm_2 = 0.0;
@@ -113,30 +141,37 @@ namespace autopilot { // to encompass autonomy and trim
     };
 
     template <typename T>
-    TrimResidual<T> evaluate_trim_residual(const TrimState<T>& x, const TrimInput<T>& u, const TrimModelContext& model, const TrimTarget& target, const TrimConditions& conditions);
+    TrimDynamics<T> compute_trim_dynamics_T(const TrimState<T>& x, const TrimInput<T>& u, const TrimModel& model, const TrimConditions& conditions);
 
     template <typename T>
-    std::vector<T> pack_trim_variables_T(const TrimState<T>& x, const TrimInput<T>& u);
+    TrimResidual<T> compute_trim_residual(const TrimState<T>& x, const TrimInput<T>& u, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions);
 
     template <typename T>
-    TrimState<T> unpack_trim_state_T(const std::vector<T>& z);
+    TrimVariableVector_T<T> pack_trim_variables_T(const TrimState<T>& x, const TrimInput<T>& u);
 
     template <typename T>
-    TrimInput<T> unpack_trim_input_T(const std::vector<T>& z);
+    TrimState<T> unpack_trim_state_T(const TrimVariableVector_T<T>& z);
 
     template <typename T>
-    std::vector<T> pack_trim_residual_T(const TrimResidual<T>& residual);
+    TrimInput<T> unpack_trim_input_T(const TrimVariableVector_T<T>& z);
 
     template <typename T>
-    std::vector<T> evaluate_trim_residual_vector_T(const std::vector<T>& z, const TrimModelContext& model, const TrimTarget& target, const TrimConditions& conditions);
+    TrimResidualVector_T<T> pack_trim_residual_T(const TrimResidual<T>& residual);
 
-    std::vector<double> evaluate_trim_residual_vector(const std::vector<double>& z, const TrimModelContext& model, const TrimTarget& target, const TrimConditions& conditions);
+    template <typename T>
+    TrimResidualVector_T<T> compute_trim_residual_vector_T(const TrimVariableVector_T<T>& z, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions, bool use_physical_controls);
 
-    std::vector<double> compute_trim_residual_jac(const std::vector<double>& z, const TrimModelContext& model, const TrimTarget& target, const TrimConditions& conditions);
+    TrimResidualVector_T<double> compute_trim_residual_vector(const TrimVariableVector_T<double>& z, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions, bool use_physical_controls);
 
-    TrimSolution solve_trim(const TrimProblem<double>& problem, const TrimModelContext& model, TrimSolveOptions options = {});
+    TrimResidualJacobian compute_trim_residual_jac(const TrimVariableVector_T<double>& z, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions, bool use_physical_controls);
+
+    TrimSolution solve_trim(const TrimProblem<double>& problem, const TrimModel& model, TrimSolveOptions options = {});
 
     TrimSolution inspect_trim(vehicles::Aircraft& aircraft, const atmospheric::Wind& wind);
+
+    std::string print_trim_solution(const TrimSolution& trim_sol);
+
+    std::pair<dynamics::RigidBodyState, aerodynamics::AerodynamicState> update_state_from_trim(const dynamics::RigidBodyState& xN_t, const TrimSolution& trim_sol);
 }
 
 #include "simulation/autopilot/autopilot.tpp"

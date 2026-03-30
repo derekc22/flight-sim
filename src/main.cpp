@@ -17,10 +17,30 @@
 #include "simulation/structural/structural.hpp"
 #include "simulation/aerodynamics/aerodynamics.hpp"
 #include "simulation/autopilot/autopilot.hpp"
+#include "simulation/analysis/analysis.hpp"
 #include "core/io/io.hpp"
 #include "core/connection/connection.hpp"
 #include "core/messages/messages.hpp"
 
+
+struct SimulationInput {
+    vehicles::Aircraft& aircraft;
+    double time_sec;
+    bool trim_bool;
+    bool verbose_bool;
+    bool data_bool;
+    std::string out_dir;
+}; 
+struct SimulationOutput {
+    std::optional<io::DataMatrix> p_DM;
+    std::optional<io::DataMatrix> eul_DM;
+    std::optional<io::DataMatrix> w_DM;
+    std::optional<io::DataMatrix> v_DM;
+    std::string trim_sol_str;
+    std::string lin_sol_str;
+    autopilot::TrimSolution trim_sol;
+    analysis::TrimLinearization lin_sol;
+}; 
 
 
 vehicles::Aircraft load(bool trim_bool) {
@@ -36,39 +56,51 @@ vehicles::Aircraft load(bool trim_bool) {
 
     return aircraft;
 }
-void run(vehicles::Aircraft& aircraft, double time_sec, bool trim_bool, bool verbose_bool, bool data_bool, std::string data_folder) {
+
+
+void cleanup(const SimulationInput& sim_in, const SimulationOutput& sim_out) {
+    std::string out_dir_path = "data/" + sim_in.out_dir + "/";
+    if (sim_in.data_bool){
+        // save data
+        sim_out.p_DM->write_csv(out_dir_path, "p");
+        sim_out.eul_DM->write_csv(out_dir_path, "eul");
+        sim_out.w_DM->write_csv(out_dir_path, "w");
+        sim_out.v_DM->write_csv(out_dir_path, "v");
+        
+        // log trim and linearization
+        if (sim_in.trim_bool){
+            io::write_txt(sim_out.trim_sol_str, out_dir_path, "trim_sol");
+            if (sim_out.trim_sol.converged) io::write_txt(sim_out.lin_sol_str, out_dir_path, "lin_sol");
+        }
+
+        // dump configs
+        io::dump_configs(out_dir_path);
+    }
+}
+
+
+void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
+    // unpack aircraft object
+    vehicles::Aircraft& aircraft = sim_in.aircraft;
+
     // get aircraft properties
     structural::StructuralProperties structural_properties = aircraft.structural_properties;
     aerodynamics::AerodynamicProperties aerodynamic_properties = aircraft.aerodynamic_properties;
     control::ControlProperties control_properties = aircraft.control_properties;
 
-    // declare and define useful variables
     dynamics::Mass mass = structural_properties.Mass;
     dynamics::InertiaTensor J = structural_properties.J;
 
-    // define no external moment 
-    Eigen::Vector3d MB_ext = global::Zero3;;
-
-    // initialize rigid body state
-    dynamics::RigidBodyState xN_t = aircraft.rigidBodyState(aircraft.FRDFrameNED);
-
-    autopilot::TrimSolution trim;
-    bool trim_ready = false;
+    autopilot::TrimSolution trim_sol;
 
     // run for user-specified seconds
-    const int tf = std::max(1, static_cast<int>(std::ceil(time_sec / global::dt)));
+    const int tf = std::max(1, static_cast<int>(std::ceil(sim_in.time_sec / global::dt)));
 
-    // create data matrices
-    std::optional<io::DataMatrix> p_DM;
-    std::optional<io::DataMatrix> eul_DM;
-    std::optional<io::DataMatrix> w_DM;
-    std::optional<io::DataMatrix> v_DM;
-
-    if (data_bool) {
-        p_DM = io::DataMatrix{ Eigen::MatrixXd::Zero(tf, 3+1) };
-        eul_DM = io::DataMatrix{ Eigen::MatrixXd::Zero(tf, 3+1) };
-        w_DM = io::DataMatrix{ Eigen::MatrixXd::Zero(tf, 3+1) };
-        v_DM = io::DataMatrix{ Eigen::MatrixXd::Zero(tf, 3+1) };
+    if (sim_in.data_bool) {
+        sim_out.p_DM = io::DataMatrix{ Eigen::MatrixXd::Zero(tf, 3+1) };
+        sim_out.eul_DM = io::DataMatrix{ Eigen::MatrixXd::Zero(tf, 3+1) };
+        sim_out.w_DM = io::DataMatrix{ Eigen::MatrixXd::Zero(tf, 3+1) };
+        sim_out.v_DM = io::DataMatrix{ Eigen::MatrixXd::Zero(tf, 3+1) };
     }
 
     // initialize udp connections
@@ -80,6 +112,9 @@ void run(vehicles::Aircraft& aircraft, double time_sec, bool trim_bool, bool ver
     auto next = clock::now();
 
     for (int t = 0; t < tf; ++t) {
+
+        // get rigid body state
+        dynamics::RigidBodyState xN_t = aircraft.rigidBodyState(aircraft.FRDFrameNED);
 
         // step timer by dt
         next += std::chrono::duration_cast<clock::duration>(std::chrono::duration<double>(global::dt));
@@ -93,10 +128,9 @@ void run(vehicles::Aircraft& aircraft, double time_sec, bool trim_bool, bool ver
         // }
         atmospheric::Wind wind{ global::Zero3 }; // no wind for now
 
-        // Before trim is available, propagate one tick with neutral controls
-        // After that, hold the trim solution's control deflections
+        // specify control commands
         control::ControlSurfaceInputs u{};
-        if (trim_ready) { u.elevator = trim.input.elevator; u.aileron = trim.input.aileron; u.rudder = trim.input.rudder; }
+        if (trim_sol.converged) { u.elevator = trim_sol.input.elevator; u.aileron = trim_sol.input.aileron; u.rudder = trim_sol.input.rudder; }
 
         // compute aerodynamics forces and moments
         aerodynamics::AerodynamicLoad LB_aero = step_aero_forces_moments(aerodynamic_properties, structural_properties, xN_t, rho, u, control_properties, wind);
@@ -118,7 +152,6 @@ void run(vehicles::Aircraft& aircraft, double time_sec, bool trim_bool, bool ver
 
         // set step options
         StepOpts.FRDFrameNEDStepOpts = vehicles::FRDFrameNEDStepOptions{ .rbs_BN = xN_t };
-
         aerodynamics::AerodynamicState ads = aerodynamics::compute_aerodynamic_state(xN_t, wind);
         StepOpts.STABFrameFRDStepOpts = vehicles::STABFrameFRDStepOptions{ .ads = ads };
         StepOpts.WINDFrameSTABStepOpts = vehicles::WINDFrameSTABStepOptions{ .ads = ads };
@@ -126,42 +159,43 @@ void run(vehicles::Aircraft& aircraft, double time_sec, bool trim_bool, bool ver
         // step frames
         aircraft.step(StepOpts);
 
-        if (trim_bool && !trim_ready) {
-            trim = autopilot::inspect_trim(aircraft, wind);
-            if (!trim.converged) { std::cerr << "trim failed to converge; aborting run" << std::endl; return; }
-            trim_ready = true;
+        // trim and linearization
+        if (sim_in.trim_bool && !trim_sol.attempted) {
+            trim_sol = autopilot::inspect_trim(aircraft, wind);
+            sim_out.trim_sol = trim_sol;
+            sim_out.trim_sol_str = autopilot::print_trim_solution(trim_sol);
 
-            dynamics::EulerAngles eul_curr;
-            eul_curr.set(xN_t.q);
-            dynamics::EulerAngles eul_trim{ Eigen::Vector3d(eul_curr.psi(), trim.state.theta, trim.state.phi) };
-            dynamics::OrientationQuaternion qNB_trim;
-            qNB_trim.set(eul_trim);
+            if (trim_sol.converged){
+                // obtain full state from trim solution
+                auto [xN_t_trim, ads_trim] = autopilot::update_state_from_trim(xN_t, trim_sol);
 
-            dynamics::RigidBodyState xN_t_trim = { 
-                .p = xN_t.p, 
-                .v = dynamics::LinearVelocity{ Eigen::Vector3d(trim.state.vx, trim.state.vy, trim.state.vz) },
-                .q = qNB_trim,
-                .w = dynamics::AngularVelocity{ Eigen::Vector3d(trim.state.p, trim.state.q, trim.state.r) },
-            };
+                // define TrimStepOptions
+                vehicles::StepOptions TrimStepOptions;
 
-            StepOpts.FRDFrameNEDStepOpts = vehicles::FRDFrameNEDStepOptions { .rbs_BN = xN_t_trim };
+                // overwrite state with trim state
+                TrimStepOptions.FRDFrameNEDStepOpts = vehicles::FRDFrameNEDStepOptions { .rbs_BN = xN_t_trim };
+                TrimStepOptions.STABFrameFRDStepOpts = vehicles::STABFrameFRDStepOptions{ .ads = ads_trim };
+                TrimStepOptions.WINDFrameSTABStepOpts = vehicles::WINDFrameSTABStepOptions{ .ads = ads_trim };
 
-            aerodynamics::AerodynamicState ads_trim = aerodynamics::compute_aerodynamic_state(xN_t_trim, wind);
-            StepOpts.STABFrameFRDStepOpts = vehicles::STABFrameFRDStepOptions{ .ads = ads_trim };
-            StepOpts.WINDFrameSTABStepOpts = vehicles::WINDFrameSTABStepOptions{ .ads = ads_trim };
+                // step frames
+                aircraft.step(TrimStepOptions);
 
-            // step frames
-            aircraft.step(StepOpts);
+                // overwrite local state with trim state
+                xN_t = xN_t_trim;
 
-            xN_t = xN_t_trim;
+                // linearize
+                const analysis::TrimLinearization lin_sol = analysis::linearize_trim_solution(aircraft, trim_sol);
+                sim_out.lin_sol = lin_sol;
+                sim_out.lin_sol_str = analysis::print_linerization_solution(lin_sol);
+            }            
         }
 
-        // save data
-        if (data_bool) {
-            p_DM->set(t, xN_t.p.data, global::dt);
-            eul_DM->set(t, transforms::quatC2eul(xN_t.q.data, "ZYX", "intr"), global::dt);
-            w_DM->set(t, xN_t.w.data, global::dt);
-            v_DM->set(t, xN_t.v.data, global::dt);
+        // update data matrix
+        if (sim_in.data_bool) {
+            sim_out.p_DM->set(t, xN_t.p.data, global::dt);
+            sim_out.eul_DM->set(t, transforms::quatC_to_eul(xN_t.q.data, "ZYX", "intr"), global::dt);
+            sim_out.w_DM->set(t, xN_t.w.data, global::dt);
+            sim_out.v_DM->set(t, xN_t.v.data, global::dt);
         }
 
         // generate in_pkt from the simulation state
@@ -176,18 +210,12 @@ void run(vehicles::Aircraft& aircraft, double time_sec, bool trim_bool, bool ver
         // sleep to maintain frequency dictated by dt
         std::this_thread::sleep_until(next);
 
-        // print state for debugging
-        if (verbose_bool) aircraft.print_state(t, wind);
+        // print state
+        if (sim_in.verbose_bool) aircraft.print_state(t, wind);
     }
 
-    // write data to csv
-    if (data_bool) {
-        std::string csv_path = "data/" + data_folder + "/";
-        p_DM->write_csv(csv_path, "p");
-        eul_DM->write_csv(csv_path, "eul");
-        w_DM->write_csv(csv_path, "w");
-        v_DM->write_csv(csv_path, "v");
-    }
+    // cleanup
+    cleanup(sim_in, sim_out);
 }
 
 
@@ -205,13 +233,26 @@ int main(int argc, char* argv[]) {
     bool trim_bool = std::stoi(argv[2]) == 1;
     bool verbose_bool = std::stoi(argv[3]) == 1;
     bool data_bool = std::stoi(argv[4]) == 1;
-    std::string data_folder = argv[5];
+    std::string out_dir = argv[5];
 
     // load vehicle
     vehicles::Aircraft aircraft = load(trim_bool);
 
+    // create simulation input
+    SimulationInput sim_in { 
+        .aircraft=aircraft, 
+        .time_sec=time_sec,
+        .trim_bool=trim_bool,
+        .verbose_bool=verbose_bool,
+        .data_bool=data_bool, 
+        .out_dir=out_dir  
+    };
+
+    // declare simulation output
+    SimulationOutput sim_out;
+
     // run case
-    run(aircraft, time_sec, trim_bool, verbose_bool, data_bool, data_folder);
+    run(sim_in, sim_out);
 
     return 0;
 }

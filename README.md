@@ -19,26 +19,26 @@ Flight simulator built in C++ with FlightGear integration
 
 - Edit the following environment variables in `.env`:
   - `DIR`: Project path on your machine
-  - `SRC`: Path to the project 'config' folder on your machine
-  - `DEST`: Path to the FlightGear 'Protocol' folder on your machine
+  - `SRC`: Path to the project `config` folder on your machine
+  - `DEST`: Path to the FlightGear `Protocol` folder on your machine
   - `FG`: Path to the FlightGear executable on your machine
   
 - Edit the following JSON configuration file paths in `config/run.json`:
-  - `aerodynamics_config_path`: Path to the aerodynamic properties JSON
-  - `structural_config_path`: Path to the structural properties JSON
-  - `control_config_path`: Path to the control properties JSON
-  - `initialization_config_path`: Path to the initial conditions JSON
+  - `aerodynamics_config`: Path to the aerodynamic properties JSON
+  - `structural_config`: Path to the structural properties JSON
+  - `control_config`: Path to the control properties JSON
+  - `initialization_config`: Path to the initial conditions JSON
   
-- Run `scripts/run.sh -a <AIRCRAFT> -t <TIME_SEC> [-r <TRIM>] [-v <VERBOSE>] [-d <DATA>] [-f <FOLDER>]`
+- Run `scripts/run.sh -a <AIRCRAFT> -t <TIME_SEC> [-r <TRIM>] [-v <VERBOSE>] [-d <DATA>] [-o <OUT_DIR>]`
   - `-a AIRCRAFT`: Aircraft to simulate (e.g. ASW28)
   - `-t TIME_SEC`: Simulation time in seconds
   - `-r TRIM`: Enable trim
   - `-v VERBOSE`: Enable verbose output
   - `-d DATA`: Enable data logging
-  - `-f FOLDER`: Folder to save data
+  - `-o OUT_DIR`: Output directory
 
-- Run `scripts/plot.sh <FOLDER>`
-  - `FOLDER`: Folder with saved data
+- Run `scripts/plot.sh <OUT_DIR>`
+  - `OUT_DIR`: Ouput directory from  simulation run
 
 ## References:
 https://hopsan.github.io/tutorials/tutorial_flightgear.pdf

@@ -352,6 +352,43 @@ namespace io {
         std::filesystem::create_directories(dir);
     }
 
+    void write_txt(const std::string& text, const std::string& dir, const std::string& fname) {
+        create_dir(dir);
+
+        const auto path_name = std::filesystem::path(dir) / (fname + ".txt");
+        std::ofstream file_txt(path_name);
+        if (!file_txt.is_open()) { throw std::runtime_error("Failed to open file: " + path_name.string()); }
+
+        file_txt << text;
+        file_txt.close();
+        std::cout << "File saved successfully to " << path_name.string() << std::endl;
+    }
+
+    void write_json(const nlohmann::json& cfg, const std::string& dir, const std::string& fname) {
+        create_dir(dir);
+
+        const auto path_name = std::filesystem::path(dir) / (fname + ".json");
+        std::ofstream file_json(path_name);
+        if (!file_json.is_open()) { throw std::runtime_error("Failed to open file: " + path_name.string()); }
+
+        file_json << cfg.dump(4) << "\n";
+        file_json.close();
+        std::cout << "File saved successfully to " << path_name.string() << std::endl;
+    }
+
+    void dump_configs(const std::string& dir) {
+        const auto run_path = std::filesystem::path("config") / "run.json";
+        const auto run_cfg = read_json_file(run_path);
+
+        for (const auto& [key, value] : run_cfg.items()) {
+            if (!value.is_string()) { throw std::runtime_error("io::dump_configs: expected string path for key '" + key + "'"); }
+
+            const auto cfg_path = resolve_config_path(run_path, value.get<std::string>());
+            const auto cfg = read_json_file(cfg_path);
+            write_json(cfg, dir, key);
+        }
+    }
+
     void save_vector_to_file(std::vector<int>& data, std::string fname){
         std::string path_name = "data/" + fname + ".csv";
         std::ofstream file_v(path_name);
@@ -363,8 +400,8 @@ namespace io {
     }
 
     aerodynamics::AerodynamicProperties parse_aerodynamics_config() {
-        const auto aerodynamics_path = resolve_run_config_entry_path("aerodynamics_config_path");
-        const auto cfg = read_json_file(aerodynamics_path);
+        const auto aerodynamics_cfg_path = resolve_run_config_entry_path("aerodynamics_config");
+        const auto cfg = read_json_file(aerodynamics_cfg_path);
 
         const auto& surfaces_json = cfg.at("surfaces");
         if (!surfaces_json.is_array()) { throw std::runtime_error("io::parse_aerodynamics_config expected 'surfaces' to be an array"); }
@@ -400,14 +437,14 @@ namespace io {
     }
 
     control::ControlProperties parse_control_config() {
-        const auto control_path = resolve_run_config_entry_path("control_config_path");
-        const auto cfg = read_json_file(control_path);
+        const auto control_cfg_path = resolve_run_config_entry_path("control_config");
+        const auto cfg = read_json_file(control_cfg_path);
         return parse_control_properties(cfg);
     }
 
     vehicles::StepOptions parse_init_options_config(bool trim_bool) {
-        const auto init_path = resolve_run_config_entry_path("initialization_config_path");
-        const auto cfg = read_json_file(init_path);
+        const auto init_cfg_path = resolve_run_config_entry_path("initialization_config");
+        const auto cfg = read_json_file(init_cfg_path);
         _validate_init_options_config(cfg, trim_bool);
 
         vehicles::StepOptions opts;
@@ -436,8 +473,8 @@ namespace io {
     }
 
     structural::StructuralProperties parse_structural_config() {
-        const auto structural_path = resolve_run_config_entry_path("structural_config_path");
-        const auto cfg = read_json_file(structural_path);
+        const auto structural_cfg_path = resolve_run_config_entry_path("structural_config");
+        const auto cfg = read_json_file(structural_cfg_path);
 
         const auto& geometries_json = cfg.at("geometries");
         if (!geometries_json.is_array()) { throw std::runtime_error("io::parse_structural_config expected 'geometries' to be an array"); }
@@ -481,7 +518,7 @@ namespace io {
             file_m << "\n";
         }
         file_m.close();
-        std::cout << "Data saved successfully" << std::endl;
+        std::cout << "File saved successfully to " << path_name.string() << std::endl;
     }
 
     void DataMatrix::set(int t, const Eigen::VectorXd input, double dt){

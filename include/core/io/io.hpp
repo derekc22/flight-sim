@@ -59,6 +59,9 @@ namespace io {
     void _validate_WINDFrameSTAB_init_options_config(const nlohmann::json& frame_json);
 
     void create_dir(const std::string& dir);
+    void write_txt(const std::string& text, const std::string& dir, const std::string& fname);
+    void write_json(const nlohmann::json& cfg, const std::string& dir, const std::string& fname);
+    void dump_configs(const std::string& dir);
     void save_vector_to_file(std::vector<int>& data, std::string fname);
     aerodynamics::AerodynamicProperties parse_aerodynamics_config();
     control::ControlProperties parse_control_config();

@@ -28,7 +28,7 @@ namespace frames {
     // }
 
     Eigen::Matrix4d HRF(const Frame& F) {
-        return transforms::makeHC(CRF(F), pRF(F), "translate");
+        return transforms::make_HC(CRF(F), pRF(F), "translate");
     }
 
 
@@ -174,8 +174,8 @@ namespace frames {
     void Frame::set(const dynamics::OrientationMatrix& C){
         MutableFrameView mfv = view();
         mfv.H->set(C);
-        mfv.q->set(C); // *mfv.q = dynamics::OrientationQuaternion{ transforms::rot2quat(C.data) };
-        mfv.eul->set(C); // *mfv.eul = dynamics::EulerAngles{ transforms::C2eul_intr(C.data, "ZYX") };
+        mfv.q->set(C); // *mfv.q = dynamics::OrientationQuaternion{ transforms::rot_to_quat(C.data) };
+        mfv.eul->set(C); // *mfv.eul = dynamics::EulerAngles{ transforms::C_to_eul_intr(C.data, "ZYX") };
     }
     void Frame::set(const dynamics::Position& p){
         MutableFrameView mfv = view();
@@ -185,13 +185,13 @@ namespace frames {
         MutableFrameView mfv = view();
         dynamics::OrientationQuaternion q_{ transforms::normalize_and_canonicalize(q.data) };
         *mfv.q = q_;
-        mfv.H->set(q_); // mfv.H->set(transforms::quat2rot(q.data));
-        mfv.eul->set(q_); // *mfv.eul = dynamics::EulerAngles{ transforms::quatC2eul_intr(q.data, "ZYX") };
+        mfv.H->set(q_); // mfv.H->set(transforms::quat_to_rot(q.data));
+        mfv.eul->set(q_); // *mfv.eul = dynamics::EulerAngles{ transforms::quatC_to_eul_intr(q.data, "ZYX") };
     }
     void Frame::set(const dynamics::EulerAngles& eul){
         MutableFrameView mfv = view();
-        mfv.H->set(eul); // mfv.H->set(transforms::eul2C_intr(eul.psi(), eul.theta(), eul.phi(), "ZYX"));
-        mfv.q->set(eul); // *mfv.q = dynamics::OrientationQuaternion{ transforms::eul2quatC_intr(eul.psi(), eul.theta(), eul.phi(), "ZYX") };
+        mfv.H->set(eul); // mfv.H->set(transforms::eul_to_C_intr(eul.psi(), eul.theta(), eul.phi(), "ZYX"));
+        mfv.q->set(eul); // *mfv.q = dynamics::OrientationQuaternion{ transforms::eul_to_quatC_intr(eul.psi(), eul.theta(), eul.phi(), "ZYX") };
         *mfv.eul = eul;
     }
     void Frame::set(const dynamics::OrientationMatrixRate& C_dot){
@@ -201,7 +201,7 @@ namespace frames {
         mfv.q_dot->set(*mfv.q, w); // *mfv.q_dot = dynamics::_quat_kin_vel(*mfv.q, w);
         // mfv.q_dot->set(C_dot, mfv.H->C(), *mfv.q); // *mfv.q_dot = dynamics::_CIB_dot2qIB_dot(C_dot, mfv.H->C(), *mfv.q);
         *mfv.w = w;
-        mfv.eul_dot->set(w, *mfv.eul); // *mfv.eul_dot = dynamics::_wB_BI2eul_dot(w, *mfv.eul);
+        mfv.eul_dot->set(w, *mfv.eul); // *mfv.eul_dot = dynamics::_wB_BI_to_eul_dot(w, *mfv.eul);
         mfv.wq->set(w);
     }
     void Frame::set(const dynamics::OrientationQuaternionRate& q_dot){
@@ -210,7 +210,7 @@ namespace frames {
         *mfv.q_dot = q_dot;
         dynamics::AngularVelocity w = dynamics::_qIB_dot2wB_BI(q_dot, *mfv.q);
         *mfv.w = w;
-        mfv.eul_dot->set(w, *mfv.eul); // *mfv.eul_dot = dynamics::_wB_BI2eul_dot(w, *mfv.eul);
+        mfv.eul_dot->set(w, *mfv.eul); // *mfv.eul_dot = dynamics::_wB_BI_to_eul_dot(w, *mfv.eul);
         mfv.wq->set(w);
     }
     void Frame::set(const dynamics::AngularVelocity& w){
@@ -218,7 +218,7 @@ namespace frames {
         mfv.C_dot->set(mfv.H->C(), w); // *mfv.C_dot = dynamics::_ddt_CIB(mfv.H->C(), w);
         mfv.q_dot->set(*mfv.q, w); // *mfv.q_dot = dynamics::_quat_kin_vel(*mfv.q, w);
         *mfv.w = w;
-        mfv.eul_dot->set(w, *mfv.eul); // *mfv.eul_dot = dynamics::_wB_BI2eul_dot(w, *mfv.eul);
+        mfv.eul_dot->set(w, *mfv.eul); // *mfv.eul_dot = dynamics::_wB_BI_to_eul_dot(w, *mfv.eul);
         mfv.wq->set(w);
     }
     void Frame::set(const dynamics::EulerAngleRates& eul_dot){
@@ -236,7 +236,7 @@ namespace frames {
         mfv.C_dot->set(mfv.H->C(), w); // *mfv.C_dot = dynamics::_ddt_CIB(mfv.H->C(), w);
         mfv.q_dot->set(*mfv.q, w); // *mfv.q_dot = dynamics::_quat_kin_vel(*mfv.q, w);
         *mfv.w = w;
-        mfv.eul_dot->set(w, *mfv.eul); // *mfv.eul_dot = dynamics::_wB_BI2eul_dot(w, *mfv.eul);
+        mfv.eul_dot->set(w, *mfv.eul); // *mfv.eul_dot = dynamics::_wB_BI_to_eul_dot(w, *mfv.eul);
         *mfv.wq = wq;
     }
     void Frame::set(const dynamics::LinearVelocity& v){
@@ -325,7 +325,7 @@ namespace frames {
     Frame::Frame(std::string n, Frame* p) : name(n), parent(p) {};
 
     Frame::~Frame() {
-        // Destructor for frame A
+        // DestruC_tor for frame A
 
         // Parent side cleanup (for each parent P in dependent_on)
         for (auto it = dependent_on.begin(); it != dependent_on.end(); ) {
@@ -405,32 +405,32 @@ namespace frames {
     Eigen::Vector3d transform_point(const Eigen::Vector3d& pA, const Frame& A, const Frame& B) {
         Eigen::Matrix4d HRA = HRF(A);
         Eigen::Matrix4d HRB = HRF(B);
-        Eigen::Vector3d pB = transforms::apply_hom(HRB * transforms::make_Hinv(HRA), pA);
+        Eigen::Vector3d pB = transforms::apply_H(HRB * transforms::make_Hinv(HRA), pA);
         return pB;
     }
 
     Eigen::Vector3d transform_point(const Eigen::Vector3d& pA, const Frame& A, const ECEFFrame&) {
         Eigen::Matrix4d HRA = HRF(A);
-        Eigen::Vector3d pB = transforms::apply_hom(transforms::make_Hinv(HRA), pA);
+        Eigen::Vector3d pB = transforms::apply_H(transforms::make_Hinv(HRA), pA);
         return pB;
     }
 
     Eigen::Vector3d transform_point(const Eigen::Vector3d& pA, const ECEFFrame&, const Frame& B) {
         Eigen::Matrix4d HRB = HRF(B);
-        Eigen::Vector3d pB = transforms::apply_hom(HRB, pA);
+        Eigen::Vector3d pB = transforms::apply_H(HRB, pA);
         return pB;
     }
 
     // Eigen::Vector3d transform_point(const Eigen::Vector3d& pA, const Frame& A, const Frame& B) {
-    //     return transforms::apply_hom(HRF(B) * transforms::make_Hinv(HRF(A)), pA);
+    //     return transforms::apply_H(HRF(B) * transforms::make_Hinv(HRF(A)), pA);
     // }
 
     // Eigen::Vector3d transform_point(const Eigen::Vector3d& pA, const Frame& A, const ECEFFrame&) {
-    //     return transforms::apply_hom(transforms::make_Hinv(HRF(A)), pA);
+    //     return transforms::apply_H(transforms::make_Hinv(HRF(A)), pA);
     // }
 
     // Eigen::Vector3d transform_point(const Eigen::Vector3d& pA, const ECEFFrame&, const Frame& B) {
-    //     return transforms::apply_hom(HRF(B), pA);
+    //     return transforms::apply_H(HRF(B), pA);
     // }
 
 

@@ -2,7 +2,7 @@
 
 namespace dynamics {
     template <typename T>
-    Matrix3_T<T> _eul_dot2wB_BI_mat_T(const T& theta, const T& phi) {
+    Matrix3_T<T> _eul_dot_to_wB_BI_mat_T(const T& theta, const T& phi) {
         Matrix3_T<T> T_mat;
         T_mat << T(1), T(0), -global::sin(theta),
                  T(0), global::cos(phi), global::sin(phi) * global::cos(theta),
@@ -11,7 +11,7 @@ namespace dynamics {
     }
 
     template <typename T>
-    Matrix3_T<T> _wB_BI2eul_dot_mat_T(const T& theta, const T& phi) {
+    Matrix3_T<T> _wB_BI_to_eul_dot_mat_T(const T& theta, const T& phi) {
         const T sec_theta = T(1) / global::cos(theta);
         Matrix3_T<T> T_mat;
         T_mat << T(1), global::sin(phi) * global::tan(theta), global::cos(phi) * global::tan(theta),
@@ -40,11 +40,11 @@ namespace dynamics {
 
     template <typename T>
     Vector3_T<T> _eul_dot2wB_BI_T(const Vector3_T<T>& eul_dot, const T& theta, const T& phi) {
-        return _eul_dot2wB_BI_mat_T(theta, phi) * eul_dot;
+        return _eul_dot_to_wB_BI_mat_T(theta, phi) * eul_dot;
     }
 
     template <typename T>
-    Vector3_T<T> _wB_BI2eul_dot_T(const Vector3_T<T>& wB_BI, const T& theta, const T& phi) {
-        return _wB_BI2eul_dot_mat_T(theta, phi) * wB_BI;
+    Vector3_T<T> _wB_BI_to_eul_dot_T(const Vector3_T<T>& wB_BI, const T& theta, const T& phi) {
+        return _wB_BI_to_eul_dot_mat_T(theta, phi) * wB_BI;
     }
 }

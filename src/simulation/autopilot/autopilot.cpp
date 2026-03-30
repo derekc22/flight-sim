@@ -1,106 +1,30 @@
 #include "simulation/autopilot/autopilot.hpp"
-#include <cppad/cppad.hpp>
-#include <iostream>
+#include <algorithm>
+#include <sstream>
+#include <utility> // For std::pair
 #include <stdexcept>
-
 
 namespace autopilot { // to encompass autonomy and trim
 
-    static Eigen::Matrix<double, trim_variable_dofs, 1> _trim_variable_vector(const std::vector<double>& z) {
-        if (z.size() != trim_variable_dofs) {
-            throw std::invalid_argument("autopilot::_trim_variable_vector: trim variable vector has incorrect size");
-        }
-
-        Eigen::Matrix<double, trim_variable_dofs, 1> out;
-        for (std::size_t i = 0; i < trim_variable_dofs; ++i) {
-            out(static_cast<Eigen::Index>(i)) = z[i];
-        }
-        return out;
-    }
-
-    static Eigen::Matrix<double, trim_residual_dofs, 1> _trim_residual_vector(const std::vector<double>& residual) {
-        if (residual.size() != trim_residual_dofs) {
-            throw std::invalid_argument("autopilot::_trim_residual_vector: trim residual vector has incorrect size");
-        }
-
-        Eigen::Matrix<double, trim_residual_dofs, 1> out;
-        for (std::size_t i = 0; i < trim_residual_dofs; ++i) {
-            out(static_cast<Eigen::Index>(i)) = residual[i];
-        }
-        return out;
-    }
-
-    static std::vector<double> _std_vector(const Eigen::Matrix<double, trim_variable_dofs, 1>& z) {
-        return std::vector<double>(z.data(), z.data() + trim_variable_dofs);
-    }
-
-    static double _control_solver_variable_from_physical(double u, double limit) {
+    static double _send_control_to_solver_space(double u, double limit) {
         if (limit <= 0.0) {
             return 0.0;
         }
 
-        constexpr double ratio_eps = 1e-9;
-        const double ratio = std::clamp(u / limit, -1.0 + ratio_eps, 1.0 - ratio_eps);
-        return ratio / std::sqrt(std::max(1.0 - ratio * ratio, ratio_eps));
+        const double ratio = global::clamp_inside_1(u / limit);
+        return ratio / std::sqrt(std::max(1.0 - ratio * ratio, global::eps));
     }
 
-    template <typename T>
-    static T _control_from_solver_variable_T(const T& u_solver, double limit) {
-        if (limit <= 0.0) {
-            return T(0);
-        }
-
-        return T(limit) * u_solver / global::sqrt(T(1) + u_solver * u_solver);
-    }
-
-    static std::vector<double> _pack_trim_solver_variables(const TrimState<double>& x, const TrimInput<double>& u, const control::ControlSurfaceLimits& limits) {
-        std::vector<double> z = pack_trim_variables_T<double>(x, u);
-        z[8] = _control_solver_variable_from_physical(u.elevator, limits.elevator_max);
-        z[9] = _control_solver_variable_from_physical(u.aileron, limits.aileron_max);
-        z[10] = _control_solver_variable_from_physical(u.rudder, limits.rudder_max);
+    static TrimVariableVector_T<double> _pack_trim_solver_variables(const TrimState<double>& x, const TrimInput<double>& u, const control::ControlSurfaceLimits& limits) {
+        TrimVariableVector_T<double> z = pack_trim_variables_T<double>(x, u);
+        z(8) = _send_control_to_solver_space(u.elevator, limits.elevator_max);
+        z(9) = _send_control_to_solver_space(u.aileron, limits.aileron_max);
+        z(10) = _send_control_to_solver_space(u.rudder, limits.rudder_max);
         return z;
     }
 
-    template <typename T>
-    static TrimInput<T> _unpack_trim_solver_input_T(const std::vector<T>& z, const control::ControlSurfaceLimits& limits) {
-        _check_trim_variables_size(z.size());
-        return TrimInput<T>{
-            .elevator = _control_from_solver_variable_T<T>(z[8], limits.elevator_max),
-            .aileron = _control_from_solver_variable_T<T>(z[9], limits.aileron_max),
-            .rudder = _control_from_solver_variable_T<T>(z[10], limits.rudder_max),
-        };
-    }
-
-    template <typename T>
-    static std::vector<T> _evaluate_trim_solver_residual_vector_T(const std::vector<T>& z, const TrimModelContext& model, const TrimTarget& target, const TrimConditions& conditions) {
-        const TrimState<T> x = unpack_trim_state_T<T>(z);
-        const TrimInput<T> u = _unpack_trim_solver_input_T<T>(z, model.control.limits);
-        const TrimResidual<T> residual = evaluate_trim_residual<T>(x, u, model, target, conditions);
-        return pack_trim_residual_T<T>(residual);
-    }
-
-    static std::vector<double> _evaluate_trim_solver_residual_vector(const std::vector<double>& z, const TrimModelContext& model, const TrimTarget& target, const TrimConditions& conditions) {
-        return _evaluate_trim_solver_residual_vector_T<double>(z, model, target, conditions);
-    }
-
-    static std::vector<double> _compute_trim_solver_residual_jac(const std::vector<double>& z, const TrimModelContext& model, const TrimTarget& target, const TrimConditions& conditions) {
-        if (z.size() != trim_variable_dofs) {
-            throw std::invalid_argument("autopilot::_compute_trim_solver_residual_jac: trim variable vector has incorrect size");
-        }
-
-        std::vector<CppAD::AD<double>> z_T(trim_variable_dofs);
-        for (std::size_t i = 0; i < trim_variable_dofs; ++i) {
-            z_T[i] = z[i];
-        }
-
-        CppAD::Independent(z_T);
-        const std::vector<CppAD::AD<double>> y_T = _evaluate_trim_solver_residual_vector_T<CppAD::AD<double>>(z_T, model, target, conditions);
-        CppAD::ADFun<double> f(z_T, y_T);
-        return f.Jacobian(z);
-    }
-
-    static Eigen::Matrix<double, trim_residual_dofs, 1> _trim_residual_weights(const TrimSolveOptions& options) {
-        Eigen::Matrix<double, trim_residual_dofs, 1> w;
+    static TrimResidualVector_T<double> _trim_residual_weights(const TrimSolveOptions& options) {
+        TrimResidualVector_T<double> w;
         w << 1.0 / options.linear_accel_scale,
              1.0 / options.linear_accel_scale,
              1.0 / options.linear_accel_scale,
@@ -115,145 +39,110 @@ namespace autopilot { // to encompass autonomy and trim
         return w;
     }
 
-    static double _residual_norm_inf(const Eigen::Matrix<double, trim_residual_dofs, 1>& residual) {
+    static double _residual_norm_inf(const TrimResidualVector_T<double>& residual) {
         return residual.cwiseAbs().maxCoeff();
     }
 
     static void _validate_trim_solve_options(const TrimSolveOptions& options) {
-        if (options.residual_tolerance < 0.0) {
-            throw std::invalid_argument("autopilot::_validate_trim_solve_options: residual_tolerance must be nonnegative");
-        }
-
-        if (options.step_tolerance < 0.0) {
-            throw std::invalid_argument("autopilot::_validate_trim_solve_options: step_tolerance must be nonnegative");
-        }
-
-        if (options.initial_damping < 0.0) {
-            throw std::invalid_argument("autopilot::_validate_trim_solve_options: initial_damping must be nonnegative");
-        }
-
-        if (options.damping_growth <= 1.0) {
-            throw std::invalid_argument("autopilot::_validate_trim_solve_options: damping_growth must be greater than 1");
-        }
-
-        if (options.linear_accel_scale <= 0.0) {
-            throw std::invalid_argument("autopilot::_validate_trim_solve_options: linear_accel_scale must be positive");
-        }
-
-        if (options.angular_accel_scale <= 0.0) {
-            throw std::invalid_argument("autopilot::_validate_trim_solve_options: angular_accel_scale must be positive");
-        }
-
-        if (options.angle_rate_scale <= 0.0) {
-            throw std::invalid_argument("autopilot::_validate_trim_solve_options: angle_rate_scale must be positive");
-        }
-
-        if (options.angle_error_scale <= 0.0) {
-            throw std::invalid_argument("autopilot::_validate_trim_solve_options: angle_error_scale must be positive");
-        }
-
-        if (options.backtrack_scale <= 0.0 || options.backtrack_scale >= 1.0) {
-            throw std::invalid_argument("autopilot::_validate_trim_solve_options: backtrack_scale must be in (0, 1)");
-        }
-
-        if (options.min_step_scale <= 0.0 || options.min_step_scale > 1.0) {
-            throw std::invalid_argument("autopilot::_validate_trim_solve_options: min_step_scale must be in (0, 1]");
-        }
+        if (options.residual_tolerance < 0.0) throw std::invalid_argument("autopilot::_validate_trim_solve_options: residual_tolerance must be nonnegative");
+        if (options.step_tolerance < 0.0) throw std::invalid_argument("autopilot::_validate_trim_solve_options: step_tolerance must be nonnegative");
+        if (options.initial_damping < 0.0) throw std::invalid_argument("autopilot::_validate_trim_solve_options: initial_damping must be nonnegative");
+        if (options.damping_growth <= 1.0) throw std::invalid_argument("autopilot::_validate_trim_solve_options: damping_growth must be greater than 1");
+        if (options.linear_accel_scale <= 0.0) throw std::invalid_argument("autopilot::_validate_trim_solve_options: linear_accel_scale must be positive");
+        if (options.angular_accel_scale <= 0.0) throw std::invalid_argument("autopilot::_validate_trim_solve_options: angular_accel_scale must be positive");
+        if (options.angle_rate_scale <= 0.0) throw std::invalid_argument("autopilot::_validate_trim_solve_options: angle_rate_scale must be positive");
+        if (options.angle_error_scale <= 0.0) throw std::invalid_argument("autopilot::_validate_trim_solve_options: angle_error_scale must be positive");
+        if (options.backtrack_scale <= 0.0 || options.backtrack_scale >= 1.0) throw std::invalid_argument("autopilot::_validate_trim_solve_options: backtrack_scale must be in (0, 1)");
+        if (options.min_step_scale <= 0.0 || options.min_step_scale > 1.0) throw std::invalid_argument("autopilot::_validate_trim_solve_options: min_step_scale must be in (0, 1]");
     }
 
-    static TrimSolution _trim_solution(const std::vector<double>& z, const std::vector<double>& residual, const TrimModelContext& model, bool converged, std::size_t iterations) {
+    static TrimSolution _build_trim_solution(const TrimVariableVector_T<double>& z, const TrimResidualVector_T<double>& residual, const TrimModel& model, const TrimConditions& conditions, bool converged, std::size_t iterations) {
         TrimSolution out;
         out.state = unpack_trim_state_T<double>(z);
         out.input = _unpack_trim_solver_input_T<double>(z, model.control.limits);
+        out.conditions = conditions;
         out.variables = pack_trim_variables_T<double>(out.state, out.input);
+        out.attempted = true;
         out.converged = converged;
         out.iterations = iterations;
-
-        const Eigen::Matrix<double, trim_residual_dofs, 1> residual_vec = _trim_residual_vector(residual);
         out.residual = TrimResidual<double>{
-            .vx_dot = residual[0],
-            .vy_dot = residual[1],
-            .vz_dot = residual[2],
-            .p_dot = residual[3],
-            .q_dot = residual[4],
-            .r_dot = residual[5],
-            .phi_dot = residual[6],
-            .theta_dot = residual[7],
-            .beta_error = residual[8],
-            .phi_error = residual[9],
-            .theta_error = residual[10],
+            .vx_dot = residual(0),
+            .vy_dot = residual(1),
+            .vz_dot = residual(2),
+            .p_dot = residual(3),
+            .q_dot = residual(4),
+            .r_dot = residual(5),
+            .phi_dot = residual(6),
+            .theta_dot = residual(7),
+            .beta_error = residual(8),
+            .phi_error = residual(9),
+            .theta_error = residual(10),
         };
-        out.residual_norm_2 = residual_vec.norm();
-        out.residual_norm_inf = _residual_norm_inf(residual_vec);
+        out.residual_norm_2 = residual.norm();
+        out.residual_norm_inf = _residual_norm_inf(residual);
         return out;
     }
 
-    std::vector<double> evaluate_trim_residual_vector(const std::vector<double>& z, const TrimModelContext& model, const TrimTarget& target, const TrimConditions& conditions) {
-        return evaluate_trim_residual_vector_T<double>(z, model, target, conditions);
+    TrimResidualVector_T<double> compute_trim_residual_vector(const TrimVariableVector_T<double>& z, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions, bool use_physical_controls) {
+        return compute_trim_residual_vector_T<double>(z, model, target, conditions, use_physical_controls);
     }
 
-    std::vector<double> compute_trim_residual_jac(const std::vector<double>& z, const TrimModelContext& model, const TrimTarget& target, const TrimConditions& conditions) {
-        if (z.size() != trim_variable_dofs) {
-            throw std::invalid_argument("autopilot::compute_trim_residual_jac: trim variable vector has incorrect size");
-        }
-
-        std::vector<CppAD::AD<double>> z_T(trim_variable_dofs);
-        for (std::size_t i = 0; i < trim_variable_dofs; ++i) {
-            z_T[i] = z[i];
-        }
-
-        CppAD::Independent(z_T);
-        const std::vector<CppAD::AD<double>> y_T = evaluate_trim_residual_vector_T<CppAD::AD<double>>(z_T, model, target, conditions);
-        CppAD::ADFun<double> f(z_T, y_T);
-        return f.Jacobian(z);
+    TrimResidualJacobian compute_trim_residual_jac(const TrimVariableVector_T<double>& z, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions, bool use_physical_controls) {
+        CppAD::eigen_vector<CppAD::AD<double>> z_tracked_cppad = global::start_autodiff_tracking(z);
+        const TrimResidualVector_T<CppAD::AD<double>> y_tracked = compute_trim_residual_vector_T<CppAD::AD<double>>(
+            global::eigen_vector_from_cppad_vector<CppAD::AD<double>, trim_variable_dofs>(z_tracked_cppad),
+            model,
+            target,
+            conditions,
+            use_physical_controls
+        );
+        const CppAD::eigen_vector<CppAD::AD<double>> y_tracked_cppad = global::cppad_vector_from_eigen_vector(y_tracked);
+        CppAD::ADFun<double> f(z_tracked_cppad, y_tracked_cppad);
+        return global::compute_jac<trim_residual_dofs, trim_variable_dofs>(f, z);
     }
 
-    TrimSolution solve_trim(const TrimProblem<double>& problem, const TrimModelContext& model, TrimSolveOptions options) {
+    TrimSolution solve_trim(const TrimProblem<double>& problem, const TrimModel& model, TrimSolveOptions options) {
         _validate_trim_solve_options(options);
 
-        std::vector<double> z = _pack_trim_solver_variables(problem.state_guess, problem.input_guess, model.control.limits);
-
-        std::vector<double> residual = _evaluate_trim_solver_residual_vector(z, model, problem.target, problem.conditions);
+        const bool use_physical_controls = false;
+        TrimVariableVector_T<double> z = _pack_trim_solver_variables(problem.state_guess, problem.input_guess, model.control.limits);
+        TrimResidualVector_T<double> residual = compute_trim_residual_vector(z, model, problem.target, problem.conditions, use_physical_controls);
         double damping = options.initial_damping;
         std::size_t iterations_completed = 0;
-        const Eigen::Matrix<double, trim_residual_dofs, 1> weights = _trim_residual_weights(options);
+        const TrimResidualVector_T<double> weights = _trim_residual_weights(options);
 
         for (std::size_t iteration = 0; iteration < options.max_iterations; ++iteration) {
             iterations_completed = iteration;
-            const Eigen::Matrix<double, trim_residual_dofs, 1> residual_vec = _trim_residual_vector(residual);
-            const Eigen::Matrix<double, trim_residual_dofs, 1> weighted_residual_vec = weights.cwiseProduct(residual_vec);
-            const double residual_norm_inf = _residual_norm_inf(residual_vec);
+            const TrimResidualVector_T<double> weighted_residual = weights.cwiseProduct(residual);
+            const double residual_norm_inf = _residual_norm_inf(residual);
 
             if (residual_norm_inf <= options.residual_tolerance) {
-                return _trim_solution(z, residual, model, true, iteration);
+                return _build_trim_solution(z, residual, model, problem.conditions, true, iteration);
             }
 
-            const std::vector<double> jac_flat = _compute_trim_solver_residual_jac(z, model, problem.target, problem.conditions);
-            const Eigen::Map<const Eigen::Matrix<double, trim_residual_dofs, trim_variable_dofs, Eigen::RowMajor>> jac_raw_map(jac_flat.data());
-            const Eigen::Matrix<double, trim_residual_dofs, trim_variable_dofs> jac = weights.asDiagonal() * Eigen::Matrix<double, trim_residual_dofs, trim_variable_dofs>(jac_raw_map);
-
+            const TrimResidualJacobian jac_raw = compute_trim_residual_jac(z, model, problem.target, problem.conditions, use_physical_controls);
+            const TrimResidualJacobian jac = weights.asDiagonal() * jac_raw;
             const Eigen::Matrix<double, trim_variable_dofs, trim_variable_dofs> hess = jac.transpose() * jac + damping * Eigen::Matrix<double, trim_variable_dofs, trim_variable_dofs>::Identity();
-            const Eigen::Matrix<double, trim_variable_dofs, 1> gradient = jac.transpose() * weighted_residual_vec;
+            const TrimVariableVector_T<double> grad = jac.transpose() * weighted_residual;
             const Eigen::LDLT<Eigen::Matrix<double, trim_variable_dofs, trim_variable_dofs>> ldlt(hess);
-            const Eigen::Matrix<double, trim_variable_dofs, 1> step = ldlt.solve(-gradient);
+            const TrimVariableVector_T<double> step = ldlt.solve(-grad);
 
             if (ldlt.info() != Eigen::Success || !step.allFinite()) {
                 break;
             }
 
             if (step.norm() <= options.step_tolerance) {
-                return _trim_solution(z, residual, model, residual_norm_inf <= options.residual_tolerance, iteration);
+                return _build_trim_solution(z, residual, model, problem.conditions, residual_norm_inf <= options.residual_tolerance, iteration);
             }
 
             bool accepted = false;
             double step_scale = 1.0;
-            const double residual_norm_2 = weighted_residual_vec.norm();
+            const double residual_norm_2 = weighted_residual.norm();
 
             while (step_scale >= options.min_step_scale) {
-                const Eigen::Matrix<double, trim_variable_dofs, 1> z_trial_vec = _trim_variable_vector(z) + step_scale * step;
-                const std::vector<double> z_trial = _std_vector(z_trial_vec);
-                const std::vector<double> residual_trial = _evaluate_trim_solver_residual_vector(z_trial, model, problem.target, problem.conditions);
-                const double residual_trial_norm_2 = weights.cwiseProduct(_trim_residual_vector(residual_trial)).norm();
+                const TrimVariableVector_T<double> z_trial = z + step_scale * step;
+                const TrimResidualVector_T<double> residual_trial = compute_trim_residual_vector(z_trial, model, problem.target, problem.conditions, use_physical_controls);
+                const double residual_trial_norm_2 = weights.cwiseProduct(residual_trial).norm();
 
                 if (residual_trial_norm_2 < residual_norm_2) {
                     z = z_trial;
@@ -262,7 +151,6 @@ namespace autopilot { // to encompass autonomy and trim
                     accepted = true;
                     break;
                 }
-
                 step_scale *= options.backtrack_scale;
             }
 
@@ -271,12 +159,11 @@ namespace autopilot { // to encompass autonomy and trim
             }
         }
 
-        return _trim_solution(z, residual, model, false, iterations_completed);
+        return _build_trim_solution(z, residual, model, problem.conditions, false, iterations_completed);
     }
 
     TrimSolution inspect_trim(vehicles::Aircraft& aircraft, const atmospheric::Wind& wind) {
-
-        const TrimModelContext model{
+        const TrimModel model{
             .structural = aircraft.structural_properties,
             .aerodynamic = aircraft.aerodynamic_properties,
             .control = aircraft.control_properties,
@@ -286,17 +173,17 @@ namespace autopilot { // to encompass autonomy and trim
             },
         };
 
-        const TrimProblem<double> problem {
-            .target = TrimTarget {
+        const TrimProblem<double> problem{
+            .target = TrimTarget{
                 .beta = aircraft.aerodynamicState(aircraft.FRDFrameNED, wind).beta.data,
                 .phi = aircraft.FRDFrameNED.eulNB.phi(),
                 .theta = aircraft.FRDFrameNED.eulNB.theta(),
             },
-            .conditions = TrimConditions {
+            .conditions = TrimConditions{
                 .rho = aircraft.atmosphericState(aircraft.FRDFrameECEF).rho,
                 .windB = wind,
             },
-            .state_guess = TrimState<double> {
+            .state_guess = TrimState<double>{
                 .vx = aircraft.FRDFrameNED.vB_BN.data.x(),
                 .vy = aircraft.FRDFrameNED.vB_BN.data.y(),
                 .vz = aircraft.FRDFrameNED.vB_BN.data.z(),
@@ -309,50 +196,73 @@ namespace autopilot { // to encompass autonomy and trim
             .input_guess = TrimInput<double>{},
         };
 
-        const TrimSolution trim = solve_trim(problem, model);
-        dynamics::Twist_T<double> trim_twist;
-        trim_twist.v << trim.state.vx, trim.state.vy, trim.state.vz;
-        trim_twist.w << trim.state.p, trim.state.q, trim.state.r;
-        const aerodynamics::AerodynamicState_T<double> trim_ads = aerodynamics::compute_aerodynamic_state_T<double>(trim_twist, wind);
-        const dynamics::AngularVelocity trim_w{ Eigen::Vector3d(trim.state.p, trim.state.q, trim.state.r) };
-        const dynamics::EulerAngles trim_eul{ Eigen::Vector3d(0.0, trim.state.theta, trim.state.phi) };
-        const dynamics::EulerAngleRates trim_eul_dot = dynamics::_wB_BI2eul_dot(trim_w, trim_eul);
+        const TrimSolution trim_sol = solve_trim(problem, model);
+        if (!trim_sol.converged) { std::cerr << "autopilot::inspect_trim: Warning, trim failed to converge" << std::endl; }
 
-        std::cout << "trim.converged: " << trim.converged << "\n";
-        // std::cout << "trim.status: " << trim_status << "\n";
-        std::cout << "trim.iterations: " << trim.iterations << "\n";
-        std::cout << "trim.residual_norm_2: " << trim.residual_norm_2 << "\n";
-        std::cout << "trim.residual_norm_inf: " << trim.residual_norm_inf << "\n";
-        std::cout << "trim.state.vB_BN: [" << trim.state.vx << ", " << trim.state.vy << ", " << trim.state.vz << "]\n";
-        std::cout << "trim.state.wB_BN: [" << trim.state.p << ", " << trim.state.q << ", " << trim.state.r << "]\n";
-        std::cout << "trim.state.phi_deg: " << global::rad_to_deg(trim.state.phi) << "\n";
-        std::cout << "trim.state.theta_deg: " << global::rad_to_deg(trim.state.theta) << "\n";
-        std::cout << "trim.ads: [Vinf=" << trim_ads.Vinf
-                  << ", alpha_deg=" << global::rad_to_deg(trim_ads.alpha)
-                  << ", beta_deg=" << global::rad_to_deg(trim_ads.beta) << "]\n";
-        std::cout << "trim.state.euler_dot_deg_s: ["
-                  << global::rad_to_deg(trim_eul_dot.phi_dot()) << ", "
-                  << global::rad_to_deg(trim_eul_dot.theta_dot()) << ", "
-                  << global::rad_to_deg(trim_eul_dot.psi_dot()) << "]\n";
-        std::cout << "trim.input.elevator_deg: " << global::rad_to_deg(trim.input.elevator) << "\n";
-        std::cout << "trim.input.aileron_deg: " << global::rad_to_deg(trim.input.aileron) << "\n";
-        std::cout << "trim.input.rudder_deg: " << global::rad_to_deg(trim.input.rudder) << "\n";
-        std::cout << "trim.residual: ["
-                  << trim.residual.vx_dot << ", "
-                  << trim.residual.vy_dot << ", "
-                  << trim.residual.vz_dot << ", "
-                  << trim.residual.p_dot << ", "
-                  << trim.residual.q_dot << ", "
-                  << trim.residual.r_dot << ", "
-                  << trim.residual.phi_dot << ", "
-                  << trim.residual.theta_dot << ", "
-                  << trim.residual.beta_error << ", "
-                  << trim.residual.phi_error << ", "
-                  << trim.residual.theta_error << "]\n";
-
-        return trim;
+        return trim_sol;
     }
 
 
-    
+    std::string print_trim_solution(const TrimSolution& trim_sol) {
+        dynamics::Twist_T<double> trim_sol_twist;
+        trim_sol_twist.v << trim_sol.state.vx, trim_sol.state.vy, trim_sol.state.vz;
+        trim_sol_twist.w << trim_sol.state.p, trim_sol.state.q, trim_sol.state.r;
+        const aerodynamics::AerodynamicState_T<double> trim_sol_ads = aerodynamics::compute_aerodynamic_state_T<double>(trim_sol_twist, trim_sol.conditions.windB);
+        const dynamics::AngularVelocity trim_w{ Eigen::Vector3d(trim_sol.state.p, trim_sol.state.q, trim_sol.state.r) };
+        const dynamics::EulerAngles trim_eul{ Eigen::Vector3d(0.0, trim_sol.state.theta, trim_sol.state.phi) };
+        const dynamics::EulerAngleRates trim_eul_dot = dynamics::_wB_BI_to_eul_dot(trim_w, trim_eul);
+        std::ostringstream out;
+        out << "trim_sol.converged: " << trim_sol.converged << "\n";
+        out << "trim_sol.iterations: " << trim_sol.iterations << "\n";
+        out << "trim_sol.residual_norm_2: " << trim_sol.residual_norm_2 << "\n";
+        out << "trim_sol.residual_norm_inf: " << trim_sol.residual_norm_inf << "\n";
+        out << "trim_sol.state.vB_BN: [" << trim_sol.state.vx << ", " << trim_sol.state.vy << ", " << trim_sol.state.vz << "]\n";
+        out << "trim_sol.state.wB_BN: [" << trim_sol.state.p << ", " << trim_sol.state.q << ", " << trim_sol.state.r << "]\n";
+        out << "trim_sol.state.phi_deg: " << global::rad_to_deg(trim_sol.state.phi) << "\n";
+        out << "trim_sol.state.theta_deg: " << global::rad_to_deg(trim_sol.state.theta) << "\n";
+        out << "trim_sol.ads: [Vinf=" << trim_sol_ads.Vinf
+            << ", alpha_deg=" << global::rad_to_deg(trim_sol_ads.alpha)
+            << ", beta_deg=" << global::rad_to_deg(trim_sol_ads.beta) << "]\n";
+        out << "trim_sol.state.euler_dot_deg_s: ["
+            << global::rad_to_deg(trim_eul_dot.phi_dot()) << ", "
+            << global::rad_to_deg(trim_eul_dot.theta_dot()) << ", "
+            << global::rad_to_deg(trim_eul_dot.psi_dot()) << "]\n";
+        out << "trim_sol.input.elevator_deg: " << global::rad_to_deg(trim_sol.input.elevator) << "\n";
+        out << "trim_sol.input.aileron_deg: " << global::rad_to_deg(trim_sol.input.aileron) << "\n";
+        out << "trim_sol.input.rudder_deg: " << global::rad_to_deg(trim_sol.input.rudder) << "\n";
+        out << "trim_sol.residual:\n"
+            << "vx_dot: " << trim_sol.residual.vx_dot << "\n"
+            << "vy_dot: " << trim_sol.residual.vy_dot << "\n"
+            << "vz_dot: " << trim_sol.residual.vz_dot << "\n"
+            << "p_dot: " << trim_sol.residual.p_dot << "\n"
+            << "q_dot: " << trim_sol.residual.q_dot << "\n"
+            << "r_dot: " << trim_sol.residual.r_dot << "\n"
+            << "phi_dot: " << trim_sol.residual.phi_dot << "\n"
+            << "theta_dot: " << trim_sol.residual.theta_dot << "\n"
+            << "beta_error: " << trim_sol.residual.beta_error << "\n"
+            << "phi_error: " << trim_sol.residual.phi_error << "\n"
+            << "theta_error: " << trim_sol.residual.theta_error << "\n";
+        return out.str();
+    }
+
+
+    std::pair<dynamics::RigidBodyState, aerodynamics::AerodynamicState> update_state_from_trim(const dynamics::RigidBodyState& xN_t, const TrimSolution& trim_sol) {
+            dynamics::EulerAngles eul_curr;
+            eul_curr.set(xN_t.q);
+            dynamics::EulerAngles eul_trim{ Eigen::Vector3d(eul_curr.psi(), trim_sol.state.theta, trim_sol.state.phi) };
+            dynamics::OrientationQuaternion qNB_trim;
+            qNB_trim.set(eul_trim);
+
+            dynamics::RigidBodyState xN_t_trim = { 
+                .p = xN_t.p, 
+                .v = dynamics::LinearVelocity{ Eigen::Vector3d(trim_sol.state.vx, trim_sol.state.vy, trim_sol.state.vz) },
+                .q = qNB_trim,
+                .w = dynamics::AngularVelocity{ Eigen::Vector3d(trim_sol.state.p, trim_sol.state.q, trim_sol.state.r) },
+            };
+
+            aerodynamics::AerodynamicState ads_trim = aerodynamics::compute_aerodynamic_state(xN_t_trim, trim_sol.conditions.windB);
+
+        return { xN_t_trim, ads_trim };
+    }
+
 }

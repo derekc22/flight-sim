@@ -1,6 +1,6 @@
 {
-    "aerodynamics_config_path": "aerodynamics/trim.json",
-    "control_config_path": "control/real.json",
-    "structural_config_path": "structural/real.json",
-    "initialization_config_path": "initialization/trim.json"
+    "aerodynamics_config": "aerodynamics/trim.json",
+    "control_config": "control/real.json",
+    "structural_config": "structural/real.json",
+    "initialization_config": "initialization/trim.json"
 }

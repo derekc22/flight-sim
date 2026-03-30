@@ -180,10 +180,10 @@ namespace dynamics {
     using Matrix3_T = Eigen::Matrix<T, 3, 3>;
 
     template <typename T>
-    Matrix3_T<T> _eul_dot2wB_BI_mat_T(const T& theta, const T& phi);
+    Matrix3_T<T> _eul_dot_to_wB_BI_mat_T(const T& theta, const T& phi);
 
     template <typename T>
-    Matrix3_T<T> _wB_BI2eul_dot_mat_T(const T& theta, const T& phi);
+    Matrix3_T<T> _wB_BI_to_eul_dot_mat_T(const T& theta, const T& phi);
 
     template <typename T>
     Vector3_T<T> _ddtB_vB_BI_T(const Vector3_T<T>& vB, const Vector3_T<T>& wB_BI, double mass, const Vector3_T<T>& FB_net);
@@ -198,7 +198,7 @@ namespace dynamics {
     Vector3_T<T> _eul_dot2wB_BI_T(const Vector3_T<T>& eul_dot, const T& theta, const T& phi);
 
     template <typename T>
-    Vector3_T<T> _wB_BI2eul_dot_T(const Vector3_T<T>& wB_BI, const T& theta, const T& phi);
+    Vector3_T<T> _wB_BI_to_eul_dot_T(const Vector3_T<T>& wB_BI, const T& theta, const T& phi);
 
 
 
@@ -246,14 +246,14 @@ namespace dynamics {
     AngularVelocity _qIB_dot2wB_BI(const OrientationQuaternionRate& qIB_dot, const OrientationQuaternion& qIB);
     OrientationMatrixRate _qIB_dot2CIB_dot(const OrientationQuaternionRate& qIB_dot, const OrientationQuaternion& qIB, const OrientationMatrix& CIB);
     AngularVelocity _eul_dot2wB_BI(const EulerAngleRates& eul_dot, const EulerAngles& eul);
-    EulerAngleRates _wB_BI2eul_dot(const AngularVelocity& wB_BI, const EulerAngles& eul);
+    EulerAngleRates _wB_BI_to_eul_dot(const AngularVelocity& wB_BI, const EulerAngles& eul);
 
 
     Eigen::Vector3d f_cv(Eigen::Vector3d xt, Eigen::Vector3d xt_dot); // constant velocity
 
-    Eigen::Matrix3d _eul_dot2wB_BI_mat(double theta, double phi);
+    Eigen::Matrix3d _eul_dot_to_wB_BI_mat(double theta, double phi);
 
-    Eigen::Matrix3d _wB_BI2eul_dot_mat(double theta, double phi);
+    Eigen::Matrix3d _wB_BI_to_eul_dot_mat(double theta, double phi);
 }
 
 #include "simulation/dynamics/dynamics.tpp"
