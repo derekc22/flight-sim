@@ -106,18 +106,18 @@ namespace frames {
 
         Frame(std::string n, Frame* p);
 
-        void set(const dynamics::HomogenousFrameTransformationMatrix& H);
-        void set(const dynamics::OrientationMatrix& C);
-        void set(const dynamics::Position& p);
-        void set(const dynamics::OrientationQuaternion& q);
-        void set(const dynamics::EulerAngles& eul);
-        void set(const dynamics::OrientationMatrixRate& C_dot);
-        void set(const dynamics::OrientationQuaternionRate& q_dot);
-        void set(const dynamics::AngularVelocity& w);
-        void set(const dynamics::EulerAngleRates& eul_dot);
-        void set(const dynamics::AngularVelocityQuaternion& wq);
-        void set(const dynamics::LinearVelocity& v);
-        void set(const dynamics::Gravity& g);
+        void _set(const dynamics::HomogenousFrameTransformationMatrix& H);
+        void _set(const dynamics::OrientationMatrix& C);
+        void _set(const dynamics::Position& p);
+        void _set(const dynamics::OrientationQuaternion& q);
+        void _set(const dynamics::EulerAngles& eul);
+        void _set(const dynamics::OrientationMatrixRate& C_dot);
+        void _set(const dynamics::OrientationQuaternionRate& q_dot);
+        void _set(const dynamics::AngularVelocity& w);
+        void _set(const dynamics::EulerAngleRates& eul_dot);
+        void _set(const dynamics::AngularVelocityQuaternion& wq);
+        void _set(const dynamics::LinearVelocity& v);
+        void _set(const dynamics::Gravity& g);
 
         virtual MutableFrameView view() = 0;
         virtual FrameView view() const = 0;
@@ -135,7 +135,7 @@ namespace frames {
         
         std::unordered_set<Frame*> dependents;
         std::unordered_set<Frame*> dependent_on;
-        void add_as_direct_dependent(Frame* p);
+        void _add_as_direct_dependent(Frame* p);
     };
 
     /** @deprecated */

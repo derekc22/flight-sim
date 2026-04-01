@@ -75,7 +75,7 @@ namespace io {
 
         DataMatrix(const Eigen::MatrixXd& d);
         void write_csv(const std::string& dir, const std::string& fname) const;
-        void set(int t, const Eigen::VectorXd data, double dt);
+        void insert(int t, const Eigen::VectorXd data, double dt);
 
     };
 

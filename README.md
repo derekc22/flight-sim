@@ -1,6 +1,6 @@
 # flight-sim
 
-Flight simulator built in C++ with FlightGear integration
+C++ flight simulator with FlightGear integration
 
 ## Setup
 - Clone the repository

@@ -1,7 +1,7 @@
 {
     "NEDFrameECEF": {
-        "lat": 64,
-        "lon": -22,
+        "lat": 64.0,
+        "lon": -22.0,
         "alt": 0.0
     },
     "FRDFrameNED": {
@@ -11,6 +11,6 @@
         "v": [10.0, 0.0, 0.0]
     },
     "WINDFrameSTAB": {
-        "beta": 0
+        "beta": 0.0
     }
 }

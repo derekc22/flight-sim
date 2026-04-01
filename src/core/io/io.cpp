@@ -521,10 +521,10 @@ namespace io {
         std::cout << "File saved successfully to " << path_name.string() << std::endl;
     }
 
-    void DataMatrix::set(int t, const Eigen::VectorXd input, double dt){
-        if (input.cols() > 1) { throw std::runtime_error("io::DataMatrix::set Eigen::Matrix passed for 'input', expected Eigen::Vector"); }
-        if (input.rows() > n_cols-1) { throw std::runtime_error("io::DataMatrix::set Number of rows in 'input' exceeds number of columns in DataMatrix"); }
-        if (t > n_rows-1) { throw std::runtime_error("io::DataMatrix::set Input index 't' exceeds number of rows in DataMatrix"); }
+    void DataMatrix::insert(int t, const Eigen::VectorXd input, double dt){
+        if (input.cols() > 1) { throw std::runtime_error("io::DataMatrix::insert Eigen::Matrix passed for 'input', expected Eigen::Vector"); }
+        if (input.rows() > n_cols-1) { throw std::runtime_error("io::DataMatrix::insert Number of rows in 'input' exceeds number of columns in DataMatrix"); }
+        if (t > n_rows-1) { throw std::runtime_error("io::DataMatrix::insert Input index 't' exceeds number of rows in DataMatrix"); }
 
         data(t, 0) = t * dt;
         Eigen::Index cols_to_copy = data.cols() - 1;

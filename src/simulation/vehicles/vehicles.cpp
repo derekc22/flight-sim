@@ -758,14 +758,14 @@ namespace vehicles {
         WINDFrameSTAB.set(initStepOptions);
 
         // Set dependents, {X} -depends-on-> {Y}
-        NEDFrameECEF.add_as_direct_dependent(&FRDFrameNED);    // {FRDFrameNED} -> {NEDFrameECEF}
+        NEDFrameECEF._add_as_direct_dependent(&FRDFrameNED);    // {FRDFrameNED} -> {NEDFrameECEF}
     
-        FRDFrameECEF.add_as_direct_dependent(&FRDFrameNED);    // {FRDFrameNED} -> {FRDFrameECEF}
+        FRDFrameECEF._add_as_direct_dependent(&FRDFrameNED);    // {FRDFrameNED} -> {FRDFrameECEF}
 
-        FRDFrameNED.add_as_direct_dependent(&FRDFrameECEF);    // {FRDFrameECEF} -> {FRDFrameNED}
-        FRDFrameNED.add_as_direct_dependent(&STABFrameFRD);    // {STABFrameFRD} -> {FRDFrameNED}
+        FRDFrameNED._add_as_direct_dependent(&FRDFrameECEF);    // {FRDFrameECEF} -> {FRDFrameNED}
+        FRDFrameNED._add_as_direct_dependent(&STABFrameFRD);    // {STABFrameFRD} -> {FRDFrameNED}
 
-        STABFrameFRD.add_as_direct_dependent(&WINDFrameSTAB);  // {WINDFrameSTAB} -> {STABFrameFRD}
+        STABFrameFRD._add_as_direct_dependent(&WINDFrameSTAB);  // {WINDFrameSTAB} -> {STABFrameFRD}
 
     }
 

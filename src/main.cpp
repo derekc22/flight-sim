@@ -196,10 +196,10 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
 
         // update data matrix
         if (sim_in.data_bool) {
-            sim_out.p_DM->set(t, xN_t.p.data, global::dt);
-            sim_out.eul_DM->set(t, transforms::quatC_to_eul(xN_t.q.data, "ZYX", "intr"), global::dt);
-            sim_out.w_DM->set(t, xN_t.w.data, global::dt);
-            sim_out.v_DM->set(t, xN_t.v.data, global::dt);
+            sim_out.p_DM->insert(t, xN_t.p.data, global::dt);
+            sim_out.eul_DM->insert(t, transforms::quatC_to_eul(xN_t.q.data, "ZYX", "intr"), global::dt);
+            sim_out.w_DM->insert(t, xN_t.w.data, global::dt);
+            sim_out.v_DM->insert(t, xN_t.v.data, global::dt);
         }
 
         // generate in_pkt from the simulation state

@@ -40,4 +40,4 @@ plt.tight_layout()
 plt.savefig(save_fpath)
 plt.close()
 
-print(f"Plots saved successfully to {save_fpath}")
+print(f"File saved successfully to {save_fpath}")

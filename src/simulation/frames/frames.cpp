@@ -167,34 +167,34 @@ namespace frames {
 
 
 
-    void Frame::set(const dynamics::HomogenousFrameTransformationMatrix& H){
-        set(H.C());
-        set(H.p());
+    void Frame::_set(const dynamics::HomogenousFrameTransformationMatrix& H){
+        _set(H.C());
+        _set(H.p());
     }
-    void Frame::set(const dynamics::OrientationMatrix& C){
+    void Frame::_set(const dynamics::OrientationMatrix& C){
         MutableFrameView mfv = view();
         mfv.H->set(C);
         mfv.q->set(C); // *mfv.q = dynamics::OrientationQuaternion{ transforms::rot_to_quat(C.data) };
         mfv.eul->set(C); // *mfv.eul = dynamics::EulerAngles{ transforms::C_to_eul_intr(C.data, "ZYX") };
     }
-    void Frame::set(const dynamics::Position& p){
+    void Frame::_set(const dynamics::Position& p){
         MutableFrameView mfv = view();
         mfv.H->set(p);
     }
-    void Frame::set(const dynamics::OrientationQuaternion& q){
+    void Frame::_set(const dynamics::OrientationQuaternion& q){
         MutableFrameView mfv = view();
         dynamics::OrientationQuaternion q_{ transforms::normalize_and_canonicalize(q.data) };
         *mfv.q = q_;
         mfv.H->set(q_); // mfv.H->set(transforms::quat_to_rot(q.data));
         mfv.eul->set(q_); // *mfv.eul = dynamics::EulerAngles{ transforms::quatC_to_eul_intr(q.data, "ZYX") };
     }
-    void Frame::set(const dynamics::EulerAngles& eul){
+    void Frame::_set(const dynamics::EulerAngles& eul){
         MutableFrameView mfv = view();
         mfv.H->set(eul); // mfv.H->set(transforms::eul_to_C_intr(eul.psi(), eul.theta(), eul.phi(), "ZYX"));
         mfv.q->set(eul); // *mfv.q = dynamics::OrientationQuaternion{ transforms::eul_to_quatC_intr(eul.psi(), eul.theta(), eul.phi(), "ZYX") };
         *mfv.eul = eul;
     }
-    void Frame::set(const dynamics::OrientationMatrixRate& C_dot){
+    void Frame::_set(const dynamics::OrientationMatrixRate& C_dot){
         MutableFrameView mfv = view();
         *mfv.C_dot = C_dot;
         dynamics::AngularVelocity w = dynamics::_CIB_dot2wB_BI(*mfv.C_dot, mfv.H->C());
@@ -204,7 +204,7 @@ namespace frames {
         mfv.eul_dot->set(w, *mfv.eul); // *mfv.eul_dot = dynamics::_wB_BI_to_eul_dot(w, *mfv.eul);
         mfv.wq->set(w);
     }
-    void Frame::set(const dynamics::OrientationQuaternionRate& q_dot){
+    void Frame::_set(const dynamics::OrientationQuaternionRate& q_dot){
         MutableFrameView mfv = view();
         mfv.C_dot->set(q_dot, *mfv.q, mfv.H->C()); // *mfv.C_dot = dynamics::_qIB_dot2CIB_dot(q_dot, *mfv.q, mfv.H->C());
         *mfv.q_dot = q_dot;
@@ -213,7 +213,7 @@ namespace frames {
         mfv.eul_dot->set(w, *mfv.eul); // *mfv.eul_dot = dynamics::_wB_BI_to_eul_dot(w, *mfv.eul);
         mfv.wq->set(w);
     }
-    void Frame::set(const dynamics::AngularVelocity& w){
+    void Frame::_set(const dynamics::AngularVelocity& w){
         MutableFrameView mfv = view();
         mfv.C_dot->set(mfv.H->C(), w); // *mfv.C_dot = dynamics::_ddt_CIB(mfv.H->C(), w);
         mfv.q_dot->set(*mfv.q, w); // *mfv.q_dot = dynamics::_quat_kin_vel(*mfv.q, w);
@@ -221,7 +221,7 @@ namespace frames {
         mfv.eul_dot->set(w, *mfv.eul); // *mfv.eul_dot = dynamics::_wB_BI_to_eul_dot(w, *mfv.eul);
         mfv.wq->set(w);
     }
-    void Frame::set(const dynamics::EulerAngleRates& eul_dot){
+    void Frame::_set(const dynamics::EulerAngleRates& eul_dot){
         MutableFrameView mfv = view();
         dynamics::AngularVelocity w = dynamics::_eul_dot2wB_BI(eul_dot, *mfv.eul);
         mfv.C_dot->set(mfv.H->C(), w); // *mfv.C_dot = dynamics::_ddt_CIB(mfv.H->C(), w);
@@ -230,7 +230,7 @@ namespace frames {
         *mfv.eul_dot = eul_dot;
         mfv.wq->set(w);
     }
-    void Frame::set(const dynamics::AngularVelocityQuaternion& wq){
+    void Frame::_set(const dynamics::AngularVelocityQuaternion& wq){
         MutableFrameView mfv = view();
         dynamics::AngularVelocity w = wq.w();
         mfv.C_dot->set(mfv.H->C(), w); // *mfv.C_dot = dynamics::_ddt_CIB(mfv.H->C(), w);
@@ -239,15 +239,15 @@ namespace frames {
         mfv.eul_dot->set(w, *mfv.eul); // *mfv.eul_dot = dynamics::_wB_BI_to_eul_dot(w, *mfv.eul);
         *mfv.wq = wq;
     }
-    void Frame::set(const dynamics::LinearVelocity& v){
+    void Frame::_set(const dynamics::LinearVelocity& v){
         MutableFrameView mfv = view();
         *mfv.v = v;
     }
-    // void Frame::set(const dynamics::LinearAcceleration& a){
+    // void Frame::_set(const dynamics::LinearAcceleration& a){
     //     MutableFrameView mfv = view();
     //     *mfv.a = a;
     // }
-    void Frame::set(const dynamics::Gravity& g){
+    void Frame::_set(const dynamics::Gravity& g){
         MutableFrameView mfv = view();
         *mfv.g = g;
     }
@@ -266,54 +266,36 @@ namespace frames {
 
     /** @deprecated */
     // void Frame::set(const SetOptions& opts){
-    //     if (opts.H.has_value())         { set(*opts.H); }
-    //     if (opts.C.has_value())         { set(*opts.C); }
-    //     if (opts.p.has_value())         { set(*opts.p); }
-    //     if (opts.q.has_value())         { set(*opts.q); }
-    //     if (opts.eul.has_value())       { set(*opts.eul); }
-    //     if (opts.C_dot.has_value())     { set(*opts.C_dot); }
-    //     if (opts.q_dot.has_value())     { set(*opts.q_dot); }
-    //     if (opts.w.has_value())         { set(*opts.w); }
-    //     if (opts.eul_dot.has_value())   { set(*opts.eul_dot); }
-    //     if (opts.wq.has_value())        { set(*opts.wq); }
-    //     if (opts.v.has_value())         { set(*opts.v); }
-    //     // if (opts.a.has_value())         { set(*opts.a); }
-    //     if (opts.g.has_value())         { set(*opts.g); }
-    //     // opts.clear();
-    // }
-
-    /** @deprecated */
-    // void Frame::set(const SetOptions& opts){
-    //     if (opts.H.has_value())         { set(dynamics::HomogenousFrameTransformationMatrix{ *opts.H }); }
-    //     if (opts.C.has_value())         { set(dynamics::OrientationMatrix{ *opts.C }); }
-    //     if (opts.p.has_value())         { set(dynamics::Position{ *opts.p }); }
-    //     if (opts.q.has_value())         { set(dynamics::OrientationQuaternion{ *opts.q }); }
-    //     if (opts.eul.has_value())       { set(dynamics::EulerAngles{ *opts.eul }); }
-    //     if (opts.C_dot.has_value())     { set(dynamics::OrientationMatrixRate{ *opts.C_dot }); }
-    //     if (opts.q_dot.has_value())     { set(dynamics::OrientationQuaternionRate{ *opts.q_dot }); }
-    //     if (opts.w.has_value())         { set(dynamics::AngularVelocity{ *opts.w }); }
-    //     if (opts.eul_dot.has_value())   { set(dynamics::EulerAngleRates{ *opts.eul_dot }); }
-    //     if (opts.wq.has_value())        { set(dynamics::AngularVelocityQuaternion{ *opts.wq }); }
-    //     if (opts.v.has_value())         { set(dynamics::LinearVelocity{ *opts.v }); }
-    //     // if (opts.a.has_value())         { set(dynamics::LinearAcceleration{ *opts.a }); }
-    //     if (opts.g.has_value())         { set(dynamics::Gravity{ *opts.g }); }
+    //     if (opts.H.has_value())         { _set(dynamics::HomogenousFrameTransformationMatrix{ *opts.H }); }
+    //     if (opts.C.has_value())         { _set(dynamics::OrientationMatrix{ *opts.C }); }
+    //     if (opts.p.has_value())         { _set(dynamics::Position{ *opts.p }); }
+    //     if (opts.q.has_value())         { _set(dynamics::OrientationQuaternion{ *opts.q }); }
+    //     if (opts.eul.has_value())       { _set(dynamics::EulerAngles{ *opts.eul }); }
+    //     if (opts.C_dot.has_value())     { _set(dynamics::OrientationMatrixRate{ *opts.C_dot }); }
+    //     if (opts.q_dot.has_value())     { _set(dynamics::OrientationQuaternionRate{ *opts.q_dot }); }
+    //     if (opts.w.has_value())         { _set(dynamics::AngularVelocity{ *opts.w }); }
+    //     if (opts.eul_dot.has_value())   { _set(dynamics::EulerAngleRates{ *opts.eul_dot }); }
+    //     if (opts.wq.has_value())        { _set(dynamics::AngularVelocityQuaternion{ *opts.wq }); }
+    //     if (opts.v.has_value())         { _set(dynamics::LinearVelocity{ *opts.v }); }
+    //     // if (opts.a.has_value())         { _set(dynamics::LinearAcceleration{ *opts.a }); }
+    //     if (opts.g.has_value())         { _set(dynamics::Gravity{ *opts.g }); }
     //     // opts.clear();
     // }
 
     void Frame::set(const SetOptions& opts){
-        if (opts.H.has_value())         { set(*opts.H); }
-        if (opts.C.has_value())         { set(*opts.C); }
-        if (opts.p.has_value())         { set(*opts.p); }
-        if (opts.q.has_value())         { set(*opts.q); }
-        if (opts.eul.has_value())       { set(*opts.eul); }
-        if (opts.C_dot.has_value())     { set(*opts.C_dot); }
-        if (opts.q_dot.has_value())     { set(*opts.q_dot); }
-        if (opts.w.has_value())         { set(*opts.w); }
-        if (opts.eul_dot.has_value())   { set(*opts.eul_dot); }
-        if (opts.wq.has_value())        { set(*opts.wq); }
-        if (opts.v.has_value())         { set(*opts.v); }
-        // if (opts.a.has_value())         { set(*opts.a); }
-        if (opts.g.has_value())         { set(*opts.g); }
+        if (opts.H.has_value())         { _set(*opts.H); }
+        if (opts.C.has_value())         { _set(*opts.C); }
+        if (opts.p.has_value())         { _set(*opts.p); }
+        if (opts.q.has_value())         { _set(*opts.q); }
+        if (opts.eul.has_value())       { _set(*opts.eul); }
+        if (opts.C_dot.has_value())     { _set(*opts.C_dot); }
+        if (opts.q_dot.has_value())     { _set(*opts.q_dot); }
+        if (opts.w.has_value())         { _set(*opts.w); }
+        if (opts.eul_dot.has_value())   { _set(*opts.eul_dot); }
+        if (opts.wq.has_value())        { _set(*opts.wq); }
+        if (opts.v.has_value())         { _set(*opts.v); }
+        // if (opts.a.has_value())         { _set(*opts.a); }
+        if (opts.g.has_value())         { _set(*opts.g); }
         // opts.clear();
     }
 
@@ -342,7 +324,7 @@ namespace frames {
     }
 
 
-    void Frame::add_as_direct_dependent(Frame* p) {
+    void Frame::_add_as_direct_dependent(Frame* p) {
         dependents.insert(p);
         p->dependent_on.insert(this);
     }
