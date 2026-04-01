@@ -68,12 +68,7 @@ namespace aerodynamics {
     }
 
 
-    SurfaceCoefficients compute_surface_coefficients(
-        const Surface& s,
-        const SurfaceKinematics& sk,
-        const control::ControlSurfaceInputs& u,
-        const control::ControlProperties& cp
-    ) {
+    SurfaceCoefficients compute_surface_coefficients(const Surface& s, const SurfaceKinematics& sk, const control::ControlSurfaceInputs& u, const control::ControlProperties& cp) {
         const SurfaceCoefficients_T<double> sc = compute_surface_coefficients_T<double>(
             s,
             SurfaceKinematics_T<double>{

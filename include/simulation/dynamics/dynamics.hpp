@@ -122,6 +122,10 @@ namespace dynamics {
         Eigen::Vector3d data; // e.g. pB_BI_ddot
     };
 
+    struct VerticalSpeed {
+        double data;   // pB_BI_dot_z [m/s]
+    };
+
     struct Force {
         Eigen::Vector3d data; // F [N]
     };
@@ -195,7 +199,7 @@ namespace dynamics {
     Vector3_T<T> _ddtB_to_ddtI_T(const Vector3_T<T>& ddtB_v, const Vector3_T<T>& v, const Vector3_T<T>& w);
 
     template <typename T>
-    Vector3_T<T> _eul_dot2wB_BI_T(const Vector3_T<T>& eul_dot, const T& theta, const T& phi);
+    Vector3_T<T> _eul_dot_to_wB_BI_T(const Vector3_T<T>& eul_dot, const T& theta, const T& phi);
 
     template <typename T>
     Vector3_T<T> _wB_BI_to_eul_dot_T(const Vector3_T<T>& wB_BI, const T& theta, const T& phi);
@@ -211,7 +215,7 @@ namespace dynamics {
     */
 
     std::array<Eigen::Vector3d, 2> fwd_euler(Eigen::Vector3d xt, Eigen::Vector3d xt_dot, DynamicsFunction f, double tf);
-    EulerAngleRates _wB_BI_2_eul_dot(const EulerAngles& eul, const AngularVelocity& wB_BI);
+    EulerAngleRates _wB_BI_to_eul_dot(const AngularVelocity& wB_BI, const EulerAngles& eul);
     Position _trans_kin(const Position& xt, const LinearVelocity& xt_dot, const LinearAcceleration& xt_ddot);
     EulerAngles _eul_kin(const EulerAngles& eul_t, const EulerAngleRates& eul_dot_t);
 
@@ -241,11 +245,11 @@ namespace dynamics {
     AngularVelocity _rot_dyn(const AngularVelocity& wB_BI_t, const InertiaTensor& J, const Moment& MB_net_t);
     RigidBodyState step_rigid_body(const RigidBodyState& xB_BI_t, const Mass& mass, const InertiaTensor& J, const Force& FB_net_t, const Moment& MB_net_t);
 
-    AngularVelocity _CIB_dot2wB_BI(const OrientationMatrixRate& CIB_dot, const OrientationMatrix& CIB);
-    OrientationQuaternionRate _CIB_dot2qIB_dot(const OrientationMatrixRate& CIB_dot, const OrientationMatrix& CIB, const OrientationQuaternion& qIB);
-    AngularVelocity _qIB_dot2wB_BI(const OrientationQuaternionRate& qIB_dot, const OrientationQuaternion& qIB);
-    OrientationMatrixRate _qIB_dot2CIB_dot(const OrientationQuaternionRate& qIB_dot, const OrientationQuaternion& qIB, const OrientationMatrix& CIB);
-    AngularVelocity _eul_dot2wB_BI(const EulerAngleRates& eul_dot, const EulerAngles& eul);
+    AngularVelocity _CIB_dot_to_wB_BI(const OrientationMatrixRate& CIB_dot, const OrientationMatrix& CIB);
+    OrientationQuaternionRate _CIB_dot_to_qIB_dot(const OrientationMatrixRate& CIB_dot, const OrientationMatrix& CIB, const OrientationQuaternion& qIB);
+    AngularVelocity _qIB_dot_to_wB_BI(const OrientationQuaternionRate& qIB_dot, const OrientationQuaternion& qIB);
+    OrientationMatrixRate _qIB_dot_to_CIB_dot(const OrientationQuaternionRate& qIB_dot, const OrientationQuaternion& qIB, const OrientationMatrix& CIB);
+    AngularVelocity _eul_dot_to_wB_BI(const EulerAngleRates& eul_dot, const EulerAngles& eul);
     EulerAngleRates _wB_BI_to_eul_dot(const AngularVelocity& wB_BI, const EulerAngles& eul);
 
 

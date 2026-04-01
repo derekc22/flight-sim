@@ -195,7 +195,7 @@ namespace dynamics {
     }
 
 
-    AngularVelocity _CIB_dot2wB_BI(const OrientationMatrixRate& CIB_dot, const OrientationMatrix& CIB){
+    AngularVelocity _CIB_dot_to_wB_BI(const OrientationMatrixRate& CIB_dot, const OrientationMatrix& CIB){
         Eigen::Matrix3d Omega_skew =  - CIB_dot.data * CIB.data.transpose();         // minus because CIB convention
         Omega_skew = 0.5 * (Omega_skew - Omega_skew.transpose());                    // enforce skew
         Eigen::Vector3d wB_BI = global::vee(Omega_skew);
@@ -203,14 +203,14 @@ namespace dynamics {
         return AngularVelocity{ wB_BI };
     }
 
-    OrientationQuaternionRate _CIB_dot2qIB_dot(const OrientationMatrixRate& CIB_dot, const OrientationMatrix& CIB, const OrientationQuaternion& qIB){
-        AngularVelocity wB_BI = _CIB_dot2wB_BI(CIB_dot, CIB) ;
+    OrientationQuaternionRate _CIB_dot_to_qIB_dot(const OrientationMatrixRate& CIB_dot, const OrientationMatrix& CIB, const OrientationQuaternion& qIB){
+        AngularVelocity wB_BI = _CIB_dot_to_wB_BI(CIB_dot, CIB) ;
         OrientationQuaternionRate qIB_dot = _quat_kin_vel(qIB, wB_BI);
 
         return qIB_dot;
     }
 
-    AngularVelocity _qIB_dot2wB_BI(const OrientationQuaternionRate& qIB_dot, const OrientationQuaternion& qIB){
+    AngularVelocity _qIB_dot_to_wB_BI(const OrientationQuaternionRate& qIB_dot, const OrientationQuaternion& qIB){
         Eigen::Quaterniond qdot_qinv = qIB_dot.data * qIB.data.conjugate();
         qdot_qinv.coeffs() *= -2; // minus for qIB convention
         Eigen::Vector3d wB_BI = qdot_qinv.vec();
@@ -218,17 +218,17 @@ namespace dynamics {
         return AngularVelocity{ wB_BI };
     }
 
-    OrientationMatrixRate _qIB_dot2CIB_dot(const OrientationQuaternionRate& qIB_dot, const OrientationQuaternion& qIB, const OrientationMatrix& CIB){
-        AngularVelocity wB_BI = _qIB_dot2wB_BI(qIB_dot, qIB);
+    OrientationMatrixRate _qIB_dot_to_CIB_dot(const OrientationQuaternionRate& qIB_dot, const OrientationQuaternion& qIB, const OrientationMatrix& CIB){
+        AngularVelocity wB_BI = _qIB_dot_to_wB_BI(qIB_dot, qIB);
         Eigen::Matrix3d CIB_dot = - global::hat(wB_BI.data) * CIB.data; // minus for qIB convention
 
         return OrientationMatrixRate{ CIB_dot };
     }
 
-    AngularVelocity _eul_dot2wB_BI(const EulerAngleRates& eul_dot, const EulerAngles& eul) {
+    AngularVelocity _eul_dot_to_wB_BI(const EulerAngleRates& eul_dot, const EulerAngles& eul) {
         double theta = eul.theta();
         double phi = eul.phi();
-        return AngularVelocity{ _eul_dot2wB_BI_T<double>(eul_dot.data, theta, phi) };
+        return AngularVelocity{ _eul_dot_to_wB_BI_T<double>(eul_dot.data, theta, phi) };
     }
 
     EulerAngleRates _wB_BI_to_eul_dot(const AngularVelocity& wB_BI, const EulerAngles& eul) {
@@ -266,10 +266,10 @@ namespace dynamics {
     void EulerAngles::set(const OrientationMatrix& C) { data = transforms::C_to_eul(C.data, "ZYX", "intr"); }
     void EulerAngles::set(const OrientationQuaternion& q) { data = transforms::quatC_to_eul(q.data, "ZYX", "intr"); }
 
-    void OrientationMatrixRate::set(const OrientationQuaternionRate& q_dot, const OrientationQuaternion& q, const OrientationMatrix& C) { data = dynamics::_qIB_dot2CIB_dot(q_dot, q, C).data; }
+    void OrientationMatrixRate::set(const OrientationQuaternionRate& q_dot, const OrientationQuaternion& q, const OrientationMatrix& C) { data = dynamics::_qIB_dot_to_CIB_dot(q_dot, q, C).data; }
     void OrientationMatrixRate::set(const OrientationMatrix& C, const AngularVelocity& w) { data = dynamics::_ddt_CIB(C, w).data; }
 
-    void OrientationQuaternionRate::set(const OrientationMatrixRate& C_dot, const OrientationMatrix& C, const OrientationQuaternion& q) { data = dynamics::_CIB_dot2qIB_dot(C_dot, C, q).data; };
+    void OrientationQuaternionRate::set(const OrientationMatrixRate& C_dot, const OrientationMatrix& C, const OrientationQuaternion& q) { data = dynamics::_CIB_dot_to_qIB_dot(C_dot, C, q).data; };
     void OrientationQuaternionRate::set(const OrientationQuaternion& q, const AngularVelocity& w) { data = dynamics::_quat_kin_vel(q, w).data; }
 
     

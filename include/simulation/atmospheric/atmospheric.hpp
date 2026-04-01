@@ -18,6 +18,14 @@ namespace atmospheric {
         double data;   // ρ [kg/m^3]
     };
 
+    struct StagnationPressure {
+        double data;   // P_total [Pa]
+    };
+
+    struct StaticPressure {
+        double data;   // P_static [Pa]
+    };
+
     struct DynamicViscosity {
         double data;   // μ [kg/m·s]
     };

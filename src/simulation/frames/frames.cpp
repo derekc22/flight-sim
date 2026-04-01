@@ -197,18 +197,18 @@ namespace frames {
     void Frame::_set(const dynamics::OrientationMatrixRate& C_dot){
         MutableFrameView mfv = view();
         *mfv.C_dot = C_dot;
-        dynamics::AngularVelocity w = dynamics::_CIB_dot2wB_BI(*mfv.C_dot, mfv.H->C());
+        dynamics::AngularVelocity w = dynamics::_CIB_dot_to_wB_BI(*mfv.C_dot, mfv.H->C());
         mfv.q_dot->set(*mfv.q, w); // *mfv.q_dot = dynamics::_quat_kin_vel(*mfv.q, w);
-        // mfv.q_dot->set(C_dot, mfv.H->C(), *mfv.q); // *mfv.q_dot = dynamics::_CIB_dot2qIB_dot(C_dot, mfv.H->C(), *mfv.q);
+        // mfv.q_dot->set(C_dot, mfv.H->C(), *mfv.q); // *mfv.q_dot = dynamics::_CIB_dot_to_qIB_dot(C_dot, mfv.H->C(), *mfv.q);
         *mfv.w = w;
         mfv.eul_dot->set(w, *mfv.eul); // *mfv.eul_dot = dynamics::_wB_BI_to_eul_dot(w, *mfv.eul);
         mfv.wq->set(w);
     }
     void Frame::_set(const dynamics::OrientationQuaternionRate& q_dot){
         MutableFrameView mfv = view();
-        mfv.C_dot->set(q_dot, *mfv.q, mfv.H->C()); // *mfv.C_dot = dynamics::_qIB_dot2CIB_dot(q_dot, *mfv.q, mfv.H->C());
+        mfv.C_dot->set(q_dot, *mfv.q, mfv.H->C()); // *mfv.C_dot = dynamics::_qIB_dot_to_CIB_dot(q_dot, *mfv.q, mfv.H->C());
         *mfv.q_dot = q_dot;
-        dynamics::AngularVelocity w = dynamics::_qIB_dot2wB_BI(q_dot, *mfv.q);
+        dynamics::AngularVelocity w = dynamics::_qIB_dot_to_wB_BI(q_dot, *mfv.q);
         *mfv.w = w;
         mfv.eul_dot->set(w, *mfv.eul); // *mfv.eul_dot = dynamics::_wB_BI_to_eul_dot(w, *mfv.eul);
         mfv.wq->set(w);
@@ -223,7 +223,7 @@ namespace frames {
     }
     void Frame::_set(const dynamics::EulerAngleRates& eul_dot){
         MutableFrameView mfv = view();
-        dynamics::AngularVelocity w = dynamics::_eul_dot2wB_BI(eul_dot, *mfv.eul);
+        dynamics::AngularVelocity w = dynamics::_eul_dot_to_wB_BI(eul_dot, *mfv.eul);
         mfv.C_dot->set(mfv.H->C(), w); // *mfv.C_dot = dynamics::_ddt_CIB(mfv.H->C(), w);
         mfv.q_dot->set(*mfv.q, w); // *mfv.q_dot = dynamics::_quat_kin_vel(*mfv.q, w);
         *mfv.w = w;

@@ -39,7 +39,7 @@ namespace dynamics {
     }
 
     template <typename T>
-    Vector3_T<T> _eul_dot2wB_BI_T(const Vector3_T<T>& eul_dot, const T& theta, const T& phi) {
+    Vector3_T<T> _eul_dot_to_wB_BI_T(const Vector3_T<T>& eul_dot, const T& theta, const T& phi) {
         return _eul_dot_to_wB_BI_mat_T(theta, phi) * eul_dot;
     }
 
