@@ -6,7 +6,8 @@
 #include <unordered_map>
 #include "simulation/structural/structural.hpp"
 #include "simulation/dynamics/dynamics.hpp"
-#include "simulation/global/global.hpp"
+#include "simulation/constants/constants.hpp"
+#include "simulation/util/util.hpp"
 
 namespace structural {
 
@@ -22,12 +23,12 @@ namespace structural {
         for (const Geometry& geom : geometries) {
             m += geom.mass;
         }
-        if (m < global::eps) { throw std::runtime_error("structural::StructuralProperties::compute_Mass: Mass must be positive"); }
+        if (m < constants::eps) { throw std::runtime_error("structural::StructuralProperties::compute_Mass: Mass must be positive"); }
         return m;
     }
 
     Eigen::Vector3d StructuralProperties::compute_CG() {
-        Eigen::Vector3d cg = global::Zero3;
+        Eigen::Vector3d cg = constants::Zero3;
         for (const Geometry& geom : geometries) {
             cg(0) += geom.mass * geom.x_loc;
             cg(1) += geom.mass * geom.y_loc;
@@ -38,7 +39,7 @@ namespace structural {
     }
 
     Eigen::Matrix3d StructuralProperties::compute_J() {
-        Eigen::Matrix3d j = global::Zero3x3;
+        Eigen::Matrix3d j = constants::Zero3x3;
 
         for (const Geometry& geom : geometries) {
             double m = geom.mass;
@@ -73,7 +74,7 @@ namespace structural {
         j(2, 1) = j(1, 2);
 
         const double detj = j.determinant();
-        if (std::abs(detj) < global::eps) { throw std::runtime_error("structural::StructuralProperties::compute_j: Inertia tensor is singular"); }
+        if (std::abs(detj) < constants::eps) { throw std::runtime_error("structural::StructuralProperties::compute_j: Inertia tensor is singular"); }
 
         return j;
     }

@@ -17,8 +17,8 @@ namespace analysis {
 
     TrimLinearization linearize_trim_dynamics(const autopilot::TrimState<double>& x, const autopilot::TrimInput<double>& u, const autopilot::TrimModel& model, const autopilot::TrimConditions& conditions) {
         const autopilot::TrimVariableVector_T<double> z = autopilot::pack_trim_variables_T<double>(x, u);
-        CppAD::eigen_vector<CppAD::AD<double>> z_t = global::start_autodiff_tracking(z);
-        const autopilot::TrimVariableVector_T<CppAD::AD<double>> z_vec = global::eigen_vector_from_cppad_vector<CppAD::AD<double>, autopilot::trim_variable_dofs>(z_t);
+        CppAD::eigen_vector<CppAD::AD<double>> z_t = util::start_autodiff_tracking(z);
+        const autopilot::TrimVariableVector_T<CppAD::AD<double>> z_vec = util::eigen_vector_from_cppad_vector<CppAD::AD<double>, autopilot::trim_variable_dofs>(z_t);
         const autopilot::TrimState<CppAD::AD<double>> x_t = autopilot::unpack_trim_state_T<CppAD::AD<double>>(z_vec);
         const autopilot::TrimInput<CppAD::AD<double>> u_t = autopilot::unpack_trim_input_T<CppAD::AD<double>>(z_vec);
         const autopilot::TrimDynamics<CppAD::AD<double>> trim_dynamics = autopilot::compute_trim_dynamics_T<CppAD::AD<double>>(x_t, u_t, model, conditions);
@@ -31,9 +31,9 @@ namespace analysis {
                      trim_dynamics.r_dot,
                      trim_dynamics.phi_dot,
                      trim_dynamics.theta_dot;
-        const CppAD::eigen_vector<CppAD::AD<double>> x_dot_t = global::cppad_vector_from_eigen_vector(x_dot_vec);
+        const CppAD::eigen_vector<CppAD::AD<double>> x_dot_t = util::cppad_vector_from_eigen_vector(x_dot_vec);
         CppAD::ADFun<double> f(z_t, x_dot_t);
-        const Eigen::Matrix<double, autopilot::trim_state_dofs, autopilot::trim_variable_dofs> jac_map = global::compute_jac<autopilot::trim_state_dofs, autopilot::trim_variable_dofs>(f, z);
+        const Eigen::Matrix<double, autopilot::trim_state_dofs, autopilot::trim_variable_dofs> jac_map = util::compute_jac<autopilot::trim_state_dofs, autopilot::trim_variable_dofs>(f, z);
 
         TrimLinearization out;
         out.A = jac_map.leftCols<autopilot::trim_state_dofs>();

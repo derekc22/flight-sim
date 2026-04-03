@@ -10,7 +10,8 @@
 #include <optional>
 #include "simulation/transforms/transforms.hpp"
 #include "simulation/dynamics/dynamics.hpp"
-#include "simulation/global/global.hpp"
+#include "simulation/constants/constants.hpp"
+#include "simulation/util/util.hpp"
 #include "simulation/frames/frames.hpp"
 #include "simulation/vehicles/vehicles.hpp"
 #include "simulation/atmospheric/atmospheric.hpp"
@@ -98,7 +99,7 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
     autopilot::TrimSolution trim_sol;
 
     // run for user-specified seconds
-    const int tf = std::max(1, static_cast<int>(std::ceil(sim_in.time_sec / global::dt)));
+    const int tf = std::max(1, static_cast<int>(std::ceil(sim_in.time_sec / constants::dt)));
 
     if (sim_in.data_bool) {
         sim_out.p_DM = io::DataMatrix{ Eigen::MatrixXd::Zero(tf, 3+1) };
@@ -121,16 +122,16 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
         dynamics::RigidBodyState xN_t = aircraft.rigidBodyState(aircraft.FRDFrameNED);
 
         // step timer by dt
-        next += std::chrono::duration_cast<clock::duration>(std::chrono::duration<double>(global::dt));
+        next += std::chrono::duration_cast<clock::duration>(std::chrono::duration<double>(constants::dt));
 
-        // compute density at current altitude
-        atmospheric::Density rho = aircraft.atmosphericState(aircraft.FRDFrameECEF).rho;
+        // compute airdensity at current altitude
+        atmospheric::AirDensity rho = aircraft.staticAtmosphericState(aircraft.FRDFrameECEF).rho;
 
         // fetch wind
         // if (auto out_pkt = udp_out.try_receive()) {
         //     // use out_pkt->wind_heading, out_pkt->wind_speed
         // }
-        atmospheric::Wind wind{ global::Zero3 }; // no wind for now
+        atmospheric::Wind wind{ constants::Zero3 }; // no wind for now
 
         // specify control commands
         control::ControlSurfaceInputs u{};
@@ -196,10 +197,10 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
 
         // update data matrix
         if (sim_in.data_bool) {
-            sim_out.p_DM->insert(t, xN_t.p.data, global::dt);
-            sim_out.eul_DM->insert(t, transforms::quatC_to_eul(xN_t.q.data, "ZYX", "intr"), global::dt);
-            sim_out.w_DM->insert(t, xN_t.w.data, global::dt);
-            sim_out.v_DM->insert(t, xN_t.v.data, global::dt);
+            sim_out.p_DM->insert(t, xN_t.p.data, constants::dt);
+            sim_out.eul_DM->insert(t, transforms::quatC_to_eul(xN_t.q.data, "ZYX", "intr"), constants::dt);
+            sim_out.w_DM->insert(t, xN_t.w.data, constants::dt);
+            sim_out.v_DM->insert(t, xN_t.v.data, constants::dt);
         }
 
         // generate in_pkt from the simulation state

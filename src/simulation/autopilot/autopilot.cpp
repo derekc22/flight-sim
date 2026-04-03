@@ -11,8 +11,8 @@ namespace autopilot { // to encompass autonomy and trim
             return 0.0;
         }
 
-        const double ratio = global::clamp_inside_1(u / limit);
-        return ratio / std::sqrt(std::max(1.0 - ratio * ratio, global::eps));
+        const double ratio = util::clamp_inside_1(u / limit);
+        return ratio / std::sqrt(std::max(1.0 - ratio * ratio, constants::eps));
     }
 
     static TrimVariableVector_T<double> _pack_trim_solver_variables(const TrimState<double>& x, const TrimInput<double>& u, const control::ControlSurfaceLimits& limits) {
@@ -88,17 +88,17 @@ namespace autopilot { // to encompass autonomy and trim
     }
 
     TrimResidualJacobian compute_trim_residual_jac(const TrimVariableVector_T<double>& z, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions, bool use_physical_controls) {
-        CppAD::eigen_vector<CppAD::AD<double>> z_tracked_cppad = global::start_autodiff_tracking(z);
+        CppAD::eigen_vector<CppAD::AD<double>> z_tracked_cppad = util::start_autodiff_tracking(z);
         const TrimResidualVector_T<CppAD::AD<double>> y_tracked = compute_trim_residual_vector_T<CppAD::AD<double>>(
-            global::eigen_vector_from_cppad_vector<CppAD::AD<double>, trim_variable_dofs>(z_tracked_cppad),
+            util::eigen_vector_from_cppad_vector<CppAD::AD<double>, trim_variable_dofs>(z_tracked_cppad),
             model,
             target,
             conditions,
             use_physical_controls
         );
-        const CppAD::eigen_vector<CppAD::AD<double>> y_tracked_cppad = global::cppad_vector_from_eigen_vector(y_tracked);
+        const CppAD::eigen_vector<CppAD::AD<double>> y_tracked_cppad = util::cppad_vector_from_eigen_vector(y_tracked);
         CppAD::ADFun<double> f(z_tracked_cppad, y_tracked_cppad);
-        return global::compute_jac<trim_residual_dofs, trim_variable_dofs>(f, z);
+        return util::compute_jac<trim_residual_dofs, trim_variable_dofs>(f, z);
     }
 
     TrimSolution solve_trim(const TrimProblem<double>& problem, const TrimModel& model, TrimSolveOptions options) {
@@ -180,7 +180,7 @@ namespace autopilot { // to encompass autonomy and trim
                 .theta = aircraft.FRDFrameNED.eulNB.theta(),
             },
             .conditions = TrimConditions{
-                .rho = aircraft.atmosphericState(aircraft.FRDFrameECEF).rho,
+                .rho = aircraft.staticAtmosphericState(aircraft.FRDFrameECEF).rho,
                 .windB = wind,
             },
             .state_guess = TrimState<double>{
@@ -218,18 +218,18 @@ namespace autopilot { // to encompass autonomy and trim
         out << "trim_sol.residual_norm_inf: " << trim_sol.residual_norm_inf << "\n";
         out << "trim_sol.state.vB_BN: [" << trim_sol.state.vx << ", " << trim_sol.state.vy << ", " << trim_sol.state.vz << "]\n";
         out << "trim_sol.state.wB_BN: [" << trim_sol.state.p << ", " << trim_sol.state.q << ", " << trim_sol.state.r << "]\n";
-        out << "trim_sol.state.phi_deg: " << global::rad_to_deg(trim_sol.state.phi) << "\n";
-        out << "trim_sol.state.theta_deg: " << global::rad_to_deg(trim_sol.state.theta) << "\n";
+        out << "trim_sol.state.phi_deg: " << util::rad_to_deg(trim_sol.state.phi) << "\n";
+        out << "trim_sol.state.theta_deg: " << util::rad_to_deg(trim_sol.state.theta) << "\n";
         out << "trim_sol.ads: [Vinf=" << trim_sol_ads.Vinf
-            << ", alpha_deg=" << global::rad_to_deg(trim_sol_ads.alpha)
-            << ", beta_deg=" << global::rad_to_deg(trim_sol_ads.beta) << "]\n";
+            << ", alpha_deg=" << util::rad_to_deg(trim_sol_ads.alpha)
+            << ", beta_deg=" << util::rad_to_deg(trim_sol_ads.beta) << "]\n";
         out << "trim_sol.state.euler_dot_deg_s: ["
-            << global::rad_to_deg(trim_eul_dot.phi_dot()) << ", "
-            << global::rad_to_deg(trim_eul_dot.theta_dot()) << ", "
-            << global::rad_to_deg(trim_eul_dot.psi_dot()) << "]\n";
-        out << "trim_sol.input.elevator_deg: " << global::rad_to_deg(trim_sol.input.elevator) << "\n";
-        out << "trim_sol.input.aileron_deg: " << global::rad_to_deg(trim_sol.input.aileron) << "\n";
-        out << "trim_sol.input.rudder_deg: " << global::rad_to_deg(trim_sol.input.rudder) << "\n";
+            << util::rad_to_deg(trim_eul_dot.phi_dot()) << ", "
+            << util::rad_to_deg(trim_eul_dot.theta_dot()) << ", "
+            << util::rad_to_deg(trim_eul_dot.psi_dot()) << "]\n";
+        out << "trim_sol.input.elevator_deg: " << util::rad_to_deg(trim_sol.input.elevator) << "\n";
+        out << "trim_sol.input.aileron_deg: " << util::rad_to_deg(trim_sol.input.aileron) << "\n";
+        out << "trim_sol.input.rudder_deg: " << util::rad_to_deg(trim_sol.input.rudder) << "\n";
         out << "trim_sol.residual:\n"
             << "vx_dot: " << trim_sol.residual.vx_dot << "\n"
             << "vy_dot: " << trim_sol.residual.vy_dot << "\n"

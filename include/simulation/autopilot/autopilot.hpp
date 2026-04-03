@@ -7,7 +7,8 @@
 #include "simulation/atmospheric/atmospheric.hpp"
 #include "simulation/control/control.hpp"
 #include "simulation/dynamics/dynamics.hpp"
-#include "simulation/global/global.hpp"
+#include "simulation/constants/constants.hpp"
+#include "simulation/util/util.hpp"
 #include "simulation/structural/structural.hpp"
 #include "simulation/vehicles/vehicles.hpp"
 
@@ -70,8 +71,8 @@ namespace autopilot { // to encompass autonomy and trim
     };
 
     struct TrimConditions {
-        atmospheric::Density rho{ 0.0 };
-        atmospheric::Wind windB{ global::Zero3 };
+        atmospheric::AirDensity rho{ 0.0 };
+        atmospheric::Wind windB{ constants::Zero3 };
     };
 
     struct TrimSolveOptions {
@@ -80,10 +81,10 @@ namespace autopilot { // to encompass autonomy and trim
         double step_tolerance = 1e-8;
         double initial_damping = 1e-6;
         double damping_growth = 10.0;
-        double linear_accel_scale = global::gravity;
-        double angular_accel_scale = global::deg_to_rad(30.0);
-        double angle_rate_scale = global::deg_to_rad(10.0);
-        double angle_error_scale = global::deg_to_rad(5.0);
+        double linear_accel_scale = constants::g_earth;
+        double angular_accel_scale = util::deg_to_rad(30.0);
+        double angle_rate_scale = util::deg_to_rad(10.0);
+        double angle_error_scale = util::deg_to_rad(5.0);
         double backtrack_scale = 0.5;
         double min_step_scale = 1.0 / 1024.0;
     };

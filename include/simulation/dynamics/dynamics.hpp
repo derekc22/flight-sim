@@ -8,7 +8,8 @@
 #include <tuple> // For std::tuple
 #include <array>
 #include <functional>
-#include "simulation/global/global.hpp"
+#include "simulation/constants/constants.hpp"
+#include "simulation/util/util.hpp"
 #include "simulation/transforms/transforms.hpp"
 
 namespace dynamics {
@@ -34,11 +35,12 @@ namespace dynamics {
     struct Wrench;
     struct Twist;
 
-    using DynamicsFunction =
-    std::function<Eigen::Vector3d(
-        const Eigen::Vector3d&,
-        const Eigen::Vector3d&
-    )>;
+    /** @deprecated */
+    // using DynamicsFunction =
+    // std::function<Eigen::Vector3d(
+    //     const Eigen::Vector3d&,
+    //     const Eigen::Vector3d&
+    // )>;
 
     struct Position {
         Eigen::Vector3d data; // e.g. pI_BI
@@ -130,6 +132,10 @@ namespace dynamics {
         Eigen::Vector3d data; // F [N]
     };
 
+    struct SpecificForce {
+        Eigen::Vector3d data; // F/m [N/kg=ms^-2]
+    };
+
     struct Gravity {
         Eigen::Vector3d data; // g [ms^-2]
     };
@@ -214,7 +220,9 @@ namespace dynamics {
         This may change in the future, but, for now, always assume inertial <=> ECEF and NEVER pass arguments corresponding to other frames to the below dynamics functions
     */
 
-    std::array<Eigen::Vector3d, 2> fwd_euler(Eigen::Vector3d xt, Eigen::Vector3d xt_dot, DynamicsFunction f, double tf);
+    /** @deprecated */
+    // std::array<Eigen::Vector3d, 2> fwd_euler(Eigen::Vector3d xt, Eigen::Vector3d xt_dot, DynamicsFunction f, double tf);
+
     EulerAngleRates _wB_BI_to_eul_dot(const AngularVelocity& wB_BI, const EulerAngles& eul);
     Position _trans_kin(const Position& xt, const LinearVelocity& xt_dot, const LinearAcceleration& xt_ddot);
     EulerAngles _eul_kin(const EulerAngles& eul_t, const EulerAngleRates& eul_dot_t);
@@ -252,8 +260,8 @@ namespace dynamics {
     AngularVelocity _eul_dot_to_wB_BI(const EulerAngleRates& eul_dot, const EulerAngles& eul);
     EulerAngleRates _wB_BI_to_eul_dot(const AngularVelocity& wB_BI, const EulerAngles& eul);
 
-
-    Eigen::Vector3d f_cv(Eigen::Vector3d xt, Eigen::Vector3d xt_dot); // constant velocity
+    /** @deprecated */
+    // Eigen::Vector3d f_cv(Eigen::Vector3d xt, Eigen::Vector3d xt_dot); // constant velocity
 
     Eigen::Matrix3d _eul_dot_to_wB_BI_mat(double theta, double phi);
 

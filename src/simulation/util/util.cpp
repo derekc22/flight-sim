@@ -1,35 +1,17 @@
-#include "simulation/global/global.hpp"
+#include <Eigen/Dense>
+#include "simulation/constants/constants.hpp"
+#include "simulation/util/util.hpp"
 
-namespace global {
-
-    // Constants
-    const double r_earth = 6.371e6; // [m]
-    const double gravity = 9.81;    // [ms^-2]
-    const double pi = 3.1415926535897932384626433832795028841971693993751;
-    const double eps = 1e-9;
-    const double dt = 0.001;        // [s]
-
-    // Special Matrices
-    const Eigen::Matrix3d I3 = Eigen::Matrix3d::Identity();
-    const Eigen::Matrix4d I4 = Eigen::Matrix4d::Identity();
-    const Eigen::Matrix4d HI = Eigen::Matrix4d::Identity(); // Identity homogenous transformation matrix
-    const Eigen::Matrix3d Zero3x3 = Eigen::Matrix3d::Zero();
-
-    // Special Vectors
-    const Eigen::Vector3d Zero3 = Eigen::Vector3d::Zero();
-    const Eigen::Vector3d i = Eigen::Vector3d(1, 0, 0);
-    const Eigen::Vector3d j = Eigen::Vector3d(0, 1, 0);
-    const Eigen::Vector3d k = Eigen::Vector3d(0, 0, 1);
-
+namespace util {
 
     // Trigonometry
     double deg_to_rad(double deg){
-        return deg * (pi / 180.0);
-    };
+        return deg * (constants::pi / 180.0);
+    }
 
     double rad_to_deg(double rad){
-        return rad * (180.0 / pi);
-    };
+        return rad * (180.0 / constants::pi);
+    }
 
     double sec(double theta) {
         return 1.0 / std::cos(theta);
@@ -80,7 +62,7 @@ namespace global {
 
     Eigen::Vector3d norm(const Eigen::Vector3d& v) {
         const double n = v.norm();
-        if (n < global::eps) { return global::Zero3; }
+        if (n < constants::eps) { return constants::Zero3; }
         return v / n;
     }
 
@@ -101,12 +83,12 @@ namespace global {
 
     double clamp_inside_1(double x) {
         // clamps to [-1+eps, 1-eps]
-        return std::clamp(x, -1.0 + global::eps, 1.0 - global::eps);
+        return std::clamp(x, -1.0 + constants::eps, 1.0 - constants::eps);
     }
 
     double wrap_to_pi(double x) {
         // maps to (-pi, pi]
-        return std::remainder(x, 2.0 * ::global::pi);
+        return std::remainder(x, 2.0 * constants::pi);
     }
 
     double sin(double x) {
@@ -138,7 +120,7 @@ namespace global {
     }
 
     double smooth_abs(double x) {
-        return sqrt(x * x + global::eps * global::eps) - global::eps;
+        return sqrt(x * x + constants::eps * constants::eps) - constants::eps;
     }
 
     double vector_norm(const Eigen::Vector3d& v) {
@@ -174,7 +156,7 @@ namespace global {
     }
 
     CppAD::AD<double> smooth_abs(const CppAD::AD<double>& x) {
-        const CppAD::AD<double> eps_t(global::eps);
+        const CppAD::AD<double> eps_t(constants::eps);
         return sqrt(x * x + eps_t * eps_t) - eps_t;
     }
 
@@ -206,7 +188,7 @@ namespace global {
 
     Eigen::Matrix<CppAD::AD<double>, 3, 1> norm(const Eigen::Matrix<CppAD::AD<double>, 3, 1>& v) {
         const CppAD::AD<double> n = vector_norm(v);
-        if (n < CppAD::AD<double>(global::eps)) {
+        if (n < CppAD::AD<double>(constants::eps)) {
             return Eigen::Matrix<CppAD::AD<double>, 3, 1>::Zero();
         }
         return v / n;

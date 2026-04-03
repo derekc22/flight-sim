@@ -4,7 +4,8 @@
 #include <algorithm>
 #include "simulation/frames/frames.hpp"
 #include "simulation/transforms/transforms.hpp"
-#include "simulation/global/global.hpp"
+#include "simulation/constants/constants.hpp"
+#include "simulation/util/util.hpp"
 #include "simulation/dynamics/dynamics.hpp"
 #include "simulation/geography/geography.hpp"
 #include "simulation/aerodynamics/aerodynamics.hpp"
@@ -13,7 +14,7 @@ namespace frames {
 
 
     Eigen::Vector3d pRF(const Frame& F) {
-        Eigen::Vector3d p = global::Zero3;
+        Eigen::Vector3d p = constants::Zero3;
         const Frame* pF = &F;
         while (pF != nullptr) {
             const FrameView fv = pF->view();
@@ -24,7 +25,7 @@ namespace frames {
     }
 
     // Eigen::Matrix4d HRF(const ECEFFrame&) {
-    //     return global::HI;
+    //     return constants::HI;
     // }
 
     Eigen::Matrix4d HRF(const Frame& F) {
@@ -59,7 +60,7 @@ namespace frames {
     //     Latitude lat{ std::atan2(z, p) };
 
     //     // Altitude above the spherical Earth (meters)
-    //     Altitude alt{ r - global::r_earth };
+    //     Altitude alt{ r - constants::r_earth };
 
     //     return geography::GeographicState{ lat, lon, alt };
     // }
@@ -70,7 +71,7 @@ namespace frames {
     //     double lon = geographicState.lon.data;   // radians
     //     double alt = geographicState.alt.data;   // meters
 
-    //     double r = global::r_earth + alt;
+    //     double r = constants::r_earth + alt;
 
     //     double cos_lat = std::cos(lat);
     //     double sin_lat = std::sin(lat);
@@ -438,6 +439,6 @@ namespace frames {
 
 
     /** @deprecated */
-    // dynamics::Gravity ECEFFrame::gE(dynamics::Position pE){ return dynamics::Gravity{ -global::gravity * pE.normalized() }; }
+    // dynamics::Gravity ECEFFrame::gE(dynamics::Position pE){ return dynamics::Gravity{ -constants::g_earth * pE.normalized() }; }
   
 }

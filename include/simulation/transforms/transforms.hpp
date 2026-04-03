@@ -7,40 +7,40 @@
 namespace transforms {
 
     /**
-    * @brief Returns a rotation matrix about the "x" axis
+    * @brief Returns an active rotation matrix about the "x" axis
     *
-    * @details Given an "angle" in degrees,
-            this function returns a rotation matrix "Rx" that encodes a rotation about the "x" axis of a coordinate frame by "angle" degrees
+    * @details Given an angle "phi" in radians,
+            this function returns a rotation matrix "Rx" that encodes a rotation about the "x" axis of a coordinate frame by "phi" radians
     *
-    * @param angle Angle to rotate by [degrees]
+    * @param phi Angle to rotate by [radians]
     *
-    * @return Rotation matrix "Rx" that encodes a rotation about the 'x' axis of a coordinate frame by "angle" degrees
+    * @return Rotation matrix "Rx" that encodes a rotation about the 'x' axis of a coordinate frame by "phi" radians
     */
-    Eigen::Matrix3d Rx(double angle);
+    Eigen::Matrix3d Rx(double phi);
 
     /**
-    * @brief Returns a rotation matrix about the "y" axis
+    * @brief Returns an active rotation matrix about the "y" axis
     *
-    * @details Given an "angle" in degrees,
-            this function returns a rotation matrix "Ry" that encodes a rotation about the "y" axis of a coordinate frame by "angle" degrees
+    * @details Given an angle "theta" in radians,
+            this function returns a rotation matrix "Ry" that encodes a rotation about the "y" axis of a coordinate frame by "theta" radians
     *
-    * @param angle Angle to rotate by [degrees]
+    * @param theta Angle to rotate by [radians]
     *
-    * @return Rotation matrix "Ry" that encodes a rotation about the "y" axis of a coordinate frame by "angle" degrees
+    * @return Rotation matrix "Ry" that encodes a rotation about the "y" axis of a coordinate frame by "theta" radians
     */
-    Eigen::Matrix3d Ry(double angle);
+    Eigen::Matrix3d Ry(double theta);
 
     /**
-    * @brief Returns a rotation matrix about the "z" axis
+    * @brief Returns a active rotation matrix about the "z" axis
     *
-    * @details Given an "angle" in degrees,
-            this function returns a rotation matrix "Rz" that encodes a rotation about the "z" axis of a coordinate frame by "angle" degrees
+    * @details Given an angle "psi" in radians,
+            this function returns a rotation matrix "Rz" that encodes a rotation about the "z" axis of a coordinate frame by "psi" radians
     *
-    * @param angle Angle to rotate by [degrees]
+    * @param psi Angle to rotate by [radians]
     *
-    * @return Rotation matrix "Rz" that encodes a rotation about the "z" axis of a coordinate frame by "angle" degrees
+    * @return Rotation matrix "Rz" that encodes a rotation about the "z" axis of a coordinate frame by "psi" radians
     */
-    Eigen::Matrix3d Rz(double angle);
+    Eigen::Matrix3d Rz(double psi);
 
     Eigen::Matrix3d eul_to_R_extr(double roll, double pitch, double yaw, const std::string& order);
     Eigen::Matrix3d eul_to_R_intr(double roll, double pitch, double yaw, const std::string& order);

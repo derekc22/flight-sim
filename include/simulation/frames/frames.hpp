@@ -6,7 +6,8 @@
 #include <optional>
 #include <unordered_set>
 #include "simulation/dynamics/dynamics.hpp"
-#include "simulation/global/global.hpp"
+#include "simulation/constants/constants.hpp"
+#include "simulation/util/util.hpp"
 #include "simulation/transforms/transforms.hpp"
 #include "simulation/aerodynamics/aerodynamics.hpp"
 #include <algorithm>

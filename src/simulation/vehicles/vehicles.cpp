@@ -11,7 +11,8 @@
 #include "simulation/geography/geography.hpp"
 #include "simulation/vehicles/vehicles.hpp"
 #include "simulation/transforms/transforms.hpp"
-#include "simulation/global/global.hpp"
+#include "simulation/constants/constants.hpp"
+#include "simulation/util/util.hpp"
 
 
 
@@ -133,9 +134,9 @@ namespace vehicles {
         return aerodynamics::compute_aerodynamic_state(rigidBodyState(F), windB);
     }
 
-    atmospheric::AtmosphericState Aircraft::atmosphericState(const frames::Frame& F) {
+    atmospheric::StaticAtmosphericState Aircraft::staticAtmosphericState(const frames::Frame& F) {
         if (F.parent != nullptr) {
-            std::string err_msg = std::format("vehicles::Aircraft::atmosphericState: Invalid frame input, the parent of {} must be ECEFFrame", F.name);
+            std::string err_msg = std::format("vehicles::Aircraft::staticAtmosphericState: Invalid frame input, the parent of {} must be ECEFFrame", F.name);
             throw std::invalid_argument(err_msg);
         }
         return atmospheric::std_atmosphere(geographicState(F).alt);
@@ -315,8 +316,8 @@ namespace vehicles {
         }
 
         // Defaults
-        NEDFrameECEFSetOpts.C_dot = dynamics::OrientationMatrixRate{ global::Zero3x3 };
-        NEDFrameECEFSetOpts.v = dynamics::LinearVelocity{ global::Zero3 };
+        NEDFrameECEFSetOpts.C_dot = dynamics::OrientationMatrixRate{ constants::Zero3x3 };
+        NEDFrameECEFSetOpts.v = dynamics::LinearVelocity{ constants::Zero3 };
         // NEDFrameECEFSetOpts.g = geography::gN();
 
         F.set(NEDFrameECEFSetOpts); 
@@ -583,9 +584,9 @@ namespace vehicles {
         }
 
         // Defaults
-        STABFrameFRDSetOpts.p = dynamics::Position{ global::Zero3 };
-        STABFrameFRDSetOpts.C_dot = dynamics::OrientationMatrixRate{ global::Zero3x3 };
-        STABFrameFRDSetOpts.v = dynamics::LinearVelocity{ global::Zero3 };
+        STABFrameFRDSetOpts.p = dynamics::Position{ constants::Zero3 };
+        STABFrameFRDSetOpts.C_dot = dynamics::OrientationMatrixRate{ constants::Zero3x3 };
+        STABFrameFRDSetOpts.v = dynamics::LinearVelocity{ constants::Zero3 };
 
         F.set(STABFrameFRDSetOpts); 
     }
@@ -636,9 +637,9 @@ namespace vehicles {
         }
 
         // Defaults
-        WINDFrameSTABSetOpts.p = dynamics::Position{ global::Zero3 };
-        WINDFrameSTABSetOpts.C_dot = dynamics::OrientationMatrixRate{ global::Zero3x3 };
-        WINDFrameSTABSetOpts.v = dynamics::LinearVelocity{ global::Zero3 };
+        WINDFrameSTABSetOpts.p = dynamics::Position{ constants::Zero3 };
+        WINDFrameSTABSetOpts.C_dot = dynamics::OrientationMatrixRate{ constants::Zero3x3 };
+        WINDFrameSTABSetOpts.v = dynamics::LinearVelocity{ constants::Zero3 };
 
         F.set(WINDFrameSTABSetOpts); 
     }
@@ -745,10 +746,10 @@ namespace vehicles {
 
         // Set default values
         frames::SetOptions initStepOptions = {
-            .H = dynamics::HomogenousFrameTransformationMatrix{ global::HI },
-            .w = dynamics::AngularVelocity{ global::Zero3 },
-            .v = dynamics::LinearVelocity{ global::Zero3 },
-            .g = dynamics::Gravity{ global::Zero3 }
+            .H = dynamics::HomogenousFrameTransformationMatrix{ constants::HI },
+            .w = dynamics::AngularVelocity{ constants::Zero3 },
+            .v = dynamics::LinearVelocity{ constants::Zero3 },
+            .g = dynamics::Gravity{ constants::Zero3 }
         };
 
         NEDFrameECEF.set(initStepOptions);
@@ -799,14 +800,14 @@ namespace vehicles {
         const Eigen::Vector3d& g = FRDFrameNED.gB.data;
 
         std::cout
-            << "t: " << t * global::dt << " [s]" << "\n\n"
+            << "t: " << t * constants::dt << " [s]" << "\n\n"
             << "p: " << p.x() << ", " << p.y() << ", " << p.z() << " [m]" << "\n\n"
-            << "eul: " << global::rad_to_deg(eul.psi()) << ", " << global::rad_to_deg(eul.theta()) << ", " << global::rad_to_deg(eul.phi()) << " [deg]" << "\n\n"
+            << "eul: " << util::rad_to_deg(eul.psi()) << ", " << util::rad_to_deg(eul.theta()) << ", " << util::rad_to_deg(eul.phi()) << " [deg]" << "\n\n"
             << "v: " << v.x() << ", " << v.y() << ", " << v.z() << " [ms^-1]" << "\n\n"
-            << "w: " << global::rad_to_deg(w.x()) << ", " << global::rad_to_deg(w.y()) << ", " << global::rad_to_deg(w.z()) << " [deg/s]" << "\n\n"
+            << "w: " << util::rad_to_deg(w.x()) << ", " << util::rad_to_deg(w.y()) << ", " << util::rad_to_deg(w.z()) << " [deg/s]" << "\n\n"
             << "g: " << g.x() << ", " << g.y() << ", " << g.z() << " [ms^-2]" << "\n\n"
-            << "lat: " << global::rad_to_deg(gps.lat.data) << ", lon: " << global::rad_to_deg(gps.lon.data) << " [deg]" << ", alt: " << gps.alt.data << " [m]" << "\n\n"
-            << "alpha: " <<  global::rad_to_deg(ads.alpha.data) << ", beta: " <<  global::rad_to_deg(ads.beta.data) << " [deg]" << "\n\n"
+            << "lat: " << util::rad_to_deg(gps.lat.data) << ", lon: " << util::rad_to_deg(gps.lon.data) << " [deg]" << ", alt: " << gps.alt.data << " [m]" << "\n\n"
+            << "alpha: " <<  util::rad_to_deg(ads.alpha.data) << ", beta: " <<  util::rad_to_deg(ads.beta.data) << " [deg]" << "\n\n"
             << "-------------------------------------------------------------------------------" << "\n\n";
     }
 

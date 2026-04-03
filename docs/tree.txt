@@ -82,26 +82,26 @@ compute_trim_dynamics_T()
 └─ dynamics::_wB_BI_to_eul_dot_T()
 
 compute_trim_residual_jac()
-├─ global::start_autodiff_tracking()
+├─ util::start_autodiff_tracking()
 ├─ compute_trim_residual_vector_T<CppAD::AD<double>>()
-├─ global::cppad_vector_from_eigen_vector()
+├─ util::cppad_vector_from_eigen_vector()
 ├─ CppAD::ADFun(...)
-└─ global::compute_jac()
+└─ util::compute_jac()
 
 linearize_trim_solution()
 └─ linearize_trim_dynamics()
 
 linearize_trim_dynamics()
 ├─ pack_trim_variables_T()
-├─ global::start_autodiff_tracking()
-├─ global::eigen_vector_from_cppad_vector()
+├─ util::start_autodiff_tracking()
+├─ util::eigen_vector_from_cppad_vector()
 ├─ unpack_trim_state_T()
 ├─ unpack_trim_input_T()
 ├─ compute_trim_dynamics_T<CppAD::AD<double>>()
 ├─ x_dot_vec << trim_dynamics.vx_dot, trim_dynamics.vy_dot, trim_dynamics.vz_dot, trim_dynamics.p_dot, trim_dynamics.q_dot, trim_dynamics.r_dot, trim_dynamics.phi_dot, trim_dynamics.theta_dot
-├─ global::cppad_vector_from_eigen_vector()
+├─ util::cppad_vector_from_eigen_vector()
 ├─ CppAD::ADFun(...)
-└─ global::compute_jac()
+└─ util::compute_jac()
 
 print_trim_solution()
 ├─ uses trim_sol.conditions.windB

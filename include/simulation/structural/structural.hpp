@@ -6,7 +6,8 @@
 #include <string>
 #include <unordered_map>
 #include "simulation/dynamics/dynamics.hpp"
-#include "simulation/global/global.hpp"
+#include "simulation/constants/constants.hpp"
+#include "simulation/util/util.hpp"
 
 
 namespace structural {

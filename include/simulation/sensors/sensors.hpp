@@ -4,10 +4,14 @@
 #include "simulation/aerodynamics/aerodynamics.hpp"
 #include "simulation/atmospheric/atmospheric.hpp"
 #include "simulation/geography/geography.hpp"
+#include "simulation/constants/constants.hpp"
+#include "simulation/util/util.hpp"
 
 namespace sensors {
 
     struct PositionMeasurement : dynamics::Position {};
+
+    struct OrientationMeasurement : dynamics::OrientationQuaternion {};
 
     struct LinearVelocityMeasurement : dynamics::LinearVelocity {};
 
@@ -21,67 +25,68 @@ namespace sensors {
 
     struct AltitudeMeasurement : geography::Altitude {};
 
-    struct TemperatureMeasurement : atmospheric::Temperature {};
+    // struct StaticAirTemperatureMeasurement : atmospheric::StaticAirTemperature {};
 
-    struct DensityMeasurement : atmospheric::Density {};
+    struct StagnationAirTemperatureMeasurement : atmospheric::StagnationAirTemperature {};
 
-    struct StagnationPressureMeasurement : atmospheric::StagnationPressure {};
+    struct AirDensityMeasurement : atmospheric::AirDensity {};
 
-    struct StaticPressureMeasurement : atmospheric::StaticPressure {};
+    struct StaticAirPressureMeasurement : atmospheric::StaticAirPressure {};
+
+    struct StagnationAirPressureMeasurement : atmospheric::StagnationAirPressure {};
 
     struct VerticalSpeedMeasurement : dynamics::VerticalSpeed {};
 
-    // Under-modelled sensors:
-    // Due to modelling complexity, the internal dynamics of some sensors will remain unmodelled
-    // Instead, these sensor will simply output a noised version of the corresponding ground-truth state
+    struct MagneticFieldVectorMeasurement : geography::MagneticFieldVector {};
+
+    struct HeadingMeasurement : geography::Heading {};
+
+    // Note: Due to modelling complexity, the internal dynamics of some sensors will remain unmodelled
+    // Instead, these sensor will simply output a noised, delayed version of the corresponding ground-truth quantity
 
     struct Sensor {
         double mean = 0.0;
         double cov = 0.0;
+        double tau = constants::eps;
     };
 
     struct AngleOfAttackVane : Sensor {
         AngleOfAttackMeasurement measure(aerodynamics::AngleOfAttack AoA);
     };
 
+    // IMU
     struct Accelerometer : Sensor {
-        LinearAccelerationMeasurement measure(dynamics::LinearAcceleration pB_BI_ddot);
+        LinearAccelerationMeasurement measure(dynamics::LinearAcceleration accel);
+        // Note: accel = F_non-gravity/m - g, not pB_BI_ddot
+        // That is, an accelerometer measures all forces/accelerations, excluding gravity 
     };
 
+    // IMU
     struct Gyroscope : Sensor {
         AngularVelocityMeasurement measure(dynamics::AngularVelocity wB_BI);
     };
 
     struct PitotTube : Sensor {
-        StagnationPressureMeasurement measure(atmospheric::StagnationPressure P_total);
+        StagnationAirPressureMeasurement measure(atmospheric::StagnationAirPressure P0);
     };
 
     struct StaticPort : Sensor {
-        StaticPressureMeasurement measure(atmospheric::StaticPressure P_static);
+        StaticAirPressureMeasurement measure(atmospheric::StaticAirPressure P);
     };
 
     struct TotalAirTemperatureProbe : Sensor {
-        TemperatureMeasurement measure(...);
+        StagnationAirTemperatureMeasurement measure(atmospheric::StagnationAirTemperature);
     };
 
-    struct GNSSPositionReceiver : Sensor {
+    struct GNSSReceiver : Sensor {
         PositionMeasurement measure(dynamics::Position pI_BI);
-    };
-
-    struct GNSSVelocityReceiver : Sensor {
         LinearVelocityMeasurement measure(dynamics::LinearVelocity pB_BI_dot);
+    }
+
+    struct Magnetometer : Sensor {
+        MagneticFieldVectorMeasurement measure(geography::MagneticFieldVector magE);
     };
 
-
-    // Computers
-    struct AirDataComputer {
-        FreeStreamVelocityMeasurement measure(...);
-        AltitudeMeasurement measure(...);
-        VerticalSpeedMeasurement measure(...);
-        DensityMeasurement measure();
-    };
-
-
-
+    
 
 }

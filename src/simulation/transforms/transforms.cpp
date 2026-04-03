@@ -5,7 +5,8 @@
 #include <iostream>
 #include <vector>
 #include "simulation/transforms/transforms.hpp"
-#include "simulation/global/global.hpp"
+#include "simulation/constants/constants.hpp"
+#include "simulation/util/util.hpp"
 
 namespace transforms {
 
@@ -78,9 +79,9 @@ namespace transforms {
 
         // Tait-Bryan, middle angle in [-pi/2, pi/2]
         if (order == "ZYX") {
-            b = std::asin(global::clamp_to_1(R(0,2)));
+            b = std::asin(util::clamp_to_1(R(0,2)));
             const double cb = std::cos(b);
-            if (std::abs(cb) > global::eps) {
+            if (std::abs(cb) > constants::eps) {
                 a = std::atan2(-R(0,1), R(0,0));
                 c = std::atan2(-R(1,2), R(2,2));
             } else {
@@ -89,9 +90,9 @@ namespace transforms {
             }
 
         } else if (order == "ZXY") {
-            b = std::asin(global::clamp_to_1(-R(1,2)));
+            b = std::asin(util::clamp_to_1(-R(1,2)));
             const double cb = std::cos(b);
-            if (std::abs(cb) > global::eps) {
+            if (std::abs(cb) > constants::eps) {
                 a = std::atan2(R(1,0), R(1,1));
                 c = std::atan2(R(0,2), R(2,2));
             } else {
@@ -100,9 +101,9 @@ namespace transforms {
             }
 
         } else if (order == "YZX") {
-            b = std::asin(global::clamp_to_1(-R(0,1)));
+            b = std::asin(util::clamp_to_1(-R(0,1)));
             const double cb = std::cos(b);
-            if (std::abs(cb) > global::eps) {
+            if (std::abs(cb) > constants::eps) {
                 a = std::atan2(R(0,2), R(0,0));
                 c = std::atan2(R(2,1), R(1,1));
             } else {
@@ -111,9 +112,9 @@ namespace transforms {
             }
 
         } else if (order == "YXZ") {
-            b = std::asin(global::clamp_to_1(R(2,1)));
+            b = std::asin(util::clamp_to_1(R(2,1)));
             const double cb = std::cos(b);
-            if (std::abs(cb) > global::eps) {
+            if (std::abs(cb) > constants::eps) {
                 a = std::atan2(-R(2,0), R(2,2));
                 c = std::atan2(-R(0,1), R(1,1));
             } else {
@@ -122,9 +123,9 @@ namespace transforms {
             }
 
         } else if (order == "XZY") {
-            b = std::asin(global::clamp_to_1(R(1,0)));
+            b = std::asin(util::clamp_to_1(R(1,0)));
             const double cb = std::cos(b);
-            if (std::abs(cb) > global::eps) {
+            if (std::abs(cb) > constants::eps) {
                 a = std::atan2(-R(1,2), R(1,1));
                 c = std::atan2(-R(2,0), R(0,0));
             } else {
@@ -133,9 +134,9 @@ namespace transforms {
             }
 
         } else if (order == "XYZ") {
-            b = std::asin(global::clamp_to_1(-R(2,0)));
+            b = std::asin(util::clamp_to_1(-R(2,0)));
             const double cb = std::cos(b);
-            if (std::abs(cb) > global::eps) {
+            if (std::abs(cb) > constants::eps) {
                 a = std::atan2(R(2,1), R(2,2));
                 c = std::atan2(R(1,0), R(0,0));
             } else {
@@ -145,9 +146,9 @@ namespace transforms {
 
         // Proper Euler (repeated axis), middle angle in [-pi, 0]
         } else if (order == "ZXZ") {
-            b = -std::acos(global::clamp_to_1(R(2,2)));
+            b = -std::acos(util::clamp_to_1(R(2,2)));
             const double sb = std::sin(b);
-            if (std::abs(sb) > global::eps) {
+            if (std::abs(sb) > constants::eps) {
                 a = std::atan2(-R(2,0), -R(2,1));
                 c = std::atan2(-R(0,2),  R(1,2));
             } else {
@@ -156,9 +157,9 @@ namespace transforms {
             }
 
         } else if (order == "ZYZ") {
-            b = -std::acos(global::clamp_to_1(R(2,2)));
+            b = -std::acos(util::clamp_to_1(R(2,2)));
             const double sb = std::sin(b);
-            if (std::abs(sb) > global::eps) {
+            if (std::abs(sb) > constants::eps) {
                 a = std::atan2(-R(2,1),  R(2,0));
                 c = std::atan2(-R(1,2), -R(0,2));
             } else {
@@ -167,9 +168,9 @@ namespace transforms {
             }
 
         } else if (order == "XYX") {
-            b = -std::acos(global::clamp_to_1(R(0,0)));
+            b = -std::acos(util::clamp_to_1(R(0,0)));
             const double sb = std::sin(b);
-            if (std::abs(sb) > global::eps) {
+            if (std::abs(sb) > constants::eps) {
                 a = std::atan2(-R(0,1), -R(0,2));
                 c = std::atan2(-R(1,0),  R(2,0));
             } else {
@@ -178,9 +179,9 @@ namespace transforms {
             }
 
         } else if (order == "XZX") {
-            b = -std::acos(global::clamp_to_1(R(0,0)));
+            b = -std::acos(util::clamp_to_1(R(0,0)));
             const double sb = std::sin(b);
-            if (std::abs(sb) > global::eps) {
+            if (std::abs(sb) > constants::eps) {
                 a = std::atan2(-R(0,2),  R(0,1));
                 c = std::atan2(-R(2,0), -R(1,0));
             } else {
@@ -189,9 +190,9 @@ namespace transforms {
             }
 
         } else if (order == "YXY") {
-            b = -std::acos(global::clamp_to_1(R(1,1)));
+            b = -std::acos(util::clamp_to_1(R(1,1)));
             const double sb = std::sin(b);
-            if (std::abs(sb) > global::eps) {
+            if (std::abs(sb) > constants::eps) {
                 a = std::atan2(-R(1,0),  R(1,2));
                 c = std::atan2(-R(0,1), -R(2,1));
             } else {
@@ -200,9 +201,9 @@ namespace transforms {
             }
 
         } else if (order == "YZY") {
-            b = -std::acos(global::clamp_to_1(R(1,1)));
+            b = -std::acos(util::clamp_to_1(R(1,1)));
             const double sb = std::sin(b);
-            if (std::abs(sb) > global::eps) {
+            if (std::abs(sb) > constants::eps) {
                 a = std::atan2(-R(1,2), -R(1,0));
                 c = std::atan2(-R(2,1),  R(0,1));
             } else {
@@ -214,7 +215,7 @@ namespace transforms {
             throw std::invalid_argument("Unsupported Euler order: " + order);
         }
 
-        return Eigen::Vector3d(global::wrap_to_pi(a),global::wrap_to_pi(b),global::wrap_to_pi(c));
+        return Eigen::Vector3d(util::wrap_to_pi(a),util::wrap_to_pi(b),util::wrap_to_pi(c));
     }
 
     Eigen::Vector3d R_to_eul_intr(const Eigen::Matrix3d& R, const std::string& order) {
@@ -343,7 +344,7 @@ namespace transforms {
     // That is, the concept of an "intrinsic" vector rotation is not defined
     // Given the orientation (of the frame/vector) obtained via the nth transformation, how is the n+1 transformation applied
     Eigen::Matrix4d chain_hom_post(const std::vector<Eigen::Matrix4d>& H_list) {
-        Eigen::Matrix4d Htot = global::HI;
+        Eigen::Matrix4d Htot = constants::HI;
         for (const auto& H : H_list){
             Htot *= H;
         }
@@ -352,7 +353,7 @@ namespace transforms {
 
     // Given the orientation (of the frame/vector) obtained via the nth transformation, how is the n+1 transformation applied
     Eigen::Matrix4d chain_hom_pre(const std::vector<Eigen::Matrix4d>& H_list) {
-        Eigen::Matrix4d Htot = global::HI;
+        Eigen::Matrix4d Htot = constants::HI;
 
         for (auto rit = H_list.rbegin(); rit != H_list.rend(); ++rit) {
             Htot *= *rit;
@@ -369,7 +370,7 @@ namespace transforms {
     // That is, the concept of an "intrinsic" vector rotation is not defined
     // Given the orientation (of the frame/vector) obtained via the nth rotation, how is the n+1 rotation applied
     Eigen::Matrix3d chain_rot_post(const std::vector<Eigen::Matrix3d>& rot_list) {
-        Eigen::Matrix3d rot_tot = global::I3;
+        Eigen::Matrix3d rot_tot = constants::I3;
         for (const auto& rot : rot_list){
             rot_tot *= rot;
         }
@@ -378,7 +379,7 @@ namespace transforms {
 
     // Given the orientation (of the frame/vector) obtained via the nth rotation, how is the n+1 rotation applied
     Eigen::Matrix3d chain_rot_pre(const std::vector<Eigen::Matrix3d>& rot_list) {
-        Eigen::Matrix3d rot_tot = global::I3;
+        Eigen::Matrix3d rot_tot = constants::I3;
 
         for (auto rit = rot_list.rbegin(); rit != rot_list.rend(); ++rit) {
             rot_tot *= *rit;

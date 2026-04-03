@@ -220,7 +220,7 @@ namespace vehicles {
         aerodynamics::AerodynamicState aerodynamicState(const frames::Frame& F, const atmospheric::Wind& windB);
 
         /** @warning The parent of F must the ECEFFrame */
-        atmospheric::AtmosphericState atmosphericState(const frames::Frame& F);
+        atmospheric::StaticAtmosphericState staticAtmosphericState(const frames::Frame& F);
 
         void step(const StepOptions& opts);
         void _step(frames::NEDFrameECEF& F, const _StepOptions& opts);

@@ -7,7 +7,8 @@
 #include <cppad/cppad.hpp>
 #include <stdexcept>
 
-namespace global {
+namespace util {
+
     const extern double r_earth;
     const extern double gravity;
     const extern double pi;
@@ -76,7 +77,7 @@ namespace global {
 
     template <typename T, std::size_t rows>
     Eigen::Matrix<T, rows, 1> eigen_vector_from_cppad_vector(const CppAD::eigen_vector<T>& x) {
-        if (x.size() != rows) throw std::invalid_argument("global::eigen_vector_from_cppad_vector: vector has incorrect size");
+        if (x.size() != rows) throw std::invalid_argument("util::eigen_vector_from_cppad_vector: vector has incorrect size");
 
         Eigen::Matrix<T, rows, 1> out;
         for (std::size_t i = 0; i < rows; ++i) {

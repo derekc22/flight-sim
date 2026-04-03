@@ -9,7 +9,8 @@
 #include "simulation/structural/structural.hpp"
 #include <simulation/dynamics/dynamics.hpp>
 #include <simulation/atmospheric/atmospheric.hpp>
-#include "simulation/global/global.hpp"
+#include "simulation/constants/constants.hpp"
+#include "simulation/util/util.hpp"
 
 namespace aerodynamics {
 
@@ -39,7 +40,7 @@ namespace aerodynamics {
         const Surface& s,
         const structural::StructuralProperties& structural_properties,
         const dynamics::RigidBodyState& rigidBodyState,
-        const atmospheric::Density& rho,
+        const atmospheric::AirDensity& rho,
         const atmospheric::Wind& windB
     ) {
         const dynamics::Twist_T<double> twist{
@@ -126,7 +127,7 @@ namespace aerodynamics {
         const AerodynamicProperties& aerodynamic_properties,
         const structural::StructuralProperties& structural_properties,
         const dynamics::RigidBodyState& rigidBodyState,
-        const atmospheric::Density& rho,
+        const atmospheric::AirDensity& rho,
         const control::ControlSurfaceInputs& u,
         const control::ControlProperties& cp,
         const atmospheric::Wind& windB

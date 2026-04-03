@@ -105,10 +105,10 @@ namespace io {
             fields.v = dynamics::LinearVelocity{ parse_vector3d(frame_json.at("v")) };
         }
         if (frame_json.contains("lat")) {
-            fields.lat = geography::Latitude{ global::deg_to_rad(frame_json.at("lat").get<double>()) };
+            fields.lat = geography::Latitude{ util::deg_to_rad(frame_json.at("lat").get<double>()) };
         }
         if (frame_json.contains("lon")) {
-            fields.lon = geography::Longitude{ global::deg_to_rad(frame_json.at("lon").get<double>()) };
+            fields.lon = geography::Longitude{ util::deg_to_rad(frame_json.at("lon").get<double>()) };
         }
         if (frame_json.contains("alt")) {
             fields.alt = geography::Altitude{ frame_json.at("alt").get<double>() };
@@ -219,11 +219,11 @@ namespace io {
 
     control::ControlSurfaceLimits parse_control_surface_limits(const nlohmann::json& limits_json) {
         return control::ControlSurfaceLimits{
-            .elevator_max = global::deg_to_rad(limits_json.value("elevator_max", 0.0)),
-            .aileron_max = global::deg_to_rad(limits_json.value("aileron_max", 0.0)),
-            .rudder_max = global::deg_to_rad(limits_json.value("rudder_max", 0.0)),
-            .flap_max = global::deg_to_rad(limits_json.value("flap_max", 0.0)),
-            .spoiler_max = global::deg_to_rad(limits_json.value("spoiler_max", 0.0)),
+            .elevator_max = util::deg_to_rad(limits_json.value("elevator_max", 0.0)),
+            .aileron_max = util::deg_to_rad(limits_json.value("aileron_max", 0.0)),
+            .rudder_max = util::deg_to_rad(limits_json.value("rudder_max", 0.0)),
+            .flap_max = util::deg_to_rad(limits_json.value("flap_max", 0.0)),
+            .spoiler_max = util::deg_to_rad(limits_json.value("spoiler_max", 0.0)),
         };
     }
 

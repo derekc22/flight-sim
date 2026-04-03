@@ -19,6 +19,14 @@ namespace geography {
         double data; // [m] e.g. alt_BE
     };
 
+    struct Heading { 
+        double data; // [rad] e.g. heading_BE
+    };
+
+    struct MagneticFieldVector { 
+        Eigen::Vector3d data; // [µT] e.g. magE
+    };
+
     /** @brief Latitude, Longitude, and Altitude of a frame WRT the ECEF frame */
     struct GeographicState {
         Latitude lat;

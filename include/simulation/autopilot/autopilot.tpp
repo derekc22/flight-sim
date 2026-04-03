@@ -26,7 +26,7 @@ namespace autopilot {
             return T(0);
         }
 
-        return T(limit) * u_solver / global::sqrt(T(1) + u_solver * u_solver);
+        return T(limit) * u_solver / util::sqrt(T(1) + u_solver * u_solver);
     }
 
     template <typename T>
@@ -41,9 +41,9 @@ namespace autopilot {
     template <typename T>
     dynamics::Vector3_T<T> _gB_T(const T& phi, const T& theta) {
         dynamics::Vector3_T<T> gB;
-        gB << -T(global::gravity) * global::sin(theta),
-               T(global::gravity) * global::sin(phi) * global::cos(theta),
-               T(global::gravity) * global::cos(phi) * global::cos(theta);
+        gB << -T(constants::g_earth) * util::sin(theta),
+               T(constants::g_earth) * util::sin(phi) * util::cos(theta),
+               T(constants::g_earth) * util::cos(phi) * util::cos(theta);
         return gB;
     }
 

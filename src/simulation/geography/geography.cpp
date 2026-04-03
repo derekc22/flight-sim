@@ -31,7 +31,7 @@ namespace geography {
         Latitude lat{ std::atan2(z, p) };
 
         // Altitude above the spherical Earth (meters)
-        Altitude alt{ r - global::r_earth };
+        Altitude alt{ r - constants::r_earth };
 
         return geography::GeographicState{ lat, lon, alt };
     }
@@ -41,7 +41,7 @@ namespace geography {
         double lon = geographicState.lon.data;   // [rad]
         double alt = geographicState.alt.data;   // [m]
 
-        double r = global::r_earth + alt;
+        double r = constants::r_earth + alt;
 
         double cos_lat = std::cos(lat);
         double sin_lat = std::sin(lat);
@@ -56,8 +56,8 @@ namespace geography {
         return dynamics::Position{ p };
     }
 
-    dynamics::Gravity gE(const dynamics::Position& pE){ return dynamics::Gravity{ -global::gravity * pE.data.normalized() }; }
-    dynamics::Gravity gN() { return dynamics::Gravity{ Eigen::Vector3d(0, 0, global::gravity) }; };
+    dynamics::Gravity gE(const dynamics::Position& pE){ return dynamics::Gravity{ -constants::g_earth * pE.data.normalized() }; }
+    dynamics::Gravity gN() { return dynamics::Gravity{ Eigen::Vector3d(0, 0, constants::g_earth) }; };
 
     dynamics::Gravity gB(const dynamics::Position& pE, const dynamics::HomogenousFrameTransformationMatrix& HEB) { return dynamics::Gravity{ HEB.C().data * geography::gE(HEB.p()).data }; };
     dynamics::Gravity gB(const dynamics::Position& pE, const dynamics::OrientationMatrix& CEB) { return dynamics::Gravity{ CEB.data * geography::gE(pE).data }; };
