@@ -28,6 +28,7 @@ struct SimulationInput {
     vehicles::Aircraft& aircraft;
     double time_sec;
     bool trim_bool;
+    bool sensor_bool;
     bool verbose_bool;
     bool data_bool;
     std::string out_dir;
@@ -49,6 +50,7 @@ vehicles::Aircraft load(bool trim_bool) {
         io::parse_structural_config(), 
         io::parse_aerodynamics_config(),
         io::parse_control_config(),
+        io::parse_avionics_config(),
     };
 
     // set initial conditions from config
@@ -148,6 +150,7 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
         // compute net forces and moments
         dynamics::Force FB_net{ FB_g + FB_aero.data };
         dynamics::Moment MB_net{ MB_aero.data };
+        dynamics::Wrench WB_net { .F=FB_net, .M=MB_net };
 
         // compute rigid-body dynamics
         xN_t = dynamics::step_rigid_body(xN_t, mass, J, FB_net, MB_net);
@@ -157,9 +160,9 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
 
         // set step options
         StepOpts.FRDFrameNEDStepOpts = vehicles::FRDFrameNEDStepOptions{ .rbs_BN = xN_t };
-        aerodynamics::AerodynamicState ads = aerodynamics::compute_aerodynamic_state(xN_t, wind);
-        StepOpts.STABFrameFRDStepOpts = vehicles::STABFrameFRDStepOptions{ .ads = ads };
-        StepOpts.WINDFrameSTABStepOpts = vehicles::WINDFrameSTABStepOptions{ .ads = ads };
+        aerodynamics::AerodynamicState ads_t = aerodynamics::compute_aerodynamic_state(xN_t, wind);
+        StepOpts.STABFrameFRDStepOpts = vehicles::STABFrameFRDStepOptions{ .ads = ads_t };
+        StepOpts.WINDFrameSTABStepOpts = vehicles::WINDFrameSTABStepOptions{ .ads = ads_t };
 
         // step frames
         aircraft.step(StepOpts);
@@ -171,21 +174,24 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
 
             if (trim_sol.converged){
                 // obtain full state from trim solution
-                auto [xN_t_trim, ads_trim] = autopilot::update_state_from_trim(xN_t, trim_sol);
+                auto [xN_t_trim, ads_t_trim] = autopilot::update_state_from_trim(xN_t, trim_sol);
+
+                dynamics::Wrench WB_net_trim = trim_sol.wrench;
 
                 // define TrimStepOptions
                 vehicles::StepOptions TrimStepOptions;
 
                 // overwrite state with trim state
                 TrimStepOptions.FRDFrameNEDStepOpts = vehicles::FRDFrameNEDStepOptions { .rbs_BN = xN_t_trim };
-                TrimStepOptions.STABFrameFRDStepOpts = vehicles::STABFrameFRDStepOptions{ .ads = ads_trim };
-                TrimStepOptions.WINDFrameSTABStepOpts = vehicles::WINDFrameSTABStepOptions{ .ads = ads_trim };
+                TrimStepOptions.STABFrameFRDStepOpts = vehicles::STABFrameFRDStepOptions{ .ads = ads_t_trim };
+                TrimStepOptions.WINDFrameSTABStepOpts = vehicles::WINDFrameSTABStepOptions{ .ads = ads_t_trim };
 
                 // step frames
                 aircraft.step(TrimStepOptions);
 
                 // overwrite local state with trim state
                 xN_t = xN_t_trim;
+                WB_net = WB_net_trim;
 
                 // linearize
                 const analysis::TrimLinearization lin_sol = analysis::linearize_trim_solution(aircraft, trim_sol);
@@ -195,12 +201,43 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
             }            
         }
 
+        // initialize measurements to ground truth
+        dynamics::RigidBodyState xN_t_meas = xN_t;
+
+        if (sim_in.sensor_bool){
+
+                atmospheric::StaticAtmosphericState static_atmo_t = aircraft.staticAtmosphericState(aircraft.FRDFrameECEF);
+                geography::GeographicState geo_t = aircraft.geographicState(aircraft.FRDFrameECEF);
+
+                // obtain full state from sensors
+                aerodynamics::AerodynamicState ads_t = aerodynamics::compute_aerodynamic_state(xN_t, wind);
+                auto [xN_t_sensor, ads_t_sensor] = avionics::update_state_from_avionics(xN_t, ads_t, static_atmo_t, geo_t, mass, wind, WB_net, aircraft.avionics_properties);
+
+                // // define MeasurementStepOptions
+                // vehicles::StepOptions MeasurementStepOptions;
+
+                // // overwrite state with measured state
+                // MeasurementStepOptions.FRDFrameNEDStepOpts = vehicles::FRDFrameNEDStepOptions { .rbs_BN = xN_t_meas };
+                // MeasurementStepOptions.STABFrameFRDStepOpts = vehicles::STABFrameFRDStepOptions{ .ads = ads_t_meas };
+                // MeasurementStepOptions.WINDFrameSTABStepOpts = vehicles::WINDFrameSTABStepOptions{ .ads = ads_t_meas };
+
+                // // step frames
+                // aircraft.step(MeasurementStepOptions);
+
+                // // overwrite local state with measured state
+                // xN_t = xN_t_meas;
+                // ads_t = ads_t_meas;
+
+                xN_t_meas = xN_t_sensor;
+                
+        }
+
         // update data matrix
         if (sim_in.data_bool) {
-            sim_out.p_DM->insert(t, xN_t.p.data, constants::dt);
-            sim_out.eul_DM->insert(t, transforms::quatC_to_eul(xN_t.q.data, "ZYX", "intr"), constants::dt);
-            sim_out.w_DM->insert(t, xN_t.w.data, constants::dt);
-            sim_out.v_DM->insert(t, xN_t.v.data, constants::dt);
+            sim_out.p_DM->insert(t, xN_t_meas.p.data, constants::dt);
+            sim_out.eul_DM->insert(t, transforms::quatC_to_eul(xN_t_meas.q.data, "ZYX", "intr"), constants::dt);
+            sim_out.w_DM->insert(t, xN_t_meas.w.data, constants::dt);
+            sim_out.v_DM->insert(t, xN_t_meas.v.data, constants::dt);
         }
 
         // generate in_pkt from the simulation state
@@ -228,7 +265,7 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
 
 
 int main(int argc, char* argv[]) {
-    if (argc != 6) { return 1; }
+    if (argc != 7) { return 1; }
     
     double time_sec;
     try { time_sec = std::stod(argv[1]); } 
@@ -236,9 +273,10 @@ int main(int argc, char* argv[]) {
     if (!std::isfinite(time_sec) || time_sec <= 0.0) { std::cerr << "TIME_SEC must be > 0" << std::endl; return 1; }
 
     bool trim_bool = std::stoi(argv[2]) == 1;
-    bool verbose_bool = std::stoi(argv[3]) == 1;
-    bool data_bool = std::stoi(argv[4]) == 1;
-    std::string out_dir = argv[5];
+    bool sensor_bool = std::stoi(argv[3]) == 1;
+    bool verbose_bool = std::stoi(argv[4]) == 1;
+    bool data_bool = std::stoi(argv[5]) == 1;
+    std::string out_dir = argv[6];
 
     // load vehicle
     vehicles::Aircraft aircraft = load(trim_bool);
@@ -248,6 +286,7 @@ int main(int argc, char* argv[]) {
         .aircraft=aircraft, 
         .time_sec=time_sec,
         .trim_bool=trim_bool,
+        .sensor_bool=sensor_bool,
         .verbose_bool=verbose_bool,
         .data_bool=data_bool, 
         .out_dir=out_dir  

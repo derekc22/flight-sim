@@ -1,6 +1,7 @@
 {
-    "aerodynamics_config": "aerodynamics/trim.json",
-    "control_config": "control/trim.json",
+    "aerodynamics_config": "aerodynamics/baseline.json",
+    "control_config": "control/baseline.json",
     "structural_config": "structural/baseline.json",
-    "initialization_config": "initialization/trim_level.json"
+    "initialization_config": "initialization/baseline.json",
+    "avionics_config": "avionics/avionics.json"
 }

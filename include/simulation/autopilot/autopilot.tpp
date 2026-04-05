@@ -31,7 +31,7 @@ namespace autopilot {
 
     template <typename T>
     TrimInput<T> _unpack_trim_solver_input_T(const TrimVariableVector_T<T>& z, const control::ControlSurfaceLimits& limits) {
-        return TrimInput<T>{
+        return {
             .elevator = _get_control_from_solver_space_T<T>(z(8), limits.elevator_max),
             .aileron = _get_control_from_solver_space_T<T>(z(9), limits.aileron_max),
             .rudder = _get_control_from_solver_space_T<T>(z(10), limits.rudder_max),
@@ -68,7 +68,7 @@ namespace autopilot {
         const dynamics::Vector3_T<T> w_dot = dynamics::_ddtB_wB_BI_T<T>(twist.w, model.structural.J.data, MB_net);
         const dynamics::Vector3_T<T> eul_dot = dynamics::_wB_BI_to_eul_dot_T<T>(twist.w, x.theta, x.phi);
 
-        return TrimDynamics<T> {
+        return {
             .vx_dot = v_dot.x(),
             .vy_dot = v_dot.y(),
             .vz_dot = v_dot.z(),
@@ -85,7 +85,7 @@ namespace autopilot {
         const TrimDynamics<T> trim_dynamics = compute_trim_dynamics_T<T>(x, u, model, conditions);
         const aerodynamics::AerodynamicState_T<T> ads = aerodynamics::compute_aerodynamic_state_T<T>(_build_twist_from_trim_T(x), conditions.windB);
 
-        return TrimResidual<T> {
+        return {
             .vx_dot = trim_dynamics.vx_dot,
             .vy_dot = trim_dynamics.vy_dot,
             .vz_dot = trim_dynamics.vz_dot,
@@ -112,7 +112,7 @@ namespace autopilot {
 
     template <typename T>
     TrimState<T> unpack_trim_state_T(const TrimVariableVector_T<T>& z) {
-        return TrimState<T>{
+        return {
             .vx = z(0),
             .vy = z(1),
             .vz = z(2),
@@ -126,7 +126,7 @@ namespace autopilot {
 
     template <typename T>
     TrimInput<T> unpack_trim_input_T(const TrimVariableVector_T<T>& z) {
-        return TrimInput<T>{
+        return {
             .elevator = z(8),
             .aileron = z(9),
             .rudder = z(10),
@@ -153,12 +153,11 @@ namespace autopilot {
     template <typename T>
     TrimResidualVector_T<T> compute_trim_residual_vector_T(const TrimVariableVector_T<T>& z, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions, bool use_physical_controls) {
         const TrimState<T> x = unpack_trim_state_T<T>(z);
+
         TrimInput<T> u;
-        if (use_physical_controls) {
-            u = unpack_trim_input_T<T>(z);
-        } else {
-            u = _unpack_trim_solver_input_T<T>(z, model.control.limits);
-        }
+        if (use_physical_controls) u = unpack_trim_input_T<T>(z);
+        else u = _unpack_trim_solver_input_T<T>(z, model.control.limits);
+
         const TrimResidual<T> residual = compute_trim_residual<T>(x, u, model, target, conditions);
         return pack_trim_residual_T(residual);
     }

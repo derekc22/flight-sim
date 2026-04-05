@@ -48,15 +48,9 @@ namespace aerodynamics {
             .w = rigidBodyState.w.data,
         };
 
-        const SurfaceKinematics_T<double> sk = compute_surface_kinematics_T<double>(
-            s,
-            structural_properties,
-            twist,
-            rho,
-            windB
-        );
+        const SurfaceKinematics_T<double> sk = compute_surface_kinematics_T<double>(s, structural_properties, twist, rho, windB);
 
-        return SurfaceKinematics{
+        return {
             .r_ac_B = sk.r_ac_B,
             .v_rel_B = sk.v_rel_B,
             .V = sk.V,
@@ -92,7 +86,7 @@ namespace aerodynamics {
             cp
         );
 
-        return SurfaceCoefficients{
+        return {
             .CL = LiftCoefficient{ sc.CL },
             .CD = DragCoefficient{ sc.CD },
             .CM = MomentCoefficient{ sc.CM },
@@ -119,7 +113,7 @@ namespace aerodynamics {
             }
         );
 
-        return AerodynamicLoad{ dynamics::Force{ loads.F }, dynamics::Moment{ loads.M } };
+        return { dynamics::Force{ loads.F }, dynamics::Moment{ loads.M } };
     }
 
 
@@ -153,7 +147,7 @@ namespace aerodynamics {
             windB
         );
 
-        return AerodynamicLoad{ dynamics::Force{ loads.F }, dynamics::Moment{ loads.M } };
+        return { dynamics::Force{ loads.F }, dynamics::Moment{ loads.M } };
     }
 
 
@@ -162,17 +156,11 @@ namespace aerodynamics {
 
 
     AerodynamicState compute_aerodynamic_state(const dynamics::RigidBodyState& rigidBodyState, const atmospheric::Wind& windB) {
-        const dynamics::Twist_T<double> twist{
-            .v = rigidBodyState.v.data,
-            .w = rigidBodyState.w.data,
-        };
+        const dynamics::Twist_T<double> twist{ .v = rigidBodyState.v.data, .w = rigidBodyState.w.data };
 
-        const AerodynamicState_T<double> ads = compute_aerodynamic_state_T<double>(
-            twist,
-            windB
-        );
+        const AerodynamicState_T<double> ads = compute_aerodynamic_state_T<double>(twist, windB);
 
-        return AerodynamicState{ FreeStreamVelocity{ ads.Vinf }, AngleOfAttack{ ads.alpha }, SideslipAngle{ ads.beta } };
+        return { FreeStreamVelocity{ ads.Vinf }, AngleOfAttack{ ads.alpha }, SideslipAngle{ ads.beta } };
     }
 
 
@@ -183,7 +171,7 @@ namespace aerodynamics {
         CBS     <<   std::cos(a),   0,   std::sin(a),
                                0,   1,             0,
                     -std::sin(a),   0,    std::cos(a);
-        return dynamics::OrientationMatrix{ CBS };
+        return { CBS };
     };
 
     dynamics::OrientationMatrix CSW(const aerodynamics::SideslipAngle& beta) {
@@ -192,7 +180,7 @@ namespace aerodynamics {
         CSW     <<   std::cos(b),   std::sin(b),   0,
                     -std::sin(b),   std::cos(b),   0,
                                0,             0,   1;
-        return dynamics::OrientationMatrix{ CSW };
+        return { CSW };
     };
 
 

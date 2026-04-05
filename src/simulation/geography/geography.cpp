@@ -13,7 +13,7 @@ namespace geography {
         CEN     <<   -std::sin(lat) * std::cos(lon),  -std::sin(lat) * std::sin(lon),   std::cos(lat),
                                      -std::sin(lon),                   std::cos(lon),               0,
                      -std::cos(lat) * std::cos(lon),  -std::cos(lat) * std::sin(lon),  -std::sin(lat);
-        return dynamics::OrientationMatrix{ CEN };
+        return { CEN };
     };
 
     geography::GeographicState lat_lon_alt_from_pE(const dynamics::Position & pE) {
@@ -33,13 +33,13 @@ namespace geography {
         // Altitude above the spherical Earth (meters)
         Altitude alt{ r - constants::r_earth };
 
-        return geography::GeographicState{ lat, lon, alt };
+        return { lat, lon, alt };
     }
 
-    dynamics::Position pE_from_lat_lon_alt(const geography::GeographicState& geographicState) {
-        double lat = geographicState.lat.data;   // [rad]
-        double lon = geographicState.lon.data;   // [rad]
-        double alt = geographicState.alt.data;   // [m]
+    dynamics::Position pE_from_lat_lon_alt(const geography::GeographicState& geographic_state) {
+        double lat = geographic_state.lat.data;   // [rad]
+        double lon = geographic_state.lon.data;   // [rad]
+        double alt = geographic_state.alt.data;   // [m]
 
         double r = constants::r_earth + alt;
 
@@ -53,24 +53,48 @@ namespace geography {
         double z = r * sin_lat;
         Eigen::Vector3d p(x, y, z);
 
-        return dynamics::Position{ p };
+        return { p };
     }
 
-    dynamics::Gravity gE(const dynamics::Position& pE){ return dynamics::Gravity{ -constants::g_earth * pE.data.normalized() }; }
-    dynamics::Gravity gN() { return dynamics::Gravity{ Eigen::Vector3d(0, 0, constants::g_earth) }; };
+    dynamics::Gravity gE(const dynamics::Position& pE){ 
+        return { -constants::g_earth * pE.data.normalized() }; 
+    }
+    dynamics::Gravity gN() { 
+        return { Eigen::Vector3d(0, 0, constants::g_earth) }; 
+    };
 
-    dynamics::Gravity gB(const dynamics::Position& pE, const dynamics::HomogenousFrameTransformationMatrix& HEB) { return dynamics::Gravity{ HEB.C().data * geography::gE(HEB.p()).data }; };
-    dynamics::Gravity gB(const dynamics::Position& pE, const dynamics::OrientationMatrix& CEB) { return dynamics::Gravity{ CEB.data * geography::gE(pE).data }; };
-    dynamics::Gravity gB(const dynamics::Position& pE, const dynamics::OrientationQuaternion& qEB) { return dynamics::Gravity{ transforms::quat_to_rot(qEB.data) * geography::gE(pE).data }; };
-    dynamics::Gravity gB(const dynamics::Position& pE, const dynamics::EulerAngles& eulEB) { return dynamics::Gravity{ transforms::eul_to_C(eulEB.psi(), eulEB.theta(), eulEB.phi(), "ZYX", "intr") * geography::gE(pE).data }; };
+    dynamics::Gravity gB(const dynamics::Position& pE, const dynamics::HomogenousFrameTransformationMatrix& HEB) { 
+        return { HEB.C().data * geography::gE(HEB.p()).data }; 
+    };
+    dynamics::Gravity gB(const dynamics::Position& pE, const dynamics::OrientationMatrix& CEB) { 
+        return { CEB.data * geography::gE(pE).data }; 
+    };
+    dynamics::Gravity gB(const dynamics::Position& pE, const dynamics::OrientationQuaternion& qEB) { 
+        return { transforms::quat_to_rot(qEB.data) * geography::gE(pE).data }; 
+    };
+    dynamics::Gravity gB(const dynamics::Position& pE, const dynamics::EulerAngles& eulEB) { 
+        return { transforms::eul_to_C(eulEB.psi(), eulEB.theta(), eulEB.phi(), "ZYX", "intr") * geography::gE(pE).data }; 
+    };
 
-    dynamics::Gravity gB(const dynamics::HomogenousFrameTransformationMatrix& HNB) { return dynamics::Gravity{ HNB.C().data * geography::gN().data }; };
-    dynamics::Gravity gB(const dynamics::OrientationMatrix& CNB) { return dynamics::Gravity{ CNB.data * geography::gN().data }; };
-    dynamics::Gravity gB(const dynamics::OrientationQuaternion& qNB) { return dynamics::Gravity{ transforms::quat_to_rot(qNB.data) * geography::gN().data }; };
-    dynamics::Gravity gB(const dynamics::EulerAngles& eulNB) { return dynamics::Gravity{ transforms::eul_to_C(eulNB.psi(), eulNB.theta(), eulNB.phi(), "ZYX", "intr") * geography::gN().data }; };
+    dynamics::Gravity gB(const dynamics::HomogenousFrameTransformationMatrix& HNB) { 
+        return { HNB.C().data * geography::gN().data }; 
+    };
+    dynamics::Gravity gB(const dynamics::OrientationMatrix& CNB) {
+        return { CNB.data * geography::gN().data };
+    };
+    dynamics::Gravity gB(const dynamics::OrientationQuaternion& qNB) { 
+        return { transforms::quat_to_rot(qNB.data) * geography::gN().data }; 
+    };
+    dynamics::Gravity gB(const dynamics::EulerAngles& eulNB) { 
+        return { transforms::eul_to_C(eulNB.psi(), eulNB.theta(), eulNB.phi(), "ZYX", "intr") * geography::gN().data }; 
+    };
 
-    dynamics::Gravity gS(const dynamics::Gravity& gB, const dynamics::OrientationMatrix& CBS) { return dynamics::Gravity{ CBS.data * gB.data }; };
-    dynamics::Gravity gW(const dynamics::Gravity& gS, const dynamics::OrientationMatrix& CSW) { return dynamics::Gravity{ CSW.data * gS.data }; };
+    dynamics::Gravity gS(const dynamics::Gravity& gB, const dynamics::OrientationMatrix& CBS) { 
+        return { CBS.data * gB.data }; 
+    };
+    dynamics::Gravity gW(const dynamics::Gravity& gS, const dynamics::OrientationMatrix& CSW) { 
+        return { CSW.data * gS.data }; 
+    };
 
 
 

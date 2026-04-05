@@ -7,6 +7,7 @@
 #include "simulation/control/control.hpp"
 #include "simulation/geography/geography.hpp"
 #include "simulation/atmospheric/atmospheric.hpp"
+#include "simulation/avionics/avionics.hpp"
 
 
 
@@ -203,11 +204,13 @@ namespace vehicles {
         structural::StructuralProperties structural_properties;
         aerodynamics::AerodynamicProperties aerodynamic_properties;
         control::ControlProperties control_properties;
+        avionics::AvionicsProperties avionics_properties;
 
         Aircraft(
             const structural::StructuralProperties& structural_properties,
             const aerodynamics::AerodynamicProperties& aerodynamic_properties,
-            const control::ControlProperties& control_properties
+            const control::ControlProperties& control_properties,
+            const avionics::AvionicsProperties& avionics_properties
         );
 
         /** @warning The parent of F must be an inertial frame: ECEFFrame or NEDFrameECEF */
@@ -231,8 +234,8 @@ namespace vehicles {
         void _step_dependents(frames::Frame& root);
         void _step_dependent(frames::Frame& F);
         void _step_gravity();
-
         void _init_frames();
+        void _sense();
 
         /** @deprecated */
         // void _set(const dynamics::RigidBodyState& rigidBodyState, frames::Frame& F);

@@ -56,11 +56,32 @@ namespace autopilot { // to encompass autonomy and trim
         if (options.min_step_scale <= 0.0 || options.min_step_scale > 1.0) throw std::invalid_argument("autopilot::_validate_trim_solve_options: min_step_scale must be in (0, 1]");
     }
 
+    static dynamics::Wrench _compute_trim_wrench(const TrimState<double>& x, const TrimInput<double>& u, const TrimModel& model, const TrimConditions& conditions) {
+        const dynamics::Twist_T<double> twist = _build_twist_from_trim_T<double>(x);
+        const aerodynamics::ControlSurfaceInputs_T<double> controls = _build_control_surface_inputs_from_trim_T<double>(u, model.fixed_controls);
+        const aerodynamics::AerodynamicLoad_T<double> aero = aerodynamics::step_aero_forces_moments_T<double>(
+            model.aerodynamic,
+            model.structural,
+            twist,
+            conditions.rho,
+            controls,
+            model.control,
+            conditions.windB,
+            false
+        );
+
+        return {
+            .F = dynamics::Force{ aero.F + model.structural.Mass.data * _gB_T<double>(x.phi, x.theta) },
+            .M = dynamics::Moment{ aero.M },
+        };
+    }
+
     static TrimSolution _build_trim_solution(const TrimVariableVector_T<double>& z, const TrimResidualVector_T<double>& residual, const TrimModel& model, const TrimConditions& conditions, bool converged, std::size_t iterations) {
         TrimSolution out;
         out.state = unpack_trim_state_T<double>(z);
         out.input = _unpack_trim_solver_input_T<double>(z, model.control.limits);
         out.conditions = conditions;
+        out.wrench = _compute_trim_wrench(out.state, out.input, model, out.conditions);
         out.variables = pack_trim_variables_T<double>(out.state, out.input);
         out.attempted = true;
         out.converged = converged;
@@ -230,6 +251,8 @@ namespace autopilot { // to encompass autonomy and trim
         out << "trim_sol.input.elevator_deg: " << util::rad_to_deg(trim_sol.input.elevator) << "\n";
         out << "trim_sol.input.aileron_deg: " << util::rad_to_deg(trim_sol.input.aileron) << "\n";
         out << "trim_sol.input.rudder_deg: " << util::rad_to_deg(trim_sol.input.rudder) << "\n";
+        out << "trim_sol.wrench.F: [" << trim_sol.wrench.F.data.x() << ", " << trim_sol.wrench.F.data.y() << ", " << trim_sol.wrench.F.data.z() << "]\n";
+        out << "trim_sol.wrench.M: [" << trim_sol.wrench.M.data.x() << ", " << trim_sol.wrench.M.data.y() << ", " << trim_sol.wrench.M.data.z() << "]\n";
         out << "trim_sol.residual:\n"
             << "vx_dot: " << trim_sol.residual.vx_dot << "\n"
             << "vy_dot: " << trim_sol.residual.vy_dot << "\n"
@@ -260,9 +283,9 @@ namespace autopilot { // to encompass autonomy and trim
                 .w = dynamics::AngularVelocity{ Eigen::Vector3d(trim_sol.state.p, trim_sol.state.q, trim_sol.state.r) },
             };
 
-            aerodynamics::AerodynamicState ads_trim = aerodynamics::compute_aerodynamic_state(xN_t_trim, trim_sol.conditions.windB);
+            aerodynamics::AerodynamicState ads_t_trim = aerodynamics::compute_aerodynamic_state(xN_t_trim, trim_sol.conditions.windB);
 
-        return { xN_t_trim, ads_trim };
+        return { xN_t_trim, ads_t_trim };
     }
 
 }

@@ -1,3 +1,4 @@
+#include <cmath>
 #include <iomanip>
 #include <filesystem>
 #include <fstream>
@@ -7,10 +8,15 @@
 #include <optional>
 #include <Eigen/Dense>
 #include "core/io/io.hpp"
+#include "simulation/aerodynamics/aerodynamics.hpp"
+#include "simulation/control/control.hpp"
+#include "simulation/structural/structural.hpp"
+#include "simulation/vehicles/vehicles.hpp"
+#include "simulation/avionics/avionics.hpp"
 
 namespace io {
 
-    Eigen::Vector3d parse_vector3d(const nlohmann::json& values) {
+    Eigen::Vector3d parse_Vector3d(const nlohmann::json& values) {
         if (!values.is_array() || values.size() != 3) { throw std::runtime_error("expected a 3-element array"); }
 
         return Eigen::Vector3d(
@@ -20,7 +26,7 @@ namespace io {
         );
     }
 
-    Eigen::Vector4d parse_vector4d(const nlohmann::json& values) {
+    Eigen::Vector4d parse_Vector4d(const nlohmann::json& values) {
         if (!values.is_array() || values.size() != 4) { throw std::runtime_error("expected a 4-element array"); }
 
         return Eigen::Vector4d(
@@ -31,7 +37,7 @@ namespace io {
         );
     }
 
-    Eigen::Matrix3d parse_matrix3d(const nlohmann::json& values) {
+    Eigen::Matrix3d parse_Matrix3d(const nlohmann::json& values) {
         if (!values.is_array() || values.size() != 3) { throw std::runtime_error("expected a 3x3 array"); }
 
         Eigen::Matrix3d out;
@@ -47,7 +53,7 @@ namespace io {
         return out;
     }
 
-    Eigen::Matrix4d parse_matrix4d(const nlohmann::json& values) {
+    Eigen::Matrix4d parse_Matrix4d(const nlohmann::json& values) {
         if (!values.is_array() || values.size() != 4) { throw std::runtime_error("expected a 4x4 array"); }
 
         Eigen::Matrix4d out;
@@ -63,8 +69,8 @@ namespace io {
         return out;
     }
 
-    Eigen::Quaterniond parse_quaterniond(const nlohmann::json& values) {
-        const Eigen::Vector4d q = parse_vector4d(values);
+    Eigen::Quaterniond parse_Quaterniond(const nlohmann::json& values) {
+        const Eigen::Vector4d q = parse_Vector4d(values);
         return Eigen::Quaterniond(q(0), q(1), q(2), q(3));
     }
 
@@ -72,37 +78,37 @@ namespace io {
         ParsedStepOptions fields;
 
         if (frame_json.contains("H")) {
-            fields.H = dynamics::HomogenousFrameTransformationMatrix{ parse_matrix4d(frame_json.at("H")) };
+            fields.H = dynamics::HomogenousFrameTransformationMatrix{ parse_Matrix4d(frame_json.at("H")) };
         }
         if (frame_json.contains("C")) {
-            fields.C = dynamics::OrientationMatrix{ parse_matrix3d(frame_json.at("C")) };
+            fields.C = dynamics::OrientationMatrix{ parse_Matrix3d(frame_json.at("C")) };
         }
         if (frame_json.contains("p")) {
-            fields.p = dynamics::Position{ parse_vector3d(frame_json.at("p")) };
+            fields.p = dynamics::Position{ parse_Vector3d(frame_json.at("p")) };
         }
         if (frame_json.contains("q")) {
-            fields.q = dynamics::OrientationQuaternion{ parse_quaterniond(frame_json.at("q")) };
+            fields.q = dynamics::OrientationQuaternion{ parse_Quaterniond(frame_json.at("q")) };
         }
         if (frame_json.contains("eul")) {
-            fields.eul = dynamics::EulerAngles{ parse_vector3d(frame_json.at("eul")) };
+            fields.eul = dynamics::EulerAngles{ parse_Vector3d(frame_json.at("eul")) };
         }
         if (frame_json.contains("C_dot")) {
-            fields.C_dot = dynamics::OrientationMatrixRate{ parse_matrix3d(frame_json.at("C_dot")) };
+            fields.C_dot = dynamics::OrientationMatrixRate{ parse_Matrix3d(frame_json.at("C_dot")) };
         }
         if (frame_json.contains("q_dot")) {
-            fields.q_dot = dynamics::OrientationQuaternionRate{ parse_quaterniond(frame_json.at("q_dot")) };
+            fields.q_dot = dynamics::OrientationQuaternionRate{ parse_Quaterniond(frame_json.at("q_dot")) };
         }
         if (frame_json.contains("w")) {
-            fields.w = dynamics::AngularVelocity{ parse_vector3d(frame_json.at("w")) };
+            fields.w = dynamics::AngularVelocity{ parse_Vector3d(frame_json.at("w")) };
         }
         if (frame_json.contains("eul_dot")) {
-            fields.eul_dot = dynamics::EulerAngleRates{ parse_vector3d(frame_json.at("eul_dot")) };
+            fields.eul_dot = dynamics::EulerAngleRates{ parse_Vector3d(frame_json.at("eul_dot")) };
         }
         if (frame_json.contains("wq")) {
-            fields.wq = dynamics::AngularVelocityQuaternion{ parse_quaterniond(frame_json.at("wq")) };
+            fields.wq = dynamics::AngularVelocityQuaternion{ parse_Quaterniond(frame_json.at("wq")) };
         }
         if (frame_json.contains("v")) {
-            fields.v = dynamics::LinearVelocity{ parse_vector3d(frame_json.at("v")) };
+            fields.v = dynamics::LinearVelocity{ parse_Vector3d(frame_json.at("v")) };
         }
         if (frame_json.contains("lat")) {
             fields.lat = geography::Latitude{ util::deg_to_rad(frame_json.at("lat").get<double>()) };
@@ -125,7 +131,7 @@ namespace io {
 
     vehicles::NEDFrameECEFStepOptions parse_NEDFrameECEF_step_options(const nlohmann::json& frame_json) {
         const ParsedStepOptions fields = parse_step_options(frame_json);
-        return vehicles::NEDFrameECEFStepOptions{
+        return {
             .lat_NE = fields.lat,
             .lon_NE = fields.lon,
             .alt_NE = fields.alt,
@@ -134,7 +140,7 @@ namespace io {
 
     vehicles::FRDFrameECEFStepOptions parse_FRDFrameECEF_step_options(const nlohmann::json& frame_json) {
         const ParsedStepOptions fields = parse_step_options(frame_json);
-        return vehicles::FRDFrameECEFStepOptions{
+        return {
             .HEB = fields.H,
             .CEB = fields.C,
             .pE_BE = fields.p,
@@ -154,7 +160,7 @@ namespace io {
 
     vehicles::FRDFrameNEDStepOptions parse_FRDFrameNED_step_options(const nlohmann::json& frame_json) {
         const ParsedStepOptions fields = parse_step_options(frame_json);
-        return vehicles::FRDFrameNEDStepOptions{
+        return {
             .HNB = fields.H,
             .CNB = fields.C,
             .pN_BN = fields.p,
@@ -171,20 +177,20 @@ namespace io {
 
     vehicles::STABFrameFRDStepOptions parse_STABFrameFRD_step_options(const nlohmann::json& frame_json) {
         const ParsedStepOptions fields = parse_step_options(frame_json);
-        return vehicles::STABFrameFRDStepOptions{
+        return {
             .alpha = fields.alpha,
         };
     }
 
     vehicles::WINDFrameSTABStepOptions parse_WINDFrameSTAB_step_options(const nlohmann::json& frame_json) {
         const ParsedStepOptions fields = parse_step_options(frame_json);
-        return vehicles::WINDFrameSTABStepOptions{
+        return {
             .beta = fields.beta,
         };
     }
 
     aerodynamics::DynamicDerivatives parse_dynamic_derivatives(const nlohmann::json& dyn_json) {
-        return aerodynamics::DynamicDerivatives{
+        return {
             .CL_qhat = dyn_json.value("CL_qhat", 0.0),
             .CD_qhat = dyn_json.value("CD_qhat", 0.0),
             .CM_qhat = dyn_json.value("CM_qhat", 0.0),
@@ -198,7 +204,7 @@ namespace io {
     }
 
     aerodynamics::ControlDerivatives parse_control_derivatives(const nlohmann::json& ctrl_json) {
-        return aerodynamics::ControlDerivatives{
+        return {
             .dCL_de = ctrl_json.value("dCL_de", 0.0),
             .dCM_de = ctrl_json.value("dCM_de", 0.0),
             .dCD_de = ctrl_json.value("dCD_de", 0.0),
@@ -218,7 +224,7 @@ namespace io {
     }
 
     control::ControlSurfaceLimits parse_control_surface_limits(const nlohmann::json& limits_json) {
-        return control::ControlSurfaceLimits{
+        return {
             .elevator_max = util::deg_to_rad(limits_json.value("elevator_max", 0.0)),
             .aileron_max = util::deg_to_rad(limits_json.value("aileron_max", 0.0)),
             .rudder_max = util::deg_to_rad(limits_json.value("rudder_max", 0.0)),
@@ -235,6 +241,23 @@ namespace io {
         }
 
         return control_properties;
+    }
+
+    template <typename SensorType>
+    SensorType parse_sensor_config(const nlohmann::json& cfg, const std::string& key) {
+        const auto& sensor_json = cfg.at(key);
+
+        SensorType sensor{ avionics::Sensor{
+            sensor_json.value("mean", 0.0),
+            sensor_json.value("stddev", 0.0)
+            // sensor_json.value("bias", 0.0)
+        } };
+
+        sensor.tau = sensor_json.value("tau", constants::eps);
+        if (sensor.tau <= constants::eps) { sensor.tau = constants::eps; }
+        sensor.alpha = 1.0 - std::exp(-constants::dt / sensor.tau);
+
+        return sensor;
     }
 
     nlohmann::json read_json_file(const std::filesystem::path& path) {
@@ -414,8 +437,8 @@ namespace io {
                 .id = surface_json.at("id").get<std::string>(),
                 .chord = surface_json.at("chord").get<double>(),
                 .span = surface_json.at("span").get<double>(),
-                .p_ref = parse_vector3d(surface_json.at("p_ref")),
-                .n = parse_vector3d(surface_json.at("n")),
+                .p_ref = parse_Vector3d(surface_json.at("p_ref")),
+                .n = parse_Vector3d(surface_json.at("n")),
                 .CL0 = surface_json.at("CL0").get<double>(),
                 .e = surface_json.at("e").get<double>(),
                 .i = surface_json.at("i").get<double>(),
@@ -497,6 +520,36 @@ namespace io {
 
         return structural::StructuralProperties{ geometries };
     }
+
+    avionics::AvionicsProperties parse_avionics_config() { 
+        const auto avionics_cfg_path = resolve_run_config_entry_path("avionics_config");
+        const auto cfg = read_json_file(avionics_cfg_path);
+
+        avionics::AvionicsSensors sensors = {
+            .aoa_vane = parse_sensor_config<avionics::AngleOfAttackVane>(cfg, "AngleOfAttackVane"),
+            .accelerometer = parse_sensor_config<avionics::Accelerometer>(cfg, "Accelerometer"),
+            .gyro = parse_sensor_config<avionics::Gyroscope>(cfg, "Gyroscope"),
+            .pitot_tube = parse_sensor_config<avionics::PitotTube>(cfg, "PitotTube"),
+            .static_port = parse_sensor_config<avionics::StaticPort>(cfg, "StaticPort"),
+            .tat_probe = parse_sensor_config<avionics::TotalAirTemperatureProbe>(cfg, "TotalAirTemperatureProbe"),
+            .gnss = parse_sensor_config<avionics::GNSSReceiver>(cfg, "GNSSReceiver"),
+            .magnetometer = parse_sensor_config<avionics::Magnetometer>(cfg, "Magnetometer"),
+        };
+
+        avionics::AvionicsComputers computers = {
+            .ADC = {},
+            .AHRS = {},
+            .INS = {},
+        };
+
+        return {
+            .sensors = sensors,
+            .computers = computers,
+            .hist = {},
+            .cache = {}
+        };
+    }
+
 
     DataMatrix::DataMatrix(const Eigen::MatrixXd& d) : data(d), n_rows(static_cast<int>(data.rows())), n_cols(static_cast<int>(data.cols())) {};
 

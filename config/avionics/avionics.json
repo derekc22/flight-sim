@@ -1,0 +1,42 @@
+{
+    "AngleOfAttackVane": {
+        "mean": 0.0,
+        "stddev": 0.0087,
+        "tau": 0.05
+    },
+    "Accelerometer": {
+        "mean": 0.0,
+        "stddev": 0.05,
+        "tau": 0.01
+    },
+    "Gyroscope": {
+        "mean": 0.0,
+        "stddev": 0.002,
+        "tau": 0.005
+    },
+    "PitotTube": {
+        "mean": 0.0,
+        "stddev": 15.0,
+        "tau": 0.03
+    },
+    "StaticPort": {
+        "mean": 0.0,
+        "stddev": 10.0,
+        "tau": 0.1
+    },
+    "TotalAirTemperatureProbe": {
+        "mean": 0.0,
+        "stddev": 0.5,
+        "tau": 1.5
+    },
+    "GNSSReceiver": {
+        "mean": 0.0,
+        "stddev": 2.5,
+        "tau": 0.2
+    },
+    "Magnetometer": {
+        "mean": 0.0,
+        "stddev": 0.5,
+        "tau": 0.02
+  }
+}

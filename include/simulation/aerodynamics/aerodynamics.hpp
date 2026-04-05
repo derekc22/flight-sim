@@ -61,27 +61,27 @@ namespace aerodynamics {
     };
 
     struct ControlDerivatives {
-        // Let u > 0 -> pitch up, u < 0 -> pitch down
+        // Define u > 0 -> pitch up, u < 0 -> pitch down
         double dCL_de = 0.0;    // dCL_de < 0
         double dCM_de = 0.0;    // dCM_de > 0
         double dCD_de = 0.0;    // dCD_de > 0
 
-        // Let u > 0 -> roll right, u < 0 -> roll left
+        // Define u > 0 -> roll right, u < 0 -> roll left
         double dCL_da = 0.0;    // dCL_da_right < 0, dCL_da_left > 0
         double dCM_da = 0.0;    // dCM_da_right ≈ 0, dCM_da_left ≈ 0
         double dCD_da = 0.0;    // dCD_da_right > 0, dCD_da_left > 0
 
-        // Let u > 0 -> yaw right, u < 0 -> yaw left
+        // Define u > 0 -> yaw right, u < 0 -> yaw left
         double dCL_dr = 0.0;    // dCL_dr < 0
         double dCM_dr = 0.0;    // dCM_dr > 0
         double dCD_dr = 0.0;    // dCD_dr > 0
 
-        // Let u > 0 -> flaps deployed
+        // Define u > 0 -> flaps deployed
         double dCL_df = 0.0;    // dCL_df > 0
         double dCM_df = 0.0;    // dCM_df < 0
         double dCD_df = 0.0;    // dCD_df > 0
 
-        // Let u > 0 -> spoilers deployed
+        // Define u > 0 -> spoilers deployed
         double dCL_ds = 0.0;    // dCL_ds < 0
         double dCM_ds = 0.0;    // dCM_ds ≈ 0
         double dCD_ds = 0.0;    // dCD_ds > 0

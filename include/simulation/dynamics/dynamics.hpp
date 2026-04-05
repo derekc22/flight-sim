@@ -125,7 +125,7 @@ namespace dynamics {
     };
 
     struct VerticalSpeed {
-        double data;   // pB_BI_dot_z [m/s]
+        double data;   // alt_BE_dot [m/s]
     };
 
     struct Force {
@@ -133,7 +133,7 @@ namespace dynamics {
     };
 
     struct SpecificForce {
-        Eigen::Vector3d data; // F/m [N/kg=ms^-2]
+        Eigen::Vector3d data; // F/m [ms^-2]
     };
 
     struct Gravity {
@@ -225,9 +225,11 @@ namespace dynamics {
 
     EulerAngleRates _wB_BI_to_eul_dot(const AngularVelocity& wB_BI, const EulerAngles& eul);
     Position _trans_kin(const Position& xt, const LinearVelocity& xt_dot, const LinearAcceleration& xt_ddot);
+    LinearVelocity _trans_kin_vel(const LinearVelocity& xt_dot, const LinearAcceleration& xt_ddot);
     EulerAngles _eul_kin(const EulerAngles& eul_t, const EulerAngleRates& eul_dot_t);
 
     OrientationMatrixRate _ddt_CIB(const OrientationMatrix& CIB, const AngularVelocity& wB_BI);
+    OrientationMatrixRate _ddt_CBI(const OrientationMatrix& CBI, const AngularVelocity& wB_BI);
     OrientationMatrix _rot_kin(const OrientationMatrix& CIB_t, const AngularVelocity& wB_BI_t);
     OrientationQuaternion _quat_kin(const OrientationQuaternion& qIB_t, const AngularVelocity& wB_BI_t);
     OrientationQuaternionRate _quat_kin_vel(const OrientationQuaternion& qIB_t, const AngularVelocity& wB_BI_t);

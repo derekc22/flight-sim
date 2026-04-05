@@ -132,6 +132,7 @@ namespace autopilot { // to encompass autonomy and trim
         TrimState<double> state;
         TrimInput<double> input;
         TrimConditions conditions;
+        dynamics::Wrench wrench{};
         TrimResidual<double> residual;
         TrimVariableVector_T<double> variables = TrimVariableVector_T<double>::Zero();
         bool attempted = false;

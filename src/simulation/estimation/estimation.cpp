@@ -54,7 +54,7 @@ namespace estimation {
 
         Eigen::MatrixXd Pt1_bar = A * Pt * A.transpose() + Rt;
 
-        return KalmanState { xt1_bar, Pt1_bar };
+        return { xt1_bar, Pt1_bar };
     }
 
     KalmanState KalmanFilter::_correct(const KalmanState& pred, const Eigen::VectorXd& zt) {
@@ -72,7 +72,7 @@ namespace estimation {
         xt = xt1;
         Pt = Pt1;
 
-        return KalmanState{ xt1, Pt1 };
+        return { xt1, Pt1 };
     }
 
     KalmanState KalmanFilter::step(const Eigen::VectorXd& zt, const Eigen::VectorXd& u) {

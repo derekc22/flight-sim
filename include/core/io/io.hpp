@@ -9,14 +9,15 @@
 #include "simulation/control/control.hpp"
 #include "simulation/structural/structural.hpp"
 #include "simulation/vehicles/vehicles.hpp"
+#include "simulation/avionics/avionics.hpp"
 
 namespace io {
 
-    Eigen::Vector3d parse_vector3d(const nlohmann::json& values);
-    Eigen::Vector4d parse_vector4d(const nlohmann::json& values);
-    Eigen::Matrix3d parse_matrix3d(const nlohmann::json& values);
-    Eigen::Matrix4d parse_matrix4d(const nlohmann::json& values);
-    Eigen::Quaterniond parse_quaterniond(const nlohmann::json& values);
+    Eigen::Vector3d parse_Vector3d(const nlohmann::json& values);
+    Eigen::Vector4d parse_Vector4d(const nlohmann::json& values);
+    Eigen::Matrix3d parse_Matrix3d(const nlohmann::json& values);
+    Eigen::Matrix4d parse_Matrix4d(const nlohmann::json& values);
+    Eigen::Quaterniond parse_Quaterniond(const nlohmann::json& values);
 
     struct ParsedStepOptions {
         std::optional<dynamics::HomogenousFrameTransformationMatrix> H;
@@ -52,6 +53,7 @@ namespace io {
     nlohmann::json read_json_file(const std::filesystem::path& path);
     std::filesystem::path resolve_config_path(const std::filesystem::path& run_path, const std::string& config_path);
     std::filesystem::path resolve_run_config_entry_path(const std::string& key);
+
     void _validate_init_options_config(const nlohmann::json& cfg, bool trim_bool);
     void _validate_NEDFrameECEF_init_options_config(const nlohmann::json& frame_json);
     void _validate_FRDFrameECEF_init_options_config(const nlohmann::json& frame_json);
@@ -63,10 +65,12 @@ namespace io {
     void write_json(const nlohmann::json& cfg, const std::string& dir, const std::string& fname);
     void dump_configs(const std::string& dir);
     void save_vector_to_file(std::vector<int>& data, std::string fname);
+
     aerodynamics::AerodynamicProperties parse_aerodynamics_config();
     control::ControlProperties parse_control_config();
     vehicles::StepOptions parse_init_options_config(bool trim_enabled);
     structural::StructuralProperties parse_structural_config();
+    avionics::AvionicsProperties parse_avionics_config();
 
     struct DataMatrix {
         Eigen::MatrixXd data;
