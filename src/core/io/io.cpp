@@ -74,6 +74,16 @@ namespace io {
         return Eigen::Quaterniond(q(0), q(1), q(2), q(3));
     }
 
+    double parse_sensor_scalar_bias(const nlohmann::json& sensor_json) {
+        if (!sensor_json.contains("bias")) { return 0.0; }
+        return sensor_json.at("bias").get<double>();
+    }
+
+    Eigen::Vector3d parse_sensor_3d_bias(const nlohmann::json& sensor_json) {
+        if (!sensor_json.contains("bias")) { return constants::Zero3; }
+        return parse_Vector3d(sensor_json.at("bias"));
+    }
+
     ParsedStepOptions parse_step_options(const nlohmann::json& frame_json) {
         ParsedStepOptions fields;
 
@@ -233,11 +243,144 @@ namespace io {
         };
     }
 
+    template <typename ControllerType>
+    control::ControlLaw make_stateful_control_law(const control::ControlLawParameters& params) {
+        return [controller = ControllerType(params)](double meas, double meas_dot, double setpoint) mutable {
+            return controller._step(meas, meas_dot, setpoint);
+        };
+    }
+
+    Eigen::VectorXd parse_control_gains(const nlohmann::json& gains_json, const std::string& control_type) {
+        Eigen::VectorXd gains = Eigen::VectorXd::Zero(3);
+
+        if (gains_json.is_array()) {
+            if (gains_json.size() > 3) { throw std::runtime_error("io::parse_control_gains expected at most 3 gains"); }
+            for (int i = 0; i < static_cast<int>(gains_json.size()); ++i) {
+                gains[i] = gains_json.at(i).get<double>();
+            }
+            return gains;
+        }
+
+        if (!gains_json.is_number()) { throw std::runtime_error("io::parse_control_gains expected number or array"); }
+
+        const double gain = gains_json.get<double>();
+        gains[0] = gain;
+        return gains;
+    }
+
+    control::ControlLawParameters parse_control_law_parameters(const nlohmann::json& controller_json, const std::string& control_type, double ctrl_surface_max) {
+        return {
+            .gains = parse_control_gains(controller_json.at("gains"), control_type),
+            .ctrl_surface_max = ctrl_surface_max,
+            .ctrl_surface_min = -ctrl_surface_max,
+        };
+    }
+
+    control::ControlLaw make_control_law(const std::string& control_type, const control::ControlLawParameters& params) {
+        if (control_type == "RollPIDController") { return make_stateful_control_law<control::RollPIDController>(params); }
+        if (control_type == "PitchPIDController") { return make_stateful_control_law<control::PitchPIDController>(params); }
+        if (control_type == "YawPIDController") { return make_stateful_control_law<control::YawPIDController>(params); }
+        if (control_type == "RollDamper") { return make_stateful_control_law<control::RollDamper>(params); }
+        if (control_type == "PitchDamper") { return make_stateful_control_law<control::PitchDamper>(params); }
+        if (control_type == "YawDamper") { return make_stateful_control_law<control::YawDamper>(params); }
+        throw std::runtime_error("io::make_control_law unknown control type: " + control_type);
+    }
+
+    vehicles::_StepOptions to_step_options(const vehicles::FRDFrameNEDStepOptions& opts) {
+        return {
+            .H = opts.HNB,
+            .C = opts.CNB,
+            .p = opts.pN_BN,
+            .q = opts.qNB,
+            .eul = opts.eulNB,
+            .C_dot = opts.CNB_dot,
+            .q_dot = opts.qNB_dot,
+            .w = opts.wB_BN,
+            .eul_dot = opts.eulNB_dot,
+            .wq = opts.wq_BN,
+            .v = opts.vB_BN,
+            .rbs = opts.rbs_BN
+        };
+    }
+
+    frames::SetOptions to_set_options(const vehicles::FRDFrameNEDStepOptions& opts) {
+        frames::SetOptions set_opts{
+            .H = opts.HNB,
+            .C = opts.CNB,
+            .p = opts.pN_BN,
+            .q = opts.qNB,
+            .eul = opts.eulNB,
+            .C_dot = opts.CNB_dot,
+            .q_dot = opts.qNB_dot,
+            .w = opts.wB_BN,
+            .eul_dot = opts.eulNB_dot,
+            .wq = opts.wq_BN,
+            .v = opts.vB_BN
+        };
+
+        if (opts.rbs_BN.has_value()) {
+            set_opts.p = opts.rbs_BN->p;
+            set_opts.q = opts.rbs_BN->q;
+            set_opts.w = opts.rbs_BN->w;
+            set_opts.v = opts.rbs_BN->v;
+        }
+
+        return set_opts;
+    }
+
+    dynamics::RigidBodyState rigid_body_state(const frames::Frame& F) {
+        const frames::FrameView fv = F.view();
+        return {
+            .p = fv.H->p(),
+            .v = *fv.v,
+            .q = *fv.q,
+            .w = *fv.w
+        };
+    }
+
+    dynamics::RigidBodyState parse_control_target_state(const vehicles::FRDFrameNEDStepOptions& opts) {
+        frames::NEDFrameECEF ned_frame_fake;
+        frames::FRDFrameNED frd_frame_fake(&ned_frame_fake);
+
+        vehicles::_StepOptions::_validate(frd_frame_fake, to_step_options(opts));
+        frd_frame_fake.set(to_set_options(opts));
+        return rigid_body_state(frd_frame_fake);
+    }
+
+    void parse_axis_controller(const nlohmann::json& controllers_json, const std::string& key, double ctrl_surface_max, std::string& control_type, control::ControlLaw& controller) {
+        if (!controllers_json.contains(key)) { return; }
+
+        const auto& controller_json = controllers_json.at(key);
+        control_type = controller_json.at("control_type").get<std::string>();
+        controller = make_control_law(control_type, parse_control_law_parameters(controller_json, control_type, ctrl_surface_max));
+    }
+
     control::ControlProperties parse_control_properties(const nlohmann::json& control_json) {
-        control::ControlProperties control_properties{};
+        control::ControlProperties control_properties{
+            .xN_des_t = {
+                .p = dynamics::Position{ constants::Zero3 },
+                .v = dynamics::LinearVelocity{ constants::Zero3 },
+                .q = dynamics::OrientationQuaternion{ Eigen::Quaterniond::Identity() },
+                .w = dynamics::AngularVelocity{ constants::Zero3 },
+            },
+        };
 
         if (control_json.contains("control_surface_limits")) {
             control_properties.limits = parse_control_surface_limits(control_json.at("control_surface_limits"));
+        }
+
+        if (control_json.contains("controllers")) {
+            const auto& controllers_json = control_json.at("controllers");
+            control_properties.full_state = controllers_json.value("full_state", false);
+            parse_axis_controller(controllers_json, "longitudinal", control_properties.limits.aileron_max, control_properties.longitudinal_control_type, control_properties.longitudinal_controller);
+            parse_axis_controller(controllers_json, "lateral", control_properties.limits.elevator_max, control_properties.lateral_control_type, control_properties.lateral_controller);
+            parse_axis_controller(controllers_json, "vertical", control_properties.limits.rudder_max, control_properties.vertical_control_type, control_properties.vertical_controller);
+        }
+
+        if (control_json.contains("desired_FRDFrameNED")) {
+            _validate_FRDFrameNED_initialization_config(control_json.at("desired_FRDFrameNED"));
+            vehicles::FRDFrameNEDStepOptions target_opts = parse_FRDFrameNED_step_options(control_json.at("desired_FRDFrameNED"));
+            control_properties.xN_des_t = parse_control_target_state(target_opts);
         }
 
         return control_properties;
@@ -246,16 +389,20 @@ namespace io {
     template <typename SensorType>
     SensorType parse_sensor_config(const nlohmann::json& cfg, const std::string& key) {
         const auto& sensor_json = cfg.at(key);
+        const bool has_vector_bias = sensor_json.contains("bias") && sensor_json.at("bias").is_array();
+        const double bias = has_vector_bias ? 0.0 : parse_sensor_scalar_bias(sensor_json);
+        const Eigen::Vector3d bias_3d = has_vector_bias ? parse_sensor_3d_bias(sensor_json) : constants::Zero3;
 
         SensorType sensor{ avionics::Sensor{
             sensor_json.value("mean", 0.0),
-            sensor_json.value("stddev", 0.0)
-            // sensor_json.value("bias", 0.0)
+            sensor_json.value("stddev", 0.0),
+            bias,
+            bias_3d
         } };
 
         sensor.tau = sensor_json.value("tau", constants::eps);
         if (sensor.tau <= constants::eps) { sensor.tau = constants::eps; }
-        sensor.alpha = 1.0 - std::exp(-constants::dt / sensor.tau);
+        sensor.alpha = std::exp(-constants::dt / sensor.tau);
 
         return sensor;
     }
@@ -287,28 +434,28 @@ namespace io {
         return resolve_config_path(run_path, run_config.at(key).get<std::string>());
     }
 
-    void _validate_init_options_config(const nlohmann::json& cfg, bool trim_bool) {
-        if (!cfg.contains("NEDFrameECEF") && !cfg.contains("FRDFrameECEF")) { throw std::runtime_error("io::_validate_init_options_config: One of NEDFrameECEF, FRDFrameECEF required"); }
-        if (!cfg.contains("FRDFrameECEF") && !cfg.contains("FRDFrameNED")) { throw std::runtime_error("io::_validate_init_options_config: One of FRDFrameECEF, FRDFrameNED required"); }
-        if (cfg.contains("STABFrameFRD")) { throw std::runtime_error("io::_validate_init_options_config: STABFrameFRD initialization not allowed"); }
+    void _validate_initialization_config(const nlohmann::json& cfg, bool trim_bool) {
+        if (!cfg.contains("NEDFrameECEF") && !cfg.contains("FRDFrameECEF")) { throw std::runtime_error("io::_validate_initialization_config: One of NEDFrameECEF, FRDFrameECEF required"); }
+        if (!cfg.contains("FRDFrameECEF") && !cfg.contains("FRDFrameNED")) { throw std::runtime_error("io::_validate_initialization_config: One of FRDFrameECEF, FRDFrameNED required"); }
+        if (cfg.contains("STABFrameFRD")) { throw std::runtime_error("io::_validate_initialization_config: STABFrameFRD initialization not allowed"); }
         
-        if (!trim_bool && cfg.contains("WINDFrameSTAB")) { throw std::runtime_error("io::_validate_init_options_config: WINDFrameSTAB requires trim to be enabled"); }
-        if (trim_bool && !cfg.contains("WINDFrameSTAB")) { throw std::runtime_error("io::_validate_init_options_config: trim requires WINDFrameSTAB"); }
-        if (trim_bool && !cfg.contains("FRDFrameNED")) { throw std::runtime_error("io::_validate_init_options_config: FRDFrameNED required for trim"); }
+        if (!trim_bool && cfg.contains("WINDFrameSTAB")) { throw std::runtime_error("io::_validate_initialization_config: WINDFrameSTAB requires trim to be enabled"); }
+        if (trim_bool && !cfg.contains("WINDFrameSTAB")) { throw std::runtime_error("io::_validate_initialization_config: trim requires WINDFrameSTAB"); }
+        if (trim_bool && !cfg.contains("FRDFrameNED")) { throw std::runtime_error("io::_validate_initialization_config: FRDFrameNED required for trim"); }
 
-        if (cfg.contains("NEDFrameECEF")) { _validate_NEDFrameECEF_init_options_config(cfg.at("NEDFrameECEF")); }
-        if (cfg.contains("FRDFrameECEF")) { _validate_FRDFrameECEF_init_options_config(cfg.at("FRDFrameECEF")); }
-        if (cfg.contains("FRDFrameNED")) { _validate_FRDFrameNED_init_options_config(cfg.at("FRDFrameNED")); }
-        if (cfg.contains("WINDFrameSTAB")) { _validate_WINDFrameSTAB_init_options_config(cfg.at("WINDFrameSTAB")); }
+        if (cfg.contains("NEDFrameECEF")) { _validate_NEDFrameECEF_initialization_config(cfg.at("NEDFrameECEF")); }
+        if (cfg.contains("FRDFrameECEF")) { _validate_FRDFrameECEF_initialization_config(cfg.at("FRDFrameECEF")); }
+        if (cfg.contains("FRDFrameNED")) { _validate_FRDFrameNED_initialization_config(cfg.at("FRDFrameNED")); }
+        if (cfg.contains("WINDFrameSTAB")) { _validate_WINDFrameSTAB_initialization_config(cfg.at("WINDFrameSTAB")); }
     }
 
-    void _validate_NEDFrameECEF_init_options_config(const nlohmann::json& frame_json) {
+    void _validate_NEDFrameECEF_initialization_config(const nlohmann::json& frame_json) {
         const ParsedStepOptions fields = parse_step_options(frame_json);
 
-        if (!fields.lat.has_value() || !fields.lon.has_value() || !fields.alt.has_value()) { throw std::runtime_error("io::_validate_NEDFrameECEF_init_options_config: lat, lon, alt required"); }
+        if (!fields.lat.has_value() || !fields.lon.has_value() || !fields.alt.has_value()) { throw std::runtime_error("io::_validate_NEDFrameECEF_initialization_config: lat, lon, alt required"); }
     }
 
-    void _validate_FRDFrameECEF_init_options_config(const nlohmann::json& frame_json) {
+    void _validate_FRDFrameECEF_initialization_config(const nlohmann::json& frame_json) {
         const ParsedStepOptions fields = parse_step_options(frame_json);
 
         const bool has_H = fields.H.has_value();
@@ -332,13 +479,13 @@ namespace io {
         const bool has_linear_velocity = has_v;
         const bool has_angular_velocity = (has_C_dot || has_q_dot || has_w || has_eul_dot || has_wq);
 
-        if (!has_position) { throw std::runtime_error("io::_validate_FRDFrameECEF_init_options_config: one position representation required"); }
-        if (!has_orientation) { throw std::runtime_error("io::_validate_FRDFrameECEF_init_options_config: one orientation representation required"); }
-        if (!has_linear_velocity) { throw std::runtime_error("io::_validate_FRDFrameECEF_init_options_config: v required"); }
-        if (!has_angular_velocity) { throw std::runtime_error("io::_validate_FRDFrameECEF_init_options_config: one angular velocity representation required"); }
+        if (!has_position) { throw std::runtime_error("io::_validate_FRDFrameECEF_initialization_config: one position representation required"); }
+        if (!has_orientation) { throw std::runtime_error("io::_validate_FRDFrameECEF_initialization_config: one orientation representation required"); }
+        if (!has_linear_velocity) { throw std::runtime_error("io::_validate_FRDFrameECEF_initialization_config: v required"); }
+        if (!has_angular_velocity) { throw std::runtime_error("io::_validate_FRDFrameECEF_initialization_config: one angular velocity representation required"); }
     }
 
-    void _validate_FRDFrameNED_init_options_config(const nlohmann::json& frame_json) {
+    void _validate_FRDFrameNED_initialization_config(const nlohmann::json& frame_json) {
         const ParsedStepOptions fields = parse_step_options(frame_json);
 
         const bool has_H = fields.H.has_value();
@@ -358,16 +505,16 @@ namespace io {
         const bool has_linear_velocity = has_v;
         const bool has_angular_velocity = (has_C_dot || has_q_dot || has_w || has_eul_dot || has_wq);
 
-        if (!has_position) { throw std::runtime_error("io::_validate_FRDFrameNED_init_options_config: one position representation required"); }
-        if (!has_orientation) { throw std::runtime_error("io::_validate_FRDFrameNED_init_options_config: one orientation representation required"); }
-        if (!has_linear_velocity) { throw std::runtime_error("io::_validate_FRDFrameNED_init_options_config: v required"); }
-        if (!has_angular_velocity) { throw std::runtime_error("io::_validate_FRDFrameNED_init_options_config: one angular velocity representation required"); }
+        if (!has_position) { throw std::runtime_error("io::_validate_FRDFrameNED_initialization_config: one position representation required"); }
+        if (!has_orientation) { throw std::runtime_error("io::_validate_FRDFrameNED_initialization_config: one orientation representation required"); }
+        if (!has_linear_velocity) { throw std::runtime_error("io::_validate_FRDFrameNED_initialization_config: v required"); }
+        if (!has_angular_velocity) { throw std::runtime_error("io::_validate_FRDFrameNED_initialization_config: one angular velocity representation required"); }
     }
 
-    void _validate_WINDFrameSTAB_init_options_config(const nlohmann::json& frame_json) {
+    void _validate_WINDFrameSTAB_initialization_config(const nlohmann::json& frame_json) {
         const ParsedStepOptions fields = parse_step_options(frame_json);
 
-        if (!fields.beta.has_value()) { throw std::runtime_error("io::_validate_WINDFrameSTAB_init_options_config: beta required"); }
+        if (!fields.beta.has_value()) { throw std::runtime_error("io::_validate_WINDFrameSTAB_initialization_config: beta required"); }
     }
 
 
@@ -456,7 +603,7 @@ namespace io {
             });
         }
 
-        return aerodynamics::AerodynamicProperties{ surfaces };
+        return { surfaces };
     }
 
     control::ControlProperties parse_control_config() {
@@ -465,10 +612,10 @@ namespace io {
         return parse_control_properties(cfg);
     }
 
-    vehicles::StepOptions parse_init_options_config(bool trim_bool) {
+    vehicles::StepOptions parse_initialization_config(bool trim_bool) {
         const auto init_cfg_path = resolve_run_config_entry_path("initialization_config");
         const auto cfg = read_json_file(init_cfg_path);
-        _validate_init_options_config(cfg, trim_bool);
+        _validate_initialization_config(cfg, trim_bool);
 
         vehicles::StepOptions opts;
 
@@ -518,7 +665,7 @@ namespace io {
             });
         }
 
-        return structural::StructuralProperties{ geometries };
+        return { geometries };
     }
 
     avionics::AvionicsProperties parse_avionics_config() { 

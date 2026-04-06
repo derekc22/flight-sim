@@ -42,8 +42,8 @@ namespace transforms {
     */
     Eigen::Matrix3d Rz(double psi);
 
-    Eigen::Matrix3d eul_to_R_extr(double roll, double pitch, double yaw, const std::string& order);
-    Eigen::Matrix3d eul_to_R_intr(double roll, double pitch, double yaw, const std::string& order);
+    Eigen::Matrix3d _eul_to_R_extr(double roll, double pitch, double yaw, const std::string& order);
+    Eigen::Matrix3d _eul_to_R_intr(double roll, double pitch, double yaw, const std::string& order);
 
     Eigen::Vector3d R_to_eul_extr(const Eigen::Matrix3d& R, const std::string& order);
     Eigen::Vector3d R_to_eul_intr(const Eigen::Matrix3d& R, const std::string& order);
@@ -155,10 +155,10 @@ namespace transforms {
     Eigen::Matrix3d chain_rot_post(const std::vector<Eigen::Matrix3d>& rot_list);
     Eigen::Matrix3d chain_rot_pre(const std::vector<Eigen::Matrix3d>& rot_list);
 
-    Eigen::Quaterniond eul_to_quatR_extr(double a, double b, double c, const std::string& order);
-    Eigen::Quaterniond eul_to_quatR_intr(double a, double b, double c, const std::string& order);
-    Eigen::Quaterniond eul_to_quatC_extr(double a, double b, double c, const std::string& order);
-    Eigen::Quaterniond eul_to_quatC_intr(double a, double b, double c, const std::string& order);
+    Eigen::Quaterniond _eul_to_quatR_extr(double a, double b, double c, const std::string& order);
+    Eigen::Quaterniond _eul_to_quatR_intr(double a, double b, double c, const std::string& order);
+    Eigen::Quaterniond _eul_to_quatC_extr(double a, double b, double c, const std::string& order);
+    Eigen::Quaterniond _eul_to_quatC_intr(double a, double b, double c, const std::string& order);
 
     Eigen::Quaterniond qx(double phi);
     Eigen::Quaterniond qy(double theta);
@@ -171,8 +171,8 @@ namespace transforms {
 
     Eigen::Vector3d quatR_to_eul_extr(const Eigen::Quaterniond& q, const std::string& order);
     Eigen::Vector3d quatR_to_eul_intr(const Eigen::Quaterniond& q, const std::string& order);
-    Eigen::Vector3d quatC_to_eul_extr(const Eigen::Quaterniond& q, const std::string& order);
-    Eigen::Vector3d quatC_to_eul_intr(const Eigen::Quaterniond& q, const std::string& order);
+    Eigen::Vector3d _quatC_to_eul_extr(const Eigen::Quaterniond& q, const std::string& order);
+    Eigen::Vector3d _quatC_to_eul_intr(const Eigen::Quaterniond& q, const std::string& order);
 
     // Eigen::Vector3d active_quat(const Eigen::Quaterniond& q, const Eigen::Vector3d& v);
     // Eigen::Vector3d passive_quat(const Eigen::Quaterniond& q, const Eigen::Vector3d& v);
@@ -185,10 +185,10 @@ namespace transforms {
     Eigen::Matrix4d _make_HR_translate_first(const Eigen::Matrix3d& R, const Eigen::Vector3d& d);
     Eigen::Quaterniond normalize_and_canonicalize(Eigen::Quaterniond q);
 
-    Eigen::Vector3d C_to_eul_extr(const Eigen::Matrix3d& C, const std::string& order);
-    Eigen::Vector3d C_to_eul_intr(const Eigen::Matrix3d& C, const std::string& order);
-    Eigen::Matrix3d eul_to_C_extr(double a, double b, double c, const std::string& order);
-    Eigen::Matrix3d eul_to_C_intr(double a, double b, double c, const std::string& order);
+    Eigen::Vector3d _C_to_eul_extr(const Eigen::Matrix3d& C, const std::string& order);
+    Eigen::Vector3d _C_to_eul_intr(const Eigen::Matrix3d& C, const std::string& order);
+    Eigen::Matrix3d _eul_to_C_extr(double a, double b, double c, const std::string& order);
+    Eigen::Matrix3d _eul_to_C_intr(double a, double b, double c, const std::string& order);
 
     Eigen::Matrix4d make_HC(const Eigen::Matrix3d& C, const Eigen::Vector3d& d, const std::string& first);
     Eigen::Matrix4d _make_HC_translate_first(const Eigen::Matrix3d& C, const Eigen::Vector3d& d);

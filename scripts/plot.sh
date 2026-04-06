@@ -18,3 +18,4 @@ python3 "$SCRIPT" -d "$DATA_DIR/p.csv"    -l "x(t) [m]"      "y(t) [m]"       "z
 python3 "$SCRIPT" -d "$DATA_DIR/eul.csv"  -l "psi(t) [rad]"  "theta(t) [rad]" "phi(t) [rad]" -t "orientation vs time"
 python3 "$SCRIPT" -d "$DATA_DIR/w.csv"    -l "p(t) [rad/s]"  "q(t) [rad/s]"   "r(t) [rad/s]" -t "angular velocity vs time"
 python3 "$SCRIPT" -d "$DATA_DIR/v.csv"    -l "vx(t) [m/s]"   "vy(t) [m/s]"    "vz(t) [m/s]"  -t "linear velocity vs time"
+python3 "$SCRIPT" -d "$DATA_DIR/u.csv"    -l "elevator(t) [rad]" "aileron(t) [rad]" "rudder(t) [rad]" "flap(t) [rad]" "spoiler(t) [rad]" -t "control inputs vs time"

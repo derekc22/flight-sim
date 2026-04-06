@@ -186,7 +186,7 @@ namespace dynamics {
         // Quaternion rotational kinematics
         const OrientationQuaternion qIB_t1 = _quat_kin(xB_BI_t.q, xB_BI_t.w);
 
-        // Convert body velocity/accel to inertial for translational kinematics update on pI_BI
+        // Convert body velocity/acceleleration to inertial for translational kinematics update on pI_BI
         const Eigen::Vector3d vI_BI_t = CBI_t * xB_BI_t.v.data;
         const Eigen::Vector3d aI_BI_t = CBI_t * aB_BI_t.data;
 

@@ -29,6 +29,7 @@ struct SimulationInput {
     double time_sec;
     bool trim_bool;
     bool sensor_bool;
+    bool control_bool;
     bool verbose_bool;
     bool data_bool;
     std::string out_dir;
@@ -38,6 +39,7 @@ struct SimulationOutput {
     std::optional<io::DataMatrix> eul_DM;
     std::optional<io::DataMatrix> w_DM;
     std::optional<io::DataMatrix> v_DM;
+    std::optional<io::DataMatrix> u_DM;
     autopilot::TrimSolution trim_sol;
     analysis::TrimLinearization lin_sol;
     analysis::TrimEigenAnalysis eig_sol;
@@ -54,7 +56,7 @@ vehicles::Aircraft load(bool trim_bool) {
     };
 
     // set initial conditions from config
-    aircraft.step(io::parse_init_options_config(trim_bool));
+    aircraft.step(io::parse_initialization_config(trim_bool));
 
     return aircraft;
 }
@@ -68,6 +70,7 @@ void cleanup(const SimulationInput& sim_in, const SimulationOutput& sim_out) {
         sim_out.eul_DM->write_csv(out_dir_path, "eul");
         sim_out.w_DM->write_csv(out_dir_path, "w");
         sim_out.v_DM->write_csv(out_dir_path, "v");
+        sim_out.u_DM->write_csv(out_dir_path, "u");
         
         // log trim
         if (sim_in.trim_bool){
@@ -93,7 +96,7 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
     // get aircraft properties
     structural::StructuralProperties structural_properties = aircraft.structural_properties;
     aerodynamics::AerodynamicProperties aerodynamic_properties = aircraft.aerodynamic_properties;
-    control::ControlProperties control_properties = aircraft.control_properties;
+    control::ControlProperties& control_properties = aircraft.control_properties;
 
     dynamics::Mass mass = structural_properties.Mass;
     dynamics::InertiaTensor J = structural_properties.J;
@@ -108,6 +111,7 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
         sim_out.eul_DM = io::DataMatrix{ Eigen::MatrixXd::Zero(tf, 3+1) };
         sim_out.w_DM = io::DataMatrix{ Eigen::MatrixXd::Zero(tf, 3+1) };
         sim_out.v_DM = io::DataMatrix{ Eigen::MatrixXd::Zero(tf, 3+1) };
+        sim_out.u_DM = io::DataMatrix{ Eigen::MatrixXd::Zero(tf, 5+1) };
     }
 
     // initialize udp connections
@@ -123,6 +127,9 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
         // get rigid body state
         dynamics::RigidBodyState xN_t = aircraft.rigidBodyState(aircraft.FRDFrameNED);
 
+        // initialize measurements to ground truth
+        dynamics::RigidBodyState xN_meas_t = xN_t;
+
         // step timer by dt
         next += std::chrono::duration_cast<clock::duration>(std::chrono::duration<double>(constants::dt));
 
@@ -137,7 +144,17 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
 
         // specify control commands
         control::ControlSurfaceInputs u{};
-        if (trim_sol.converged) { u.elevator = trim_sol.input.elevator; u.aileron = trim_sol.input.aileron; u.rudder = trim_sol.input.rudder; }
+        if (sim_in.trim_bool && trim_sol.converged) { 
+            u.elevator = trim_sol.input.elevator; 
+            u.aileron = trim_sol.input.aileron; 
+            u.rudder = trim_sol.input.rudder; 
+        }
+        else if (sim_in.control_bool) {
+            control::ControlSurfaceInputs u_ctrl = control_properties.step(xN_meas_t);
+            u.elevator = u_ctrl.elevator;
+            u.aileron = u_ctrl.aileron;
+            u.rudder = u_ctrl.rudder;
+        }
 
         // compute aerodynamics forces and moments
         aerodynamics::AerodynamicLoad LB_aero = step_aero_forces_moments(aerodynamic_properties, structural_properties, xN_t, rho, u, control_properties, wind);
@@ -201,43 +218,31 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
             }            
         }
 
-        // initialize measurements to ground truth
-        dynamics::RigidBodyState xN_t_meas = xN_t;
-
         if (sim_in.sensor_bool){
+            atmospheric::StaticAtmosphericState static_atmo_t = aircraft.staticAtmosphericState(aircraft.FRDFrameECEF);
+            geography::GeographicState geo_t = aircraft.geographicState(aircraft.FRDFrameECEF);
 
-                atmospheric::StaticAtmosphericState static_atmo_t = aircraft.staticAtmosphericState(aircraft.FRDFrameECEF);
-                geography::GeographicState geo_t = aircraft.geographicState(aircraft.FRDFrameECEF);
+            // obtain full state from sensors
+            aerodynamics::AerodynamicState ads_t = aerodynamics::compute_aerodynamic_state(xN_t, wind);
+            auto [xN_t_sensor, ads_t_sensor] = avionics::update_state_from_avionics(xN_t, ads_t, static_atmo_t, geo_t, mass, wind, WB_net, aircraft.avionics_properties);
 
-                // obtain full state from sensors
-                aerodynamics::AerodynamicState ads_t = aerodynamics::compute_aerodynamic_state(xN_t, wind);
-                auto [xN_t_sensor, ads_t_sensor] = avionics::update_state_from_avionics(xN_t, ads_t, static_atmo_t, geo_t, mass, wind, WB_net, aircraft.avionics_properties);
-
-                // // define MeasurementStepOptions
-                // vehicles::StepOptions MeasurementStepOptions;
-
-                // // overwrite state with measured state
-                // MeasurementStepOptions.FRDFrameNEDStepOpts = vehicles::FRDFrameNEDStepOptions { .rbs_BN = xN_t_meas };
-                // MeasurementStepOptions.STABFrameFRDStepOpts = vehicles::STABFrameFRDStepOptions{ .ads = ads_t_meas };
-                // MeasurementStepOptions.WINDFrameSTABStepOpts = vehicles::WINDFrameSTABStepOptions{ .ads = ads_t_meas };
-
-                // // step frames
-                // aircraft.step(MeasurementStepOptions);
-
-                // // overwrite local state with measured state
-                // xN_t = xN_t_meas;
-                // ads_t = ads_t_meas;
-
-                xN_t_meas = xN_t_sensor;
-                
+            // overwrite local measurement state with sensor measurements
+            xN_meas_t = xN_t_sensor;
         }
 
         // update data matrix
         if (sim_in.data_bool) {
-            sim_out.p_DM->insert(t, xN_t_meas.p.data, constants::dt);
-            sim_out.eul_DM->insert(t, transforms::quatC_to_eul(xN_t_meas.q.data, "ZYX", "intr"), constants::dt);
-            sim_out.w_DM->insert(t, xN_t_meas.w.data, constants::dt);
-            sim_out.v_DM->insert(t, xN_t_meas.v.data, constants::dt);
+            dynamics::EulerAngles eul_meas_t;
+            eul_meas_t.set(xN_meas_t.q);
+            Eigen::VectorXd u_t(5);
+            u_t << u.elevator, u.aileron, u.rudder, u.flap, u.spoiler;
+
+            sim_out.p_DM->insert(t, xN_meas_t.p.data, constants::dt);
+            // sim_out.eul_DM->insert(t, transforms::quatC_to_eul(xN_meas_t.q.data, "ZYX", "intr"), constants::dt);
+            sim_out.eul_DM->insert(t, eul_meas_t.data, constants::dt);
+            sim_out.w_DM->insert(t, xN_meas_t.w.data, constants::dt);
+            sim_out.v_DM->insert(t, xN_meas_t.v.data, constants::dt);
+            sim_out.u_DM->insert(t, u_t, constants::dt);
         }
 
         // generate in_pkt from the simulation state
@@ -265,7 +270,7 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
 
 
 int main(int argc, char* argv[]) {
-    if (argc != 7) { return 1; }
+    if (argc != 8) { return 1; }
     
     double time_sec;
     try { time_sec = std::stod(argv[1]); } 
@@ -274,9 +279,10 @@ int main(int argc, char* argv[]) {
 
     bool trim_bool = std::stoi(argv[2]) == 1;
     bool sensor_bool = std::stoi(argv[3]) == 1;
-    bool verbose_bool = std::stoi(argv[4]) == 1;
-    bool data_bool = std::stoi(argv[5]) == 1;
-    std::string out_dir = argv[6];
+    bool control_bool = std::stoi(argv[4]) == 1;
+    bool verbose_bool = std::stoi(argv[5]) == 1;
+    bool data_bool = std::stoi(argv[6]) == 1;
+    std::string out_dir = argv[7];
 
     // load vehicle
     vehicles::Aircraft aircraft = load(trim_bool);
@@ -287,6 +293,7 @@ int main(int argc, char* argv[]) {
         .time_sec=time_sec,
         .trim_bool=trim_bool,
         .sensor_bool=sensor_bool,
+        .control_bool=control_bool,
         .verbose_bool=verbose_bool,
         .data_bool=data_bool, 
         .out_dir=out_dir  

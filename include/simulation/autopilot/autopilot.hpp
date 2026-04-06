@@ -58,7 +58,7 @@ namespace autopilot { // to encompass autonomy and trim
     };
 
     template <typename T>
-    struct TrimInput {
+    struct TrimControlSurfaceInputs {
         T elevator = T(0);
         T aileron = T(0);
         T rudder = T(0);
@@ -94,7 +94,7 @@ namespace autopilot { // to encompass autonomy and trim
         TrimTarget target;
         TrimConditions conditions;
         TrimState<T> state_guess;
-        TrimInput<T> input_guess;
+        TrimControlSurfaceInputs<T> input_guess;
     };
 
     template <typename T>
@@ -130,7 +130,7 @@ namespace autopilot { // to encompass autonomy and trim
 
     struct TrimSolution {
         TrimState<double> state;
-        TrimInput<double> input;
+        TrimControlSurfaceInputs<double> input;
         TrimConditions conditions;
         dynamics::Wrench wrench{};
         TrimResidual<double> residual;
@@ -143,19 +143,19 @@ namespace autopilot { // to encompass autonomy and trim
     };
 
     template <typename T>
-    TrimDynamics<T> compute_trim_dynamics_T(const TrimState<T>& x, const TrimInput<T>& u, const TrimModel& model, const TrimConditions& conditions);
+    TrimDynamics<T> compute_trim_dynamics_T(const TrimState<T>& x, const TrimControlSurfaceInputs<T>& u, const TrimModel& model, const TrimConditions& conditions);
 
     template <typename T>
-    TrimResidual<T> compute_trim_residual(const TrimState<T>& x, const TrimInput<T>& u, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions);
+    TrimResidual<T> compute_trim_residual(const TrimState<T>& x, const TrimControlSurfaceInputs<T>& u, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions);
 
     template <typename T>
-    TrimVariableVector_T<T> pack_trim_variables_T(const TrimState<T>& x, const TrimInput<T>& u);
+    TrimVariableVector_T<T> pack_trim_variables_T(const TrimState<T>& x, const TrimControlSurfaceInputs<T>& u);
 
     template <typename T>
     TrimState<T> unpack_trim_state_T(const TrimVariableVector_T<T>& z);
 
     template <typename T>
-    TrimInput<T> unpack_trim_input_T(const TrimVariableVector_T<T>& z);
+    TrimControlSurfaceInputs<T> unpack_trim_input_T(const TrimVariableVector_T<T>& z);
 
     template <typename T>
     TrimResidualVector_T<T> pack_trim_residual_T(const TrimResidual<T>& residual);

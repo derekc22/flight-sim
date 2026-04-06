@@ -10,7 +10,7 @@ namespace autopilot {
     }
 
     template <typename T>
-    aerodynamics::ControlSurfaceInputs_T<T> _build_control_surface_inputs_from_trim_T(const TrimInput<T>& u, const TrimFixedControls& fixed_controls) {
+    aerodynamics::ControlSurfaceInputs_T<T> _build_control_surface_inputs_from_trim_T(const TrimControlSurfaceInputs<T>& u, const TrimFixedControls& fixed_controls) {
         return aerodynamics::ControlSurfaceInputs_T<T>{
             .elevator = u.elevator,
             .aileron = u.aileron,
@@ -30,7 +30,7 @@ namespace autopilot {
     }
 
     template <typename T>
-    TrimInput<T> _unpack_trim_solver_input_T(const TrimVariableVector_T<T>& z, const control::ControlSurfaceLimits& limits) {
+    TrimControlSurfaceInputs<T> _unpack_trim_solver_input_T(const TrimVariableVector_T<T>& z, const control::ControlSurfaceLimits& limits) {
         return {
             .elevator = _get_control_from_solver_space_T<T>(z(8), limits.elevator_max),
             .aileron = _get_control_from_solver_space_T<T>(z(9), limits.aileron_max),
@@ -48,7 +48,7 @@ namespace autopilot {
     }
 
     template <typename T>
-    TrimDynamics<T> compute_trim_dynamics_T(const TrimState<T>& x, const TrimInput<T>& u, const TrimModel& model, const TrimConditions& conditions) {
+    TrimDynamics<T> compute_trim_dynamics_T(const TrimState<T>& x, const TrimControlSurfaceInputs<T>& u, const TrimModel& model, const TrimConditions& conditions) {
         const dynamics::Twist_T<T> twist = _build_twist_from_trim_T(x);
         const aerodynamics::ControlSurfaceInputs_T<T> controls = _build_control_surface_inputs_from_trim_T(u, model.fixed_controls);
         const aerodynamics::AerodynamicLoad_T<T> aero = aerodynamics::step_aero_forces_moments_T<T>(
@@ -81,7 +81,7 @@ namespace autopilot {
     }
 
     template <typename T>
-    TrimResidual<T> compute_trim_residual(const TrimState<T>& x, const TrimInput<T>& u, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions) {
+    TrimResidual<T> compute_trim_residual(const TrimState<T>& x, const TrimControlSurfaceInputs<T>& u, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions) {
         const TrimDynamics<T> trim_dynamics = compute_trim_dynamics_T<T>(x, u, model, conditions);
         const aerodynamics::AerodynamicState_T<T> ads = aerodynamics::compute_aerodynamic_state_T<T>(_build_twist_from_trim_T(x), conditions.windB);
 
@@ -101,7 +101,7 @@ namespace autopilot {
     }
 
     template <typename T>
-    TrimVariableVector_T<T> pack_trim_variables_T(const TrimState<T>& x, const TrimInput<T>& u) {
+    TrimVariableVector_T<T> pack_trim_variables_T(const TrimState<T>& x, const TrimControlSurfaceInputs<T>& u) {
         TrimVariableVector_T<T> out;
         out << x.vx, x.vy, x.vz,
                x.p, x.q, x.r,
@@ -125,7 +125,7 @@ namespace autopilot {
     }
 
     template <typename T>
-    TrimInput<T> unpack_trim_input_T(const TrimVariableVector_T<T>& z) {
+    TrimControlSurfaceInputs<T> unpack_trim_input_T(const TrimVariableVector_T<T>& z) {
         return {
             .elevator = z(8),
             .aileron = z(9),
@@ -154,7 +154,7 @@ namespace autopilot {
     TrimResidualVector_T<T> compute_trim_residual_vector_T(const TrimVariableVector_T<T>& z, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions, bool use_physical_controls) {
         const TrimState<T> x = unpack_trim_state_T<T>(z);
 
-        TrimInput<T> u;
+        TrimControlSurfaceInputs<T> u;
         if (use_physical_controls) u = unpack_trim_input_T<T>(z);
         else u = _unpack_trim_solver_input_T<T>(z, model.control.limits);
 

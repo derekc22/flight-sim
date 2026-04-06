@@ -36,7 +36,7 @@ namespace transforms {
         return Rz;
     };
 
-    Eigen::Matrix3d eul_to_R_extr(double a, double b, double c, const std::string& order){
+    Eigen::Matrix3d _eul_to_R_extr(double a, double b, double c, const std::string& order){
         if (order == "ZYX") return Rx(c) * Ry(b) * Rz(a);
         if (order == "ZXY") return Ry(c) * Rx(b) * Rz(a);
 
@@ -60,18 +60,18 @@ namespace transforms {
 
     // All vector rotations (as opposed to frame rotations) are, by definition, extrinsic. The concept of an "intrinsic" rotation only applies to frames
     // That is, the concept of an "intrinsic" vector rotation is not defined
-    // So the function 'eul_to_R_intr' does not technically make sense
+    // So the function '_eul_to_R_intr' does not technically make sense
     // However, for consistency with the extrinsic case, it is still implemented since transposing the result of this function indeed gives the correct result for an intrinsic frame rotation
-    Eigen::Matrix3d eul_to_R_intr(double a, double b, double c, const std::string& order){
-        return eul_to_R_extr(-a, -b, -c, order).transpose();
+    Eigen::Matrix3d _eul_to_R_intr(double a, double b, double c, const std::string& order){
+        return _eul_to_R_extr(-a, -b, -c, order).transpose();
     }
 
-    Eigen::Matrix3d eul_to_C_extr(double a, double b, double c, const std::string& order){
-       return eul_to_R_extr(a, b, c, order).transpose();
+    Eigen::Matrix3d _eul_to_C_extr(double a, double b, double c, const std::string& order){
+       return _eul_to_R_extr(a, b, c, order).transpose();
     };
 
-    Eigen::Matrix3d eul_to_C_intr(double a, double b, double c, const std::string& order){
-        return eul_to_R_intr(a, b, c, order).transpose();
+    Eigen::Matrix3d _eul_to_C_intr(double a, double b, double c, const std::string& order){
+        return _eul_to_R_intr(a, b, c, order).transpose();
     };
 
     Eigen::Vector3d R_to_eul_extr(const Eigen::Matrix3d& R, const std::string& order) {
@@ -223,12 +223,12 @@ namespace transforms {
         return -1 * R_to_eul_extr(R.transpose(), order);
     }
 
-    Eigen::Vector3d C_to_eul_extr(const Eigen::Matrix3d& C, const std::string& order) {
+    Eigen::Vector3d _C_to_eul_extr(const Eigen::Matrix3d& C, const std::string& order) {
         // C_extr(a, b, c) = R_extr(a, b, c).T = R_intr(-a, -b, -c)
         return R_to_eul_extr(C.transpose(), order);
     }
 
-    Eigen::Vector3d C_to_eul_intr(const Eigen::Matrix3d& C, const std::string& order) {
+    Eigen::Vector3d _C_to_eul_intr(const Eigen::Matrix3d& C, const std::string& order) {
         // C_intr(a, b, c) = R_intr(a, b, c).T = R_extr(-a, -b, -c)
         return R_to_eul_intr(C.transpose(), order);
     }
@@ -432,7 +432,7 @@ namespace transforms {
         return q;
     }
 
-    Eigen::Quaterniond eul_to_quatR_extr(double a, double b, double c, const std::string& order) {
+    Eigen::Quaterniond _eul_to_quatR_extr(double a, double b, double c, const std::string& order) {
         Eigen::Quaterniond q;
 
         if      (order == "ZYX") q = qx(c) * qy(b) * qz(a);
@@ -457,18 +457,18 @@ namespace transforms {
 
     // All vector rotations (as opposed to frame rotations) are, by definition, extrinsic. The concept of an "intrinsic" rotation only applies to frames
     // That is, the concept of an "intrinsic" vector rotation is not defined
-    // So, as with eul_to_R_intr, the function 'eul_to_quatR_intr' does not technically make sense
+    // So, as with _eul_to_R_intr, the function '_eul_to_quatR_intr' does not technically make sense
     // However, for consistency with the extrinsic case, it is still implemented since transposing the result of this function indeed gives the correct result for an intrinsic frame rotation
-    Eigen::Quaterniond eul_to_quatR_intr(double a, double b, double c, const std::string& order) {
-        return normalize_and_canonicalize(eul_to_quatR_extr(-a, -b, -c, order).conjugate());
+    Eigen::Quaterniond _eul_to_quatR_intr(double a, double b, double c, const std::string& order) {
+        return normalize_and_canonicalize(_eul_to_quatR_extr(-a, -b, -c, order).conjugate());
     }
 
-    Eigen::Quaterniond eul_to_quatC_extr(double a, double b, double c, const std::string& order) {
-        return normalize_and_canonicalize(eul_to_quatR_extr(a,b,c,order).conjugate());
+    Eigen::Quaterniond _eul_to_quatC_extr(double a, double b, double c, const std::string& order) {
+        return normalize_and_canonicalize(_eul_to_quatR_extr(a,b,c,order).conjugate());
     }
 
-    Eigen::Quaterniond eul_to_quatC_intr(double a, double b, double c, const std::string& order) {
-        return normalize_and_canonicalize(eul_to_quatR_intr(a,b,c,order).conjugate());
+    Eigen::Quaterniond _eul_to_quatC_intr(double a, double b, double c, const std::string& order) {
+        return normalize_and_canonicalize(_eul_to_quatR_intr(a,b,c,order).conjugate());
     }
 
 
@@ -508,9 +508,9 @@ namespace transforms {
         return R_to_eul_intr(R, order);
     }
 
-    Eigen::Vector3d quatC_to_eul_intr(const Eigen::Quaterniond& q, const std::string& order){
+    Eigen::Vector3d _quatC_to_eul_intr(const Eigen::Quaterniond& q, const std::string& order){
         Eigen::Matrix3d C = quat_to_rot(q);
-        return C_to_eul_intr(C, order);
+        return _C_to_eul_intr(C, order);
     }
 
     Eigen::Vector3d quatR_to_eul_extr(const Eigen::Quaterniond& q, const std::string& order){
@@ -518,9 +518,9 @@ namespace transforms {
         return R_to_eul_extr(R, order);
     }
 
-    Eigen::Vector3d quatC_to_eul_extr(const Eigen::Quaterniond& q, const std::string& order){
+    Eigen::Vector3d _quatC_to_eul_extr(const Eigen::Quaterniond& q, const std::string& order){
         Eigen::Matrix3d C = quat_to_rot(q);
-        return C_to_eul_extr(C, order);
+        return _C_to_eul_extr(C, order);
     }
 
     // // Call this when you want to rotate the vector
@@ -563,38 +563,38 @@ namespace transforms {
 
 
     Eigen::Matrix3d eul_to_C(double a, double b, double c, const std::string& order, const std::string& type){
-        if (type == "extr") return eul_to_C_extr(a, b, c, order);
-        if (type == "intr") return eul_to_C_intr(a, b, c, order);
+        if (type == "extr") return _eul_to_C_extr(a, b, c, order);
+        if (type == "intr") return _eul_to_C_intr(a, b, c, order);
         throw std::invalid_argument("Unsupported type: " + type);
     }
 
     Eigen::Matrix3d eul_to_R(double a, double b, double c, const std::string& order, const std::string& type){
-        if (type == "extr") return eul_to_R_extr(a, b, c, order);
-        if (type == "intr") return eul_to_R_intr(a, b, c, order);
+        if (type == "extr") return _eul_to_R_extr(a, b, c, order);
+        if (type == "intr") return _eul_to_R_intr(a, b, c, order);
         throw std::invalid_argument("Unsupported type: " + type);
     }
 
     Eigen::Quaterniond eul_to_quatR(double a, double b, double c, const std::string& order, const std::string& type){
-        if (type == "extr") return eul_to_quatR_extr(a, b, c, order);
-        if (type == "intr") return eul_to_quatR_intr(a, b, c, order);
+        if (type == "extr") return _eul_to_quatR_extr(a, b, c, order);
+        if (type == "intr") return _eul_to_quatR_intr(a, b, c, order);
         throw std::invalid_argument("Unsupported type: " + type);
     }
 
     Eigen::Quaterniond eul_to_quatC(double a, double b, double c, const std::string& order, const std::string& type){
-        if (type == "extr") return eul_to_quatC_extr(a, b, c, order);
-        if (type == "intr") return eul_to_quatC_intr(a, b, c, order);
+        if (type == "extr") return _eul_to_quatC_extr(a, b, c, order);
+        if (type == "intr") return _eul_to_quatC_intr(a, b, c, order);
         throw std::invalid_argument("Unsupported type: " + type);
     }
 
     Eigen::Vector3d quatC_to_eul(const Eigen::Quaterniond& qC, const std::string& order, const std::string& type) {
-        if (type == "extr") return quatC_to_eul_extr(qC, order);
-        if (type == "intr") return quatC_to_eul_intr(qC, order);
+        if (type == "extr") return _quatC_to_eul_extr(qC, order);
+        if (type == "intr") return _quatC_to_eul_intr(qC, order);
         throw std::invalid_argument("Unsupported type: " + type);
     }
 
     Eigen::Vector3d C_to_eul(const Eigen::Matrix3d& C, const std::string& order, const std::string& type) {
-        if (type == "extr") return C_to_eul_extr(C, order);
-        if (type == "intr") return C_to_eul_intr(C, order);
+        if (type == "extr") return _C_to_eul_extr(C, order);
+        if (type == "intr") return _C_to_eul_intr(C, order);
         throw std::invalid_argument("Unsupported type: " + type);
     }
 

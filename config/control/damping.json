@@ -1,0 +1,30 @@
+{
+    "control_surface_limits": {
+        "elevator_max": 20.0,
+        "aileron_max": 20.0,
+        "rudder_max": 31.0,
+        "flap_max": 0.0,
+        "spoiler_max": 90.0
+    },
+    "controllers": {
+        "longitudinal": {
+            "control_type": "RollDamper",
+            "gains": 1
+        },
+        "lateral": {
+            "control_type": "PitchDamper",
+            "gains": 1
+        },
+        "vertical": {
+            "control_type": "YawDamper",
+            "gains": 1
+        },
+        "full_state": false
+    },
+    "desired_FRDFrameNED": {
+        "eul": [0.0, 0.0, 0.0],
+        "p": [0.0, 0.0, 0.0],
+        "w": [0.0, 0.0, 0.0],
+        "v": [0.0, 0.0, 0.0]
+    }
+}

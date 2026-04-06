@@ -15,7 +15,7 @@ namespace autopilot { // to encompass autonomy and trim
         return ratio / std::sqrt(std::max(1.0 - ratio * ratio, constants::eps));
     }
 
-    static TrimVariableVector_T<double> _pack_trim_solver_variables(const TrimState<double>& x, const TrimInput<double>& u, const control::ControlSurfaceLimits& limits) {
+    static TrimVariableVector_T<double> _pack_trim_solver_variables(const TrimState<double>& x, const TrimControlSurfaceInputs<double>& u, const control::ControlSurfaceLimits& limits) {
         TrimVariableVector_T<double> z = pack_trim_variables_T<double>(x, u);
         z(8) = _send_control_to_solver_space(u.elevator, limits.elevator_max);
         z(9) = _send_control_to_solver_space(u.aileron, limits.aileron_max);
@@ -56,7 +56,7 @@ namespace autopilot { // to encompass autonomy and trim
         if (options.min_step_scale <= 0.0 || options.min_step_scale > 1.0) throw std::invalid_argument("autopilot::_validate_trim_solve_options: min_step_scale must be in (0, 1]");
     }
 
-    static dynamics::Wrench _compute_trim_wrench(const TrimState<double>& x, const TrimInput<double>& u, const TrimModel& model, const TrimConditions& conditions) {
+    static dynamics::Wrench _compute_trim_wrench(const TrimState<double>& x, const TrimControlSurfaceInputs<double>& u, const TrimModel& model, const TrimConditions& conditions) {
         const dynamics::Twist_T<double> twist = _build_twist_from_trim_T<double>(x);
         const aerodynamics::ControlSurfaceInputs_T<double> controls = _build_control_surface_inputs_from_trim_T<double>(u, model.fixed_controls);
         const aerodynamics::AerodynamicLoad_T<double> aero = aerodynamics::step_aero_forces_moments_T<double>(
@@ -214,7 +214,7 @@ namespace autopilot { // to encompass autonomy and trim
                 .phi = aircraft.FRDFrameNED.eulNB.phi(),
                 .theta = aircraft.FRDFrameNED.eulNB.theta(),
             },
-            .input_guess = TrimInput<double>{},
+            .input_guess = TrimControlSurfaceInputs<double>{},
         };
 
         const TrimSolution trim_sol = solve_trim(problem, model);

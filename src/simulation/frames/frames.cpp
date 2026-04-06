@@ -176,7 +176,7 @@ namespace frames {
         MutableFrameView mfv = view();
         mfv.H->set(C);
         mfv.q->set(C); // *mfv.q = dynamics::OrientationQuaternion{ transforms::rot_to_quat(C.data) };
-        mfv.eul->set(C); // *mfv.eul = dynamics::EulerAngles{ transforms::C_to_eul_intr(C.data, "ZYX") };
+        mfv.eul->set(C); // *mfv.eul = dynamics::EulerAngles{ transforms::_C_to_eul_intr(C.data, "ZYX") };
     }
     void Frame::_set(const dynamics::Position& p){
         MutableFrameView mfv = view();
@@ -187,12 +187,12 @@ namespace frames {
         dynamics::OrientationQuaternion q_{ transforms::normalize_and_canonicalize(q.data) };
         *mfv.q = q_;
         mfv.H->set(q_); // mfv.H->set(transforms::quat_to_rot(q.data));
-        mfv.eul->set(q_); // *mfv.eul = dynamics::EulerAngles{ transforms::quatC_to_eul_intr(q.data, "ZYX") };
+        mfv.eul->set(q_); // *mfv.eul = dynamics::EulerAngles{ transforms::_quatC_to_eul_intr(q.data, "ZYX") };
     }
     void Frame::_set(const dynamics::EulerAngles& eul){
         MutableFrameView mfv = view();
-        mfv.H->set(eul); // mfv.H->set(transforms::eul_to_C_intr(eul.psi(), eul.theta(), eul.phi(), "ZYX"));
-        mfv.q->set(eul); // *mfv.q = dynamics::OrientationQuaternion{ transforms::eul_to_quatC_intr(eul.psi(), eul.theta(), eul.phi(), "ZYX") };
+        mfv.H->set(eul); // mfv.H->set(transforms::_eul_to_C_intr(eul.psi(), eul.theta(), eul.phi(), "ZYX"));
+        mfv.q->set(eul); // *mfv.q = dynamics::OrientationQuaternion{ transforms::_eul_to_quatC_intr(eul.psi(), eul.theta(), eul.phi(), "ZYX") };
         *mfv.eul = eul;
     }
     void Frame::_set(const dynamics::OrientationMatrixRate& C_dot){

@@ -10,3 +10,4 @@ AGENTS.md
 CMakeFiles/
 CMakeCache.txt
 **.pdf
+__pycache__

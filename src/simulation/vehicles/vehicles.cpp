@@ -102,7 +102,6 @@ namespace vehicles {
         }
     }
 
-
     dynamics::RigidBodyState Aircraft::rigidBodyState(const frames::Frame& F) {
         if (F.parent != nullptr && F.parent->name != "NEDFrameECEF") {
             std::string err_msg = std::format("vehicles::Aircraft::rigidBodyState: Invalid frame input, the parent of {} must be an inertial frame: ECEFFrame or NEDFrameECEF", F.name);
@@ -209,7 +208,6 @@ namespace vehicles {
                 .eul_dot = opts.FRDFrameNEDStepOpts->eulNB_dot,
                 .wq = opts.FRDFrameNEDStepOpts->wq_BN,
                 .v = opts.FRDFrameNEDStepOpts->vB_BN,
-                // g = opts.FRDFrameNEDStepOpts->gB,
                 .rbs = opts.FRDFrameNEDStepOpts->rbs_BN
             };
             _StepOptions::_validate(FRDFrameNED, _FRDFrameNEDStepOpts);

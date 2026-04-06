@@ -15,12 +15,12 @@ namespace analysis {
         return out.str();
     }
 
-    TrimLinearization linearize_trim_dynamics(const autopilot::TrimState<double>& x, const autopilot::TrimInput<double>& u, const autopilot::TrimModel& model, const autopilot::TrimConditions& conditions) {
+    TrimLinearization linearize_trim_dynamics(const autopilot::TrimState<double>& x, const autopilot::TrimControlSurfaceInputs<double>& u, const autopilot::TrimModel& model, const autopilot::TrimConditions& conditions) {
         const autopilot::TrimVariableVector_T<double> z = autopilot::pack_trim_variables_T<double>(x, u);
         CppAD::eigen_vector<CppAD::AD<double>> z_t = util::start_autodiff_tracking(z);
         const autopilot::TrimVariableVector_T<CppAD::AD<double>> z_vec = util::eigen_vector_from_cppad_vector<CppAD::AD<double>, autopilot::trim_variable_dofs>(z_t);
         const autopilot::TrimState<CppAD::AD<double>> x_t = autopilot::unpack_trim_state_T<CppAD::AD<double>>(z_vec);
-        const autopilot::TrimInput<CppAD::AD<double>> u_t = autopilot::unpack_trim_input_T<CppAD::AD<double>>(z_vec);
+        const autopilot::TrimControlSurfaceInputs<CppAD::AD<double>> u_t = autopilot::unpack_trim_input_T<CppAD::AD<double>>(z_vec);
         const autopilot::TrimDynamics<CppAD::AD<double>> trim_dynamics = autopilot::compute_trim_dynamics_T<CppAD::AD<double>>(x_t, u_t, model, conditions);
         autopilot::TrimDynamicsVector_T<CppAD::AD<double>> x_dot_vec;
         x_dot_vec << trim_dynamics.vx_dot,

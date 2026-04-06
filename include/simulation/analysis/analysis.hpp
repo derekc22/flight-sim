@@ -20,7 +20,7 @@ namespace analysis {
         TrimEigenvectors eigenvectors = TrimEigenvectors::Zero();
     };
 
-    TrimLinearization linearize_trim_dynamics(const autopilot::TrimState<double>& x, const autopilot::TrimInput<double>& u, const autopilot::TrimModel& model, const autopilot::TrimConditions& conditions);
+    TrimLinearization linearize_trim_dynamics(const autopilot::TrimState<double>& x, const autopilot::TrimControlSurfaceInputs<double>& u, const autopilot::TrimModel& model, const autopilot::TrimConditions& conditions);
 
     TrimLinearization linearize_trim_solution(vehicles::Aircraft& aircraft, const autopilot::TrimSolution& trim);
 

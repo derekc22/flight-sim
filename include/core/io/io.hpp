@@ -18,6 +18,8 @@ namespace io {
     Eigen::Matrix3d parse_Matrix3d(const nlohmann::json& values);
     Eigen::Matrix4d parse_Matrix4d(const nlohmann::json& values);
     Eigen::Quaterniond parse_Quaterniond(const nlohmann::json& values);
+    double parse_sensor_scalar_bias(const nlohmann::json& sensor_json);
+    Eigen::Vector3d parse_sensor_3d_bias(const nlohmann::json& sensor_json);
 
     struct ParsedStepOptions {
         std::optional<dynamics::HomogenousFrameTransformationMatrix> H;
@@ -54,11 +56,11 @@ namespace io {
     std::filesystem::path resolve_config_path(const std::filesystem::path& run_path, const std::string& config_path);
     std::filesystem::path resolve_run_config_entry_path(const std::string& key);
 
-    void _validate_init_options_config(const nlohmann::json& cfg, bool trim_bool);
-    void _validate_NEDFrameECEF_init_options_config(const nlohmann::json& frame_json);
-    void _validate_FRDFrameECEF_init_options_config(const nlohmann::json& frame_json);
-    void _validate_FRDFrameNED_init_options_config(const nlohmann::json& frame_json);
-    void _validate_WINDFrameSTAB_init_options_config(const nlohmann::json& frame_json);
+    void _validate_initialization_config(const nlohmann::json& cfg, bool trim_bool);
+    void _validate_NEDFrameECEF_initialization_config(const nlohmann::json& frame_json);
+    void _validate_FRDFrameECEF_initialization_config(const nlohmann::json& frame_json);
+    void _validate_FRDFrameNED_initialization_config(const nlohmann::json& frame_json);
+    void _validate_WINDFrameSTAB_initialization_config(const nlohmann::json& frame_json);
 
     void create_dir(const std::string& dir);
     void write_txt(const std::string& text, const std::string& dir, const std::string& fname);
@@ -68,7 +70,7 @@ namespace io {
 
     aerodynamics::AerodynamicProperties parse_aerodynamics_config();
     control::ControlProperties parse_control_config();
-    vehicles::StepOptions parse_init_options_config(bool trim_enabled);
+    vehicles::StepOptions parse_initialization_config(bool trim_enabled);
     structural::StructuralProperties parse_structural_config();
     avionics::AvionicsProperties parse_avionics_config();
 

@@ -57,18 +57,21 @@ namespace avionics {
         };
     }
 
+    Sensor::Sensor(double mean, double stddev, double bias, const Eigen::Vector3d& bias3) : mean(mean), stddev(stddev), bias(bias), bias_3d(bias3), dist(mean, stddev) {}
+
     double Sensor::_step(double meas, double prev_meas){
-        double meas_lagged = alpha * meas + (1-alpha) * prev_meas; // apply EMA
+        double meas_lagged = (1-alpha) * meas + alpha * prev_meas; // apply EMA
+        double meas_biased = meas_lagged + bias; // apply bias
         double noise = dist(gen);
-        double meas_noised = meas_lagged + noise; // apply Gaussian noise
-        // double meas_biased = meas_noised + bias; // apply bias
+        double meas_noised = meas_biased + noise; // apply Gaussian noise
         return meas_noised;
     }
 
     Eigen::Vector3d Sensor::_step(const Eigen::Vector3d& meas, const Eigen::Vector3d& prev_meas){
-        Eigen::Vector3d meas_lagged = alpha * meas + (1-alpha) * prev_meas; // apply EMA
+        Eigen::Vector3d meas_lagged = (1-alpha) * meas + alpha * prev_meas; // apply EMA
+        Eigen::Vector3d meas_biased = meas_lagged + bias_3d; // apply bias
         Eigen::Vector3d noise(dist(gen), dist(gen), dist(gen));
-        Eigen::Vector3d meas_noised = meas_lagged + noise; // apply Gaussian noise
+        Eigen::Vector3d meas_noised = meas_biased + noise; // apply Gaussian noise
         return meas_noised;
     }
 
@@ -76,7 +79,16 @@ namespace avionics {
         Eigen::Quaterniond meas_adjusted = meas;
         if (prev_meas.coeffs().dot(meas.coeffs()) < 0.0) meas_adjusted.coeffs() *= -1.0;
 
-        Eigen::Quaterniond meas_lagged = prev_meas.slerp(alpha, meas_adjusted); // apply EMA via quaternion SLERP
+        Eigen::Quaterniond meas_lagged = prev_meas.slerp(1-alpha, meas_adjusted); // apply EMA via quaternion SLERP
+
+        double bias_angle = bias_3d.norm();
+        Eigen::Quaterniond bias_q;
+        if (bias_angle < constants::eps) bias_q = Eigen::Quaterniond::Identity();
+        else {
+            Eigen::Vector3d bias_axis = bias_3d / bias_angle;
+            bias_q = Eigen::Quaterniond(Eigen::AngleAxisd(bias_angle, bias_axis));
+        }
+        Eigen::Quaterniond meas_biased = meas_lagged * bias_q; // apply bias
 
         Eigen::Vector3d noise_dtheta(dist(gen), dist(gen), dist(gen));
         double angle = noise_dtheta.norm();
@@ -87,8 +99,8 @@ namespace avionics {
             Eigen::Vector3d axis = noise_dtheta / angle;
             dq = Eigen::Quaterniond(Eigen::AngleAxisd(angle, axis));
         }
+        Eigen::Quaterniond meas_noised = meas_biased * dq; // apply Gaussian noise
 
-        Eigen::Quaterniond meas_noised = meas_lagged * dq; // apply Gaussian noise
         meas_noised.normalize();
         return meas_noised;
     }
@@ -97,8 +109,8 @@ namespace avionics {
         return { _step(alpha.data, prev_alpha.data) };
     }
 
-    LinearAccelerationMeasurement Accelerometer::_measure(const dynamics::LinearAcceleration& accel, const dynamics::LinearAcceleration& prev_accel) {
-        return { _step(accel.data, prev_accel.data) };
+    LinearAccelerationMeasurement Accelerometer::_measure(const dynamics::LinearAcceleration& accelB, const dynamics::LinearAcceleration& prev_accel) {
+        return { _step(accelB.data, prev_accel.data) };
     }
 
     AngularVelocityMeasurement Gyroscope::_measure(const dynamics::AngularVelocity& wB_BI, const dynamics::AngularVelocity& prev_wB_BI) {    
@@ -154,23 +166,23 @@ namespace avionics {
         return { dynamics::_quat_kin(prev_qIB, wB_BI) };
     }
 
-    PositionMeasurement InertialNavigationSystem::_calculate(const PositionMeasurement& prev_pI_BI, const LinearVelocityMeasurement& prev_pB_BI_dot, const LinearAccelerationMeasurement& accel, const OrientationMeasurement& prev_qIB) {
+    PositionMeasurement InertialNavigationSystem::_calculate(const PositionMeasurement& prev_pI_BI, const LinearVelocityMeasurement& prev_pB_BI_dot, const LinearAccelerationMeasurement& accelB, const OrientationMeasurement& prev_qIB) {
         dynamics::Gravity prev_gB = geography::gB(prev_pI_BI, prev_qIB);
         dynamics::LinearVelocity pI_BI_dot{ prev_qIB.data.conjugate() * prev_pB_BI_dot.data };
-        dynamics::LinearAcceleration pI_BI_ddot{ prev_qIB.data.conjugate() * (accel.data + prev_gB.data) };
+        dynamics::LinearAcceleration pI_BI_ddot{ prev_qIB.data.conjugate() * (accelB.data + prev_gB.data) };
         return { dynamics::_trans_kin(prev_pI_BI, pI_BI_dot, pI_BI_ddot).data };
     }
 
-    LinearVelocityMeasurement InertialNavigationSystem::_calculate(const LinearVelocityMeasurement& prev_pB_BI_dot, const LinearAccelerationMeasurement& accel, const PositionMeasurement& prev_pI_BI, const OrientationMeasurement& prev_qIB, const AngularVelocityMeasurement& wB_BI) {
+    LinearVelocityMeasurement InertialNavigationSystem::_calculate(const LinearVelocityMeasurement& prev_pB_BI_dot, const LinearAccelerationMeasurement& accelB, const PositionMeasurement& prev_pI_BI, const OrientationMeasurement& prev_qIB, const AngularVelocityMeasurement& wB_BI) {
         dynamics::Gravity prev_gB = geography::gB(prev_pI_BI, prev_qIB);
-        dynamics::LinearAcceleration pB_BI_ddot{ accel.data + prev_gB.data - wB_BI.data.cross(prev_pB_BI_dot.data) };
+        dynamics::LinearAcceleration pB_BI_ddot{ accelB.data + prev_gB.data - wB_BI.data.cross(prev_pB_BI_dot.data) };
         return { dynamics::_trans_kin_vel(prev_pB_BI_dot, pB_BI_ddot).data };
     }
 
 
     MeasurementCache AvionicsProperties::step(const MeasurementGroundTruth& meas_gt) {
         aerodynamics::AngleOfAttack prev_alpha = hist.prev_alpha_meas ? aerodynamics::AngleOfAttack{ hist.prev_alpha_meas->data } : meas_gt.alpha;
-        dynamics::LinearAcceleration prev_accel = hist.prev_accel_meas ? dynamics::LinearAcceleration{ hist.prev_accel_meas->data } : meas_gt.accel;
+        dynamics::LinearAcceleration prev_accel = hist.prev_accel_meas ? dynamics::LinearAcceleration{ hist.prev_accel_meas->data } : meas_gt.accelB;
         dynamics::AngularVelocity prev_wB_BI = hist.prev_wB_BI_meas ? dynamics::AngularVelocity{ hist.prev_wB_BI_meas->data } : meas_gt.wB_BI;
         atmospheric::StagnationAirPressure prev_P0 = hist.prev_P0_meas ? atmospheric::StagnationAirPressure{ hist.prev_P0_meas->data } : meas_gt.P0;
         atmospheric::StaticAirPressure prev_P = hist.prev_P_meas ? atmospheric::StaticAirPressure{ hist.prev_P_meas->data } : meas_gt.P;
@@ -181,7 +193,7 @@ namespace avionics {
 
         MeasurementCache sensor_cache {
             .curr_alpha_meas = sensors.aoa_vane._measure(meas_gt.alpha, prev_alpha),
-            .curr_accel_meas = sensors.accelerometer._measure(meas_gt.accel, prev_accel),
+            .curr_accel_meas = sensors.accelerometer._measure(meas_gt.accelB, prev_accel),
             .curr_wB_BI_meas = sensors.gyro._measure(meas_gt.wB_BI, prev_wB_BI),
             .curr_P0_meas = sensors.pitot_tube._measure(meas_gt.P0, prev_P0),
             .curr_P_meas = sensors.static_port._measure(meas_gt.P, prev_P),
@@ -232,9 +244,12 @@ namespace avionics {
         dynamics::LinearVelocity vI_BI{ xN_t.q.data.conjugate() * xN_t.v.data };
         double alt_dot = xN_t.p.data.normalized().dot(vI_BI.data);
 
+        dynamics::EulerAngles eul;
+        eul.set(xN_t.q);
+
         avionics::MeasurementGroundTruth meas_gt = {
             .alpha = ads_t.alpha,
-            .accel = dynamics::LinearAcceleration{ WB_net.F.data / mass.data - geography::gB(xN_t.p, xN_t.q).data },
+            .accelB = dynamics::LinearAcceleration{ WB_net.F.data / mass.data - geography::gB(xN_t.p, xN_t.q).data },
             .wB_BI = xN_t.w,
             .P0 = stagnation_atmo_t.P0,
             .P = static_atmo_t.P,
@@ -244,7 +259,8 @@ namespace avionics {
 
             .T = static_atmo_t.T,
             .Mach = Mach,
-            .heading = geography::Heading{ transforms::quatC_to_eul_intr(xN_t.q.data, "ZYX")(0) },
+            // .heading = geography::Heading{ transforms::_quatC_to_eul_intr(xN_t.q.data, "ZYX")(0) },
+            .heading = geography::Heading{ eul.psi() },
             .qIB = xN_t.q,
             .Vinf = ads_t.Vinf,
             .alt_BE = geo_t.alt,
@@ -254,16 +270,16 @@ namespace avionics {
         
         MeasurementCache cache = avionics_properties.step(meas_gt);
 
-        dynamics::RigidBodyState xN_t_meas = { 
+        dynamics::RigidBodyState xN_meas_t = { 
             .p = cache.curr_pI_BI_gnss_meas,
             .v = cache.curr_pB_BI_dot_gnss_meas,
             .q = cache.curr_qIB_meas,
             .w = cache.curr_wB_BI_meas
         };
 
-        aerodynamics::AerodynamicState ads_t_meas = aerodynamics::compute_aerodynamic_state(xN_t_meas, wind);
+        aerodynamics::AerodynamicState ads_t_meas = aerodynamics::compute_aerodynamic_state(xN_meas_t, wind);
 
-        // literally not needed lmao 
+        // not needed 
         // atmospheric::StaticAtmosphericState static_atmo_meas = {
         //     .P=cache.curr_P_meas,
         //     .T=cache.curr_T_meas,
@@ -275,7 +291,7 @@ namespace avionics {
         //     .lat = 
         // }
         
-        return { xN_t_meas, ads_t_meas };
+        return { xN_meas_t, ads_t_meas };
     }
 
 

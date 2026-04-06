@@ -49,7 +49,7 @@ namespace avionics {
 
     struct MeasurementGroundTruth {
         aerodynamics::AngleOfAttack alpha;
-        dynamics::LinearAcceleration accel;
+        dynamics::LinearAcceleration accelB;
         dynamics::AngularVelocity wB_BI;
         atmospheric::StagnationAirPressure P0;
         atmospheric::StaticAirPressure P;
@@ -123,14 +123,15 @@ namespace avionics {
     struct Sensor {
         double mean;
         double stddev;
-        // double bias;
+        double bias;
+        Eigen::Vector3d bias_3d;
         std::mt19937 gen{std::random_device{}()};
         std::normal_distribution<double> dist;
 
         double tau;
         double alpha;
 
-        Sensor(double m, double s) : mean(m), stddev(s), dist(m, s) {}
+        Sensor(double mean, double stddev, double bias, const Eigen::Vector3d& bias3);
 
         double _step(double meas, double prev_meas);
         Eigen::Vector3d _step(const Eigen::Vector3d& meas, const Eigen::Vector3d& prev_meas);
@@ -142,8 +143,8 @@ namespace avionics {
     };
 
     struct Accelerometer : Sensor {
-        LinearAccelerationMeasurement _measure(const dynamics::LinearAcceleration& accel, const dynamics::LinearAcceleration& prev_accel);
-        // Note: accel = F_net/m - g, not pB_BI_ddot
+        LinearAccelerationMeasurement _measure(const dynamics::LinearAcceleration& accelB, const dynamics::LinearAcceleration& prev_accel);
+        // Note: accelB = FB_net/m - gB, not pB_BI_ddot
         // That is, an accelerometer measures all accelerations excluding gravity 
     };
 
@@ -187,8 +188,8 @@ namespace avionics {
     };
 
     struct InertialNavigationSystem {
-        PositionMeasurement _calculate(const PositionMeasurement& prev_pI_BI, const LinearVelocityMeasurement& prev_pB_BI_dot, const LinearAccelerationMeasurement& accel, const OrientationMeasurement& prev_qIB);
-        LinearVelocityMeasurement _calculate(const LinearVelocityMeasurement& prev_pB_BI_dot, const LinearAccelerationMeasurement& accel, const PositionMeasurement& prev_pI_BI, const OrientationMeasurement& prev_qIB, const AngularVelocityMeasurement& wB_BI);
+        PositionMeasurement _calculate(const PositionMeasurement& prev_pI_BI, const LinearVelocityMeasurement& prev_pB_BI_dot, const LinearAccelerationMeasurement& accelB, const OrientationMeasurement& prev_qIB);
+        LinearVelocityMeasurement _calculate(const LinearVelocityMeasurement& prev_pB_BI_dot, const LinearAccelerationMeasurement& accelB, const PositionMeasurement& prev_pI_BI, const OrientationMeasurement& prev_qIB, const AngularVelocityMeasurement& wB_BI);
     };
 
 
