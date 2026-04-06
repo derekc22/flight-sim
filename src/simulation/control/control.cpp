@@ -66,34 +66,28 @@ namespace control {
             dynamics::EulerAngles eul_meas_t;
             eul_meas_t.set(xN_meas_t.q);
 
-            dynamics::EulerAngleRates eul_dot_meas_t;
-            eul_dot_meas_t.set(xN_meas_t.w, eul_meas_t);
-
             dynamics::EulerAngles eul_des_t;
             eul_des_t.set(xN_des_t.q);
 
-            dynamics::EulerAngleRates eul_dot_des_t;
-            eul_dot_des_t.set(xN_des_t.w, eul_des_t);
-
             if (longitudinal_controller && longitudinal_control_type == "RollPIDController") {
-                u.aileron = longitudinal_controller(eul_meas_t.phi(), eul_dot_meas_t.phi_dot(), eul_des_t.phi());
+                u.aileron = longitudinal_controller(eul_meas_t.phi(), xN_meas_t.w.p(), eul_des_t.phi());
             }
             else if (longitudinal_controller && longitudinal_control_type == "RollDamper") {
-                u.aileron = longitudinal_controller(eul_dot_meas_t.phi_dot(), 0.0, eul_dot_des_t.phi_dot());
+                u.aileron = longitudinal_controller(xN_meas_t.w.p(), 0.0, xN_des_t.w.p());
             }
 
             if (lateral_controller && lateral_control_type == "PitchPIDController") {
-                u.elevator = lateral_controller(eul_meas_t.theta(), eul_dot_meas_t.theta_dot(), eul_des_t.theta());
+                u.elevator = lateral_controller(eul_meas_t.theta(), xN_meas_t.w.q(), eul_des_t.theta());
             }
             else if (lateral_controller && lateral_control_type == "PitchDamper") {
-                u.elevator = lateral_controller(eul_dot_meas_t.theta_dot(), 0.0, eul_dot_des_t.theta_dot());
+                u.elevator = lateral_controller(xN_meas_t.w.q(), 0.0, xN_des_t.w.q());
             }
 
             if (vertical_controller && vertical_control_type == "YawPIDController") {
-                u.rudder = vertical_controller(eul_meas_t.psi(), eul_dot_meas_t.psi_dot(), eul_des_t.psi());
+                u.rudder = vertical_controller(eul_meas_t.psi(), xN_meas_t.w.r(), eul_des_t.psi());
             }
             else if (vertical_controller && vertical_control_type == "YawDamper") {
-                u.rudder = vertical_controller(eul_dot_meas_t.psi_dot(), 0.0, eul_dot_des_t.psi_dot());
+                u.rudder = vertical_controller(xN_meas_t.w.r(), 0.0, xN_des_t.w.r());
             }
         }
         return u;
