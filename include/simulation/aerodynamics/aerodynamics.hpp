@@ -12,6 +12,8 @@
 #include <simulation/dynamics/dynamics.hpp>
 #include <simulation/atmospheric/atmospheric.hpp>
 
+namespace frames { struct Frame; } // forward declare
+
 namespace aerodynamics {
 
     struct FreeStreamVelocity {
@@ -43,6 +45,9 @@ namespace aerodynamics {
         AngleOfAttack alpha;   
         SideslipAngle beta;
     };
+
+    /** @warning The parent of F must be an inertial frame: ECEFFrame or NEDFrameECEF */
+    AerodynamicState aerodynamic_state(const frames::Frame& F, const atmospheric::Wind& windB);
 
     struct DynamicDerivatives {
         // coefficient derivatives with respect to normalized body rates

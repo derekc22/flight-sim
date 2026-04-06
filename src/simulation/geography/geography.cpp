@@ -1,10 +1,20 @@
 #include <Eigen/Dense>
-#include "simulation/frames/frames.hpp"
+#include <format>
+#include <stdexcept>
 #include "simulation/dynamics/dynamics.hpp"
+#include "simulation/frames/frames.hpp"
 #include "simulation/geography/geography.hpp"
 #include "simulation/transforms/transforms.hpp"
 
 namespace geography {
+
+    GeographicState geographic_state(const frames::Frame& F) {
+        if (F.parent != nullptr) {
+            throw std::invalid_argument(std::format("geography::geographic_state: Invalid frame input, the parent of {} must be ECEFFrame", F.name));
+        }
+        const frames::FrameView fv = F.view();
+        return geography::lat_lon_alt_from_pE(fv.H->p());
+    }
 
     dynamics::OrientationMatrix CEN_from_lat_lon(const geography::Latitude& latitude, const geography::Longitude& longitude) {
         Eigen::Matrix3d CEN;
@@ -100,4 +110,3 @@ namespace geography {
 
 
 }
-

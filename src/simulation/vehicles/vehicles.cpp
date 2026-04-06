@@ -102,46 +102,6 @@ namespace vehicles {
         }
     }
 
-    dynamics::RigidBodyState Aircraft::rigidBodyState(const frames::Frame& F) {
-        if (F.parent != nullptr && F.parent->name != "NEDFrameECEF") {
-            std::string err_msg = std::format("vehicles::Aircraft::rigidBodyState: Invalid frame input, the parent of {} must be an inertial frame: ECEFFrame or NEDFrameECEF", F.name);
-            throw std::invalid_argument(err_msg);
-        }
-        frames::FrameView fv = F.view();
-        return dynamics::RigidBodyState {
-            .p = fv.H->p(), 
-            .v = *fv.v, 
-            .q = *fv.q, 
-            .w = *fv.w
-        };   
-    }
-
-    geography::GeographicState Aircraft::geographicState(const frames::Frame& F) {
-        if (F.parent != nullptr) {
-            std::string err_msg = std::format("vehicles::Aircraft::geographicState: Invalid frame input, the parent of {} must be ECEFFrame", F.name);
-            throw std::invalid_argument(err_msg);
-        }
-        frames::FrameView fv = F.view();
-        return geography::lat_lon_alt_from_pE(fv.H->p());
-    }
-
-    aerodynamics::AerodynamicState Aircraft::aerodynamicState(const frames::Frame& F, const atmospheric::Wind& windB) {
-        if (F.parent != nullptr && F.parent->name != "NEDFrameECEF") {
-            std::string err_msg = std::format("vehicles::Aircraft::aerodynamicState: Invalid frame input, the parent of {} must be an inertial frame: ECEFFrame or NEDFrameECEF", F.name);
-            throw std::invalid_argument(err_msg);
-        }
-        return aerodynamics::compute_aerodynamic_state(rigidBodyState(F), windB);
-    }
-
-    atmospheric::StaticAtmosphericState Aircraft::staticAtmosphericState(const frames::Frame& F) {
-        if (F.parent != nullptr) {
-            std::string err_msg = std::format("vehicles::Aircraft::staticAtmosphericState: Invalid frame input, the parent of {} must be ECEFFrame", F.name);
-            throw std::invalid_argument(err_msg);
-        }
-        return atmospheric::std_atmosphere(geographicState(F).alt);
-    }
-
-
     void Aircraft::step(const StepOptions& opts) {
 
         StepOptions::_validate(opts);
@@ -676,18 +636,6 @@ namespace vehicles {
 
     }
 
-    /** @deprecated */
-    // void Aircraft::set(const dynamics::RigidBodyState& rigidBodyState, frames::NEDFrameECEF& F){
-    //     F.set(rigidBodyState.p);
-    //     F.set(rigidBodyState.v);
-    //     F.set(rigidBodyState.q);
-    //     F.set(rigidBodyState.w);
-    // }
-
-    // void Aircraft::set(const geography::GeographicState& geographicState, frames::NEDFrameECEF& F){
-    //     F.set( geography::pE_from_lat_lon_alt(geographicState));
-    // }
-
     _StepOptions::operator bool() const {
         return
             H.has_value()       ||
@@ -789,9 +737,9 @@ namespace vehicles {
 
 
     void Aircraft::print_state(int t, atmospheric::Wind wind) {
-        const dynamics::RigidBodyState rbs = rigidBodyState(FRDFrameNED);
-        const geography::GeographicState gps = geographicState(FRDFrameECEF);
-        const aerodynamics::AerodynamicState ads = aerodynamicState(FRDFrameNED, wind);
+        const dynamics::RigidBodyState rbs = dynamics::rigid_body_state(FRDFrameNED);
+        const geography::GeographicState gps = geography::geographic_state(FRDFrameECEF);
+        const aerodynamics::AerodynamicState ads = aerodynamics::aerodynamic_state(FRDFrameNED, wind);
 
         const Eigen::Vector3d& p = rbs.p.data;
         const dynamics::EulerAngles& eul = FRDFrameNED.eulNB;

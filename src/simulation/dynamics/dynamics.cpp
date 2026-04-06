@@ -3,10 +3,12 @@
 #include <stdexcept>
 #include <algorithm>
 #include <iostream>
+#include <format>
 #include <vector>
 #include <tuple>
 #include "simulation/transforms/transforms.hpp"
 #include "simulation/dynamics/dynamics.hpp"
+#include "simulation/frames/frames.hpp"
 #include "simulation/constants/constants.hpp"
 #include "simulation/util/util.hpp"
 
@@ -38,6 +40,18 @@ namespace dynamics {
     //     return std::array<Eigen::Vector3d, 2>{xt, xt_dot};
     // }
 
+    RigidBodyState rigid_body_state(const frames::Frame& F) {
+        if (F.parent != nullptr && F.parent->name != "NEDFrameECEF") {
+            throw std::invalid_argument(std::format("dynamics::rigid_body_state: Invalid frame input, the parent of {} must be an inertial frame: ECEFFrame or NEDFrameECEF", F.name));
+        }
+        const frames::FrameView fv = F.view();
+        return {
+            .p = fv.H->p(),
+            .v = *fv.v,
+            .q = *fv.q,
+            .w = *fv.w
+        };
+    }
 
 
 

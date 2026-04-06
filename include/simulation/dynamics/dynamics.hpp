@@ -12,6 +12,8 @@
 #include "simulation/util/util.hpp"
 #include "simulation/transforms/transforms.hpp"
 
+namespace frames { struct Frame; } // forward declare
+
 namespace dynamics {
 
     struct Position;
@@ -162,6 +164,9 @@ namespace dynamics {
         dynamics::OrientationQuaternion q;  // e.g. qIB
         dynamics::AngularVelocity w;        // e.g. wB_BI
     };
+
+    /** @warning The parent of F must be an inertial frame: ECEFFrame or NEDFrameECEF */
+    RigidBodyState rigid_body_state(const frames::Frame& F);
 
     /** @deprecated */
     // struct InertialRigidBodyState : RigidBodyState{

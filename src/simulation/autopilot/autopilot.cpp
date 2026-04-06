@@ -196,12 +196,12 @@ namespace autopilot { // to encompass autonomy and trim
 
         const TrimProblem<double> problem{
             .target = TrimTarget{
-                .beta = aircraft.aerodynamicState(aircraft.FRDFrameNED, wind).beta.data,
+                .beta = aerodynamics::aerodynamic_state(aircraft.FRDFrameNED, wind).beta.data,
                 .phi = aircraft.FRDFrameNED.eulNB.phi(),
                 .theta = aircraft.FRDFrameNED.eulNB.theta(),
             },
             .conditions = TrimConditions{
-                .rho = aircraft.staticAtmosphericState(aircraft.FRDFrameECEF).rho,
+                .rho = atmospheric::static_atmospheric_state(aircraft.FRDFrameECEF).rho,
                 .windB = wind,
             },
             .state_guess = TrimState<double>{

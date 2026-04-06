@@ -213,18 +213,6 @@ namespace vehicles {
             const avionics::AvionicsProperties& avionics_properties
         );
 
-        /** @warning The parent of F must be an inertial frame: ECEFFrame or NEDFrameECEF */
-        dynamics::RigidBodyState rigidBodyState(const frames::Frame& F);
-        
-        /** @warning The parent of F must the ECEFFrame */
-        geography::GeographicState geographicState(const frames::Frame& F);
-
-        /** @warning The parent of F must be an inertial frame: ECEFFrame or NEDFrameECEF */
-        aerodynamics::AerodynamicState aerodynamicState(const frames::Frame& F, const atmospheric::Wind& windB);
-
-        /** @warning The parent of F must the ECEFFrame */
-        atmospheric::StaticAtmosphericState staticAtmosphericState(const frames::Frame& F);
-
         void step(const StepOptions& opts);
         void _step(frames::NEDFrameECEF& F, const _StepOptions& opts);
         void _step(frames::FRDFrameNED& F, const _StepOptions& opts);

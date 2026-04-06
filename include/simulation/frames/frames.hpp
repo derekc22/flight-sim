@@ -22,43 +22,6 @@ namespace frames {
     struct STABFrameFRD;
     struct WINDFrameSTAB;
 
-    /** @deprecated */
-    // struct SetOptions{
-    //     std::optional<Eigen::Matrix4d> H;
-    //     std::optional<Eigen::Matrix3d> C;
-    //     std::optional<Eigen::Vector3d> p;
-    //     std::optional<Eigen::Quaterniond> q;
-    //     std::optional<Eigen::Vector3d> eul;
-    //     std::optional<Eigen::Matrix3d> C_dot;
-    //     std::optional<Eigen::Quaterniond> q_dot;
-    //     std::optional<Eigen::Vector3d> w;
-    //     std::optional<Eigen::Vector3d> eul_dot;
-    //     std::optional<Eigen::Quaterniond> wq;
-    //     std::optional<Eigen::Vector3d> v;
-    //     // std::optional<Eigen::Vector3d> a;
-    //     std::optional<Eigen::Vector3d> g;
-
-    //     // void clear() noexcept;
-    // };
-
-    /** @deprecated */
-    // struct SetOptions{
-    //     std::optional<dynamics::HomogenousFrameTransformationMatrix> H;
-    //     std::optional<dynamics::OrientationMatrix> C;
-    //     std::optional<dynamics::Position> p;
-    //     std::optional<dynamics::OrientationQuaternion> q;
-    //     std::optional<dynamics::EulerAngles> eul;
-    //     std::optional<dynamics::OrientationMatrixRate> C_dot;
-    //     std::optional<dynamics::OrientationQuaternionRate> q_dot;
-    //     std::optional<dynamics::AngularVelocity> w;
-    //     std::optional<dynamics::EulerAngleRates> eul_dot;
-    //     std::optional<dynamics::AngularVelocityQuaternion> wq;
-    //     std::optional<dynamics::LinearVelocity> v;
-    //     std::optional<dynamics::Gravity> g;
-
-    //     // void clear() noexcept;
-    // };
-
     struct SetOptions {
         std::optional<dynamics::HomogenousFrameTransformationMatrix> H;
         std::optional<dynamics::OrientationMatrix> C;
@@ -123,50 +86,19 @@ namespace frames {
         virtual MutableFrameView view() = 0;
         virtual FrameView view() const = 0;
         virtual ~Frame();
-        // virtual void step(vehicles::StepOptions) = 0;
-        // virtual void step(vehicles::StepOptionsStrict) = 0;
 
-        /** @deprecated */
-        // void set(const SetOptions& opts);
         void set(const SetOptions& opts);
-
-        /** @deprecated */
-        // void set(const dynamics::RigidBodyState& rigidBodyState);
-        // dynamics::RigidBodyState RigidBodyState();
         
         std::unordered_set<Frame*> dependents;
         std::unordered_set<Frame*> dependent_on;
         void _add_as_direct_dependent(Frame* p);
     };
 
-    /** @deprecated */
-    // {PARENT, Y} -> {SELF, X}
-    // struct GenericFrame : Frame {
-    //     GenericFrame(std::string n, Frame* parent);
-    //     dynamics::HomogenousFrameTransformationMatrix HYX; 
-    //     dynamics::OrientationQuaternion qYX;
-    //     dynamics::EulerAngles eulYX;
-    //     dynamics::OrientationMatrixRate CYX_dot;
-    //     dynamics::OrientationQuaternionRate qYX_dot;
-    //     dynamics::AngularVelocity wX_XY;
-    //     dynamics::AngularVelocityQuaternion wq_XY;
-    //     dynamics::EulerAngleRates eulYX_dot;
-    //     dynamics::LinearVelocity vX_XY;
-    //     dynamics::Gravity gX;
-
-    //     FrameView view() override;
-    //     // FrameView view() const override;
-    //     void step(const vehicles::_StepOptions& opts) override;
-    // };
 
     struct ECEFFrame { 
-        std::string name = "ECEFFrame"; 
-
-        /** @deprecated */
-        // dynamics::Gravity gE(dynamics::Position pE);
-        // geography::GeographicState lat_lon_alt_from_pE(const dynamics::Position & pE);
-        // dynamics::Position pE_from_lat_lon_alt(const geography::GeographicState& geographicState);
+        std::string name = "ECEFFrame"; ;
     }; 
+
     inline const ECEFFrame ECEF {};
 
     // {ECEF} -> {NED}
@@ -185,10 +117,6 @@ namespace frames {
 
         MutableFrameView view() override;
         FrameView view() const override;
-        // void step(const vehicles::_StepOptions& opts) override;
-
-        /** @deprecated */
-        // dynamics::OrientationMatrix CEN_from_lat_lon(const geography::Latitude& lat, const geography::Longitude& lon);
     };
 
     // {ECEF} -> {BODY}
@@ -207,13 +135,10 @@ namespace frames {
 
         MutableFrameView view() override;  
         FrameView view() const override;  
-        // void step(const vehicles::_StepOptions& opts) override;
     };
 
     // {NED} -> {BODY}
     struct FRDFrameNED : Frame { 
-        // void Frame::set(const dynamics::RigidBodyState& rigidBodyState)
-
         FRDFrameNED(NEDFrameECEF* pNEDFrameECEF);
         dynamics::HomogenousFrameTransformationMatrix HNB; 
         dynamics::OrientationQuaternion qNB;
@@ -228,7 +153,6 @@ namespace frames {
 
         MutableFrameView view() override; 
         FrameView view() const override; 
-        // void step(const vehicles::_StepOptions& opts) override;
     };
 
     // {BODY} -> {STAB}
@@ -247,10 +171,6 @@ namespace frames {
 
         MutableFrameView view() override; 
         FrameView view() const override; 
-        // void step(const vehicles::_StepOptions& opts) override;
-
-        /** @deprecated */
-        // dynamics::OrientationMatrix CBS(const aerodynamics::AngleOfAttack& alpha) const;
     };
 
     // {STAB} -> {WIND}
@@ -269,10 +189,6 @@ namespace frames {
 
         MutableFrameView view() override; 
         FrameView view() const override; 
-        // void step(const vehicles::_StepOptions& opts) override;
-
-        /** @deprecated */
-        // dynamics::OrientationMatrix CSW(const aerodynamics::SideslipAngle& beta) const;
     };
 
 

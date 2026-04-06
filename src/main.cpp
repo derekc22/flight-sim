@@ -20,6 +20,7 @@
 #include "simulation/autopilot/autopilot.hpp"
 #include "simulation/analysis/analysis.hpp"
 #include "core/io/io.hpp"
+#include "core/json/json.hpp"
 #include "core/connection/connection.hpp"
 #include "core/messages/messages.hpp"
 
@@ -49,14 +50,14 @@ struct SimulationOutput {
 vehicles::Aircraft load(bool trim_bool) {
     // create vehicle from config
     vehicles::Aircraft aircraft { 
-        io::parse_structural_config(), 
-        io::parse_aerodynamics_config(),
-        io::parse_control_config(),
-        io::parse_avionics_config(),
+        json::parse_structural_config(), 
+        json::parse_aerodynamics_config(),
+        json::parse_control_config(),
+        json::parse_avionics_config(),
     };
 
     // set initial conditions from config
-    aircraft.step(io::parse_initialization_config(trim_bool));
+    aircraft.step(json::parse_initialization_config(trim_bool));
 
     return aircraft;
 }
@@ -84,7 +85,7 @@ void cleanup(const SimulationInput& sim_in, const SimulationOutput& sim_out) {
         }
 
         // dump configs
-        io::dump_configs(out_dir_path);
+        json::dump_configs(out_dir_path);
     }
 }
 
@@ -125,7 +126,7 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
     for (int t = 0; t < tf; ++t) {
 
         // get rigid body state
-        dynamics::RigidBodyState xN_t = aircraft.rigidBodyState(aircraft.FRDFrameNED);
+        dynamics::RigidBodyState xN_t = dynamics::rigid_body_state(aircraft.FRDFrameNED);
 
         // initialize measurements to ground truth
         dynamics::RigidBodyState xN_meas_t = xN_t;
@@ -134,7 +135,7 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
         next += std::chrono::duration_cast<clock::duration>(std::chrono::duration<double>(constants::dt));
 
         // compute airdensity at current altitude
-        atmospheric::AirDensity rho = aircraft.staticAtmosphericState(aircraft.FRDFrameECEF).rho;
+        atmospheric::AirDensity rho = atmospheric::static_atmospheric_state(aircraft.FRDFrameECEF).rho;
 
         // fetch wind
         // if (auto out_pkt = udp_out.try_receive()) {
@@ -219,8 +220,8 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
         }
 
         if (sim_in.sensor_bool){
-            atmospheric::StaticAtmosphericState static_atmo_t = aircraft.staticAtmosphericState(aircraft.FRDFrameECEF);
-            geography::GeographicState geo_t = aircraft.geographicState(aircraft.FRDFrameECEF);
+            atmospheric::StaticAtmosphericState static_atmo_t = atmospheric::static_atmospheric_state(aircraft.FRDFrameECEF);
+            geography::GeographicState geo_t = geography::geographic_state(aircraft.FRDFrameECEF);
 
             // obtain full state from sensors
             aerodynamics::AerodynamicState ads_t = aerodynamics::compute_aerodynamic_state(xN_t, wind);
@@ -247,7 +248,7 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
 
         // generate in_pkt from the simulation state
         messages::FlightGearMessageIn in_pkt = messages::process_in_pkt(
-            aircraft.geographicState(aircraft.FRDFrameECEF), 
+            geography::geographic_state(aircraft.FRDFrameECEF), 
             aircraft.FRDFrameNED.eulNB
         );
 

@@ -4,6 +4,7 @@
 #include <vector>
 #include "simulation/dynamics/dynamics.hpp"
 
+namespace frames { struct Frame; } // forward declare
 
 namespace geography {
 
@@ -30,7 +31,8 @@ namespace geography {
         Altitude alt;
     };
 
-
+    /** @warning The parent of F must the ECEFFrame */
+    GeographicState geographic_state(const frames::Frame& F);
 
     dynamics::OrientationMatrix CEN_from_lat_lon(const geography::Latitude& lat, const geography::Longitude& lon);
 

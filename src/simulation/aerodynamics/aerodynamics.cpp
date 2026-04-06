@@ -5,8 +5,11 @@
 #include <optional>
 #include <algorithm>
 #include <cmath>
+#include <format>
+#include <stdexcept>
 #include "simulation/aerodynamics/aerodynamics.hpp"
 #include "simulation/structural/structural.hpp"
+#include "simulation/frames/frames.hpp"
 #include <simulation/dynamics/dynamics.hpp>
 #include <simulation/atmospheric/atmospheric.hpp>
 #include "simulation/constants/constants.hpp"
@@ -25,6 +28,13 @@ namespace aerodynamics {
             s.AR   = s.span / s.chord;
             s.p_ac = s.p_ref;   // quarter-chord assumed already in p_ref
         }
+    }
+
+    AerodynamicState aerodynamic_state(const frames::Frame& F, const atmospheric::Wind& windB) {
+        if (F.parent != nullptr && F.parent->name != "NEDFrameECEF") {
+            throw std::invalid_argument(std::format("aerodynamics::aerodynamic_state: Invalid frame input, the parent of {} must be an inertial frame: ECEFFrame or NEDFrameECEF", F.name));
+        }
+        return aerodynamics::compute_aerodynamic_state(dynamics::rigid_body_state(F), windB);
     }
 
     std::unordered_map<std::string, size_t> AerodynamicProperties::build_IDs() {
