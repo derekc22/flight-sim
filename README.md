@@ -32,7 +32,7 @@ C++ flight simulator with FlightGear integration
 - To run the simulation: `scripts/run.sh -a <AIRCRAFT> -t <TIME_SEC> [-r <TRIM>] [-s <SENSOR>] [-c <CONTROL>] [-v <VERBOSE>] [-d <DATA>] [-o <OUT_DIR>] [-p <PLOT>]`
   - `-a AIRCRAFT`: Aircraft to simulate (e.g. ASW28)
   - `-t TIME_SEC`: Simulation time in seconds
-  - `-r TRIM`: Enable trim
+  - `-r TRIM`: Enable trim, linearization, and eigenanalysis
   - `-s SENSOR`: Enable sensors and avionics
   - `-c CONTROL`: Enable control system
   - `-v VERBOSE`: Enable verbose output

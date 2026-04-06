@@ -107,7 +107,7 @@ namespace dynamics {
         const double Omega = wB_BI_t.data.norm();
         Eigen::Quaterniond dq;
 
-        if (Omega < constants::eps) dq = Eigen::Quaterniond::Identity();
+        if (Omega < constants::eps) dq = constants::qI;
         else {
             const Eigen::Vector3d w_hat = wB_BI_t.data/Omega;
             dq.w() = std::cos(Omega * constants::dt / 2);

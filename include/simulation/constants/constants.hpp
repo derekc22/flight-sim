@@ -12,7 +12,7 @@ namespace constants {
     inline constexpr double gamma_air = 1.4;        // [-]
     inline constexpr double R_air = 287.052874247;  // [J·kg^-1·K^-1]
     inline constexpr double lapse_rate = -0.0065;   // [K/m]
-    inline constexpr double P_SL = 101325;         // [Pa]
+    inline constexpr double P_SL = 101325;          // [Pa]
     inline constexpr double rho_SL = 1.225;         // [kg/m^3]
     inline constexpr double T_SL = 288.0;           // [K]
 
@@ -27,4 +27,6 @@ namespace constants {
     inline const Eigen::Vector3d ej = Eigen::Vector3d(0, 1, 0);
     inline const Eigen::Vector3d ek = Eigen::Vector3d(0, 0, 1);
 
+    // Special Quaternions
+    inline const Eigen::Quaterniond qI = Eigen::Quaterniond::Identity();
 }

@@ -542,7 +542,7 @@ namespace transforms {
     // All vector rotations (as opposed to frame rotations) are, by definition, extrinsic. The concept of an "intrinsic" rotation only applies to frames
     // That is, the concept of an "intrinsic" vector rotation is not defined
     Eigen::Quaterniond chain_quat_post(const std::vector<Eigen::Quaterniond>& q_list) {
-        Eigen::Quaterniond qtot = Eigen::Quaterniond::Identity();
+        Eigen::Quaterniond qtot = constants::qI;
         for (const auto& q : q_list){
             qtot *= normalize_and_canonicalize(q);
         }
@@ -551,7 +551,7 @@ namespace transforms {
 
     // Given the orientation (of the frame/vector) obtained via the nth rotation, how is the n+1 rotation applied
     Eigen::Quaterniond chain_quat_pre(const std::vector<Eigen::Quaterniond>& q_list) {
-        Eigen::Quaterniond qtot = Eigen::Quaterniond::Identity();
+        Eigen::Quaterniond qtot = constants::qI;
 
         for (auto rit = q_list.rbegin(); rit != q_list.rend(); ++rit) {
             qtot *= normalize_and_canonicalize(*rit);

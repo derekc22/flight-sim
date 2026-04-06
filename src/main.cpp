@@ -241,7 +241,6 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
             u_t << u.elevator, u.aileron, u.rudder, u.flap, u.spoiler;
 
             sim_out.p_DM->insert(t, xN_meas_t.p.data, constants::dt);
-            // sim_out.eul_DM->insert(t, transforms::quatC_to_eul(xN_meas_t.q.data, "ZYX", "intr"), constants::dt);
             sim_out.eul_DM->insert(t, eul_meas_t.data, constants::dt);
             sim_out.w_DM->insert(t, xN_meas_t.w.data, constants::dt);
             sim_out.v_DM->insert(t, xN_meas_t.v.data, constants::dt);

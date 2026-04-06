@@ -38,13 +38,13 @@ namespace control {
 
         // filtered derivative
         double alpha = std::exp(-constants::dt / tau);
-        d_filtered = alpha * d_filtered + (1.0 - alpha) * meas_dot;
+        d_filtered = alpha * d_filtered + (1.0 - alpha) * meas_dot; // technically PI-D, not PID
 
         // integral candidate
         double i_new = integral + err * constants::dt;
 
         // unsaturated control
-        double u_unsat = Kp * err + Ki * i_new - Kd * d_filtered;
+        double u_unsat = Kp * err - Kd * d_filtered + Ki * i_new;
 
         // saturate
         double u = std::clamp(u_unsat, u_min, u_max);

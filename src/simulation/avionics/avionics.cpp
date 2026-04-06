@@ -83,7 +83,7 @@ namespace avionics {
 
         double bias_angle = bias_3d.norm();
         Eigen::Quaterniond bias_q;
-        if (bias_angle < constants::eps) bias_q = Eigen::Quaterniond::Identity();
+        if (bias_angle < constants::eps) bias_q = constants::qI;
         else {
             Eigen::Vector3d bias_axis = bias_3d / bias_angle;
             bias_q = Eigen::Quaterniond(Eigen::AngleAxisd(bias_angle, bias_axis));
@@ -94,7 +94,7 @@ namespace avionics {
         double angle = noise_dtheta.norm();
 
         Eigen::Quaterniond dq;
-        if (angle < constants::eps) dq = Eigen::Quaterniond::Identity();
+        if (angle < constants::eps) dq = constants::qI;
         else {
             Eigen::Vector3d axis = noise_dtheta / angle;
             dq = Eigen::Quaterniond(Eigen::AngleAxisd(angle, axis));

@@ -398,7 +398,7 @@ namespace json {
             .xN_des_t = {
                 .p = dynamics::Position{ constants::Zero3 },
                 .v = dynamics::LinearVelocity{ constants::Zero3 },
-                .q = dynamics::OrientationQuaternion{ Eigen::Quaterniond::Identity() },
+                .q = dynamics::OrientationQuaternion{ constants::qI },
                 .w = dynamics::AngularVelocity{ constants::Zero3 },
             },
         };

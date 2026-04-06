@@ -2,6 +2,6 @@
     "aerodynamics_config": "aerodynamics/trim.json",
     "control_config": "control/pid.json",
     "structural_config": "structural/baseline.json",
-    "initialization_config": "initialization/trim_bank.json",
+    "initialization_config": "initialization/trim_level.json",
     "avionics_config": "avionics/avionics.json"
 }
