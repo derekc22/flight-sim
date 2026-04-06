@@ -25,6 +25,25 @@ namespace io {
         std::cout << "File saved successfully to " << path_name.string() << std::endl;
     }
 
+    void write_csv(const Eigen::MatrixXd& data, const std::string& dir, const std::string& fname) {
+        create_dir(dir);
+
+        const auto path_name = std::filesystem::path(dir) / (fname + ".csv");
+        std::ofstream file_csv(path_name);
+        if (!file_csv.is_open()) { throw std::runtime_error("Failed to open file: " + path_name.string()); }
+
+        for (Eigen::Index i = 0; i < data.rows(); ++i) {
+            for (Eigen::Index j = 0; j < data.cols(); ++j) {
+                file_csv << data(i, j);
+                if (j < data.cols() - 1) file_csv << ",";
+            }
+            file_csv << "\n";
+        }
+
+        file_csv.close();
+        std::cout << "File saved successfully to " << path_name.string() << std::endl;
+    }
+
     void save_vector_to_file(std::vector<int>& data, std::string fname){
         std::string path_name = "data/" + fname + ".csv";
         std::ofstream file_v(path_name);
@@ -36,27 +55,6 @@ namespace io {
     }
 
     DataMatrix::DataMatrix(const Eigen::MatrixXd& d) : data(d), n_rows(static_cast<int>(data.rows())), n_cols(static_cast<int>(data.cols())) {}
-
-    void DataMatrix::write_csv(const std::string& dir, const std::string& fname) const {
-
-        create_dir(dir);
-
-        // std::string path_name = dir + "/" + fname + ".csv";
-        auto path_name = std::filesystem::path(dir) / (fname + ".csv");
-
-        std::ofstream file_m(path_name);
-        if (!file_m.is_open()) { throw std::runtime_error("Failed to open file: " + path_name.string()); }
-
-        for (int i = 0; i < n_rows; ++i) {
-            for (int j = 0; j < n_cols; ++j) {
-                file_m << data(i, j);
-                if (j < n_cols - 1) file_m << ","; // comma delimiter
-            }
-            file_m << "\n";
-        }
-        file_m.close();
-        std::cout << "File saved successfully to " << path_name.string() << std::endl;
-    }
 
     void DataMatrix::insert(int t, const Eigen::VectorXd input, double dt) {
         if (input.cols() > 1) { throw std::runtime_error("io::DataMatrix::insert Eigen::Matrix passed for 'input', expected Eigen::Vector"); }

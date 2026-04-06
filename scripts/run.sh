@@ -2,11 +2,11 @@
 set -e
 
 usage() {
-  echo "USAGE: $0 -a <AIRCRAFT> -t <TIME_SEC> [-r <TRIM_BOOL>] [-s <SENSOR_BOOL>] [-c <CONTROL_BOOL>] [-v <VERBOSE_BOOL>] [-d <DATA_BOOL>] [-o <OUT_DIR>] [-p <PLOT>]" >&2
+  echo "USAGE: $0 -a <AIRCRAFT> -t <TIME_SEC> [-r <TRIM_BOOL>] [-s <SENSOR_BOOL>] [-c <CONTROL_BOOL>] [-v <VERBOSE_BOOL>] [-d <DATA_BOOL>] [-o <OUT_DIR>] [-p <PLOT>] [-z <TEST_BOOL>]" >&2
   exit 1
 }
 
-while getopts "a:t:o:rscvdph" opt; do
+while getopts "a:t:o:rscvdpzh" opt; do
   case "$opt" in
     a) AIRCRAFT="$OPTARG" ;;
     t) TIME_SEC="$OPTARG" ;;
@@ -17,6 +17,7 @@ while getopts "a:t:o:rscvdph" opt; do
     d) DATA_BOOL=1 ;;
     o) OUT_DIR="$OPTARG" ;;
     p) PLOT=1 ;;
+    z) TEST_BOOL=1 ;;
     h) usage ;;
     ?) usage ;;
   esac
@@ -29,6 +30,7 @@ done
 : "${VERBOSE_BOOL:=0}"
 : "${DATA_BOOL:=0}"
 : "${PLOT:=0}"
+: "${TEST_BOOL:=0}"
 : "${OUT_DIR:=$(date +"%Y%b%d_%H-%M-%S")}"
 
 # required args check
@@ -38,19 +40,21 @@ if [[ "$TRIM_BOOL" -eq 1 && "$CONTROL_BOOL" -eq 1 ]]; then
   exit 1
 fi
 
-source .env
+if [ "$TEST_BOOL" -eq 0 ]; then
+  source .env
 
-cd "$DIR" || exit 1
+  cd "$DIR" || exit 1
 
-./scripts/write_in_xml.sh
-./scripts/write_out_xml.sh
+  ./scripts/write_in_xml.sh
+  ./scripts/write_out_xml.sh
 
-./scripts/launch.sh "$AIRCRAFT" &
-FG_PID=$!
+  ./scripts/launch.sh "$AIRCRAFT" &
+  FG_PID=$!
 
-trap 'kill "$FG_PID" 2>/dev/null || true' EXIT
+  trap 'kill "$FG_PID" 2>/dev/null || true' EXIT
 
-sleep 0
+  sleep 0
+fi
 
 rm -rf build
 cmake -B build -S .

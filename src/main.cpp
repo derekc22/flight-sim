@@ -67,11 +67,11 @@ void cleanup(const SimulationInput& sim_in, const SimulationOutput& sim_out) {
     std::string out_dir_path = "data/" + sim_in.out_dir + "/";
     if (sim_in.data_bool){
         // save data
-        sim_out.p_DM->write_csv(out_dir_path, "p");
-        sim_out.eul_DM->write_csv(out_dir_path, "eul");
-        sim_out.w_DM->write_csv(out_dir_path, "w");
-        sim_out.v_DM->write_csv(out_dir_path, "v");
-        sim_out.u_DM->write_csv(out_dir_path, "u");
+        io::write_csv(sim_out.p_DM->data, out_dir_path, "p");
+        io::write_csv(sim_out.eul_DM->data, out_dir_path, "eul");
+        io::write_csv(sim_out.w_DM->data, out_dir_path, "w");
+        io::write_csv(sim_out.v_DM->data, out_dir_path, "v");
+        io::write_csv(sim_out.u_DM->data, out_dir_path, "u");
         
         // log trim
         if (sim_in.trim_bool){
@@ -80,6 +80,8 @@ void cleanup(const SimulationInput& sim_in, const SimulationOutput& sim_out) {
             // log linearization and eigenanalysis
             if (sim_out.trim_sol.converged) {
                 io::write_txt(analysis::print_linearization_solution(sim_out.lin_sol), out_dir_path, "lin_sol");
+                io::write_csv(Eigen::MatrixXd(sim_out.lin_sol.A), out_dir_path, "lin_sol_A");
+                io::write_csv(Eigen::MatrixXd(sim_out.lin_sol.B), out_dir_path, "lin_sol_B");
                 io::write_txt(analysis::print_eigen_analysis(sim_out.eig_sol), out_dir_path, "eig_sol");
             }
         }
