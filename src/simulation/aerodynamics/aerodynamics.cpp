@@ -49,13 +49,13 @@ namespace aerodynamics {
     SurfaceKinematics compute_surface_kinematics(
         const Surface& s,
         const structural::StructuralProperties& structural_properties,
-        const dynamics::RigidBodyState& rigidBodyState,
+        const dynamics::RigidBodyState& rigid_body_state,
         const atmospheric::AirDensity& rho,
         const atmospheric::Wind& windB
     ) {
         const dynamics::Twist_T<double> twist{
-            .v = rigidBodyState.v.data,
-            .w = rigidBodyState.w.data,
+            .v = rigid_body_state.v.data,
+            .w = rigid_body_state.w.data,
         };
 
         const SurfaceKinematics_T<double> sk = compute_surface_kinematics_T<double>(s, structural_properties, twist, rho, windB);
@@ -130,15 +130,15 @@ namespace aerodynamics {
     AerodynamicLoad step_aero_forces_moments(
         const AerodynamicProperties& aerodynamic_properties,
         const structural::StructuralProperties& structural_properties,
-        const dynamics::RigidBodyState& rigidBodyState,
+        const dynamics::RigidBodyState& rigid_body_state,
         const atmospheric::AirDensity& rho,
         const control::ControlSurfaceInputs& u,
         const control::ControlProperties& cp,
         const atmospheric::Wind& windB
     ) {
         const dynamics::Twist_T<double> twist{
-            .v = rigidBodyState.v.data,
-            .w = rigidBodyState.w.data,
+            .v = rigid_body_state.v.data,
+            .w = rigid_body_state.w.data,
         };
 
         const AerodynamicLoad_T<double> loads = step_aero_forces_moments_T<double>(
@@ -165,8 +165,8 @@ namespace aerodynamics {
 
 
 
-    AerodynamicState compute_aerodynamic_state(const dynamics::RigidBodyState& rigidBodyState, const atmospheric::Wind& windB) {
-        const dynamics::Twist_T<double> twist{ .v = rigidBodyState.v.data, .w = rigidBodyState.w.data };
+    AerodynamicState compute_aerodynamic_state(const dynamics::RigidBodyState& rigid_body_state, const atmospheric::Wind& windB) {
+        const dynamics::Twist_T<double> twist{ .v = rigid_body_state.v.data, .w = rigid_body_state.w.data };
 
         const AerodynamicState_T<double> ads = compute_aerodynamic_state_T<double>(twist, windB);
 

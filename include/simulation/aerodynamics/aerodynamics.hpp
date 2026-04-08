@@ -210,7 +210,7 @@ namespace aerodynamics {
     SurfaceKinematics compute_surface_kinematics(
         const Surface& s,
         const structural::StructuralProperties& structural_properties,
-        const dynamics::RigidBodyState& rigidBodyState,
+        const dynamics::RigidBodyState& rigid_body_state,
         const atmospheric::AirDensity& rho,
         const atmospheric::Wind& windB
     );
@@ -227,7 +227,7 @@ namespace aerodynamics {
     AerodynamicLoad step_aero_forces_moments(
         const AerodynamicProperties& aerodynamic_properties,
         const structural::StructuralProperties& structural_properties,
-        const dynamics::RigidBodyState& rigidBodyState,
+        const dynamics::RigidBodyState& rigid_body_state,
         const atmospheric::AirDensity& rho,
         const control::ControlSurfaceInputs& u,
         const control::ControlProperties& cp,
@@ -235,7 +235,7 @@ namespace aerodynamics {
     );
     
 
-    AerodynamicState compute_aerodynamic_state(const dynamics::RigidBodyState& rigidBodyState, const atmospheric::Wind& windB);
+    AerodynamicState compute_aerodynamic_state(const dynamics::RigidBodyState& rigid_body_state, const atmospheric::Wind& windB);
 
 
     dynamics::OrientationMatrix CBS(const aerodynamics::AngleOfAttack& alpha);

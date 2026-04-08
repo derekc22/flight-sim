@@ -226,8 +226,8 @@ namespace vehicles {
         void _sense();
 
         /** @deprecated */
-        // void _set(const dynamics::RigidBodyState& rigidBodyState, frames::Frame& F);
-        // void _set(const geography::GeographicState& geographicState, frames::Frame& F);
+        // void _set(const dynamics::RigidBodyState& rigid_body_state, frames::Frame& F);
+        // void _set(const geography::GeographicState& geographic_state, frames::Frame& F);
 
         void print_state(int t, atmospheric::Wind wind);
 
