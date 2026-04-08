@@ -2,7 +2,7 @@
 set -e
 
 usage() {
-  echo "USAGE: $0 -a <AIRCRAFT> -t <TIME_SEC> [-r <TRIM_BOOL>] [-s <SENSOR_BOOL>] [-c <CONTROL_BOOL>] [-v <VERBOSE_BOOL>] [-d <DATA_BOOL>] [-o <OUT_DIR>] [-p <PLOT>] [-z <TEST_BOOL>]" >&2
+  echo "USAGE: $0 -a <AIRCRAFT> -t <TIME_SEC> [-r <TRIM_BOOL>] [-s <SENSOR_BOOL>] [-c <CONTROL_BOOL>] [-v <VERBOSE_BOOL>] [-d <DATA_BOOL>] [-o <OUT_DIR>] [-p <PLOT_BOOL>] [-z <TEST_BOOL>]" >&2
   exit 1
 }
 
@@ -16,7 +16,7 @@ while getopts "a:t:o:rscvdpzh" opt; do
     v) VERBOSE_BOOL=1 ;;
     d) DATA_BOOL=1 ;;
     o) OUT_DIR="$OPTARG" ;;
-    p) PLOT=1 ;;
+    p) PLOT_BOOL=1 ;;
     z) TEST_BOOL=1 ;;
     h) usage ;;
     ?) usage ;;
@@ -29,14 +29,21 @@ done
 : "${SENSOR_BOOL:=0}"
 : "${VERBOSE_BOOL:=0}"
 : "${DATA_BOOL:=0}"
-: "${PLOT:=0}"
+: "${PLOT_BOOL:=0}"
 : "${TEST_BOOL:=0}"
 : "${OUT_DIR:=$(date +"%Y%b%d_%H-%M-%S")}"
 
 # required args check
 [[ -z "$AIRCRAFT" || -z "$TIME_SEC" ]] && usage
+
+# validate arg combinations
 if [[ "$TRIM_BOOL" -eq 1 && "$CONTROL_BOOL" -eq 1 ]]; then
   echo "ERROR: TRIM_BOOL and CONTROL_BOOL cannot both be enabled" >&2
+  exit 1
+fi
+
+if [[ "$DATA_BOOL" -eq 0 && "$PLOT_BOOL" -eq 1 ]]; then
+  echo "ERROR: DATA_BOOL must be enabled for PLOT_BOOL to be enabled" >&2
   exit 1
 fi
 
@@ -62,6 +69,6 @@ cmake --build build
 
 ./build/flight-sim "$TIME_SEC" "$TRIM_BOOL" "$SENSOR_BOOL" "$CONTROL_BOOL" "$VERBOSE_BOOL" "$DATA_BOOL" "$OUT_DIR"
 
-if [ "$PLOT" -eq 1 ]; then
+if [ "$PLOT_BOOL" -eq 1 ]; then
   ./scripts/plot.sh "$OUT_DIR"
 fi

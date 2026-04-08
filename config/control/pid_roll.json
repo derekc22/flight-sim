@@ -7,16 +7,20 @@
         "spoiler_max": 90.0
     },
     "controllers": {
-        "lateral": {
+        "longitudinal": {
             "control_type": "PitchPIDController",
+            "gains": [50, 1, 20]
+        },
+        "lateral": {
+            "control_type": "RollPIDController",
             "gains": [30, 1, 5]
         },
         "full_state": false
     },
-    "desired_FRDFrameNED": {
-        "eul": [0.0, 0.0872665, 0.0],
+    "FRDFrameNED": {
+        "eul": [0.0, 0.0, 0.04363325],
         "p": [0.0, 0.0, -750.0],
         "w": [0.0, 0.0, 0.0],
-        "v": [10.0, 0.0, 0.0]
+        "v": [20.0, 0.0, 0.0]
     }
 }

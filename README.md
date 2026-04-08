@@ -27,6 +27,7 @@ C++ flight simulator with FlightGear integration
   - `aerodynamics_config`: Path to the aerodynamic properties JSON
   - `structural_config`: Path to the structural properties JSON
   - `control_config`: Path to the control properties JSON
+  - `avionics_config`: Path to the avionics properties JSON
   - `initialization_config`: Path to the initial conditions JSON
   
 - To run the simulation: `scripts/run.sh -a <AIRCRAFT> -t <TIME_SEC> [-r <TRIM>] [-s <SENSOR>] [-c <CONTROL>] [-v <VERBOSE>] [-d <DATA>] [-o <OUT_DIR>] [-p <PLOT>]`

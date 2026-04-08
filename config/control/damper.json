@@ -8,11 +8,11 @@
     },
     "controllers": {
         "longitudinal": {
-            "control_type": "RollDamper",
+            "control_type": "PitchDamper",
             "gains": 1
         },
         "lateral": {
-            "control_type": "PitchDamper",
+            "control_type": "RollDamper",
             "gains": 1
         },
         "vertical": {
@@ -21,7 +21,7 @@
         },
         "full_state": false
     },
-    "desired_FRDFrameNED": {
+    "FRDFrameNED": {
         "eul": [0.0, 0.0, 0.0],
         "p": [0.0, 0.0, 0.0],
         "w": [0.0, 0.0, 0.0],

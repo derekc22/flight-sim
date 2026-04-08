@@ -67,51 +67,38 @@ namespace avionics {
         atmospheric::AirDensity rho;
     };
 
+    struct SensorMeasurements {
+        AngleOfAttackMeasurement alpha;
+        LinearAccelerationMeasurement accel;
+        AngularVelocityMeasurement wB_BI;
+        StagnationAirPressureMeasurement P0;
+        StaticAirPressureMeasurement P;
+        StagnationAirTemperatureMeasurement T0;
+        PositionMeasurement pI_BI_gnss;
+        LinearVelocityMeasurement pB_BI_dot_gnss;
+        HeadingMeasurement heading_BE;
+    };
+
+    struct ComputerMeasurements {
+        PositionMeasurement pI_BI_ins;
+        LinearVelocityMeasurement pB_BI_dot_ins;
+        StaticAirTemperatureMeasurement T;
+        MachNumberMeasurement Mach;
+        OrientationMeasurement qIB;
+        FreeStreamVelocityMeasurement Vinf;
+        AltitudeMeasurement alt_BE;
+        VerticalSpeedMeasurement alt_BE_dot;
+        AirDensityMeasurement rho;
+    };
+
     struct MeasurementCache {
-        AngleOfAttackMeasurement curr_alpha_meas;
-        LinearAccelerationMeasurement curr_accel_meas;
-        AngularVelocityMeasurement curr_wB_BI_meas;
-        StagnationAirPressureMeasurement curr_P0_meas;
-        StaticAirPressureMeasurement curr_P_meas;
-        StagnationAirTemperatureMeasurement curr_T0_meas;
-        PositionMeasurement curr_pI_BI_gnss_meas;
-        LinearVelocityMeasurement curr_pB_BI_dot_gnss_meas;
-        HeadingMeasurement curr_heading_BE_meas;
-
-        PositionMeasurement curr_pI_BI_ins_meas;
-        LinearVelocityMeasurement curr_pB_BI_dot_ins_meas;
-        StaticAirTemperatureMeasurement curr_T_meas;
-        MachNumberMeasurement curr_Mach_meas;
-        OrientationMeasurement curr_qIB_meas;
-        FreeStreamVelocityMeasurement curr_Vinf_meas;
-        AltitudeMeasurement curr_alt_BE_meas;
-        VerticalSpeedMeasurement curr_alt_BE_dot_meas;
-        AirDensityMeasurement curr_rho_meas;
-
-        void update_from_sensor_cache(const MeasurementCache& sensor_cache);
-        void update_from_computer_cache(const MeasurementCache& computer_cache);
+        SensorMeasurements sensors;
+        ComputerMeasurements computers;
     };
 
     struct MeasurementHistory {
-        std::optional<AngleOfAttackMeasurement> prev_alpha_meas;
-        std::optional<LinearAccelerationMeasurement> prev_accel_meas;
-        std::optional<AngularVelocityMeasurement> prev_wB_BI_meas;
-        std::optional<StagnationAirPressureMeasurement> prev_P0_meas;
-        std::optional<StaticAirPressureMeasurement> prev_P_meas;
-        std::optional<StagnationAirTemperatureMeasurement> prev_T0_meas;
-        std::optional<PositionMeasurement> prev_pI_BI_gnss_meas;
-        std::optional<LinearVelocityMeasurement> prev_pB_BI_dot_gnss_meas;
-        std::optional<HeadingMeasurement> prev_heading_BE_meas;
-
-        std::optional<PositionMeasurement> prev_pI_BI_ins_meas;
-        std::optional<LinearVelocityMeasurement> prev_pB_BI_dot_ins_meas;
-        std::optional<StaticAirTemperatureMeasurement> prev_T_meas;
-        std::optional<MachNumberMeasurement> prev_Mach_meas;
-        std::optional<OrientationMeasurement> prev_qIB_meas;
-        std::optional<FreeStreamVelocityMeasurement> prev_Vinf_meas;
-        std::optional<AltitudeMeasurement> prev_alt_BE_meas;
-        std::optional<VerticalSpeedMeasurement> prev_alt_dot_meas;
-        std::optional<AirDensityMeasurement> prev_rho_meas;
+        std::optional<SensorMeasurements> sensors;
+        std::optional<ComputerMeasurements> computers;
     };
 
 
@@ -133,44 +120,56 @@ namespace avionics {
 
         Sensor(double mean, double stddev, double bias, const Eigen::Vector3d& bias3);
 
-        double _step(double meas, double prev_meas);
-        Eigen::Vector3d _step(const Eigen::Vector3d& meas, const Eigen::Vector3d& prev_meas);
-        Eigen::Quaterniond _step(const Eigen::Quaterniond& meas, const Eigen::Quaterniond& prev_meas);
+        double _lag(double meas, double prev_meas);
+        Eigen::Vector3d _lag(const Eigen::Vector3d& meas, const Eigen::Vector3d& prev_meas);
+        Eigen::Quaterniond _lag(const Eigen::Quaterniond& meas, const Eigen::Quaterniond& prev_meas);
+        double _step(double meas, std::optional<double>& lag_state);
+        Eigen::Vector3d _step(const Eigen::Vector3d& meas, std::optional<Eigen::Vector3d>& lag_state);
+        Eigen::Quaterniond _step(const Eigen::Quaterniond& meas, std::optional<Eigen::Quaterniond>& lag_state);
     };
 
     struct AngleOfAttackVane : Sensor {
-        AngleOfAttackMeasurement _measure(const aerodynamics::AngleOfAttack& alpha, const aerodynamics::AngleOfAttack& prev_alpha);
+        std::optional<double> prev_alpha_lag;
+        AngleOfAttackMeasurement _measure(const aerodynamics::AngleOfAttack& alpha);
     };
 
     struct Accelerometer : Sensor {
-        LinearAccelerationMeasurement _measure(const dynamics::LinearAcceleration& accelB, const dynamics::LinearAcceleration& prev_accel);
+        std::optional<Eigen::Vector3d> prev_accel_lag;
+        LinearAccelerationMeasurement _measure(const dynamics::LinearAcceleration& accelB);
         // Note: accelB = FB_net/m - gB, not pB_BI_ddot
         // That is, an accelerometer measures all accelerations excluding gravity 
     };
 
     struct Gyroscope : Sensor {
-        AngularVelocityMeasurement _measure(const dynamics::AngularVelocity& wB_BI, const dynamics::AngularVelocity& prev_wB_BI);
+        std::optional<Eigen::Vector3d> prev_wB_BI_lag;
+        AngularVelocityMeasurement _measure(const dynamics::AngularVelocity& wB_BI);
     };
 
     struct PitotTube : Sensor {
-        StagnationAirPressureMeasurement _measure(const atmospheric::StagnationAirPressure& P0, const atmospheric::StagnationAirPressure& prev_P0);
+        std::optional<double> prev_P0_lag;
+        StagnationAirPressureMeasurement _measure(const atmospheric::StagnationAirPressure& P0);
     };
 
     struct StaticPort : Sensor {
-        StaticAirPressureMeasurement _measure(const atmospheric::StaticAirPressure& P, const atmospheric::StaticAirPressure& prev_P);
+        std::optional<double> prev_P_lag;
+        StaticAirPressureMeasurement _measure(const atmospheric::StaticAirPressure& P);
     };
 
     struct TotalAirTemperatureProbe : Sensor {
-        StagnationAirTemperatureMeasurement _measure(const atmospheric::StagnationAirTemperature& T0, const atmospheric::StagnationAirTemperature& prev_T0);
+        std::optional<double> prev_T0_lag;
+        StagnationAirTemperatureMeasurement _measure(const atmospheric::StagnationAirTemperature& T0);
     };
 
     struct GNSSReceiver : Sensor {
-        PositionMeasurement _measure(const dynamics::Position& pI_BI, const dynamics::Position& prev_pI_BI);
-        LinearVelocityMeasurement _measure(const dynamics::LinearVelocity& pB_BI_dot, const dynamics::LinearVelocity& prev_pB_BI_dot);
+        std::optional<Eigen::Vector3d> prev_pI_BI_lag;
+        std::optional<Eigen::Vector3d> prev_pB_BI_dot_lag;
+        PositionMeasurement _measure(const dynamics::Position& pI_BI);
+        LinearVelocityMeasurement _measure(const dynamics::LinearVelocity& pB_BI_dot);
     };
 
     struct Magnetometer : Sensor {
-        HeadingMeasurement _measure(const geography::Heading& heading, const geography::Heading& prev_heading);
+        std::optional<double> prev_heading_lag;
+        HeadingMeasurement _measure(const geography::Heading& heading);
     };
 
 
@@ -217,7 +216,6 @@ namespace avionics {
         MeasurementCache cache;
 
         MeasurementCache step(const MeasurementGroundTruth& meas_gt);
-        MeasurementHistory hist_from_cache(const MeasurementCache& cache);
 
     };
 

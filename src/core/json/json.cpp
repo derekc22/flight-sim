@@ -410,14 +410,14 @@ namespace json {
         if (control_json.contains("controllers")) {
             const auto& controllers_json = control_json.at("controllers");
             control_properties.full_state = controllers_json.value("full_state", false);
-            parse_axis_controller(controllers_json, "longitudinal", control_properties.limits.aileron_max, control_properties.longitudinal_control_type, control_properties.longitudinal_controller);
-            parse_axis_controller(controllers_json, "lateral", control_properties.limits.elevator_max, control_properties.lateral_control_type, control_properties.lateral_controller);
+            parse_axis_controller(controllers_json, "longitudinal", control_properties.limits.elevator_max, control_properties.longitudinal_control_type, control_properties.longitudinal_controller);
+            parse_axis_controller(controllers_json, "lateral", control_properties.limits.aileron_max, control_properties.lateral_control_type, control_properties.lateral_controller);
             parse_axis_controller(controllers_json, "vertical", control_properties.limits.rudder_max, control_properties.vertical_control_type, control_properties.vertical_controller);
         }
 
-        if (control_json.contains("desired_FRDFrameNED")) {
-            _validate_FRDFrameNED_initialization_config(control_json.at("desired_FRDFrameNED"));
-            vehicles::FRDFrameNEDStepOptions target_opts = parse_FRDFrameNED_step_options(control_json.at("desired_FRDFrameNED"));
+        if (control_json.contains("FRDFrameNED")) {
+            _validate_FRDFrameNED_initialization_config(control_json.at("FRDFrameNED"));
+            vehicles::FRDFrameNEDStepOptions target_opts = parse_FRDFrameNED_step_options(control_json.at("FRDFrameNED"));
             control_properties.xN_des_t = parse_control_target_state(target_opts);
         }
 

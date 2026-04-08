@@ -10,76 +10,47 @@
 
 namespace avionics {
 
-    void MeasurementCache::update_from_sensor_cache(const MeasurementCache& sensor_cache) {
-        curr_alpha_meas = sensor_cache.curr_alpha_meas;
-        curr_accel_meas = sensor_cache.curr_accel_meas;
-        curr_wB_BI_meas = sensor_cache.curr_wB_BI_meas;
-        curr_P0_meas = sensor_cache.curr_P0_meas;
-        curr_P_meas = sensor_cache.curr_P_meas;
-        curr_T0_meas = sensor_cache.curr_T0_meas;
-        curr_pI_BI_gnss_meas = sensor_cache.curr_pI_BI_gnss_meas;
-        curr_pB_BI_dot_gnss_meas = sensor_cache.curr_pB_BI_dot_gnss_meas;
-        curr_heading_BE_meas = sensor_cache.curr_heading_BE_meas;
-    }
-
-    void MeasurementCache::update_from_computer_cache(const MeasurementCache& computer_cache) {
-        curr_pI_BI_ins_meas = computer_cache.curr_pI_BI_ins_meas;
-        curr_pB_BI_dot_ins_meas = computer_cache.curr_pB_BI_dot_ins_meas;
-        curr_T_meas = computer_cache.curr_T_meas;
-        curr_Mach_meas = computer_cache.curr_Mach_meas;
-        curr_qIB_meas = computer_cache.curr_qIB_meas;
-        curr_Vinf_meas = computer_cache.curr_Vinf_meas;
-        curr_alt_BE_meas = computer_cache.curr_alt_BE_meas;
-        curr_alt_BE_dot_meas = computer_cache.curr_alt_BE_dot_meas;
-        curr_rho_meas = computer_cache.curr_rho_meas;
-    }
-
-    MeasurementHistory AvionicsProperties::hist_from_cache(const MeasurementCache& cache) {
-        return {
-            .prev_alpha_meas = cache.curr_alpha_meas,
-            .prev_accel_meas = cache.curr_accel_meas,
-            .prev_wB_BI_meas = cache.curr_wB_BI_meas,
-            .prev_P0_meas = cache.curr_P0_meas,
-            .prev_P_meas = cache.curr_P_meas,
-            .prev_T0_meas = cache.curr_T0_meas,
-            .prev_pI_BI_gnss_meas = cache.curr_pI_BI_gnss_meas,
-            .prev_pB_BI_dot_gnss_meas = cache.curr_pB_BI_dot_gnss_meas,
-            .prev_heading_BE_meas = cache.curr_heading_BE_meas,
-            .prev_pI_BI_ins_meas = cache.curr_pI_BI_ins_meas,
-            .prev_pB_BI_dot_ins_meas = cache.curr_pB_BI_dot_ins_meas,
-            .prev_T_meas = cache.curr_T_meas,
-            .prev_Mach_meas = cache.curr_Mach_meas,
-            .prev_qIB_meas = cache.curr_qIB_meas,
-            .prev_Vinf_meas = cache.curr_Vinf_meas,
-            .prev_alt_BE_meas = cache.curr_alt_BE_meas,
-            .prev_alt_dot_meas = cache.curr_alt_BE_dot_meas,
-            .prev_rho_meas = cache.curr_rho_meas
-        };
-    }
-
     Sensor::Sensor(double mean, double stddev, double bias, const Eigen::Vector3d& bias3) : mean(mean), stddev(stddev), bias(bias), bias_3d(bias3), dist(mean, stddev) {}
 
-    double Sensor::_step(double meas, double prev_meas){
-        double meas_lagged = (1-alpha) * meas + alpha * prev_meas; // apply EMA
+    double Sensor::_lag(double meas, double prev_meas) {
+        return (1-alpha) * meas + alpha * prev_meas;
+    }
+
+    Eigen::Vector3d Sensor::_lag(const Eigen::Vector3d& meas, const Eigen::Vector3d& prev_meas) {
+        return (1-alpha) * meas + alpha * prev_meas;
+    }
+
+    Eigen::Quaterniond Sensor::_lag(const Eigen::Quaterniond& meas, const Eigen::Quaterniond& prev_meas) {
+        Eigen::Quaterniond meas_adjusted = meas;
+        if (prev_meas.coeffs().dot(meas.coeffs()) < 0.0) meas_adjusted.coeffs() *= -1.0;
+
+        return prev_meas.slerp(1-alpha, meas_adjusted);
+    }
+
+    double Sensor::_step(double meas, std::optional<double>& lag_state) {
+        double prev_meas = lag_state ? *lag_state : meas;
+        double meas_lagged = _lag(meas, prev_meas); // apply EMA
+        lag_state = meas_lagged;
         double meas_biased = meas_lagged + bias; // apply bias
         double noise = dist(gen);
         double meas_noised = meas_biased + noise; // apply Gaussian noise
         return meas_noised;
     }
 
-    Eigen::Vector3d Sensor::_step(const Eigen::Vector3d& meas, const Eigen::Vector3d& prev_meas){
-        Eigen::Vector3d meas_lagged = (1-alpha) * meas + alpha * prev_meas; // apply EMA
+    Eigen::Vector3d Sensor::_step(const Eigen::Vector3d& meas, std::optional<Eigen::Vector3d>& lag_state) {
+        Eigen::Vector3d prev_meas = lag_state ? *lag_state : meas;
+        Eigen::Vector3d meas_lagged = _lag(meas, prev_meas); // apply EMA
+        lag_state = meas_lagged;
         Eigen::Vector3d meas_biased = meas_lagged + bias_3d; // apply bias
         Eigen::Vector3d noise(dist(gen), dist(gen), dist(gen));
         Eigen::Vector3d meas_noised = meas_biased + noise; // apply Gaussian noise
         return meas_noised;
     }
 
-    Eigen::Quaterniond Sensor::_step(const Eigen::Quaterniond& meas, const Eigen::Quaterniond& prev_meas){
-        Eigen::Quaterniond meas_adjusted = meas;
-        if (prev_meas.coeffs().dot(meas.coeffs()) < 0.0) meas_adjusted.coeffs() *= -1.0;
-
-        Eigen::Quaterniond meas_lagged = prev_meas.slerp(1-alpha, meas_adjusted); // apply EMA via quaternion SLERP
+    Eigen::Quaterniond Sensor::_step(const Eigen::Quaterniond& meas, std::optional<Eigen::Quaterniond>& lag_state) {
+        Eigen::Quaterniond prev_meas = lag_state ? *lag_state : meas;
+        Eigen::Quaterniond meas_lagged = _lag(meas, prev_meas); // apply EMA via quaternion SLERP
+        lag_state = meas_lagged;
 
         double bias_angle = bias_3d.norm();
         Eigen::Quaterniond bias_q;
@@ -105,40 +76,40 @@ namespace avionics {
         return meas_noised;
     }
 
-    AngleOfAttackMeasurement AngleOfAttackVane::_measure(const aerodynamics::AngleOfAttack& alpha, const aerodynamics::AngleOfAttack& prev_alpha) {
-        return { _step(alpha.data, prev_alpha.data) };
+    AngleOfAttackMeasurement AngleOfAttackVane::_measure(const aerodynamics::AngleOfAttack& alpha) {
+        return { _step(alpha.data, prev_alpha_lag) };
     }
 
-    LinearAccelerationMeasurement Accelerometer::_measure(const dynamics::LinearAcceleration& accelB, const dynamics::LinearAcceleration& prev_accel) {
-        return { _step(accelB.data, prev_accel.data) };
+    LinearAccelerationMeasurement Accelerometer::_measure(const dynamics::LinearAcceleration& accelB) {
+        return { _step(accelB.data, prev_accel_lag) };
     }
 
-    AngularVelocityMeasurement Gyroscope::_measure(const dynamics::AngularVelocity& wB_BI, const dynamics::AngularVelocity& prev_wB_BI) {    
-        return { _step(wB_BI.data, prev_wB_BI.data) };
+    AngularVelocityMeasurement Gyroscope::_measure(const dynamics::AngularVelocity& wB_BI) {
+        return { _step(wB_BI.data, prev_wB_BI_lag) };
     }
 
-    StagnationAirPressureMeasurement PitotTube::_measure(const atmospheric::StagnationAirPressure& P0, const atmospheric::StagnationAirPressure& prev_P0) {
-        return { _step(P0.data, prev_P0.data) };
+    StagnationAirPressureMeasurement PitotTube::_measure(const atmospheric::StagnationAirPressure& P0) {
+        return { _step(P0.data, prev_P0_lag) };
     }
 
-    StaticAirPressureMeasurement StaticPort::_measure(const atmospheric::StaticAirPressure& P, const atmospheric::StaticAirPressure& prev_P) {
-        return { _step(P.data, prev_P.data) };
+    StaticAirPressureMeasurement StaticPort::_measure(const atmospheric::StaticAirPressure& P) {
+        return { _step(P.data, prev_P_lag) };
     }
 
-    StagnationAirTemperatureMeasurement TotalAirTemperatureProbe::_measure(const atmospheric::StagnationAirTemperature& T0, const atmospheric::StagnationAirTemperature& prev_T0) {
-        return { _step(T0.data, prev_T0.data) };
+    StagnationAirTemperatureMeasurement TotalAirTemperatureProbe::_measure(const atmospheric::StagnationAirTemperature& T0) {
+        return { _step(T0.data, prev_T0_lag) };
     }
 
-    PositionMeasurement GNSSReceiver::_measure(const dynamics::Position& pI_BI, const dynamics::Position& prev_pI_BI) {
-        return { _step(pI_BI.data, prev_pI_BI.data) };
+    PositionMeasurement GNSSReceiver::_measure(const dynamics::Position& pI_BI) {
+        return { _step(pI_BI.data, prev_pI_BI_lag) };
     }
 
-    LinearVelocityMeasurement GNSSReceiver::_measure(const dynamics::LinearVelocity& pB_BI_dot, const dynamics::LinearVelocity& prev_pB_BI_dot) {
-        return { _step(pB_BI_dot.data, prev_pB_BI_dot.data) };
+    LinearVelocityMeasurement GNSSReceiver::_measure(const dynamics::LinearVelocity& pB_BI_dot) {
+        return { _step(pB_BI_dot.data, prev_pB_BI_dot_lag) };
     }
     
-    HeadingMeasurement Magnetometer::_measure(const geography::Heading& heading, const geography::Heading& prev_heading) {
-        return { _step(heading.data, prev_heading.data) };
+    HeadingMeasurement Magnetometer::_measure(const geography::Heading& heading) {
+        return { _step(heading.data, prev_heading_lag) };
     }
 
     FreeStreamVelocityMeasurement AirDataComputer::_calculate(const MachNumberMeasurement& Mach, const StaticAirTemperatureMeasurement& T) {
@@ -181,48 +152,35 @@ namespace avionics {
 
 
     MeasurementCache AvionicsProperties::step(const MeasurementGroundTruth& meas_gt) {
-        aerodynamics::AngleOfAttack prev_alpha = hist.prev_alpha_meas ? aerodynamics::AngleOfAttack{ hist.prev_alpha_meas->data } : meas_gt.alpha;
-        dynamics::LinearAcceleration prev_accel = hist.prev_accel_meas ? dynamics::LinearAcceleration{ hist.prev_accel_meas->data } : meas_gt.accelB;
-        dynamics::AngularVelocity prev_wB_BI = hist.prev_wB_BI_meas ? dynamics::AngularVelocity{ hist.prev_wB_BI_meas->data } : meas_gt.wB_BI;
-        atmospheric::StagnationAirPressure prev_P0 = hist.prev_P0_meas ? atmospheric::StagnationAirPressure{ hist.prev_P0_meas->data } : meas_gt.P0;
-        atmospheric::StaticAirPressure prev_P = hist.prev_P_meas ? atmospheric::StaticAirPressure{ hist.prev_P_meas->data } : meas_gt.P;
-        atmospheric::StagnationAirTemperature prev_T0 = hist.prev_T0_meas ? atmospheric::StagnationAirTemperature{ hist.prev_T0_meas->data } : meas_gt.T0;
-        dynamics::Position prev_pI_BI_gnss = hist.prev_pI_BI_gnss_meas ? dynamics::Position{ hist.prev_pI_BI_gnss_meas->data } : meas_gt.pI_BI;
-        dynamics::LinearVelocity prev_pB_BI_dot_gnss = hist.prev_pB_BI_dot_gnss_meas ? dynamics::LinearVelocity{ hist.prev_pB_BI_dot_gnss_meas->data } : meas_gt.pB_BI_dot;
-        geography::Heading prev_heading = hist.prev_heading_BE_meas ? geography::Heading{ hist.prev_heading_BE_meas->data } : meas_gt.heading;
-
-        MeasurementCache sensor_cache {
-            .curr_alpha_meas = sensors.aoa_vane._measure(meas_gt.alpha, prev_alpha),
-            .curr_accel_meas = sensors.accelerometer._measure(meas_gt.accelB, prev_accel),
-            .curr_wB_BI_meas = sensors.gyro._measure(meas_gt.wB_BI, prev_wB_BI),
-            .curr_P0_meas = sensors.pitot_tube._measure(meas_gt.P0, prev_P0),
-            .curr_P_meas = sensors.static_port._measure(meas_gt.P, prev_P),
-            .curr_T0_meas = sensors.tat_probe._measure(meas_gt.T0, prev_T0),
-            .curr_pI_BI_gnss_meas = sensors.gnss._measure(meas_gt.pI_BI, prev_pI_BI_gnss),
-            .curr_pB_BI_dot_gnss_meas = sensors.gnss._measure(meas_gt.pB_BI_dot, prev_pB_BI_dot_gnss),
-            .curr_heading_BE_meas = sensors.magnetometer._measure(meas_gt.heading, prev_heading)
+        SensorMeasurements sensor_meas {
+            .alpha = sensors.aoa_vane._measure(meas_gt.alpha),
+            .accel = sensors.accelerometer._measure(meas_gt.accelB),
+            .wB_BI = sensors.gyro._measure(meas_gt.wB_BI),
+            .P0 = sensors.pitot_tube._measure(meas_gt.P0),
+            .P = sensors.static_port._measure(meas_gt.P),
+            .T0 = sensors.tat_probe._measure(meas_gt.T0),
+            .pI_BI_gnss = sensors.gnss._measure(meas_gt.pI_BI),
+            .pB_BI_dot_gnss = sensors.gnss._measure(meas_gt.pB_BI_dot),
+            .heading_BE = sensors.magnetometer._measure(meas_gt.heading)
         };
 
-        cache.update_from_sensor_cache(sensor_cache);
-
-
-        MachNumberMeasurement curr_Mach_meas{ atmospheric::compute_mach(cache.curr_P0_meas, cache.curr_P_meas).data };
-        StaticAirTemperatureMeasurement curr_T_meas{ atmospheric::T_from_T0(cache.curr_T0_meas, curr_Mach_meas) };
+        MachNumberMeasurement curr_Mach_meas{ atmospheric::compute_mach(sensor_meas.P0, sensor_meas.P).data };
+        StaticAirTemperatureMeasurement curr_T_meas{ atmospheric::T_from_T0(sensor_meas.T0, curr_Mach_meas) };
     
-        MeasurementCache computer_cache {
-            .curr_pI_BI_ins_meas = hist.prev_pI_BI_ins_meas && hist.prev_pB_BI_dot_ins_meas && hist.prev_qIB_meas ? computers.INS._calculate(hist.prev_pI_BI_ins_meas.value(), hist.prev_pB_BI_dot_ins_meas.value(), cache.curr_accel_meas, hist.prev_qIB_meas.value()) : PositionMeasurement{ meas_gt.pI_BI.data },
-            .curr_pB_BI_dot_ins_meas = hist.prev_pB_BI_dot_ins_meas && hist.prev_pI_BI_ins_meas && hist.prev_qIB_meas ? computers.INS._calculate(hist.prev_pB_BI_dot_ins_meas.value(), cache.curr_accel_meas, hist.prev_pI_BI_ins_meas.value(), hist.prev_qIB_meas.value(), cache.curr_wB_BI_meas) : LinearVelocityMeasurement{ meas_gt.pB_BI_dot.data },
-            .curr_T_meas = curr_T_meas,
-            .curr_Mach_meas = curr_Mach_meas,
-            .curr_Vinf_meas = computers.ADC._calculate(curr_Mach_meas, curr_T_meas),
-            .curr_alt_BE_meas = computers.ADC._calculate(cache.curr_P_meas),
-            .curr_alt_BE_dot_meas = hist.prev_P_meas ? computers.ADC._calculate(cache.curr_P_meas, hist.prev_P_meas.value(), curr_T_meas) : VerticalSpeedMeasurement{ meas_gt.alt_dot.data },
-            .curr_rho_meas = computers.ADC._calculate(cache.curr_P_meas, curr_T_meas),
-            .curr_qIB_meas = hist.prev_qIB_meas ? computers.AHRS._calculate(hist.prev_qIB_meas.value(), cache.curr_wB_BI_meas) : OrientationMeasurement{ meas_gt.qIB.data }
+        ComputerMeasurements computer_meas {
+            .pI_BI_ins = hist.computers ? computers.INS._calculate(hist.computers->pI_BI_ins, hist.computers->pB_BI_dot_ins, sensor_meas.accel, hist.computers->qIB) : PositionMeasurement{ meas_gt.pI_BI.data },
+            .pB_BI_dot_ins = hist.computers ? computers.INS._calculate(hist.computers->pB_BI_dot_ins, sensor_meas.accel, hist.computers->pI_BI_ins, hist.computers->qIB, sensor_meas.wB_BI) : LinearVelocityMeasurement{ meas_gt.pB_BI_dot.data },
+            .T = curr_T_meas,
+            .Mach = curr_Mach_meas,
+            .Vinf = computers.ADC._calculate(curr_Mach_meas, curr_T_meas),
+            .alt_BE = computers.ADC._calculate(sensor_meas.P),
+            .alt_BE_dot = hist.sensors ? computers.ADC._calculate(sensor_meas.P, hist.sensors->P, curr_T_meas) : VerticalSpeedMeasurement{ meas_gt.alt_dot.data },
+            .rho = computers.ADC._calculate(sensor_meas.P, curr_T_meas),
+            .qIB = hist.computers ? computers.AHRS._calculate(hist.computers->qIB, sensor_meas.wB_BI) : OrientationMeasurement{ meas_gt.qIB.data }
         };
 
-        cache.update_from_computer_cache(computer_cache);
-        hist = hist_from_cache(cache);
+        cache = MeasurementCache{ .sensors = sensor_meas, .computers = computer_meas };
+        hist = MeasurementHistory{ .sensors = cache.sensors, .computers = cache.computers };
 
         return cache;
     }
@@ -271,19 +229,19 @@ namespace avionics {
         MeasurementCache cache = avionics_properties.step(meas_gt);
 
         dynamics::RigidBodyState xN_meas_t = { 
-            .p = cache.curr_pI_BI_gnss_meas,
-            .v = cache.curr_pB_BI_dot_gnss_meas,
-            .q = cache.curr_qIB_meas,
-            .w = cache.curr_wB_BI_meas
+            .p = cache.sensors.pI_BI_gnss,
+            .v = cache.sensors.pB_BI_dot_gnss,
+            .q = cache.computers.qIB,
+            .w = cache.sensors.wB_BI
         };
 
         aerodynamics::AerodynamicState ads_t_meas = aerodynamics::compute_aerodynamic_state(xN_meas_t, wind);
 
         // not needed 
         // atmospheric::StaticAtmosphericState static_atmo_meas = {
-        //     .P=cache.curr_P_meas,
-        //     .T=cache.curr_T_meas,
-        //     .rho=cache.curr_rho_meas,
+        //     .P=cache.sensors.P,
+        //     .T=cache.computers.T,
+        //     .rho=cache.computers.rho,
         //     .mu=static_atmo_t.mu,
         // };
 

@@ -104,7 +104,12 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
     dynamics::Mass mass = structural_properties.Mass;
     dynamics::InertiaTensor J = structural_properties.J;
 
+    // intialize trim solution
     autopilot::TrimSolution trim_sol;
+
+    // initialize net forces
+    dynamics::Force FB_net{ constants::Zero3 };
+    dynamics::Moment MB_net{ constants::Zero3 };
 
     // run for user-specified seconds
     const int tf = std::max(1, static_cast<int>(std::ceil(sim_in.time_sec / constants::dt)));
@@ -127,6 +132,9 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
 
     for (int t = 0; t < tf; ++t) {
 
+        // set wrench 
+        dynamics::Wrench WB_net { .F=FB_net, .M=MB_net };
+
         // get rigid body state
         dynamics::RigidBodyState xN_t = dynamics::rigid_body_state(aircraft.FRDFrameNED);
 
@@ -144,6 +152,19 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
         //     // use out_pkt->wind_heading, out_pkt->wind_speed
         // }
         atmospheric::Wind wind{ constants::Zero3 }; // no wind for now
+
+        // use sensors 
+        if (sim_in.sensor_bool){
+            atmospheric::StaticAtmosphericState static_atmo_t = atmospheric::static_atmospheric_state(aircraft.FRDFrameECEF);
+            geography::GeographicState geo_t = geography::geographic_state(aircraft.FRDFrameECEF);
+
+            // obtain full state from sensors
+            aerodynamics::AerodynamicState ads_t = aerodynamics::compute_aerodynamic_state(xN_t, wind);
+            auto [xN_t_sensor, ads_t_sensor] = avionics::update_state_from_avionics(xN_t, ads_t, static_atmo_t, geo_t, mass, wind, WB_net, aircraft.avionics_properties);
+
+            // overwrite local measurement state with sensor measurements
+            xN_meas_t = xN_t_sensor;
+        }
 
         // specify control commands
         control::ControlSurfaceInputs u{};
@@ -168,9 +189,8 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
         Eigen::Vector3d FB_g = mass.data * aircraft.FRDFrameNED.gB.data;
 
         // compute net forces and moments
-        dynamics::Force FB_net{ FB_g + FB_aero.data };
-        dynamics::Moment MB_net{ MB_aero.data };
-        dynamics::Wrench WB_net { .F=FB_net, .M=MB_net };
+        FB_net = dynamics::Force{ FB_g + FB_aero.data };
+        MB_net = dynamics::Moment{ MB_aero.data };
 
         // compute rigid-body dynamics
         xN_t = dynamics::step_rigid_body(xN_t, mass, J, FB_net, MB_net);
@@ -219,18 +239,6 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
                 sim_out.lin_sol = lin_sol;
                 sim_out.eig_sol = eig_sol;
             }            
-        }
-
-        if (sim_in.sensor_bool){
-            atmospheric::StaticAtmosphericState static_atmo_t = atmospheric::static_atmospheric_state(aircraft.FRDFrameECEF);
-            geography::GeographicState geo_t = geography::geographic_state(aircraft.FRDFrameECEF);
-
-            // obtain full state from sensors
-            aerodynamics::AerodynamicState ads_t = aerodynamics::compute_aerodynamic_state(xN_t, wind);
-            auto [xN_t_sensor, ads_t_sensor] = avionics::update_state_from_avionics(xN_t, ads_t, static_atmo_t, geo_t, mass, wind, WB_net, aircraft.avionics_properties);
-
-            // overwrite local measurement state with sensor measurements
-            xN_meas_t = xN_t_sensor;
         }
 
         // update data matrix

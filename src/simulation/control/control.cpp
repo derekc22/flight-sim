@@ -69,18 +69,18 @@ namespace control {
             dynamics::EulerAngles eul_des_t;
             eul_des_t.set(xN_des_t.q);
 
-            if (longitudinal_controller && longitudinal_control_type == "RollPIDController") {
-                u.aileron = longitudinal_controller(eul_meas_t.phi(), xN_meas_t.w.p(), eul_des_t.phi());
+            if (longitudinal_controller && longitudinal_control_type == "PitchPIDController") {
+                u.elevator = longitudinal_controller(eul_meas_t.theta(), xN_meas_t.w.q(), eul_des_t.theta());
             }
-            else if (longitudinal_controller && longitudinal_control_type == "RollDamper") {
-                u.aileron = longitudinal_controller(xN_meas_t.w.p(), 0.0, xN_des_t.w.p());
+            else if (longitudinal_controller && longitudinal_control_type == "PitchDamper") {
+                u.elevator = longitudinal_controller(xN_meas_t.w.q(), 0.0, xN_des_t.w.q());
             }
 
-            if (lateral_controller && lateral_control_type == "PitchPIDController") {
-                u.elevator = lateral_controller(eul_meas_t.theta(), xN_meas_t.w.q(), eul_des_t.theta());
+            if (lateral_controller && lateral_control_type == "RollPIDController") {
+                u.aileron = lateral_controller(eul_meas_t.phi(), xN_meas_t.w.p(), eul_des_t.phi());
             }
-            else if (lateral_controller && lateral_control_type == "PitchDamper") {
-                u.elevator = lateral_controller(xN_meas_t.w.q(), 0.0, xN_des_t.w.q());
+            else if (lateral_controller && lateral_control_type == "RollDamper") {
+                u.aileron = lateral_controller(xN_meas_t.w.p(), 0.0, xN_des_t.w.p());
             }
 
             if (vertical_controller && vertical_control_type == "YawPIDController") {
