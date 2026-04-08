@@ -200,7 +200,7 @@ namespace json {
         };
     }
 
-    control::ControlSurfaceLimits parse_control_surface_limits(const nlohmann::json& limits_json) {
+    actuators::ActuatorLimits parse_actuator_limits(const nlohmann::json& limits_json) {
         return {
             .elevator_max = util::deg_to_rad(limits_json.value("elevator_max", 0.0)),
             .aileron_max = util::deg_to_rad(limits_json.value("aileron_max", 0.0)),
@@ -212,8 +212,8 @@ namespace json {
 
     template <typename ControllerType>
     control::ControlLaw make_stateful_control_law(const control::ControlLawParameters& params) {
-        return [controller = ControllerType(params)](double meas, double meas_dot, double setpoint) mutable {
-            return controller._step(meas, meas_dot, setpoint);
+        return [controller = ControllerType(params)](const control::ControlLawInput& ctrl_law_input) mutable {
+            return controller._step(ctrl_law_input);
         };
     }
 
@@ -234,11 +234,9 @@ namespace json {
         return gains;
     }
 
-    control::ControlLawParameters parse_control_law_parameters(const nlohmann::json& controller_json, const std::string& control_type, double ctrl_surface_max) {
+    control::ControlLawParameters parse_control_law_parameters(const nlohmann::json& controller_json, const std::string& control_type) {
         return {
             .gains = parse_control_gains(controller_json.at("gains"), control_type),
-            .ctrl_surface_max = ctrl_surface_max,
-            .ctrl_surface_min = -ctrl_surface_max,
         };
     }
 
@@ -385,12 +383,12 @@ namespace json {
         if (!fields.beta.has_value()) { throw std::runtime_error("json::_validate_WINDFrameSTAB_initialization_config: beta required"); }
     }
 
-    void parse_axis_controller(const nlohmann::json& controllers_json, const std::string& key, double ctrl_surface_max, std::string& control_type, control::ControlLaw& controller) {
+    void parse_axis_controller(const nlohmann::json& controllers_json, const std::string& key, std::string& control_type, control::ControlLaw& controller) {
         if (!controllers_json.contains(key)) { return; }
 
         const auto& controller_json = controllers_json.at(key);
         control_type = controller_json.at("control_type").get<std::string>();
-        controller = make_control_law(control_type, parse_control_law_parameters(controller_json, control_type, ctrl_surface_max));
+        controller = make_control_law(control_type, parse_control_law_parameters(controller_json, control_type));
     }
 
     control::ControlProperties parse_control_properties(const nlohmann::json& control_json) {
@@ -403,16 +401,12 @@ namespace json {
             },
         };
 
-        if (control_json.contains("control_surface_limits")) {
-            control_properties.limits = parse_control_surface_limits(control_json.at("control_surface_limits"));
-        }
-
         if (control_json.contains("controllers")) {
             const auto& controllers_json = control_json.at("controllers");
             control_properties.full_state = controllers_json.value("full_state", false);
-            parse_axis_controller(controllers_json, "longitudinal", control_properties.limits.elevator_max, control_properties.longitudinal_control_type, control_properties.longitudinal_controller);
-            parse_axis_controller(controllers_json, "lateral", control_properties.limits.aileron_max, control_properties.lateral_control_type, control_properties.lateral_controller);
-            parse_axis_controller(controllers_json, "vertical", control_properties.limits.rudder_max, control_properties.vertical_control_type, control_properties.vertical_controller);
+            parse_axis_controller(controllers_json, "longitudinal", control_properties.longitudinal_control_type, control_properties.longitudinal_controller);
+            parse_axis_controller(controllers_json, "lateral", control_properties.lateral_control_type, control_properties.lateral_controller);
+            parse_axis_controller(controllers_json, "vertical", control_properties.vertical_control_type, control_properties.vertical_controller);
         }
 
         if (control_json.contains("FRDFrameNED")) {
@@ -422,6 +416,16 @@ namespace json {
         }
 
         return control_properties;
+    }
+
+    actuators::ActuatorProperties parse_actuator_properties(const nlohmann::json& actuator_json) {
+        actuators::ActuatorProperties actuator_properties{};
+
+        if (actuator_json.contains("control_surface_limits")) {
+            actuator_properties.limits = parse_actuator_limits(actuator_json.at("control_surface_limits"));
+        }
+
+        return actuator_properties;
     }
 
     template <typename SensorType>
@@ -517,6 +521,11 @@ namespace json {
         }
 
         return { surfaces };
+    }
+
+    actuators::ActuatorProperties parse_actuator_config() {
+        const auto actuator_cfg_path = resolve_run_config_entry_path("actuator_config");
+        return parse_actuator_properties(read_json_file(actuator_cfg_path));
     }
 
     control::ControlProperties parse_control_config() {

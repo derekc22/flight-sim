@@ -6,6 +6,7 @@
 #include "simulation/aerodynamics/aerodynamics.hpp"
 #include "simulation/atmospheric/atmospheric.hpp"
 #include "simulation/control/control.hpp"
+#include "simulation/actuators/actuators.hpp"
 #include "simulation/dynamics/dynamics.hpp"
 #include "simulation/constants/constants.hpp"
 #include "simulation/util/util.hpp"
@@ -39,7 +40,7 @@ namespace autopilot { // to encompass autonomy and trim
     struct TrimModel {
         const structural::StructuralProperties& structural;
         const aerodynamics::AerodynamicProperties& aerodynamic;
-        const control::ControlProperties& control;
+        const actuators::ActuatorProperties& actuator;
         TrimFixedControls fixed_controls{};
     };
 
@@ -71,7 +72,7 @@ namespace autopilot { // to encompass autonomy and trim
     };
 
     struct TrimConditions {
-        atmospheric::AirDensity rho{ 0.0 };
+        atmospheric::StaticAtmosphericState static_atmospheric_state;
         atmospheric::Wind windB{ constants::Zero3 };
     };
 
@@ -173,7 +174,7 @@ namespace autopilot { // to encompass autonomy and trim
 
     std::string print_trim_solution(const TrimSolution& trim_sol);
 
-    std::pair<dynamics::RigidBodyState, aerodynamics::AerodynamicState> update_state_from_trim(const dynamics::RigidBodyState& xN_t, const TrimSolution& trim_sol);
+    std::pair<dynamics::RigidBodyState, aerodynamics::AerodynamicState> get_state_from_trim(const dynamics::RigidBodyState& xN_t, const TrimSolution& trim_sol);
 }
 
 #include "simulation/autopilot/autopilot.tpp"

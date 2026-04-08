@@ -5,6 +5,7 @@
 #include "simulation/dynamics/dynamics.hpp"
 #include "simulation/aerodynamics/aerodynamics.hpp"
 #include "simulation/control/control.hpp"
+#include "simulation/actuators/actuators.hpp"
 #include "simulation/geography/geography.hpp"
 #include "simulation/atmospheric/atmospheric.hpp"
 #include "simulation/avionics/avionics.hpp"
@@ -203,12 +204,14 @@ namespace vehicles {
         frames::WINDFrameSTAB WINDFrameSTAB;
         structural::StructuralProperties structural_properties;
         aerodynamics::AerodynamicProperties aerodynamic_properties;
+        actuators::ActuatorProperties actuator_properties;
         control::ControlProperties control_properties;
         avionics::AvionicsProperties avionics_properties;
 
         Aircraft(
             const structural::StructuralProperties& structural_properties,
             const aerodynamics::AerodynamicProperties& aerodynamic_properties,
+            const actuators::ActuatorProperties& actuator_properties,
             const control::ControlProperties& control_properties,
             const avionics::AvionicsProperties& avionics_properties
         );
@@ -223,7 +226,6 @@ namespace vehicles {
         void _step_dependent(frames::Frame& F);
         void _step_gravity();
         void _init_frames();
-        void _sense();
 
         /** @deprecated */
         // void _set(const dynamics::RigidBodyState& rigid_body_state, frames::Frame& F);

@@ -108,7 +108,7 @@ print_trim_solution()
 ├─ aerodynamics::compute_aerodynamic_state_T()
 └─ dynamics::_wB_BI_to_eul_dot()
 
-update_state_from_trim()
+get_state_from_trim()
 ├─ eul_curr.set(xN_t.q)
 ├─ qNB_trim.set(eul_trim)
 └─ aerodynamics::compute_aerodynamic_state()

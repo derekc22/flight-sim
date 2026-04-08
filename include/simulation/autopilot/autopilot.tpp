@@ -30,7 +30,7 @@ namespace autopilot {
     }
 
     template <typename T>
-    TrimControlSurfaceInputs<T> _unpack_trim_solver_input_T(const TrimVariableVector_T<T>& z, const control::ControlSurfaceLimits& limits) {
+    TrimControlSurfaceInputs<T> _unpack_trim_solver_input_T(const TrimVariableVector_T<T>& z, const actuators::ActuatorLimits& limits) {
         return {
             .elevator = _get_control_from_solver_space_T<T>(z(8), limits.elevator_max),
             .aileron = _get_control_from_solver_space_T<T>(z(9), limits.aileron_max),
@@ -55,9 +55,9 @@ namespace autopilot {
             model.aerodynamic,
             model.structural,
             twist,
-            conditions.rho,
+            conditions.static_atmospheric_state,
             controls,
-            model.control,
+            model.actuator,
             conditions.windB,
             false
         );
@@ -156,7 +156,7 @@ namespace autopilot {
 
         TrimControlSurfaceInputs<T> u;
         if (use_physical_controls) u = unpack_trim_input_T<T>(z);
-        else u = _unpack_trim_solver_input_T<T>(z, model.control.limits);
+        else u = _unpack_trim_solver_input_T<T>(z, model.actuator.limits);
 
         const TrimResidual<T> residual = compute_trim_residual<T>(x, u, model, target, conditions);
         return pack_trim_residual_T(residual);

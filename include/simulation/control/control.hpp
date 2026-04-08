@@ -3,6 +3,7 @@
 #include <string>
 #include <Eigen/Dense>
 #include "simulation/dynamics/dynamics.hpp"
+#include "simulation/actuators/actuators.hpp"
 
 namespace control {
 
@@ -16,30 +17,30 @@ namespace control {
         double spoiler = 0.0;   // rad
     };
 
-    struct ControlSurfaceLimits {
-        // Assume symmetric limits
-        double elevator_max = 0.0;  // rad
-        double aileron_max = 0.0;   // rad
-        double rudder_max = 0.0;    // rad
-        // Assume lower limit is zero
-        double flap_max = 0.0;      // rad
-        double spoiler_max = 0.0;   // rad
-    };
-
     struct ControlLawParameters {
         Eigen::VectorXd gains;
-        double ctrl_surface_max;
-        double ctrl_surface_min;
     };
 
-    typedef std::function<double(double, double, double)> ControlLaw;
+    struct ControlLawInput {
+        double meas;
+        double meas_dot;
+        dynamics::RigidBodyState rbs_meas;
+
+        double meas_des;
+        double meas_dot_des;
+        dynamics::RigidBodyState rbs_des;
+
+        double limit_max;
+        double limit_min;
+        actuators::ActuatorLimits limits;
+    };
+
+    typedef std::function<double(const ControlLawInput&)> ControlLaw;
 
     struct PIDController {
         double Kp = 0;
         double Kd = 0;
         double Ki = 0;
-        double u_max = 0;
-        double u_min = 0;
 
         double integral = 0.0;
         double d_filtered = 0.0;
@@ -47,7 +48,7 @@ namespace control {
 
         PIDController(const ControlLawParameters& params);
 
-        double _step(double meas, double meas_dot, double setpoint);
+        double _step(const ControlLawInput& ctrl_law_input);
     };
 
     struct RollPIDController : PIDController {
@@ -76,7 +77,6 @@ namespace control {
 
 
     struct ControlProperties {
-        ControlSurfaceLimits limits;
 
         ControlLaw longitudinal_controller;
         ControlLaw lateral_controller;
@@ -89,7 +89,7 @@ namespace control {
         bool full_state = false;
 
         dynamics::RigidBodyState xN_des_t;
-        ControlSurfaceInputs step(const dynamics::RigidBodyState& xN_meas_t);
+        ControlSurfaceInputs step(const dynamics::RigidBodyState& xN_meas_t, const actuators::ActuatorLimits& limits);
     };
 
 }

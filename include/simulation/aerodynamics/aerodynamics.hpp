@@ -7,6 +7,7 @@
 #include <algorithm>
 #include "simulation/structural/structural.hpp"
 #include "simulation/control/control.hpp"
+#include "simulation/actuators/actuators.hpp"
 #include "simulation/constants/constants.hpp"
 #include "simulation/util/util.hpp"
 #include <simulation/dynamics/dynamics.hpp>
@@ -190,19 +191,19 @@ namespace aerodynamics {
     };
 
     template <typename T>
-    ControlSurfaceInputs_T<T> clamp_control_inputs_T(const ControlSurfaceInputs_T<T>& u, const control::ControlProperties& cp);
+    ControlSurfaceInputs_T<T> clamp_control_inputs_T(const ControlSurfaceInputs_T<T>& u, const actuators::ActuatorProperties& actuator_properties);
 
     template <typename T>
-    SurfaceKinematics_T<T> compute_surface_kinematics_T(const Surface& s, const structural::StructuralProperties& structural_properties, const dynamics::Twist_T<T>& twist, const atmospheric::AirDensity& rho, const atmospheric::Wind& windB);
+    SurfaceKinematics_T<T> compute_surface_kinematics_T(const Surface& s, const structural::StructuralProperties& structural_properties, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& static_atmospheric_state, const atmospheric::Wind& windB);
 
     template <typename T>
-    SurfaceCoefficients_T<T> compute_surface_coefficients_T(const Surface& s, const SurfaceKinematics_T<T>& sk, const ControlSurfaceInputs_T<T>& u, const control::ControlProperties& cp, bool clamp_controls = true);
+    SurfaceCoefficients_T<T> compute_surface_coefficients_T(const Surface& s, const SurfaceKinematics_T<T>& sk, const ControlSurfaceInputs_T<T>& u, const actuators::ActuatorProperties& actuator_properties, bool clamp_controls = true);
 
     template <typename T>
     AerodynamicLoad_T<T> compute_surface_loads_T(const Surface& s, const SurfaceKinematics_T<T>& sk, const SurfaceCoefficients_T<T>& sc);
 
     template <typename T>
-    AerodynamicLoad_T<T> step_aero_forces_moments_T(const AerodynamicProperties& aerodynamic_properties, const structural::StructuralProperties& structural_properties, const dynamics::Twist_T<T>& twist, const atmospheric::AirDensity& rho, const ControlSurfaceInputs_T<T>& u, const control::ControlProperties& cp, const atmospheric::Wind& windB, bool clamp_controls = true);
+    AerodynamicLoad_T<T> step_aero_forces_moments_T(const AerodynamicProperties& aerodynamic_properties, const structural::StructuralProperties& structural_properties, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& static_atmospheric_state, const ControlSurfaceInputs_T<T>& u, const actuators::ActuatorProperties& actuator_properties, const atmospheric::Wind& windB, bool clamp_controls = true);
 
     template <typename T>
     AerodynamicState_T<T> compute_aerodynamic_state_T(const dynamics::Twist_T<T>& twist, const atmospheric::Wind& windB);
@@ -211,7 +212,7 @@ namespace aerodynamics {
         const Surface& s,
         const structural::StructuralProperties& structural_properties,
         const dynamics::RigidBodyState& rigid_body_state,
-        const atmospheric::AirDensity& rho,
+        const atmospheric::StaticAtmosphericState& static_atmospheric_state,
         const atmospheric::Wind& windB
     );
 
@@ -219,7 +220,7 @@ namespace aerodynamics {
         const Surface& s,
         const SurfaceKinematics& sk,
         const control::ControlSurfaceInputs& u,
-        const control::ControlProperties& cp
+        const actuators::ActuatorProperties& actuator_properties
     );
 
     AerodynamicLoad compute_surface_loads(const Surface& s,const SurfaceKinematics& sk,const SurfaceCoefficients& sc);
@@ -228,9 +229,9 @@ namespace aerodynamics {
         const AerodynamicProperties& aerodynamic_properties,
         const structural::StructuralProperties& structural_properties,
         const dynamics::RigidBodyState& rigid_body_state,
-        const atmospheric::AirDensity& rho,
+        const atmospheric::StaticAtmosphericState& static_atmospheric_state,
         const control::ControlSurfaceInputs& u,
-        const control::ControlProperties& cp,
+        const actuators::ActuatorProperties& actuator_properties,
         const atmospheric::Wind& windB
     );
     

@@ -1,5 +1,6 @@
 {
     "aerodynamics_config": "aerodynamics/default.json",
+    "actuator_config": "actuators/default.json",
     "control_config": "control/pid_roll.json",
     "structural_config": "structural/default.json",
     "initialization_config": "initialization/default.json",

@@ -25,6 +25,7 @@ C++ flight simulator with FlightGear integration
   
 - Edit the following JSON configuration file paths in `config/run.json`:
   - `aerodynamics_config`: Path to the aerodynamic properties JSON
+  - `actuator_config`: Path to the actuator properties JSON
   - `structural_config`: Path to the structural properties JSON
   - `control_config`: Path to the control properties JSON
   - `avionics_config`: Path to the avionics properties JSON

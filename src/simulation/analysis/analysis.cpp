@@ -45,7 +45,7 @@ namespace analysis {
         const autopilot::TrimModel model{
             .structural = aircraft.structural_properties,
             .aerodynamic = aircraft.aerodynamic_properties,
-            .control = aircraft.control_properties,
+            .actuator = aircraft.actuator_properties,
             .fixed_controls = autopilot::TrimFixedControls{
                 .flap = 0.0,
                 .spoiler = 0.0,

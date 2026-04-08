@@ -17,6 +17,7 @@
 #include "simulation/atmospheric/atmospheric.hpp"
 #include "simulation/structural/structural.hpp"
 #include "simulation/aerodynamics/aerodynamics.hpp"
+#include "simulation/actuators/actuators.hpp"
 #include "simulation/autopilot/autopilot.hpp"
 #include "simulation/analysis/analysis.hpp"
 #include "core/io/io.hpp"
@@ -52,6 +53,7 @@ vehicles::Aircraft load(bool trim_bool) {
     vehicles::Aircraft aircraft { 
         json::parse_structural_config(), 
         json::parse_aerodynamics_config(),
+        json::parse_actuator_config(),
         json::parse_control_config(),
         json::parse_avionics_config(),
     };
@@ -99,6 +101,7 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
     // get aircraft properties
     structural::StructuralProperties structural_properties = aircraft.structural_properties;
     aerodynamics::AerodynamicProperties aerodynamic_properties = aircraft.aerodynamic_properties;
+    actuators::ActuatorProperties actuator_properties = aircraft.actuator_properties;
     control::ControlProperties& control_properties = aircraft.control_properties;
 
     dynamics::Mass mass = structural_properties.Mass;
@@ -144,8 +147,8 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
         // step timer by dt
         next += std::chrono::duration_cast<clock::duration>(std::chrono::duration<double>(constants::dt));
 
-        // compute airdensity at current altitude
-        atmospheric::AirDensity rho = atmospheric::static_atmospheric_state(aircraft.FRDFrameECEF).rho;
+        // compute static atmospheric state at current altitude
+        atmospheric::StaticAtmosphericState static_atmospheric_state = atmospheric::static_atmospheric_state(aircraft.FRDFrameECEF);
 
         // fetch wind
         // if (auto out_pkt = udp_out.try_receive()) {
@@ -155,12 +158,11 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
 
         // use sensors 
         if (sim_in.sensor_bool){
-            atmospheric::StaticAtmosphericState static_atmo_t = atmospheric::static_atmospheric_state(aircraft.FRDFrameECEF);
             geography::GeographicState geo_t = geography::geographic_state(aircraft.FRDFrameECEF);
 
             // obtain full state from sensors
             aerodynamics::AerodynamicState ads_t = aerodynamics::compute_aerodynamic_state(xN_t, wind);
-            auto [xN_t_sensor, ads_t_sensor] = avionics::update_state_from_avionics(xN_t, ads_t, static_atmo_t, geo_t, mass, wind, WB_net, aircraft.avionics_properties);
+            auto [xN_t_sensor, ads_t_sensor] = avionics::get_state_from_avionics(xN_t, ads_t, static_atmospheric_state, geo_t, mass, wind, WB_net, aircraft.avionics_properties);
 
             // overwrite local measurement state with sensor measurements
             xN_meas_t = xN_t_sensor;
@@ -174,14 +176,14 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
             u.rudder = trim_sol.input.rudder; 
         }
         else if (sim_in.control_bool) {
-            control::ControlSurfaceInputs u_ctrl = control_properties.step(xN_meas_t);
+            control::ControlSurfaceInputs u_ctrl = control_properties.step(xN_meas_t, actuator_properties.limits);
             u.elevator = u_ctrl.elevator;
             u.aileron = u_ctrl.aileron;
             u.rudder = u_ctrl.rudder;
         }
 
         // compute aerodynamics forces and moments
-        aerodynamics::AerodynamicLoad LB_aero = step_aero_forces_moments(aerodynamic_properties, structural_properties, xN_t, rho, u, control_properties, wind);
+        aerodynamics::AerodynamicLoad LB_aero = step_aero_forces_moments(aerodynamic_properties, structural_properties, xN_t, static_atmospheric_state, u, actuator_properties, wind);
         dynamics::Force FB_aero = LB_aero.F;
         dynamics::Moment MB_aero = LB_aero.M;
 
@@ -214,7 +216,7 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
 
             if (trim_sol.converged){
                 // obtain full state from trim solution
-                auto [xN_t_trim, ads_t_trim] = autopilot::update_state_from_trim(xN_t, trim_sol);
+                auto [xN_t_trim, ads_t_trim] = autopilot::get_state_from_trim(xN_t, trim_sol);
 
                 dynamics::Wrench WB_net_trim = trim_sol.wrench;
 

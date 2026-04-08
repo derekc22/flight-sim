@@ -15,7 +15,7 @@ namespace autopilot { // to encompass autonomy and trim
         return ratio / std::sqrt(std::max(1.0 - ratio * ratio, constants::eps));
     }
 
-    static TrimVariableVector_T<double> _pack_trim_solver_variables(const TrimState<double>& x, const TrimControlSurfaceInputs<double>& u, const control::ControlSurfaceLimits& limits) {
+    static TrimVariableVector_T<double> _pack_trim_solver_variables(const TrimState<double>& x, const TrimControlSurfaceInputs<double>& u, const actuators::ActuatorLimits& limits) {
         TrimVariableVector_T<double> z = pack_trim_variables_T<double>(x, u);
         z(8) = _send_control_to_solver_space(u.elevator, limits.elevator_max);
         z(9) = _send_control_to_solver_space(u.aileron, limits.aileron_max);
@@ -63,9 +63,9 @@ namespace autopilot { // to encompass autonomy and trim
             model.aerodynamic,
             model.structural,
             twist,
-            conditions.rho,
+            conditions.static_atmospheric_state,
             controls,
-            model.control,
+            model.actuator,
             conditions.windB,
             false
         );
@@ -79,7 +79,7 @@ namespace autopilot { // to encompass autonomy and trim
     static TrimSolution _build_trim_solution(const TrimVariableVector_T<double>& z, const TrimResidualVector_T<double>& residual, const TrimModel& model, const TrimConditions& conditions, bool converged, std::size_t iterations) {
         TrimSolution out;
         out.state = unpack_trim_state_T<double>(z);
-        out.input = _unpack_trim_solver_input_T<double>(z, model.control.limits);
+        out.input = _unpack_trim_solver_input_T<double>(z, model.actuator.limits);
         out.conditions = conditions;
         out.wrench = _compute_trim_wrench(out.state, out.input, model, out.conditions);
         out.variables = pack_trim_variables_T<double>(out.state, out.input);
@@ -126,7 +126,7 @@ namespace autopilot { // to encompass autonomy and trim
         _validate_trim_solve_options(options);
 
         const bool use_physical_controls = false;
-        TrimVariableVector_T<double> z = _pack_trim_solver_variables(problem.state_guess, problem.input_guess, model.control.limits);
+        TrimVariableVector_T<double> z = _pack_trim_solver_variables(problem.state_guess, problem.input_guess, model.actuator.limits);
         TrimResidualVector_T<double> residual = compute_trim_residual_vector(z, model, problem.target, problem.conditions, use_physical_controls);
         double damping = options.initial_damping;
         std::size_t iterations_completed = 0;
@@ -187,7 +187,7 @@ namespace autopilot { // to encompass autonomy and trim
         const TrimModel model{
             .structural = aircraft.structural_properties,
             .aerodynamic = aircraft.aerodynamic_properties,
-            .control = aircraft.control_properties,
+            .actuator = aircraft.actuator_properties,
             .fixed_controls = TrimFixedControls{
                 .flap = 0.0,
                 .spoiler = 0.0,
@@ -201,7 +201,7 @@ namespace autopilot { // to encompass autonomy and trim
                 .theta = aircraft.FRDFrameNED.eulNB.theta(),
             },
             .conditions = TrimConditions{
-                .rho = atmospheric::static_atmospheric_state(aircraft.FRDFrameECEF).rho,
+                .static_atmospheric_state = atmospheric::static_atmospheric_state(aircraft.FRDFrameECEF),
                 .windB = wind,
             },
             .state_guess = TrimState<double>{
@@ -269,7 +269,7 @@ namespace autopilot { // to encompass autonomy and trim
     }
 
 
-    std::pair<dynamics::RigidBodyState, aerodynamics::AerodynamicState> update_state_from_trim(const dynamics::RigidBodyState& xN_t, const TrimSolution& trim_sol) {
+    std::pair<dynamics::RigidBodyState, aerodynamics::AerodynamicState> get_state_from_trim(const dynamics::RigidBodyState& xN_t, const TrimSolution& trim_sol) {
             dynamics::EulerAngles eul_curr;
             eul_curr.set(xN_t.q);
             dynamics::EulerAngles eul_trim{ Eigen::Vector3d(eul_curr.psi(), trim_sol.state.theta, trim_sol.state.phi) };

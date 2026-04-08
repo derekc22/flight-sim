@@ -186,7 +186,7 @@ namespace avionics {
     }
 
 
-    std::pair<dynamics::RigidBodyState, aerodynamics::AerodynamicState> update_state_from_avionics(
+    std::pair<dynamics::RigidBodyState, aerodynamics::AerodynamicState> get_state_from_avionics(
         const dynamics::RigidBodyState& xN_t, 
         const aerodynamics::AerodynamicState& ads_t, 
         const atmospheric::StaticAtmosphericState& static_atmo_t, 
