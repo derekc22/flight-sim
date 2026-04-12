@@ -16,7 +16,7 @@ namespace io {
         int n_cols;
 
         DataMatrix(const Eigen::MatrixXd& d);
-        void insert(int t, const Eigen::VectorXd data, double dt);
+        void insert(int t, const Eigen::VectorXd data);
 
     };
 

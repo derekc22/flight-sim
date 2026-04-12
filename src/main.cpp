@@ -36,12 +36,15 @@ struct SimulationInput {
     bool data_bool;
     std::string out_dir;
 }; 
+
 struct SimulationOutput {
     std::optional<io::DataMatrix> p_DM;
     std::optional<io::DataMatrix> eul_DM;
     std::optional<io::DataMatrix> w_DM;
     std::optional<io::DataMatrix> v_DM;
     std::optional<io::DataMatrix> u_DM;
+    std::optional<io::DataMatrix> F_DM;
+    std::optional<io::DataMatrix> M_DM;
     autopilot::TrimSolution trim_sol;
     analysis::TrimLinearization lin_sol;
     analysis::TrimEigenAnalysis eig_sol;
@@ -55,7 +58,7 @@ vehicles::Aircraft load(bool trim_bool) {
         json::parse_aerodynamics_config(),
         json::parse_actuator_config(),
         json::parse_control_config(),
-        json::parse_avionics_config(),
+        json::parse_avionics_config()
     };
 
     // set initial conditions from config
@@ -74,6 +77,8 @@ void cleanup(const SimulationInput& sim_in, const SimulationOutput& sim_out) {
         io::write_csv(sim_out.w_DM->data, out_dir_path, "w");
         io::write_csv(sim_out.v_DM->data, out_dir_path, "v");
         io::write_csv(sim_out.u_DM->data, out_dir_path, "u");
+        io::write_csv(sim_out.F_DM->data, out_dir_path, "F");
+        io::write_csv(sim_out.M_DM->data, out_dir_path, "M");
         
         // log trim
         if (sim_in.trim_bool){
@@ -123,6 +128,8 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
         sim_out.w_DM = io::DataMatrix{ Eigen::MatrixXd::Zero(tf, 3+1) };
         sim_out.v_DM = io::DataMatrix{ Eigen::MatrixXd::Zero(tf, 3+1) };
         sim_out.u_DM = io::DataMatrix{ Eigen::MatrixXd::Zero(tf, 5+1) };
+        sim_out.F_DM = io::DataMatrix{ Eigen::MatrixXd::Zero(tf, 3+1) };
+        sim_out.M_DM = io::DataMatrix{ Eigen::MatrixXd::Zero(tf, 3+1) };
     }
 
     // initialize udp connections
@@ -169,21 +176,26 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
         }
 
         // specify control commands
-        control::ControlSurfaceInputs u{};
+        control::ControlSurfaceInputs u_cmd{};
         if (sim_in.trim_bool && trim_sol.converged) { 
-            u.elevator = trim_sol.input.elevator; 
-            u.aileron = trim_sol.input.aileron; 
-            u.rudder = trim_sol.input.rudder; 
+            u_cmd.elevator = trim_sol.input.elevator; 
+            u_cmd.aileron = trim_sol.input.aileron; 
+            u_cmd.rudder = trim_sol.input.rudder; 
         }
         else if (sim_in.control_bool) {
-            control::ControlSurfaceInputs u_ctrl = control_properties.step(xN_meas_t, actuator_properties.limits);
-            u.elevator = u_ctrl.elevator;
-            u.aileron = u_ctrl.aileron;
-            u.rudder = u_ctrl.rudder;
+            control::ControlSurfaceInputs u_ctrl = control_properties.step(xN_meas_t, actuator_properties.actuators);
+            u_cmd.elevator = u_ctrl.elevator;
+            u_cmd.aileron = u_ctrl.aileron;
+            u_cmd.rudder = u_ctrl.rudder;
         }
 
+        // apply actuator dynamics
+        control::ControlSurfaceInputs u_actual = aircraft.actuator_properties.step(u_cmd);
+
         // compute aerodynamics forces and moments
-        aerodynamics::AerodynamicLoad LB_aero = step_aero_forces_moments(aerodynamic_properties, structural_properties, xN_t, static_atmospheric_state, u, actuator_properties, wind);
+        /** @deprecated */
+        // aerodynamics::AerodynamicLoad LB_aero = step_aero_forces_moments(aerodynamic_properties, structural_properties, xN_t, static_atmospheric_state, u, actuator_properties, wind);
+        aerodynamics::AerodynamicLoad LB_aero = step_aero_forces_moments(aerodynamic_properties, structural_properties, xN_t, static_atmospheric_state, u_actual, wind);
         dynamics::Force FB_aero = LB_aero.F;
         dynamics::Moment MB_aero = LB_aero.M;
 
@@ -216,7 +228,7 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
 
             if (trim_sol.converged){
                 // obtain full state from trim solution
-                auto [xN_t_trim, ads_t_trim] = autopilot::get_state_from_trim(xN_t, trim_sol);
+                auto [xN_t_trim, ads_t_trim] = autopilot::update_state_from_trim(xN_t, trim_sol);
 
                 dynamics::Wrench WB_net_trim = trim_sol.wrench;
 
@@ -235,6 +247,9 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
                 xN_t = xN_t_trim;
                 WB_net = WB_net_trim;
 
+                // overwrite actuator lag state with trim controls
+                autopilot::update_actuators_from_trim(aircraft.actuator_properties.actuators, trim_sol);
+
                 // linearize
                 const analysis::TrimLinearization lin_sol = analysis::linearize_trim_solution(aircraft, trim_sol);
                 const analysis::TrimEigenAnalysis eig_sol = analysis::trim_linearization_eigen_analysis(lin_sol);
@@ -248,13 +263,15 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
             dynamics::EulerAngles eul_meas_t;
             eul_meas_t.set(xN_meas_t.q);
             Eigen::VectorXd u_t(5);
-            u_t << u.elevator, u.aileron, u.rudder, u.flap, u.spoiler;
+            u_t << u_actual.elevator, u_actual.aileron, u_actual.rudder, u_actual.flaps, u_actual.spoilers;
 
-            sim_out.p_DM->insert(t, xN_meas_t.p.data, constants::dt);
-            sim_out.eul_DM->insert(t, eul_meas_t.data, constants::dt);
-            sim_out.w_DM->insert(t, xN_meas_t.w.data, constants::dt);
-            sim_out.v_DM->insert(t, xN_meas_t.v.data, constants::dt);
-            sim_out.u_DM->insert(t, u_t, constants::dt);
+            sim_out.p_DM->insert(t, xN_meas_t.p.data);
+            sim_out.eul_DM->insert(t, eul_meas_t.data);
+            sim_out.w_DM->insert(t, xN_meas_t.w.data);
+            sim_out.v_DM->insert(t, xN_meas_t.v.data);
+            sim_out.u_DM->insert(t, u_t);
+            sim_out.F_DM->insert(t, FB_net.data);
+            sim_out.M_DM->insert(t, MB_net.data);
         }
 
         // generate in_pkt from the simulation state

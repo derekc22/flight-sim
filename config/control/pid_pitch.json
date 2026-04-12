@@ -1,10 +1,18 @@
 {
     "controllers": {
-        "longitudinal": {
-            "control_type": "PitchPIDController",
-            "gains": [50, 1, 20]
-        },
-        "full_state": false
+        "axial": {
+            "longitudinal": {
+                "control_type": "PitchPIDController",
+                "parameters": {
+                    "gains": {
+                        "Kp": 50,
+                        "Ki": 20,
+                        "Kd": 1
+                    },
+                    "tau": 0.001
+                }
+            }
+        }
     },
     "FRDFrameNED": {
         "eul": [0.0, 0.04363325, 0.0],

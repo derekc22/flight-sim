@@ -7,9 +7,10 @@
 namespace control {
 
     PIDController::PIDController(const ControlLawParameters& params) :
-        Kp(params.gains[0]),
-        Kd(params.gains[1]),
-        Ki(params.gains[2])
+        Kp(params.gains.Kp),
+        Kd(params.gains.Kd),
+        Ki(params.gains.Ki),
+        tau(params.tau)
     {}
 
     RollPIDController::RollPIDController(const ControlLawParameters& params) : PIDController(params) {}
@@ -33,12 +34,13 @@ namespace control {
         Ki = 0.0;
     }
 
-    double PIDController::_step(const ControlLawInput& ctrl_law_input) {
+    double PIDController::_step(const AxisControlLawInput& ctrl_law_input) {
         double err = ctrl_law_input.meas_des - ctrl_law_input.meas;
 
         // filtered derivative
-        double alpha = std::exp(-constants::dt / tau);
-        d_filtered = alpha * d_filtered + (1.0 - alpha) * ctrl_law_input.meas_dot;
+        // double alpha = std::exp(-constants::dt / tau);
+        // d_filtered = alpha * d_filtered + (1.0 - alpha) * ctrl_law_input.meas_dot;
+        d_filtered = util::first_order_lag(ctrl_law_input.meas_dot, d_filtered, tau);
 
         // derivative error
         double meas_dot_filtered = d_filtered;
@@ -60,100 +62,107 @@ namespace control {
     }
 
 
-    ControlSurfaceInputs ControlProperties::step(const dynamics::RigidBodyState& xN_meas_t, const actuators::ActuatorLimits& limits) {
-        ControlSurfaceInputs u;
-        ControlLawInput ctrl_law_input;
+    AxisControlLawInput ControlProperties::make_axis_control_input(const dynamics::RigidBodyState& xN_meas_t, const actuators::Actuator& actuator, ControlType control_type) {
+        dynamics::EulerAngles eul_meas_t;
+        eul_meas_t.set(xN_meas_t.q);
 
-        if (full_state) {
+        dynamics::EulerAngles eul_des_t;
+        eul_des_t.set(xN_des_t.q);
+
+        switch (control_type) {
+            case ControlType::RollDamper:
+                return {
+                    .meas = xN_meas_t.w.p(),
+                    .meas_dot = 0.0,
+                    .meas_des = xN_des_t.w.p(),
+                    .meas_dot_des = 0.0,
+                    .limit_max = actuator.limit_max,
+                    .limit_min = actuator.limit_min
+                };
+
+            case ControlType::RollPIDController:
+                return {
+                    .meas = eul_meas_t.phi(),
+                    .meas_dot = xN_meas_t.w.p(),
+                    .meas_des = eul_des_t.phi(),
+                    .meas_dot_des = 0.0,
+                    .limit_max = actuator.limit_max,
+                    .limit_min = actuator.limit_min
+                };
+
+            case ControlType::PitchDamper:
+                return {
+                    .meas = xN_meas_t.w.q(),
+                    .meas_dot = 0.0,
+                    .meas_des = xN_des_t.w.q(),
+                    .meas_dot_des = 0.0,
+                    .limit_max = actuator.limit_max,
+                    .limit_min = actuator.limit_min
+                };
+
+            case ControlType::PitchPIDController:
+                return {
+                    .meas = eul_meas_t.theta(),
+                    .meas_dot = xN_meas_t.w.q(),
+                    .meas_des = eul_des_t.theta(),
+                    .meas_dot_des = 0.0,
+                    .limit_max = actuator.limit_max,
+                    .limit_min = actuator.limit_min
+                };
+
+            case ControlType::YawDamper:
+                return {
+                    .meas = xN_meas_t.w.r(),
+                    .meas_dot = 0.0,
+                    .meas_des = xN_des_t.w.r(),
+                    .meas_dot_des = 0.0,
+                    .limit_max = actuator.limit_max,
+                    .limit_min = actuator.limit_min
+                };
+
+            case ControlType::YawPIDController:
+                return {
+                    .meas = eul_meas_t.psi(),
+                    .meas_dot = xN_meas_t.w.r(),
+                    .meas_des = eul_des_t.psi(),
+                    .meas_dot_des = 0.0,
+                    .limit_max = actuator.limit_max,
+                    .limit_min = actuator.limit_min
+                };
+
+            default:
+                throw std::runtime_error("control::make_axis_control_input invalid control type");
+        }
+    }
+
+    ControlSurfaceInputs ControlProperties::step(const dynamics::RigidBodyState& xN_meas_t, const actuators::Actuators& actuators) {
+        ControlSurfaceInputs u;
+
+        if (full_state_controller) {
             ; // placeholder
         }
         else {
-            dynamics::EulerAngles eul_meas_t;
-            eul_meas_t.set(xN_meas_t.q);
-
-            dynamics::EulerAngles eul_des_t;
-            eul_des_t.set(xN_des_t.q);
-
-
             if (lateral_controller) {
-                if (lateral_control_type == "RollPIDController") {
-                    ctrl_law_input = {
-                        .meas = eul_meas_t.phi(),
-                        .meas_dot = xN_meas_t.w.p(),
-                        .meas_des = eul_des_t.phi(),
-                        .meas_dot_des = 0.0,
-                        .limit_max = limits.aileron_max,
-                        .limit_min = -limits.aileron_max
-                    };
-                    u.aileron = lateral_controller(ctrl_law_input);
-                }
-                else if (lateral_control_type == "RollDamper") {
-                    ctrl_law_input = {
-                        .meas = xN_meas_t.w.p(),
-                        .meas_dot = 0.0,
-                        .meas_des = xN_des_t.w.p(),
-                        .meas_dot_des = 0.0,
-                        .limit_max = limits.aileron_max,
-                        .limit_min = -limits.aileron_max
-                    };
-                    u.aileron = lateral_controller(ctrl_law_input);
-                }
+                u.aileron = lateral_controller(
+                    make_axis_control_input(xN_meas_t, actuators.aileron, lateral_control_type)
+                );
             }
 
             if (longitudinal_controller) {
-                if (longitudinal_control_type == "PitchPIDController") {
-                    ctrl_law_input = {
-                        .meas = eul_meas_t.theta(),
-                        .meas_dot = xN_meas_t.w.q(),
-                        .meas_des = eul_des_t.theta(),
-                        .meas_dot_des = 0.0,
-                        .limit_max = limits.elevator_max,
-                        .limit_min = -limits.elevator_max
-                    };
-                    u.elevator = longitudinal_controller(ctrl_law_input);
-                }
-                else if (longitudinal_control_type == "PitchDamper") {
-                    ctrl_law_input = {
-                        .meas = xN_meas_t.w.q(),
-                        .meas_dot = 0.0,
-                        .meas_des = xN_des_t.w.q(),
-                        .meas_dot_des = 0.0,
-                        .limit_max = limits.elevator_max,
-                        .limit_min = -limits.elevator_max
-                    };
-                    u.elevator = longitudinal_controller(ctrl_law_input);
-                }
+                u.elevator = longitudinal_controller(
+                    make_axis_control_input(xN_meas_t, actuators.elevator, longitudinal_control_type)
+                );
             }
 
             if (vertical_controller) {
-                if (vertical_control_type == "YawPIDController") {
-                    ctrl_law_input = {
-                        .meas = eul_meas_t.psi(),
-                        .meas_dot = xN_meas_t.w.r(),
-                        .meas_des = eul_des_t.psi(),
-                        .meas_dot_des = 0.0,
-                        .limit_max = limits.rudder_max,
-                        .limit_min = -limits.rudder_max,
-                    };
-                    u.rudder = vertical_controller(ctrl_law_input);
-                }
-                else if (vertical_control_type == "YawDamper") {
-                    ctrl_law_input = {
-                        .meas = xN_meas_t.w.r(),
-                        .meas_dot = 0.0,
-                        .meas_des = xN_des_t.w.r(),
-                        .meas_dot_des = 0.0,
-                        .limit_max = limits.rudder_max,
-                        .limit_min = -limits.rudder_max,
-                    };
-                    u.rudder = vertical_controller(ctrl_law_input);
-                }
+                u.rudder = vertical_controller(
+                    make_axis_control_input(xN_meas_t, actuators.rudder, vertical_control_type)
+                );
             }
         }
+
         return u;
     }
-
-
 
 
 }

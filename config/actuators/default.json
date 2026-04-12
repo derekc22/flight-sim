@@ -1,9 +1,27 @@
 {
-    "control_surface_limits": {
-        "elevator_max": 50.0,
-        "aileron_max": 20.0,
-        "rudder_max": 31.0,
-        "flap_max": 0.0,
-        "spoiler_max": 90.0
+    "elevator": {
+        "limit_max": 50.0,
+        "limit_min": -50.0,
+        "tau": 1e-6
+    },
+    "aileron": {
+        "limit_max": 20.0,
+        "limit_min": -20.0,
+        "tau": 1e-6
+    },
+    "rudder": {
+        "limit_max": 31.0,
+        "limit_min": -31.0,
+        "tau": 1e-6
+    },
+    "flaps": {
+        "limit_max": 0.0,
+        "limit_min": 0.0,
+        "tau": 1e-6
+    },
+    "spoilers": {
+        "limit_max": 90.0,
+        "limit_min": 0.0,
+        "tau": 1e-6
     }
 }

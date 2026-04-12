@@ -42,6 +42,7 @@ namespace util {
     Eigen::Vector3d vee(const Eigen::Matrix3d& S);
 
     Eigen::Vector3d norm(const Eigen::Vector3d& v);
+    double clamp(double x, double min_value, double max_value);
     double clamp_symmetric(double x, double max_abs);
     double clamp_positive(double x, double max_value);
     double clamp_to_1(double x);
@@ -66,6 +67,7 @@ namespace util {
     CppAD::AD<double> abs(const CppAD::AD<double>& x);
     CppAD::AD<double> smooth_abs(const CppAD::AD<double>& x);
 
+    CppAD::AD<double> clamp(const CppAD::AD<double>& x, double min_value, double max_value);
     CppAD::AD<double> clamp_symmetric(const CppAD::AD<double>& x, double max_abs);
     CppAD::AD<double> clamp_positive(const CppAD::AD<double>& x, double max_value);
     CppAD::AD<double> clamp_to_1(const CppAD::AD<double>& x);
@@ -109,4 +111,9 @@ namespace util {
         const Eigen::Map<const Eigen::Matrix<double, output_rows, input_rows, Eigen::RowMajor>> jac_map(jac_flat.data());
         return Eigen::Matrix<double, output_rows, input_rows>(jac_map);
     }
+
+    double first_order_lag(double val, double prev_val, double tau);
+    Eigen::Vector3d first_order_lag(const Eigen::Vector3d& val, const Eigen::Vector3d& prev_val, double tau);
+    Eigen::Quaterniond first_order_lag(const Eigen::Quaterniond& val, const Eigen::Quaterniond& prev_val, double tau);
+
 }

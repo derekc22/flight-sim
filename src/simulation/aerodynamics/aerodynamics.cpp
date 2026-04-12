@@ -73,7 +73,10 @@ namespace aerodynamics {
     }
 
 
-    SurfaceCoefficients compute_surface_coefficients(const Surface& s, const SurfaceKinematics& sk, const control::ControlSurfaceInputs& u, const actuators::ActuatorProperties& actuator_properties) {
+    /** @deprecated */
+    // SurfaceCoefficients compute_surface_coefficients(const Surface& s, const SurfaceKinematics& sk, const control::ControlSurfaceInputs& u, const actuators::ActuatorProperties& actuator_properties) {
+    
+    SurfaceCoefficients compute_surface_coefficients(const Surface& s, const SurfaceKinematics& sk, const control::ControlSurfaceInputs& u) {
         const SurfaceCoefficients_T<double> sc = compute_surface_coefficients_T<double>(
             s,
             SurfaceKinematics_T<double>{
@@ -90,10 +93,10 @@ namespace aerodynamics {
                 .elevator = u.elevator,
                 .aileron = u.aileron,
                 .rudder = u.rudder,
-                .flap = u.flap,
-                .spoiler = u.spoiler,
-            },
-            actuator_properties
+                .flaps = u.flaps,
+                .spoilers = u.spoilers,
+            }
+            // actuator_properties.actuators
         );
 
         return {
@@ -126,14 +129,22 @@ namespace aerodynamics {
         return { dynamics::Force{ loads.F }, dynamics::Moment{ loads.M } };
     }
 
-
+    /** @deprecated */
+    // AerodynamicLoad step_aero_forces_moments(
+    //     const AerodynamicProperties& aerodynamic_properties,
+    //     const structural::StructuralProperties& structural_properties,
+    //     const dynamics::RigidBodyState& rigid_body_state,
+    //     const atmospheric::StaticAtmosphericState& static_atmospheric_state,
+    //     const control::ControlSurfaceInputs& u,
+    //     const actuators::ActuatorProperties& actuator_properties,
+    //     const atmospheric::Wind& windB
+    // ) {
     AerodynamicLoad step_aero_forces_moments(
         const AerodynamicProperties& aerodynamic_properties,
         const structural::StructuralProperties& structural_properties,
         const dynamics::RigidBodyState& rigid_body_state,
         const atmospheric::StaticAtmosphericState& static_atmospheric_state,
         const control::ControlSurfaceInputs& u,
-        const actuators::ActuatorProperties& actuator_properties,
         const atmospheric::Wind& windB
     ) {
         const dynamics::Twist_T<double> twist{
@@ -150,10 +161,10 @@ namespace aerodynamics {
                 .elevator = u.elevator,
                 .aileron = u.aileron,
                 .rudder = u.rudder,
-                .flap = u.flap,
-                .spoiler = u.spoiler,
+                .flaps = u.flaps,
+                .spoilers = u.spoilers,
             },
-            actuator_properties,
+            // actuator_properties.actuators,
             windB
         );
 

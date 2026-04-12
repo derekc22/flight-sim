@@ -1,25 +1,29 @@
-#include "simulation/autopilot/autopilot.hpp"
 #include <algorithm>
 #include <sstream>
 #include <utility> // For std::pair
 #include <stdexcept>
+#include "simulation/autopilot/autopilot.hpp"
+#include "simulation/actuators/actuators.hpp"
 
 namespace autopilot { // to encompass autonomy and trim
 
-    static double _send_control_to_solver_space(double u, double limit) {
-        if (limit <= 0.0) {
+    static double _send_control_to_solver_space(double u, const actuators::Actuator& actuator) {
+        const double mid = 0.5 * (actuator.limit_max + actuator.limit_min);
+        const double half_range = 0.5 * (actuator.limit_max - actuator.limit_min);
+
+        if (half_range <= 0.0) {
             return 0.0;
         }
 
-        const double ratio = util::clamp_inside_1(u / limit);
+        const double ratio = util::clamp_inside_1((u - mid) / half_range);
         return ratio / std::sqrt(std::max(1.0 - ratio * ratio, constants::eps));
     }
 
-    static TrimVariableVector_T<double> _pack_trim_solver_variables(const TrimState<double>& x, const TrimControlSurfaceInputs<double>& u, const actuators::ActuatorLimits& limits) {
+    static TrimVariableVector_T<double> _pack_trim_solver_variables(const TrimState<double>& x, const TrimControlSurfaceInputs<double>& u, const actuators::Actuators& actuators) {
         TrimVariableVector_T<double> z = pack_trim_variables_T<double>(x, u);
-        z(8) = _send_control_to_solver_space(u.elevator, limits.elevator_max);
-        z(9) = _send_control_to_solver_space(u.aileron, limits.aileron_max);
-        z(10) = _send_control_to_solver_space(u.rudder, limits.rudder_max);
+        z(8) = _send_control_to_solver_space(u.elevator, actuators.elevator);
+        z(9) = _send_control_to_solver_space(u.aileron, actuators.aileron);
+        z(10) = _send_control_to_solver_space(u.rudder, actuators.rudder);
         return z;
     }
 
@@ -65,9 +69,9 @@ namespace autopilot { // to encompass autonomy and trim
             twist,
             conditions.static_atmospheric_state,
             controls,
-            model.actuator,
-            conditions.windB,
-            false
+            // model.actuator.actuators,
+            conditions.windB
+            // false
         );
 
         return {
@@ -79,7 +83,7 @@ namespace autopilot { // to encompass autonomy and trim
     static TrimSolution _build_trim_solution(const TrimVariableVector_T<double>& z, const TrimResidualVector_T<double>& residual, const TrimModel& model, const TrimConditions& conditions, bool converged, std::size_t iterations) {
         TrimSolution out;
         out.state = unpack_trim_state_T<double>(z);
-        out.input = _unpack_trim_solver_input_T<double>(z, model.actuator.limits);
+        out.input = _unpack_trim_solver_input_T<double>(z, model.actuator.actuators);
         out.conditions = conditions;
         out.wrench = _compute_trim_wrench(out.state, out.input, model, out.conditions);
         out.variables = pack_trim_variables_T<double>(out.state, out.input);
@@ -126,7 +130,7 @@ namespace autopilot { // to encompass autonomy and trim
         _validate_trim_solve_options(options);
 
         const bool use_physical_controls = false;
-        TrimVariableVector_T<double> z = _pack_trim_solver_variables(problem.state_guess, problem.input_guess, model.actuator.limits);
+        TrimVariableVector_T<double> z = _pack_trim_solver_variables(problem.state_guess, problem.input_guess, model.actuator.actuators);
         TrimResidualVector_T<double> residual = compute_trim_residual_vector(z, model, problem.target, problem.conditions, use_physical_controls);
         double damping = options.initial_damping;
         std::size_t iterations_completed = 0;
@@ -189,8 +193,8 @@ namespace autopilot { // to encompass autonomy and trim
             .aerodynamic = aircraft.aerodynamic_properties,
             .actuator = aircraft.actuator_properties,
             .fixed_controls = TrimFixedControls{
-                .flap = 0.0,
-                .spoiler = 0.0,
+                .flaps = 0.0,
+                .spoilers = 0.0,
             },
         };
 
@@ -269,7 +273,7 @@ namespace autopilot { // to encompass autonomy and trim
     }
 
 
-    std::pair<dynamics::RigidBodyState, aerodynamics::AerodynamicState> get_state_from_trim(const dynamics::RigidBodyState& xN_t, const TrimSolution& trim_sol) {
+    std::pair<dynamics::RigidBodyState, aerodynamics::AerodynamicState> update_state_from_trim(const dynamics::RigidBodyState& xN_t, const TrimSolution& trim_sol) {
             dynamics::EulerAngles eul_curr;
             eul_curr.set(xN_t.q);
             dynamics::EulerAngles eul_trim{ Eigen::Vector3d(eul_curr.psi(), trim_sol.state.theta, trim_sol.state.phi) };
@@ -286,6 +290,12 @@ namespace autopilot { // to encompass autonomy and trim
             aerodynamics::AerodynamicState ads_t_trim = aerodynamics::compute_aerodynamic_state(xN_t_trim, trim_sol.conditions.windB);
 
         return { xN_t_trim, ads_t_trim };
+    }
+
+    void update_actuators_from_trim(actuators::Actuators& actuators,  const TrimSolution& trim_sol) {
+        actuators.aileron.prev_cmd = trim_sol.input.aileron;
+        actuators.elevator.prev_cmd = trim_sol.input.elevator;
+        actuators.rudder.prev_cmd = trim_sol.input.rudder;
     }
 
 }

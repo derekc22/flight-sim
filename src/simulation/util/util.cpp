@@ -66,6 +66,13 @@ namespace util {
         return v / n;
     }
 
+    double clamp(double x, double min_value, double max_value) {
+        if (max_value <= min_value) return min_value;
+        if (x > max_value) return max_value;
+        if (x < min_value) return min_value;
+        return x;
+    }
+
     double clamp_symmetric(double x, double max_abs) {
         if (max_abs <= 0.0) return 0.0;
         return std::clamp(x, -max_abs, max_abs);
@@ -160,6 +167,15 @@ namespace util {
         return sqrt(x * x + eps_t * eps_t) - eps_t;
     }
 
+    CppAD::AD<double> clamp(const CppAD::AD<double>& x, double min_value, double max_value) {
+        if (max_value <= min_value) return CppAD::AD<double>(min_value);
+        const CppAD::AD<double> min_t(min_value);
+        const CppAD::AD<double> max_t(max_value);
+        if (x > max_t) return max_t;
+        if (x < min_t) return min_t;
+        return x;
+    }
+
     CppAD::AD<double> clamp_symmetric(const CppAD::AD<double>& x, double max_abs) {
         if (max_abs <= 0.0) return CppAD::AD<double>(0.0);
         const CppAD::AD<double> max_t(max_abs);
@@ -192,6 +208,24 @@ namespace util {
             return Eigen::Matrix<CppAD::AD<double>, 3, 1>::Zero();
         }
         return v / n;
+    }
+
+    double first_order_lag(double val, double prev_val, double tau) {
+        double alpha = std::exp(-constants::dt / tau);
+        return (1-alpha) * val + alpha * prev_val;
+    }
+
+    Eigen::Vector3d first_order_lag(const Eigen::Vector3d& val, const Eigen::Vector3d& prev_val, double tau) {
+        double alpha = std::exp(-constants::dt / tau);
+        return (1-alpha) * val + alpha * prev_val;
+    }
+
+    Eigen::Quaterniond first_order_lag(const Eigen::Quaterniond& val, const Eigen::Quaterniond& prev_val, double tau) {
+        double alpha = std::exp(-constants::dt / tau);
+        Eigen::Quaterniond val_adjusted = val;
+        if (prev_val.coeffs().dot(val.coeffs()) < 0.0) val_adjusted.coeffs() *= -1.0;
+
+        return prev_val.slerp(1-alpha, val_adjusted);
     }
 
 }

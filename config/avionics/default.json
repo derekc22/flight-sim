@@ -1,47 +1,47 @@
 {
-    "AngleOfAttackVane": {
+    "angle_of_attack_vane": {
         "mean": 0.0,
         "stddev": 0.0087,
         "bias": 0.004,
         "tau": 0.05
     },
-    "Accelerometer": {
+    "accelerometer": {
         "mean": 0.0,
         "stddev": 0.05,
         "bias": [0.03, -0.02, 0.04],
         "tau": 0.01
     },
-    "Gyroscope": {
+    "gyroscope": {
         "mean": 0.0,
         "stddev": 0.002,
         "bias": [0.0006, -0.0004, 0.0005],
         "tau": 0.005
     },
-    "PitotTube": {
+    "pitot_tube": {
         "mean": 0.0,
         "stddev": 2.0,
         "bias": 1.0,
         "tau": 0.03
     },
-    "StaticPort": {
+    "static_port": {
         "mean": 0.0,
         "stddev": 1.0,
         "bias": -0.5,
         "tau": 0.1
     },
-    "TotalAirTemperatureProbe": {
+    "total_air_temperature_probe": {
         "mean": 0.0,
         "stddev": 0.5,
         "bias": 0.2,
         "tau": 1.5
     },
-    "GNSSReceiver": {
+    "gnss_receiver": {
         "mean": 0.0,
         "stddev": 0.25,
         "bias": [0.15, -0.08, 0.05],
         "tau": 0.05
     },
-    "Magnetometer": {
+    "magnetometer": {
         "mean": 0.0,
         "stddev": 0.01,
         "bias": 0.03,

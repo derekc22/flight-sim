@@ -25,8 +25,8 @@ done
 
 # set defaults for flags
 : "${TRIM_BOOL:=0}"
-: "${CONTROL_BOOL:=0}"
 : "${SENSOR_BOOL:=0}"
+: "${CONTROL_BOOL:=0}"
 : "${VERBOSE_BOOL:=0}"
 : "${DATA_BOOL:=0}"
 : "${PLOT_BOOL:=0}"

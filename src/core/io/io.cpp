@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include <Eigen/Dense>
 #include "core/io/io.hpp"
+#include "simulation/constants/constants.hpp"
 
 namespace io {
 
@@ -56,12 +57,12 @@ namespace io {
 
     DataMatrix::DataMatrix(const Eigen::MatrixXd& d) : data(d), n_rows(static_cast<int>(data.rows())), n_cols(static_cast<int>(data.cols())) {}
 
-    void DataMatrix::insert(int t, const Eigen::VectorXd input, double dt) {
+    void DataMatrix::insert(int t, const Eigen::VectorXd input) {
         if (input.cols() > 1) { throw std::runtime_error("io::DataMatrix::insert Eigen::Matrix passed for 'input', expected Eigen::Vector"); }
         if (input.rows() > n_cols - 1) { throw std::runtime_error("io::DataMatrix::insert Number of rows in 'input' exceeds number of columns in DataMatrix"); }
         if (t > n_rows - 1) { throw std::runtime_error("io::DataMatrix::insert Input index 't' exceeds number of rows in DataMatrix"); }
 
-        data(t, 0) = t * dt;
+        data(t, 0) = t * constants::dt;
         Eigen::Index cols_to_copy = data.cols() - 1;
         data.block(t, 1, 1, cols_to_copy) = input.transpose(); // startRow, startCol, blockRows, blockCols.
     }

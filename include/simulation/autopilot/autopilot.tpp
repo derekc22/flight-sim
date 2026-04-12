@@ -15,26 +15,29 @@ namespace autopilot {
             .elevator = u.elevator,
             .aileron = u.aileron,
             .rudder = u.rudder,
-            .flap = T(fixed_controls.flap),
-            .spoiler = T(fixed_controls.spoiler),
+            .flaps = T(fixed_controls.flaps),
+            .spoilers = T(fixed_controls.spoilers),
         };
     }
 
     template <typename T>
-    T _get_control_from_solver_space_T(const T& u_solver, double limit) {
-        if (limit <= 0.0) {
-            return T(0);
+    T _get_control_from_solver_space_T(const T& u_solver, const actuators::Actuator& actuator) {
+        const double mid = 0.5 * (actuator.limit_max + actuator.limit_min);
+        const double half_range = 0.5 * (actuator.limit_max - actuator.limit_min);
+
+        if (half_range <= 0.0) {
+            return T(mid);
         }
 
-        return T(limit) * u_solver / util::sqrt(T(1) + u_solver * u_solver);
+        return T(mid) + T(half_range) * u_solver / util::sqrt(T(1) + u_solver * u_solver);
     }
 
     template <typename T>
-    TrimControlSurfaceInputs<T> _unpack_trim_solver_input_T(const TrimVariableVector_T<T>& z, const actuators::ActuatorLimits& limits) {
+    TrimControlSurfaceInputs<T> _unpack_trim_solver_input_T(const TrimVariableVector_T<T>& z, const actuators::Actuators& actuators) {
         return {
-            .elevator = _get_control_from_solver_space_T<T>(z(8), limits.elevator_max),
-            .aileron = _get_control_from_solver_space_T<T>(z(9), limits.aileron_max),
-            .rudder = _get_control_from_solver_space_T<T>(z(10), limits.rudder_max),
+            .elevator = _get_control_from_solver_space_T<T>(z(8), actuators.elevator),
+            .aileron = _get_control_from_solver_space_T<T>(z(9), actuators.aileron),
+            .rudder = _get_control_from_solver_space_T<T>(z(10), actuators.rudder),
         };
     }
 
@@ -57,9 +60,9 @@ namespace autopilot {
             twist,
             conditions.static_atmospheric_state,
             controls,
-            model.actuator,
-            conditions.windB,
-            false
+            // model.actuator.actuators,
+            conditions.windB
+            // false
         );
 
         const dynamics::Vector3_T<T> FB_net = aero.F + T(model.structural.Mass.data) * _gB_T(x.phi, x.theta);
@@ -156,7 +159,7 @@ namespace autopilot {
 
         TrimControlSurfaceInputs<T> u;
         if (use_physical_controls) u = unpack_trim_input_T<T>(z);
-        else u = _unpack_trim_solver_input_T<T>(z, model.actuator.limits);
+        else u = _unpack_trim_solver_input_T<T>(z, model.actuator.actuators);
 
         const TrimResidual<T> residual = compute_trim_residual<T>(x, u, model, target, conditions);
         return pack_trim_residual_T(residual);

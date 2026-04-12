@@ -7,29 +7,15 @@
 #include "simulation/dynamics/dynamics.hpp"
 #include "simulation/transforms/transforms.hpp"
 #include "simulation/geography/geography.hpp"
+#include "simulation/util/util.hpp"
 
 namespace avionics {
 
-    Sensor::Sensor(double mean, double stddev, double bias, const Eigen::Vector3d& bias3) : mean(mean), stddev(stddev), bias(bias), bias_3d(bias3), dist(mean, stddev) {}
-
-    double Sensor::_lag(double meas, double prev_meas) {
-        return (1-alpha) * meas + alpha * prev_meas;
-    }
-
-    Eigen::Vector3d Sensor::_lag(const Eigen::Vector3d& meas, const Eigen::Vector3d& prev_meas) {
-        return (1-alpha) * meas + alpha * prev_meas;
-    }
-
-    Eigen::Quaterniond Sensor::_lag(const Eigen::Quaterniond& meas, const Eigen::Quaterniond& prev_meas) {
-        Eigen::Quaterniond meas_adjusted = meas;
-        if (prev_meas.coeffs().dot(meas.coeffs()) < 0.0) meas_adjusted.coeffs() *= -1.0;
-
-        return prev_meas.slerp(1-alpha, meas_adjusted);
-    }
+    Sensor::Sensor(double mean, double stddev, double bias, const Eigen::Vector3d& bias3, double tau) : mean(mean), stddev(stddev), bias(bias), bias_3d(bias3), dist(mean, stddev), tau(tau) {}
 
     double Sensor::_step(double meas, std::optional<double>& lag_state) {
-        double prev_meas = lag_state ? *lag_state : meas;
-        double meas_lagged = _lag(meas, prev_meas); // apply EMA
+        double prev_meas = lag_state ? lag_state.value() : meas;
+        double meas_lagged = util::first_order_lag(meas, prev_meas, tau); // apply EMA
         lag_state = meas_lagged;
         double meas_biased = meas_lagged + bias; // apply bias
         double noise = dist(gen);
@@ -38,8 +24,8 @@ namespace avionics {
     }
 
     Eigen::Vector3d Sensor::_step(const Eigen::Vector3d& meas, std::optional<Eigen::Vector3d>& lag_state) {
-        Eigen::Vector3d prev_meas = lag_state ? *lag_state : meas;
-        Eigen::Vector3d meas_lagged = _lag(meas, prev_meas); // apply EMA
+        Eigen::Vector3d prev_meas = lag_state ? lag_state.value() : meas;
+        Eigen::Vector3d meas_lagged = util::first_order_lag(meas, prev_meas, tau); // apply EMA
         lag_state = meas_lagged;
         Eigen::Vector3d meas_biased = meas_lagged + bias_3d; // apply bias
         Eigen::Vector3d noise(dist(gen), dist(gen), dist(gen));
@@ -48,8 +34,8 @@ namespace avionics {
     }
 
     Eigen::Quaterniond Sensor::_step(const Eigen::Quaterniond& meas, std::optional<Eigen::Quaterniond>& lag_state) {
-        Eigen::Quaterniond prev_meas = lag_state ? *lag_state : meas;
-        Eigen::Quaterniond meas_lagged = _lag(meas, prev_meas); // apply EMA via quaternion SLERP
+        Eigen::Quaterniond prev_meas = lag_state ? lag_state.value() : meas;
+        Eigen::Quaterniond meas_lagged = util::first_order_lag(meas, prev_meas, tau); // apply EMA via quaternion SLERP
         lag_state = meas_lagged;
 
         double bias_angle = bias_3d.norm();

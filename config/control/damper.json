@@ -1,18 +1,31 @@
 {
     "controllers": {
-        "longitudinal": {
-            "control_type": "PitchDamper",
-            "gains": 1
-        },
-        "lateral": {
-            "control_type": "RollDamper",
-            "gains": 1
-        },
-        "vertical": {
-            "control_type": "YawDamper",
-            "gains": 1
-        },
-        "full_state": false
+        "axial": {
+            "longitudinal": {
+                "control_type": "PitchDamper",
+                "parameters": {
+                    "gains": {
+                        "Kp": 1
+                    }
+                }
+            },
+            "lateral": {
+                "control_type": "RollDamper",
+                "parameters": {
+                    "gains": {
+                        "Kp": 1
+                    }
+                }
+            },
+            "vertical": {
+                "control_type": "YawDamper",
+                "parameters": {
+                    "gains": {
+                        "Kp": 1
+                    }
+                }
+            }
+        }
     },
     "FRDFrameNED": {
         "eul": [0.0, 0.0, 0.0],

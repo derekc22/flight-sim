@@ -13,29 +13,49 @@ namespace control {
         double aileron = 0.0;   // rad
         double rudder = 0.0;    // rad
         // u ∈ [0, +umax]
-        double flap = 0.0;      // rad
-        double spoiler = 0.0;   // rad
+        double flaps = 0.0;      // rad
+        double spoilers = 0.0;   // rad
+    };
+
+    struct ControlLawGains {
+        double Kp;
+        double Kd;
+        double Ki;
+        Eigen::MatrixXd Q;
+        Eigen::MatrixXd R;
     };
 
     struct ControlLawParameters {
-        Eigen::VectorXd gains;
+        ControlLawGains gains;
+        double tau;
     };
 
-    struct ControlLawInput {
+    // struct ControlLawInput {};
+
+    struct AxisControlLawInput {
         double meas;
         double meas_dot;
-        dynamics::RigidBodyState rbs_meas;
 
         double meas_des;
         double meas_dot_des;
-        dynamics::RigidBodyState rbs_des;
 
         double limit_max;
         double limit_min;
-        actuators::ActuatorLimits limits;
     };
 
-    typedef std::function<double(const ControlLawInput&)> ControlLaw;
+    struct FullStateControlLawInput {
+        dynamics::RigidBodyState rbs_meas;
+
+        dynamics::RigidBodyState rbs_des;
+
+        actuators::Actuators actuators;
+    };
+
+    template <typename ControlLawCommand>
+    using AxisControlLaw = std::function<ControlLawCommand(const AxisControlLawInput&)>;
+
+    template <typename ControlLawCommand>
+    using FullStateControlLaw = std::function<ControlLawCommand(const FullStateControlLawInput&)>;
 
     struct PIDController {
         double Kp = 0;
@@ -44,11 +64,11 @@ namespace control {
 
         double integral = 0.0;
         double d_filtered = 0.0;
-        double tau = constants::eps;
+        double tau;
 
         PIDController(const ControlLawParameters& params);
 
-        double _step(const ControlLawInput& ctrl_law_input);
+        double _step(const AxisControlLawInput& ctrl_law_input);
     };
 
     struct RollPIDController : PIDController {
@@ -76,20 +96,41 @@ namespace control {
     };
 
 
+    // struct ControlType {
+    //     enum class Longitudinal { None, PitchDamper, PitchPIDController };
+    //     enum class Lateral { None, RollDamper, RollPIDController };
+    //     enum class Vertical { None, YawDamper, YawPIDController };
+    //     enum class FullState { None, LinearQuadraticRegulator, LinearQuadraticTracker };
+    // };
+
+    enum class ControlType {
+        None,
+        PitchDamper,
+        PitchPIDController,
+        RollDamper,
+        RollPIDController,
+        YawDamper,
+        YawPIDController,
+        LinearQuadraticRegulator,
+        LinearQuadraticTracker
+    };
+
     struct ControlProperties {
 
-        ControlLaw longitudinal_controller;
-        ControlLaw lateral_controller;
-        ControlLaw vertical_controller;
-        ControlLaw full_state_controller;
+        AxisControlLaw<double> longitudinal_controller;
+        AxisControlLaw<double> lateral_controller;
+        AxisControlLaw<double> vertical_controller;
+        FullStateControlLaw<Eigen::VectorXd> full_state_controller;
 
-        std::string longitudinal_control_type;
-        std::string lateral_control_type;
-        std::string vertical_control_type;
-        bool full_state = false;
+        ControlType longitudinal_control_type = ControlType::None;
+        ControlType lateral_control_type = ControlType::None;
+        ControlType vertical_control_type = ControlType::None;
+        ControlType full_state_control_type = ControlType::None;
 
         dynamics::RigidBodyState xN_des_t;
-        ControlSurfaceInputs step(const dynamics::RigidBodyState& xN_meas_t, const actuators::ActuatorLimits& limits);
+        ControlSurfaceInputs step(const dynamics::RigidBodyState& xN_meas_t, const actuators::Actuators& actuators);
+        AxisControlLawInput make_axis_control_input(const dynamics::RigidBodyState& xN_meas_t, const actuators::Actuator& actuator, ControlType control_type);
+
     };
 
 }

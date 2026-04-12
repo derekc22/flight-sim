@@ -1,17 +1,32 @@
 {
     "controllers": {
-        "longitudinal": {
-            "control_type": "PitchPIDController",
-            "gains": [50, 1, 20]
-        },
-        "lateral": {
-            "control_type": "RollPIDController",
-            "gains": [30, 1, 5]
-        },
-        "full_state": false
+        "axial": {
+            "longitudinal": {
+                "control_type": "PitchPIDController",
+                "parameters": {
+                    "gains": {
+                        "Kp": 50,
+                        "Ki": 20,
+                        "Kd": 1
+                    },
+                    "tau": 0.001
+                }
+            },
+            "lateral": {
+                "control_type": "RollPIDController",
+                "parameters": {
+                    "gains": {
+                        "Kp": 30,
+                        "Ki": 5,
+                        "Kd": 1
+                    },
+                    "tau": 0.001
+                }
+            }
+        }
     },
     "FRDFrameNED": {
-        "eul": [0.0, 0.0, 0.04363325],
+        "eul": [0.0, 0.0, 0.08363325],
         "p": [0.0, 0.0, -750.0],
         "w": [0.0, 0.0, 0.0],
         "v": [20.0, 0.0, 0.0]

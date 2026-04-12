@@ -114,15 +114,10 @@ namespace avionics {
         Eigen::Vector3d bias_3d;
         std::mt19937 gen{std::random_device{}()};
         std::normal_distribution<double> dist;
-
         double tau;
-        double alpha;
 
-        Sensor(double mean, double stddev, double bias, const Eigen::Vector3d& bias3);
+        Sensor(double mean, double stddev, double bias, const Eigen::Vector3d& bias3, double tau);
 
-        double _lag(double meas, double prev_meas);
-        Eigen::Vector3d _lag(const Eigen::Vector3d& meas, const Eigen::Vector3d& prev_meas);
-        Eigen::Quaterniond _lag(const Eigen::Quaterniond& meas, const Eigen::Quaterniond& prev_meas);
         double _step(double meas, std::optional<double>& lag_state);
         Eigen::Vector3d _step(const Eigen::Vector3d& meas, std::optional<Eigen::Vector3d>& lag_state);
         Eigen::Quaterniond _step(const Eigen::Quaterniond& meas, std::optional<Eigen::Quaterniond>& lag_state);

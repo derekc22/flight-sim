@@ -12,6 +12,7 @@
 #include "simulation/util/util.hpp"
 #include "simulation/structural/structural.hpp"
 #include "simulation/vehicles/vehicles.hpp"
+#include "simulation/actuators/actuators.hpp"
 
 namespace autopilot { // to encompass autonomy and trim
 
@@ -33,8 +34,8 @@ namespace autopilot { // to encompass autonomy and trim
     using TrimResidualJacobian = Eigen::Matrix<double, trim_residual_dofs, trim_variable_dofs>;
 
     struct TrimFixedControls {
-        double flap = 0.0;
-        double spoiler = 0.0;
+        double flaps = 0.0;
+        double spoilers = 0.0;
     };
 
     struct TrimModel {
@@ -174,7 +175,9 @@ namespace autopilot { // to encompass autonomy and trim
 
     std::string print_trim_solution(const TrimSolution& trim_sol);
 
-    std::pair<dynamics::RigidBodyState, aerodynamics::AerodynamicState> get_state_from_trim(const dynamics::RigidBodyState& xN_t, const TrimSolution& trim_sol);
+    std::pair<dynamics::RigidBodyState, aerodynamics::AerodynamicState> update_state_from_trim(const dynamics::RigidBodyState& xN_t, const TrimSolution& trim_sol);
+
+    void update_actuators_from_trim(actuators::Actuators& actuators,  const TrimSolution& trim_sol);
 }
 
 #include "simulation/autopilot/autopilot.tpp"

@@ -41,18 +41,18 @@ namespace analysis {
         return out;
     }
 
-    TrimLinearization linearize_trim_solution(vehicles::Aircraft& aircraft, const autopilot::TrimSolution& trim) {
+    TrimLinearization linearize_trim_solution(vehicles::Aircraft& aircraft, const autopilot::TrimSolution& trim_sol) {
         const autopilot::TrimModel model{
             .structural = aircraft.structural_properties,
             .aerodynamic = aircraft.aerodynamic_properties,
             .actuator = aircraft.actuator_properties,
             .fixed_controls = autopilot::TrimFixedControls{
-                .flap = 0.0,
-                .spoiler = 0.0,
+                .flaps = 0.0,
+                .spoilers = 0.0,
             },
         };
 
-        return linearize_trim_dynamics(trim.state, trim.input, model, trim.conditions);
+        return linearize_trim_dynamics(trim_sol.state, trim_sol.input, model, trim_sol.conditions);
     }
 
     TrimEigenAnalysis trim_linearization_eigen_analysis(const TrimLinearization& lin) {
