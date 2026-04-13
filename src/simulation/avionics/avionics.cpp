@@ -90,8 +90,8 @@ namespace avionics {
         return { _step(pI_BI.data, prev_pI_BI_lag) };
     }
 
-    LinearVelocityMeasurement GNSSReceiver::_measure(const dynamics::LinearVelocity& pB_BI_dot) {
-        return { _step(pB_BI_dot.data, prev_pB_BI_dot_lag) };
+    LinearVelocityMeasurement GNSSReceiver::_measure(const dynamics::LinearVelocity& vB_BI) {
+        return { _step(vB_BI.data, prev_vB_BI_lag) };
     }
     
     HeadingMeasurement Magnetometer::_measure(const geography::Heading& heading) {
@@ -123,17 +123,17 @@ namespace avionics {
         return { dynamics::_quat_kin(prev_qIB, wB_BI) };
     }
 
-    PositionMeasurement InertialNavigationSystem::_calculate(const PositionMeasurement& prev_pI_BI, const LinearVelocityMeasurement& prev_pB_BI_dot, const LinearAccelerationMeasurement& accelB, const OrientationMeasurement& prev_qIB) {
+    PositionMeasurement InertialNavigationSystem::_calculate(const PositionMeasurement& prev_pI_BI, const LinearVelocityMeasurement& prev_vB_BI, const LinearAccelerationMeasurement& accelB, const OrientationMeasurement& prev_qIB) {
         dynamics::Gravity prev_gB = geography::gB(prev_pI_BI, prev_qIB);
-        dynamics::LinearVelocity pI_BI_dot{ prev_qIB.data.conjugate() * prev_pB_BI_dot.data };
-        dynamics::LinearAcceleration pI_BI_ddot{ prev_qIB.data.conjugate() * (accelB.data + prev_gB.data) };
-        return { dynamics::_trans_kin(prev_pI_BI, pI_BI_dot, pI_BI_ddot).data };
+        dynamics::LinearVelocity pI_BI_dot{ prev_qIB.data.conjugate() * prev_vB_BI.data };
+        dynamics::LinearAcceleration vI_BI_dot{ prev_qIB.data.conjugate() * (accelB.data + prev_gB.data) };
+        return { dynamics::_trans_kin(prev_pI_BI, pI_BI_dot, vI_BI_dot).data };
     }
 
-    LinearVelocityMeasurement InertialNavigationSystem::_calculate(const LinearVelocityMeasurement& prev_pB_BI_dot, const LinearAccelerationMeasurement& accelB, const PositionMeasurement& prev_pI_BI, const OrientationMeasurement& prev_qIB, const AngularVelocityMeasurement& wB_BI) {
+    LinearVelocityMeasurement InertialNavigationSystem::_calculate(const LinearVelocityMeasurement& prev_vB_BI, const LinearAccelerationMeasurement& accelB, const PositionMeasurement& prev_pI_BI, const OrientationMeasurement& prev_qIB, const AngularVelocityMeasurement& wB_BI) {
         dynamics::Gravity prev_gB = geography::gB(prev_pI_BI, prev_qIB);
-        dynamics::LinearAcceleration pB_BI_ddot{ accelB.data + prev_gB.data - wB_BI.data.cross(prev_pB_BI_dot.data) };
-        return { dynamics::_trans_kin_vel(prev_pB_BI_dot, pB_BI_ddot).data };
+        dynamics::LinearAcceleration vB_BI_dot{ accelB.data + prev_gB.data - wB_BI.data.cross(prev_vB_BI.data) };
+        return { dynamics::_trans_kin_vel(prev_vB_BI, vB_BI_dot).data };
     }
 
 
@@ -146,7 +146,7 @@ namespace avionics {
             .P = sensors.static_port._measure(meas_gt.P),
             .T0 = sensors.tat_probe._measure(meas_gt.T0),
             .pI_BI_gnss = sensors.gnss._measure(meas_gt.pI_BI),
-            .pB_BI_dot_gnss = sensors.gnss._measure(meas_gt.pB_BI_dot),
+            .vB_BI_gnss = sensors.gnss._measure(meas_gt.vB_BI),
             .heading_BE = sensors.magnetometer._measure(meas_gt.heading)
         };
 
@@ -154,8 +154,8 @@ namespace avionics {
         StaticAirTemperatureMeasurement curr_T_meas{ atmospheric::T_from_T0(sensor_meas.T0, curr_Mach_meas) };
     
         ComputerMeasurements computer_meas {
-            .pI_BI_ins = hist.computers ? computers.INS._calculate(hist.computers->pI_BI_ins, hist.computers->pB_BI_dot_ins, sensor_meas.accel, hist.computers->qIB) : PositionMeasurement{ meas_gt.pI_BI.data },
-            .pB_BI_dot_ins = hist.computers ? computers.INS._calculate(hist.computers->pB_BI_dot_ins, sensor_meas.accel, hist.computers->pI_BI_ins, hist.computers->qIB, sensor_meas.wB_BI) : LinearVelocityMeasurement{ meas_gt.pB_BI_dot.data },
+            .pI_BI_ins = hist.computers ? computers.INS._calculate(hist.computers->pI_BI_ins, hist.computers->vB_BI_ins, sensor_meas.accel, hist.computers->qIB) : PositionMeasurement{ meas_gt.pI_BI.data },
+            .vB_BI_ins = hist.computers ? computers.INS._calculate(hist.computers->vB_BI_ins, sensor_meas.accel, hist.computers->pI_BI_ins, hist.computers->qIB, sensor_meas.wB_BI) : LinearVelocityMeasurement{ meas_gt.vB_BI.data },
             .T = curr_T_meas,
             .Mach = curr_Mach_meas,
             .Vinf = computers.ADC._calculate(curr_Mach_meas, curr_T_meas),
@@ -172,14 +172,15 @@ namespace avionics {
     }
 
 
-    std::pair<dynamics::RigidBodyState, aerodynamics::AerodynamicState> get_state_from_avionics(
+    // std::pair<dynamics::RigidBodyState, aerodynamics::AerodynamicState> get_state_from_avionics(
+    dynamics::RigidBodyState get_state_from_avionics(
         const dynamics::RigidBodyState& xN_t, 
         const aerodynamics::AerodynamicState& ads_t, 
         const atmospheric::StaticAtmosphericState& static_atmo_t, 
         const geography::GeographicState& geo_t,
         const dynamics::Mass& mass,
         const atmospheric::Wind & wind,
-        const dynamics::Wrench WB_net,
+        const dynamics::Wrench& WB_net,
         AvionicsProperties& avionics_properties
     ) {
 
@@ -199,7 +200,7 @@ namespace avionics {
             .P = static_atmo_t.P,
             .T0 = stagnation_atmo_t.T0,
             .pI_BI = xN_t.p,
-            .pB_BI_dot = xN_t.v,
+            .vB_BI = xN_t.v,
 
             .T = static_atmo_t.T,
             .Mach = Mach,
@@ -216,12 +217,12 @@ namespace avionics {
 
         dynamics::RigidBodyState xN_meas_t = { 
             .p = cache.sensors.pI_BI_gnss,
-            .v = cache.sensors.pB_BI_dot_gnss,
+            .v = cache.sensors.vB_BI_gnss,
             .q = cache.computers.qIB,
             .w = cache.sensors.wB_BI
         };
 
-        aerodynamics::AerodynamicState ads_t_meas = aerodynamics::compute_aerodynamic_state(xN_meas_t, wind);
+        // aerodynamics::AerodynamicState ads_t_meas = aerodynamics::compute_aerodynamic_state(xN_meas_t, wind);
 
         // not needed 
         // atmospheric::StaticAtmosphericState static_atmo_meas = {
@@ -235,7 +236,8 @@ namespace avionics {
         //     .lat = 
         // }
         
-        return { xN_meas_t, ads_t_meas };
+        // return { xN_meas_t, ads_t_meas };
+        return xN_meas_t;
     }
 
 

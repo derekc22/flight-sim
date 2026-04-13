@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include "simulation/autopilot/autopilot.hpp"
 #include "simulation/actuators/actuators.hpp"
+#include "simulation/vehicles/vehicles.hpp"
 
 namespace autopilot { // to encompass autonomy and trim
 
@@ -61,7 +62,7 @@ namespace autopilot { // to encompass autonomy and trim
     }
 
     static dynamics::Wrench _compute_trim_wrench(const TrimState<double>& x, const TrimControlSurfaceInputs<double>& u, const TrimModel& model, const TrimConditions& conditions) {
-        const dynamics::Twist_T<double> twist = _build_twist_from_trim_T<double>(x);
+        const dynamics::Twist_T<double> twist = _build_twist_from_trim_state_T<double>(x);
         const aerodynamics::ControlSurfaceInputs_T<double> controls = _build_control_surface_inputs_from_trim_T<double>(u, model.fixed_controls);
         const aerodynamics::AerodynamicLoad_T<double> aero = aerodynamics::step_aero_forces_moments_T<double>(
             model.aerodynamic,
@@ -222,7 +223,8 @@ namespace autopilot { // to encompass autonomy and trim
         };
 
         const TrimSolution trim_sol = solve_trim(problem, model);
-        if (!trim_sol.converged) { std::cerr << "autopilot::inspect_trim: Warning, trim failed to converge" << std::endl; }
+        // if (!trim_sol.converged) { std::cerr << "autopilot::inspect_trim: Warning, trim failed to converge" << std::endl; }
+        if (!trim_sol.converged) { throw std::runtime_error("autopilot::inspect_trim: Error, trim failed to converge"); }
 
         return trim_sol;
     }

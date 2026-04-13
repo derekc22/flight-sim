@@ -4,17 +4,30 @@
 #include <Eigen/Dense>
 #include "simulation/dynamics/dynamics.hpp"
 #include "simulation/actuators/actuators.hpp"
+#include "simulation/autopilot/autopilot.hpp"
+#include "simulation/analysis/analysis.hpp"
 
 namespace control {
 
+    struct ControlSetpoint {};
+
+    struct AxisControlSetpoint : ControlSetpoint{
+        dynamics::EulerAngles eulIB;
+        dynamics::AngularVelocity wB_BI;
+    };
+
+    struct FullStateControlSetpoint : ControlSetpoint {
+        dynamics::LinearVelocity vB_BI;
+        dynamics::AngularVelocity wB_BI;
+        dynamics::EulerAngles eulIB;
+    };
+
     struct ControlSurfaceInputs {
-        // u ∈ [−umax, +umax]
         double elevator = 0.0;  // rad
         double aileron = 0.0;   // rad
         double rudder = 0.0;    // rad
-        // u ∈ [0, +umax]
-        double flaps = 0.0;      // rad
-        double spoilers = 0.0;   // rad
+        double flaps = 0.0;     // rad
+        double spoilers = 0.0;  // rad
     };
 
     struct ControlLawGains {
@@ -34,21 +47,20 @@ namespace control {
 
     struct AxisControlLawInput {
         double meas;
-        double meas_dot;
-
         double meas_des;
-        double meas_dot_des;
+
+        std::optional<double> meas_dot;
 
         double limit_max;
         double limit_min;
     };
 
     struct FullStateControlLawInput {
-        dynamics::RigidBodyState rbs_meas;
-
-        dynamics::RigidBodyState rbs_des;
-
-        actuators::Actuators actuators;
+        const analysis::TrimStateJacobian& A;
+        const analysis::TrimInputJacobian& B;
+        autopilot::TrimStateVector_T<double> meas;
+        autopilot::TrimStateVector_T<double> meas_des;
+        const actuators::Actuators& actuators;
     };
 
     template <typename ControlLawCommand>
@@ -64,6 +76,7 @@ namespace control {
 
         double integral = 0.0;
         double d_filtered = 0.0;
+        double prev_err = 0.0;
         double tau;
 
         PIDController(const ControlLawParameters& params);
@@ -93,6 +106,24 @@ namespace control {
 
     struct YawDamper : PIDController {
         YawDamper(const ControlLawParameters& params);
+    };
+
+    struct LinearQuadraticController {
+        Eigen::MatrixXd Q;
+        Eigen::MatrixXd R;
+        std::optional<Eigen::MatrixXd> K_lqr;
+
+        LinearQuadraticController(const ControlLawParameters& params);
+
+        Eigen::VectorXd _step(const FullStateControlLawInput& ctrl_law_input);
+    };
+
+    struct LinearQuadraticRegulator : LinearQuadraticController {
+        LinearQuadraticRegulator(const ControlLawParameters& params);
+    };
+
+    struct LinearQuadraticTracker : LinearQuadraticController {
+        LinearQuadraticTracker(const ControlLawParameters& params);
     };
 
 
@@ -127,10 +158,14 @@ namespace control {
         ControlType vertical_control_type = ControlType::None;
         ControlType full_state_control_type = ControlType::None;
 
-        dynamics::RigidBodyState xN_des_t;
-        ControlSurfaceInputs step(const dynamics::RigidBodyState& xN_meas_t, const actuators::Actuators& actuators);
+        AxisControlSetpoint axis_setpoint;
+        FullStateControlSetpoint full_state_setpoint;
+        
         AxisControlLawInput make_axis_control_input(const dynamics::RigidBodyState& xN_meas_t, const actuators::Actuator& actuator, ControlType control_type);
+        FullStateControlLawInput make_full_state_control_input(const dynamics::RigidBodyState& xN_meas_t, const analysis::TrimLinearization& lin_sol, const actuators::Actuators& actuators, ControlType control_type);
 
+        ControlSurfaceInputs step(const dynamics::RigidBodyState& xN_meas_t, const actuators::Actuators& actuators);
+        ControlSurfaceInputs step(const dynamics::RigidBodyState& xN_meas_t, const analysis::TrimLinearization& lin_sol, const autopilot::TrimControlSurfaceInputs<double>& trim_sol_input, const actuators::Actuators& actuators);
     };
 
 }

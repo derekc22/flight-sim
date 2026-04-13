@@ -2,7 +2,7 @@
 
 namespace autopilot {
     template <typename T>
-    dynamics::Twist_T<T> _build_twist_from_trim_T(const TrimState<T>& x) {
+    dynamics::Twist_T<T> _build_twist_from_trim_state_T(const TrimState<T>& x) {
         dynamics::Twist_T<T> twist;
         twist.v << x.vx, x.vy, x.vz;
         twist.w << x.p, x.q, x.r;
@@ -51,8 +51,8 @@ namespace autopilot {
     }
 
     template <typename T>
-    TrimDynamics<T> compute_trim_dynamics_T(const TrimState<T>& x, const TrimControlSurfaceInputs<T>& u, const TrimModel& model, const TrimConditions& conditions) {
-        const dynamics::Twist_T<T> twist = _build_twist_from_trim_T(x);
+    TrimStateDot<T> compute_trim_state_dot_T(const TrimState<T>& x, const TrimControlSurfaceInputs<T>& u, const TrimModel& model, const TrimConditions& conditions) {
+        const dynamics::Twist_T<T> twist = _build_twist_from_trim_state_T(x);
         const aerodynamics::ControlSurfaceInputs_T<T> controls = _build_control_surface_inputs_from_trim_T(u, model.fixed_controls);
         const aerodynamics::AerodynamicLoad_T<T> aero = aerodynamics::step_aero_forces_moments_T<T>(
             model.aerodynamic,
@@ -85,18 +85,18 @@ namespace autopilot {
 
     template <typename T>
     TrimResidual<T> compute_trim_residual(const TrimState<T>& x, const TrimControlSurfaceInputs<T>& u, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions) {
-        const TrimDynamics<T> trim_dynamics = compute_trim_dynamics_T<T>(x, u, model, conditions);
-        const aerodynamics::AerodynamicState_T<T> ads = aerodynamics::compute_aerodynamic_state_T<T>(_build_twist_from_trim_T(x), conditions.windB);
+        const TrimStateDot<T> trim_state_dot = compute_trim_state_dot_T<T>(x, u, model, conditions);
+        const aerodynamics::AerodynamicState_T<T> ads = aerodynamics::compute_aerodynamic_state_T<T>(_build_twist_from_trim_state_T(x), conditions.windB);
 
         return {
-            .vx_dot = trim_dynamics.vx_dot,
-            .vy_dot = trim_dynamics.vy_dot,
-            .vz_dot = trim_dynamics.vz_dot,
-            .p_dot = trim_dynamics.p_dot,
-            .q_dot = trim_dynamics.q_dot,
-            .r_dot = trim_dynamics.r_dot,
-            .phi_dot = trim_dynamics.phi_dot,
-            .theta_dot = trim_dynamics.theta_dot,
+            .vx_dot = trim_state_dot.vx_dot,
+            .vy_dot = trim_state_dot.vy_dot,
+            .vz_dot = trim_state_dot.vz_dot,
+            .p_dot = trim_state_dot.p_dot,
+            .q_dot = trim_state_dot.q_dot,
+            .r_dot = trim_state_dot.r_dot,
+            .phi_dot = trim_state_dot.phi_dot,
+            .theta_dot = trim_state_dot.theta_dot,
             .beta_error = ads.beta - T(target.beta),
             .phi_error = x.phi - T(target.phi),
             .theta_error = x.theta - T(target.theta),
@@ -110,6 +110,31 @@ namespace autopilot {
                x.p, x.q, x.r,
                x.phi, x.theta,
                u.elevator, u.aileron, u.rudder;
+        return out;
+    }
+
+    template <typename T>
+    TrimControlSurfaceInputsVector_T<T> pack_trim_control_surface_inputs_T(const TrimControlSurfaceInputs<T>& u) {
+        TrimControlSurfaceInputsVector_T<T> out;
+        out << u.elevator, u.aileron, u.rudder;
+        return out;
+    }
+
+    template <typename T>
+    TrimStateVector_T<T> pack_trim_state_T(const TrimState<T>& x) {
+        TrimStateVector_T<T> out;
+        out << x.vx, x.vy, x.vz,
+               x.p, x.q, x.r,
+               x.phi, x.theta;
+        return out;
+    }
+
+    template <typename T>
+    TrimStateDotVector_T<T> pack_trim_state_dot_T(const TrimStateDot<T>& x_dot) {
+        TrimStateDotVector_T<T> out;
+        out << x_dot.vx_dot, x_dot.vy_dot, x_dot.vz_dot,
+               x_dot.p_dot, x_dot.q_dot, x_dot.r_dot,
+               x_dot.phi_dot, x_dot.theta_dot;
         return out;
     }
 

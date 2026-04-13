@@ -5,28 +5,33 @@
 #include <Eigen/Dense>
 #include "simulation/aerodynamics/aerodynamics.hpp"
 #include "simulation/atmospheric/atmospheric.hpp"
-#include "simulation/control/control.hpp"
 #include "simulation/actuators/actuators.hpp"
 #include "simulation/dynamics/dynamics.hpp"
 #include "simulation/constants/constants.hpp"
 #include "simulation/util/util.hpp"
 #include "simulation/structural/structural.hpp"
-#include "simulation/vehicles/vehicles.hpp"
 #include "simulation/actuators/actuators.hpp"
+
+namespace vehicles { struct Aircraft; } // forward declare
 
 namespace autopilot { // to encompass autonomy and trim
 
     inline constexpr std::size_t trim_state_dofs = 8;
     inline constexpr std::size_t trim_input_dofs = 3;
     inline constexpr std::size_t trim_variable_dofs = trim_state_dofs + trim_input_dofs;
-    inline constexpr std::size_t trim_dynamics_dofs = trim_state_dofs;
     inline constexpr std::size_t trim_residual_dofs = 11;
 
     template <typename T>
     using TrimVariableVector_T = Eigen::Matrix<T, trim_variable_dofs, 1>;
 
     template <typename T>
-    using TrimDynamicsVector_T = Eigen::Matrix<T, trim_dynamics_dofs, 1>;
+    using TrimControlSurfaceInputsVector_T = Eigen::Matrix<T, trim_input_dofs, 1>;
+
+    template <typename T>
+    using TrimStateVector_T = Eigen::Matrix<T, trim_state_dofs, 1>;
+
+    template <typename T>
+    using TrimStateDotVector_T = Eigen::Matrix<T, trim_state_dofs, 1>;
 
     template <typename T>
     using TrimResidualVector_T = Eigen::Matrix<T, trim_residual_dofs, 1>;
@@ -57,6 +62,20 @@ namespace autopilot { // to encompass autonomy and trim
 
         T phi = T(0);
         T theta = T(0);
+    };
+
+    template <typename T>
+    struct TrimStateDot {
+        T vx_dot = T(0);
+        T vy_dot = T(0);
+        T vz_dot = T(0);
+
+        T p_dot = T(0);
+        T q_dot = T(0);
+        T r_dot = T(0);
+
+        T phi_dot = T(0);
+        T theta_dot = T(0);
     };
 
     template <typename T>
@@ -100,20 +119,6 @@ namespace autopilot { // to encompass autonomy and trim
     };
 
     template <typename T>
-    struct TrimDynamics {
-        T vx_dot = T(0);
-        T vy_dot = T(0);
-        T vz_dot = T(0);
-
-        T p_dot = T(0);
-        T q_dot = T(0);
-        T r_dot = T(0);
-
-        T phi_dot = T(0);
-        T theta_dot = T(0);
-    };
-
-    template <typename T>
     struct TrimResidual {
         T vx_dot = T(0);
         T vy_dot = T(0);
@@ -145,13 +150,22 @@ namespace autopilot { // to encompass autonomy and trim
     };
 
     template <typename T>
-    TrimDynamics<T> compute_trim_dynamics_T(const TrimState<T>& x, const TrimControlSurfaceInputs<T>& u, const TrimModel& model, const TrimConditions& conditions);
+    TrimStateDot<T> compute_trim_state_dot_T(const TrimState<T>& x, const TrimControlSurfaceInputs<T>& u, const TrimModel& model, const TrimConditions& conditions);
 
     template <typename T>
     TrimResidual<T> compute_trim_residual(const TrimState<T>& x, const TrimControlSurfaceInputs<T>& u, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions);
 
     template <typename T>
     TrimVariableVector_T<T> pack_trim_variables_T(const TrimState<T>& x, const TrimControlSurfaceInputs<T>& u);
+
+    template <typename T>
+    TrimControlSurfaceInputsVector_T<T> pack_trim_control_surface_inputs_T(const TrimControlSurfaceInputs<T>& u);
+
+    template <typename T>
+    TrimStateVector_T<T> pack_trim_state_T(const TrimState<T>& x);
+
+    template <typename T>
+    TrimStateDotVector_T<T> pack_trim_state_dot_T(const TrimStateDot<T>& x_dot);
 
     template <typename T>
     TrimState<T> unpack_trim_state_T(const TrimVariableVector_T<T>& z);

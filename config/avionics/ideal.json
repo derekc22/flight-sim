@@ -1,0 +1,50 @@
+{
+    "angle_of_attack_vane": {
+        "mean": 0.0,
+        "stddev": 0.0,
+        "bias": 0.0,
+        "tau": 1e-6
+    },
+    "accelerometer": {
+        "mean": 0.0,
+        "stddev": 0.0,
+        "bias": [0.0, 0.0, 0.0],
+        "tau": 1e-6
+    },
+    "gyroscope": {
+        "mean": 0.0,
+        "stddev": 0.0,
+        "bias": [0.0, 0.0, 0.0],
+        "tau": 1e-6
+    },
+    "pitot_tube": {
+        "mean": 0.0,
+        "stddev": 0.0,
+        "bias": 0.0,
+        "tau": 1e-6
+    },
+    "static_port": {
+        "mean": 0.0,
+        "stddev": 0.0,
+        "bias": 0.0,
+        "tau": 1e-6
+    },
+    "total_air_temperature_probe": {
+        "mean": 0.0,
+        "stddev": 0.0,
+        "bias": 0.0,
+        "tau": 1e-6
+    },
+    "gnss_receiver": {
+        "mean": 0.0,
+        "stddev": 0.0,
+        "bias": [0.0, 0.0, 0.0],
+        "tau": 1e-6
+    },
+    "magnetometer": {
+        "mean": 0.0,
+        "stddev": 0.0,
+        "bias": 0.0,
+        "tau": 1e-6
+  }
+}

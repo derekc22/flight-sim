@@ -1,3 +1,5 @@
+#pragma once
+
 #include <Eigen/Dense>
 #include <cmath>
 #include <tuple>
@@ -30,10 +32,12 @@ namespace estimation {
             const Eigen::MatrixXd& A, 
             const Eigen::MatrixXd& B, 
             const Eigen::MatrixXd& C, 
-            const Eigen::MatrixXd& R0, 
+            const Eigen::MatrixXd& P0, 
             const Eigen::MatrixXd& Q0, 
-            const Eigen::MatrixXd& P0 
+            const Eigen::MatrixXd& R0 
         );
+
+        void _validate_init(const Eigen::VectorXd& x0, const Eigen::MatrixXd& B, const Eigen::MatrixXd& C, const Eigen::MatrixXd& P0, const Eigen::MatrixXd& Q0, const Eigen::MatrixXd& R0);
 
         KalmanState _predict(const Eigen::VectorXd& u);
 

@@ -16,4 +16,5 @@ exec "$FG" \
 --aircraft="$AIRCRAFT" \
 --prop:/sim/current-view/view-number-raw=1 \
 --disable-real-weather-fetch \
---geometry=800x700
+--geometry=800x700 \
+--prop:/engines/engine[0]/rpm=2300

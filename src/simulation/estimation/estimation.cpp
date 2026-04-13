@@ -2,50 +2,41 @@
 #include <cmath>
 #include <tuple>
 #include <algorithm>
-#include <string>
-#include <format>
 #include <stdexcept>
 #include "simulation/estimation/estimation.hpp"
+#include "simulation/util/validate.hpp"
 
 namespace estimation {
-
 
     KalmanFilter::KalmanFilter(
         const Eigen::VectorXd& x0, 
         const Eigen::MatrixXd& A, 
         const Eigen::MatrixXd& B, 
         const Eigen::MatrixXd& C, 
-        const Eigen::MatrixXd& R0, 
+        const Eigen::MatrixXd& P0,
         const Eigen::MatrixXd& Q0, 
-        const Eigen::MatrixXd& P0 
+        const Eigen::MatrixXd& R0
     ) : n(A.rows()), m(B.cols()), k(C.rows()) {
 
-        std::string x0_err_msg = std::format("estimation::KalmanFilter: Incorrect shape for state, x0. Must be ({} x 1)", n);
-        if (!(x0.rows() == n && x0.cols() == 1)) throw std::invalid_argument(x0_err_msg);
-
-        std::string B_err_msg = std::format("estimation::KalmanFilter: Incorrect shape for input matrix, B. Must be ({} x {})", n, m);
-        if (!(B.rows() == n)) throw std::invalid_argument(B_err_msg);
-
-        std::string C_err_msg = std::format("estimation::KalmanFilter: Incorrect shape for measurement matrix, C. Must be ({} x {})", k, n);
-        if (!(C.cols() == n)) throw std::invalid_argument(C_err_msg);
-
-        std::string R0_err_msg = std::format("estimation::KalmanFilter: Incorrect shape for process noise covariance matrix, R0. Must be ({} x {})", n, n);
-        if (!(R0.rows() == n && R0.cols() == n)) throw std::invalid_argument(R0_err_msg);
-
-        std::string Q0_err_msg = std::format("estimation::KalmanFilter: Incorrect shape for measurement noise covariance matrix, Q0. Must be ({} x {})", k, k);
-        if (!(Q0.rows() == k && Q0.cols() == k)) throw std::invalid_argument(Q0_err_msg);
-
-        std::string P0_err_msg = std::format("estimation::KalmanFilter: Incorrect shape for state estimate error covariance matrix, P0. Must be ({} x {})", n, n);
-        if (!(P0.rows() == n && P0.cols() == n)) throw std::invalid_argument(P0_err_msg);
+        _validate_init(x0, B, C, P0, Q0, R0);
 
         this->xt = x0;
         this->A = A;
         this->B = B;
         this->C = C;
         this->Pt = P0;
-        this->Rt = R0;
         this->Qt = Q0;
+        this->Rt = R0;
+    }
 
+    void KalmanFilter::_validate_init(const Eigen::VectorXd& x0, const Eigen::MatrixXd& B, const Eigen::MatrixXd& C, const Eigen::MatrixXd& P0, const Eigen::MatrixXd& Q0, const Eigen::MatrixXd& R0) {
+        std::string err_context = "estimation::KalmanFilter";
+        util::require_shape(x0, n, 1, err_context, "x0");
+        util::require_shape(B, n, m, err_context, "B");
+        util::require_shape(C, k, n, err_context, "C");
+        util::require_shape(P0, n, n, err_context, "P0");
+        util::require_shape(Q0, k, k, err_context, "Q0");
+        util::require_shape(R0, n, n, err_context, "R0");
     }
 
     KalmanState KalmanFilter::_predict(const Eigen::VectorXd& u) {
@@ -76,13 +67,9 @@ namespace estimation {
     }
 
     KalmanState KalmanFilter::step(const Eigen::VectorXd& zt, const Eigen::VectorXd& u) {
-
-        std::string zt_err_msg = std::format("estimation::KalmanFilter::step: Incorrect shape for measurement, zt. Must be ({} x 1)", k);
-        if (!(zt.rows() == k && zt.cols() == 1)) throw std::invalid_argument(zt_err_msg);
-
-        std::string u_err_msg = std::format("estimation::KalmanFilter::step: Incorrect shape for control input, u. Must be ({} x 1)", m);
-        if (!(u.rows() == m && u.cols() == 1)) throw std::invalid_argument(u_err_msg);
-
+        std::string err_context = "estimation::KalmanFilter::step";
+        util::require_shape(zt, k, 1, err_context, "zt");
+        util::require_shape(u, m, 1, err_context, "u");
         return _correct(_predict(u), zt);
     }
 

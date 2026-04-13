@@ -231,7 +231,7 @@ namespace vehicles {
         // void _set(const dynamics::RigidBodyState& rigid_body_state, frames::Frame& F);
         // void _set(const geography::GeographicState& geographic_state, frames::Frame& F);
 
-        void print_state(int t, atmospheric::Wind wind);
+        void print_state(int t, const atmospheric::Wind& wind);
 
     };
 

@@ -119,11 +119,15 @@ namespace dynamics {
     };
 
     struct LinearVelocity {
-        Eigen::Vector3d data; // e.g. pB_BI_dot
+        Eigen::Vector3d data; // e.g. vB_BI
     };
 
     struct LinearAcceleration {
-        Eigen::Vector3d data; // e.g. pB_BI_ddot
+        Eigen::Vector3d data; // e.g. vB_BI_dot
+    };
+
+    struct AngularAcceleration {
+        Eigen::Vector3d data; // e.g. wB_BI_dot
     };
 
     struct VerticalSpeed {

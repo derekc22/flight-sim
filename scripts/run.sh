@@ -2,11 +2,11 @@
 set -e
 
 usage() {
-  echo "USAGE: $0 -a <AIRCRAFT> -t <TIME_SEC> [-r <TRIM_BOOL>] [-s <SENSOR_BOOL>] [-c <CONTROL_BOOL>] [-v <VERBOSE_BOOL>] [-d <DATA_BOOL>] [-o <OUT_DIR>] [-p <PLOT_BOOL>] [-z <TEST_BOOL>]" >&2
+  echo "USAGE: $0 -a <AIRCRAFT> -t <TIME_SEC> [-r <TRIM_BOOL>] [-s <SENSOR_BOOL>] [-c <CONTROL_BOOL>] [-v <VERBOSE_BOOL>] [-d <DATA_BOOL>] [-o <OUT_DIR>] [-p <PLOT_BOOL>] [-z <TEST_BOOL>] [-q <QUICK_BOOL>]" >&2
   exit 1
 }
 
-while getopts "a:t:o:rscvdpzh" opt; do
+while getopts "a:t:o:rscvdpzqh" opt; do
   case "$opt" in
     a) AIRCRAFT="$OPTARG" ;;
     t) TIME_SEC="$OPTARG" ;;
@@ -18,6 +18,7 @@ while getopts "a:t:o:rscvdpzh" opt; do
     o) OUT_DIR="$OPTARG" ;;
     p) PLOT_BOOL=1 ;;
     z) TEST_BOOL=1 ;;
+    q) QUICK_BOOL=1 ;;
     h) usage ;;
     ?) usage ;;
   esac
@@ -31,17 +32,13 @@ done
 : "${DATA_BOOL:=0}"
 : "${PLOT_BOOL:=0}"
 : "${TEST_BOOL:=0}"
+: "${QUICK_BOOL:=0}"
 : "${OUT_DIR:=$(date +"%Y%b%d_%H-%M-%S")}"
 
 # required args check
 [[ -z "$AIRCRAFT" || -z "$TIME_SEC" ]] && usage
 
 # validate arg combinations
-if [[ "$TRIM_BOOL" -eq 1 && "$CONTROL_BOOL" -eq 1 ]]; then
-  echo "ERROR: TRIM_BOOL and CONTROL_BOOL cannot both be enabled" >&2
-  exit 1
-fi
-
 if [[ "$DATA_BOOL" -eq 0 && "$PLOT_BOOL" -eq 1 ]]; then
   echo "ERROR: DATA_BOOL must be enabled for PLOT_BOOL to be enabled" >&2
   exit 1
@@ -59,11 +56,16 @@ if [ "$TEST_BOOL" -eq 0 ]; then
   FG_PID=$!
 
   trap 'kill "$FG_PID" 2>/dev/null || true' EXIT
-
-  sleep 0
 fi
 
-rm -rf build
+if [ "$QUICK_BOOL" -eq 0 ]; then
+  rm -rf build
+fi
+
+if [[ "$QUICK_BOOL" -eq 1 && "$TEST_BOOL" -eq 0 ]]; then
+	sleep 15
+fi
+
 cmake -B build -S .
 cmake --build build
 

@@ -45,7 +45,7 @@ namespace io {
         std::cout << "File saved successfully to " << path_name.string() << std::endl;
     }
 
-    void save_vector_to_file(std::vector<int>& data, std::string fname){
+    void save_vector_to_file(const std::vector<int>& data, const std::string& fname){
         std::string path_name = "data/" + fname + ".csv";
         std::ofstream file_v(path_name);
         for (size_t i = 0; i < data.size(); i++){
@@ -57,7 +57,7 @@ namespace io {
 
     DataMatrix::DataMatrix(const Eigen::MatrixXd& d) : data(d), n_rows(static_cast<int>(data.rows())), n_cols(static_cast<int>(data.cols())) {}
 
-    void DataMatrix::insert(int t, const Eigen::VectorXd input) {
+    void DataMatrix::insert(int t, const Eigen::VectorXd& input) {
         if (input.cols() > 1) { throw std::runtime_error("io::DataMatrix::insert Eigen::Matrix passed for 'input', expected Eigen::Vector"); }
         if (input.rows() > n_cols - 1) { throw std::runtime_error("io::DataMatrix::insert Number of rows in 'input' exceeds number of columns in DataMatrix"); }
         if (t > n_rows - 1) { throw std::runtime_error("io::DataMatrix::insert Input index 't' exceeds number of rows in DataMatrix"); }

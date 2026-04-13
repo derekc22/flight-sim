@@ -104,16 +104,17 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
     vehicles::Aircraft& aircraft = sim_in.aircraft;
 
     // get aircraft properties
-    structural::StructuralProperties structural_properties = aircraft.structural_properties;
-    aerodynamics::AerodynamicProperties aerodynamic_properties = aircraft.aerodynamic_properties;
-    actuators::ActuatorProperties actuator_properties = aircraft.actuator_properties;
+    structural::StructuralProperties& structural_properties = aircraft.structural_properties;
+    aerodynamics::AerodynamicProperties& aerodynamic_properties = aircraft.aerodynamic_properties;
+    actuators::ActuatorProperties& actuator_properties = aircraft.actuator_properties;
     control::ControlProperties& control_properties = aircraft.control_properties;
 
     dynamics::Mass mass = structural_properties.Mass;
     dynamics::InertiaTensor J = structural_properties.J;
 
-    // intialize trim solution
+    // intialize trim and linearization solutions
     autopilot::TrimSolution trim_sol;
+    analysis::TrimLinearization lin_sol;
 
     // initialize net forces
     dynamics::Force FB_net{ constants::Zero3 };
@@ -158,9 +159,9 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
         atmospheric::StaticAtmosphericState static_atmospheric_state = atmospheric::static_atmospheric_state(aircraft.FRDFrameECEF);
 
         // fetch wind
-        // if (auto out_pkt = udp_out.try_receive()) {
-        //     // use out_pkt->wind_heading, out_pkt->wind_speed
-        // }
+        if (auto out_pkt = udp_out.try_receive()) {
+            // use out_pkt->wind_heading, out_pkt->wind_speed
+        }
         atmospheric::Wind wind{ constants::Zero3 }; // no wind for now
 
         // use sensors 
@@ -169,7 +170,8 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
 
             // obtain full state from sensors
             aerodynamics::AerodynamicState ads_t = aerodynamics::compute_aerodynamic_state(xN_t, wind);
-            auto [xN_t_sensor, ads_t_sensor] = avionics::get_state_from_avionics(xN_t, ads_t, static_atmospheric_state, geo_t, mass, wind, WB_net, aircraft.avionics_properties);
+            // auto [xN_t_sensor, ads_t_sensor] = avionics::get_state_from_avionics(xN_t, ads_t, static_atmospheric_state, geo_t, mass, wind, WB_net, aircraft.avionics_properties);
+            dynamics::RigidBodyState xN_t_sensor = avionics::get_state_from_avionics(xN_t, ads_t, static_atmospheric_state, geo_t, mass, wind, WB_net, aircraft.avionics_properties);
 
             // overwrite local measurement state with sensor measurements
             xN_meas_t = xN_t_sensor;
@@ -177,13 +179,19 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
 
         // specify control commands
         control::ControlSurfaceInputs u_cmd{};
-        if (sim_in.trim_bool && trim_sol.converged) { 
+        if (sim_in.trim_bool && trim_sol.converged && !sim_in.control_bool) { 
             u_cmd.elevator = trim_sol.input.elevator; 
             u_cmd.aileron = trim_sol.input.aileron; 
             u_cmd.rudder = trim_sol.input.rudder; 
         }
-        else if (sim_in.control_bool) {
+        else if (sim_in.control_bool && !sim_in.trim_bool) {
             control::ControlSurfaceInputs u_ctrl = control_properties.step(xN_meas_t, actuator_properties.actuators);
+            u_cmd.elevator = u_ctrl.elevator;
+            u_cmd.aileron = u_ctrl.aileron;
+            u_cmd.rudder = u_ctrl.rudder;
+        }
+        else if (sim_in.control_bool && sim_in.trim_bool && trim_sol.converged) {
+            control::ControlSurfaceInputs u_ctrl = control_properties.step(xN_meas_t, lin_sol, trim_sol.input, actuator_properties.actuators);
             u_cmd.elevator = u_ctrl.elevator;
             u_cmd.aileron = u_ctrl.aileron;
             u_cmd.rudder = u_ctrl.rudder;
@@ -251,8 +259,11 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
                 autopilot::update_actuators_from_trim(aircraft.actuator_properties.actuators, trim_sol);
 
                 // linearize
-                const analysis::TrimLinearization lin_sol = analysis::linearize_trim_solution(aircraft, trim_sol);
+                lin_sol = analysis::linearize_trim_solution(aircraft, trim_sol);
+
+                // perform eigenanalysis
                 const analysis::TrimEigenAnalysis eig_sol = analysis::trim_linearization_eigen_analysis(lin_sol);
+                
                 sim_out.lin_sol = lin_sol;
                 sim_out.eig_sol = eig_sol;
             }            

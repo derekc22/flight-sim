@@ -460,59 +460,94 @@ namespace json {
         return opts;
     }
 
-    vehicles::_StepOptions to_step_options(const vehicles::FRDFrameNEDStepOptions& opts) {
-        return {
-            .H = opts.HNB,
-            .C = opts.CNB,
-            .p = opts.pN_BN,
-            .q = opts.qNB,
-            .eul = opts.eulNB,
-            .C_dot = opts.CNB_dot,
-            .q_dot = opts.qNB_dot,
-            .w = opts.wB_BN,
-            .eul_dot = opts.eulNB_dot,
-            .wq = opts.wq_BN,
-            .v = opts.vB_BN,
-            .rbs = opts.rbs_BN
-        };
-    }
+    /** @deprecated */
+    // vehicles::_StepOptions to_step_options(const vehicles::FRDFrameNEDStepOptions& opts) {
+    //     return {
+    //         .H = opts.HNB,
+    //         .C = opts.CNB,
+    //         .p = opts.pN_BN,
+    //         .q = opts.qNB,
+    //         .eul = opts.eulNB,
+    //         .C_dot = opts.CNB_dot,
+    //         .q_dot = opts.qNB_dot,
+    //         .w = opts.wB_BN,
+    //         .eul_dot = opts.eulNB_dot,
+    //         .wq = opts.wq_BN,
+    //         .v = opts.vB_BN,
+    //         .rbs = opts.rbs_BN
+    //     };
+    // }
 
-    frames::SetOptions to_set_options(const vehicles::FRDFrameNEDStepOptions& opts) {
-        frames::SetOptions set_opts{
-            .H = opts.HNB,
-            .C = opts.CNB,
-            .p = opts.pN_BN,
-            .q = opts.qNB,
-            .eul = opts.eulNB,
-            .C_dot = opts.CNB_dot,
-            .q_dot = opts.qNB_dot,
-            .w = opts.wB_BN,
-            .eul_dot = opts.eulNB_dot,
-            .wq = opts.wq_BN,
-            .v = opts.vB_BN
-        };
+    /** @deprecated */
+    // frames::SetOptions to_set_options(const vehicles::FRDFrameNEDStepOptions& opts) {
+    //     frames::SetOptions set_opts{
+    //         .H = opts.HNB,
+    //         .C = opts.CNB,
+    //         .p = opts.pN_BN,
+    //         .q = opts.qNB,
+    //         .eul = opts.eulNB,
+    //         .C_dot = opts.CNB_dot,
+    //         .q_dot = opts.qNB_dot,
+    //         .w = opts.wB_BN,
+    //         .eul_dot = opts.eulNB_dot,
+    //         .wq = opts.wq_BN,
+    //         .v = opts.vB_BN
+    //     };
 
-        if (opts.rbs_BN.has_value()) {
-            set_opts.p = opts.rbs_BN->p;
-            set_opts.q = opts.rbs_BN->q;
-            set_opts.w = opts.rbs_BN->w;
-            set_opts.v = opts.rbs_BN->v;
+    //     if (opts.rbs_BN.has_value()) {
+    //         set_opts.p = opts.rbs_BN->p;
+    //         set_opts.q = opts.rbs_BN->q;
+    //         set_opts.w = opts.rbs_BN->w;
+    //         set_opts.v = opts.rbs_BN->v;
+    //     }
+
+    //     return set_opts;
+    // }
+
+    /** @deprecated */
+    // dynamics::RigidBodyState rigid_body_state(const frames::Frame& F) {
+    //     const frames::FrameView fv = F.view();
+    //     return { .p = fv.H->p(), .v = *fv.v, .q = *fv.q, .w = *fv.w };
+    // }
+
+    /** @deprecated */
+    // dynamics::RigidBodyState parse_control_target_state(const vehicles::FRDFrameNEDStepOptions& opts) {
+    //     frames::NEDFrameECEF ned_frame_fake;
+    //     frames::FRDFrameNED frd_frame_fake(&ned_frame_fake);
+    //     vehicles::_StepOptions::_validate(frd_frame_fake, to_step_options(opts));
+    //     frd_frame_fake.set(to_set_options(opts));
+    //     return rigid_body_state(frd_frame_fake);
+    // }
+
+    control::AxisControlSetpoint parse_axis_control_setpoint(const nlohmann::json& setpoint_json, const control::ControlType& longitudinal_control_type, const control::ControlType& lateral_control_type, const control::ControlType& vertical_control_type) {
+        control::AxisControlSetpoint axis_ctrl_setpoint;
+
+        if (longitudinal_control_type == control::ControlType::PitchDamper || lateral_control_type == control::ControlType::RollDamper || vertical_control_type == control::ControlType::YawDamper) {
+            if (setpoint_json.contains("w")) { axis_ctrl_setpoint.wB_BI = dynamics::AngularVelocity{ parse_Vector3d(setpoint_json.at("w")) }; }
+            else { throw std::runtime_error("json::parse_axis_control_setpoint: Damper controller requires w"); }
         }
 
-        return set_opts;
+        if (longitudinal_control_type == control::ControlType::PitchPIDController || lateral_control_type == control::ControlType::RollPIDController || vertical_control_type == control::ControlType::YawPIDController) {
+            if (setpoint_json.contains("eul")) { axis_ctrl_setpoint.eulIB = dynamics::EulerAngles{ parse_Vector3d(setpoint_json.at("eul")) }; }
+            else { throw std::runtime_error("json::parse_axis_control_setpoint: PIDController requires eul"); }
+        }
+        return axis_ctrl_setpoint;
     }
 
-    dynamics::RigidBodyState rigid_body_state(const frames::Frame& F) {
-        const frames::FrameView fv = F.view();
-        return { .p = fv.H->p(), .v = *fv.v, .q = *fv.q, .w = *fv.w };
-    }
+    control::FullStateControlSetpoint parse_full_state_control_setpoint(const nlohmann::json& setpoint_json, const control::ControlType& full_state_control_type) {
+        control::FullStateControlSetpoint full_state_ctrl_setpoint;
 
-    dynamics::RigidBodyState parse_control_target_state(const vehicles::FRDFrameNEDStepOptions& opts) {
-        frames::NEDFrameECEF ned_frame_fake;
-        frames::FRDFrameNED frd_frame_fake(&ned_frame_fake);
-        vehicles::_StepOptions::_validate(frd_frame_fake, to_step_options(opts));
-        frd_frame_fake.set(to_set_options(opts));
-        return rigid_body_state(frd_frame_fake);
+        if (full_state_control_type == control::ControlType::LinearQuadraticRegulator || full_state_control_type == control::ControlType::LinearQuadraticTracker) {
+            if (setpoint_json.contains("v")) { full_state_ctrl_setpoint.vB_BI = dynamics::LinearVelocity{ parse_Vector3d(setpoint_json.at("v")) }; }
+            else { throw std::runtime_error("json::parse_full_state_control_setpoint: LinearQuadratic controller requires v"); }
+
+            if (setpoint_json.contains("w")) { full_state_ctrl_setpoint.wB_BI = dynamics::AngularVelocity{ parse_Vector3d(setpoint_json.at("w")) }; }
+            else { throw std::runtime_error("json::parse_full_state_control_setpoint: LinearQuadratic controller requires w"); }
+
+            if (setpoint_json.contains("eul")) { full_state_ctrl_setpoint.eulIB = dynamics::EulerAngles{ parse_Vector3d(setpoint_json.at("eul")) }; }
+            else { throw std::runtime_error("json::parse_full_state_control_setpoint: LinearQuadratic controller requires eul"); }
+        }
+        return full_state_ctrl_setpoint;
     }
 
     void validate_control_law_tau(const nlohmann::json& parameters_json, const control::ControlType& control_type) {
@@ -635,6 +670,20 @@ namespace json {
         }
     }
 
+    template <typename ControlLawCommand>
+    control::FullStateControlLaw<ControlLawCommand> make_full_state_control_law(control::ControlType control_type, const control::ControlLawParameters& params) {
+        switch (control_type) {
+            case control::ControlType::LinearQuadraticRegulator:
+                return make_stateful_full_state_control_law<control::LinearQuadraticRegulator, Eigen::VectorXd>(params);
+
+            case control::ControlType::LinearQuadraticTracker:
+                return make_stateful_full_state_control_law<control::LinearQuadraticTracker, Eigen::VectorXd>(params);
+            
+            default:
+                throw std::runtime_error("json::make_full_state_control_law unknown control type");
+        }
+    }
+
     control::ControlLawParameters parse_control_law_parameters(const nlohmann::json& controller_json, control::ControlType& control_type) {
         const auto& parameters_json = controller_json.at("parameters");
         const auto& gains_json = parameters_json.at("gains");
@@ -654,6 +703,8 @@ namespace json {
         if (control_type_str == "RollDamper") { return control::ControlType::RollDamper; }
         if (control_type_str == "YawPIDController") { return control::ControlType::YawPIDController; }
         if (control_type_str == "YawDamper") { return control::ControlType::YawDamper; }
+        if (control_type_str == "LinearQuadraticRegulator") { return control::ControlType::LinearQuadraticRegulator; }
+        if (control_type_str == "LinearQuadraticTracker") { return control::ControlType::LinearQuadraticTracker; }
         throw std::runtime_error("json::map_control_type unknown control type: " + control_type_str);
     }
 
@@ -664,7 +715,15 @@ namespace json {
 
         control_type = map_control_type(control_type_str);
         control::ControlLawParameters control_law_parameters = parse_control_law_parameters(controller_json, control_type);
-        control_law =  make_axis_control_law<double>(control_type, control_law_parameters); 
+        control_law = make_axis_control_law<double>(control_type, control_law_parameters); 
+    }
+
+    void parse_full_state_controller(const nlohmann::json& controller_json, control::ControlType& control_type, control::FullStateControlLaw<Eigen::VectorXd>& control_law) {
+        std::string control_type_str = controller_json.at("control_type").get<std::string>();
+
+        control_type = map_control_type(control_type_str);
+        control::ControlLawParameters control_law_parameters = parse_control_law_parameters(controller_json, control_type);
+        control_law = make_full_state_control_law<Eigen::VectorXd>(control_type, control_law_parameters); 
     }
  
     control::ControlProperties parse_control_properties(const nlohmann::json& config) {
@@ -673,6 +732,7 @@ namespace json {
         bool full_state_bool = controllers_json.contains("full_state");
         if (axial_bool && full_state_bool) { throw std::runtime_error("json::parse_control_properties: axial and full state control laws cannot both be present"); }
 
+        const auto& setpoint_json = config.at("setpoint");
         control::ControlProperties control_properties;
 
         if (axial_bool) {
@@ -695,16 +755,24 @@ namespace json {
                 control_properties.vertical_control_type, 
                 control_properties.vertical_controller
             );
+
+            control_properties.axis_setpoint = parse_axis_control_setpoint(
+                setpoint_json, 
+                control_properties.longitudinal_control_type, 
+                control_properties.lateral_control_type, 
+                control_properties.vertical_control_type
+            );
         }
 
         if (full_state_bool) {
-            const auto& full_state_controllers_json = controllers_json.at("full_state");
-            ;
+            const auto& full_state_controller_json = controllers_json.at("full_state");
+            parse_full_state_controller(
+                full_state_controller_json, 
+                control_properties.full_state_control_type, 
+                control_properties.full_state_controller
+            );
+            control_properties.full_state_setpoint = parse_full_state_control_setpoint(setpoint_json, control_properties.full_state_control_type);
         }
-
-        _validate_FRDFrameNED_initialization_config(config.at("FRDFrameNED"));
-        vehicles::FRDFrameNEDStepOptions target_opts = parse_FRDFrameNED_step_options(config.at("FRDFrameNED"));
-        control_properties.xN_des_t = parse_control_target_state(target_opts);
 
         return control_properties;
     }

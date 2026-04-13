@@ -1,10 +1,10 @@
-#include "simulation/analysis/analysis.hpp"
 #include <Eigen/Eigenvalues>
 #include <array>
 #include <iomanip>
 #include <sstream>
 #include <stdexcept>
-
+#include "simulation/analysis/analysis.hpp"
+#include "simulation/vehicles/vehicles.hpp"
 namespace analysis {
 
     static std::string format_complex(const std::complex<double>& z, int precision = 6) {
@@ -13,32 +13,6 @@ namespace analysis {
         if (z.imag() < 0.0) out << " - " << std::abs(z.imag()) << "i";
         else out << " + " << z.imag() << "i";
         return out.str();
-    }
-
-    TrimLinearization linearize_trim_dynamics(const autopilot::TrimState<double>& x, const autopilot::TrimControlSurfaceInputs<double>& u, const autopilot::TrimModel& model, const autopilot::TrimConditions& conditions) {
-        const autopilot::TrimVariableVector_T<double> z = autopilot::pack_trim_variables_T<double>(x, u);
-        CppAD::eigen_vector<CppAD::AD<double>> z_t = util::start_autodiff_tracking(z);
-        const autopilot::TrimVariableVector_T<CppAD::AD<double>> z_vec = util::eigen_vector_from_cppad_vector<CppAD::AD<double>, autopilot::trim_variable_dofs>(z_t);
-        const autopilot::TrimState<CppAD::AD<double>> x_t = autopilot::unpack_trim_state_T<CppAD::AD<double>>(z_vec);
-        const autopilot::TrimControlSurfaceInputs<CppAD::AD<double>> u_t = autopilot::unpack_trim_input_T<CppAD::AD<double>>(z_vec);
-        const autopilot::TrimDynamics<CppAD::AD<double>> trim_dynamics = autopilot::compute_trim_dynamics_T<CppAD::AD<double>>(x_t, u_t, model, conditions);
-        autopilot::TrimDynamicsVector_T<CppAD::AD<double>> x_dot_vec;
-        x_dot_vec << trim_dynamics.vx_dot,
-                     trim_dynamics.vy_dot,
-                     trim_dynamics.vz_dot,
-                     trim_dynamics.p_dot,
-                     trim_dynamics.q_dot,
-                     trim_dynamics.r_dot,
-                     trim_dynamics.phi_dot,
-                     trim_dynamics.theta_dot;
-        const CppAD::eigen_vector<CppAD::AD<double>> x_dot_t = util::cppad_vector_from_eigen_vector(x_dot_vec);
-        CppAD::ADFun<double> f(z_t, x_dot_t);
-        const Eigen::Matrix<double, autopilot::trim_state_dofs, autopilot::trim_variable_dofs> jac_map = util::compute_jac<autopilot::trim_state_dofs, autopilot::trim_variable_dofs>(f, z);
-
-        TrimLinearization out;
-        out.A = jac_map.leftCols<autopilot::trim_state_dofs>();
-        out.B = jac_map.rightCols<autopilot::trim_input_dofs>();
-        return out;
     }
 
     TrimLinearization linearize_trim_solution(vehicles::Aircraft& aircraft, const autopilot::TrimSolution& trim_sol) {
@@ -52,11 +26,25 @@ namespace analysis {
             },
         };
 
-        return linearize_trim_dynamics(trim_sol.state, trim_sol.input, model, trim_sol.conditions);
+        const autopilot::TrimVariableVector_T<double> z = autopilot::pack_trim_variables_T<double>(trim_sol.state, trim_sol.input);
+        CppAD::eigen_vector<CppAD::AD<double>> z_t = util::start_autodiff_tracking(z);
+        const autopilot::TrimVariableVector_T<CppAD::AD<double>> z_vec = util::eigen_vector_from_cppad_vector<CppAD::AD<double>, autopilot::trim_variable_dofs>(z_t);
+        const autopilot::TrimState<CppAD::AD<double>> x_t = autopilot::unpack_trim_state_T<CppAD::AD<double>>(z_vec);
+        const autopilot::TrimControlSurfaceInputs<CppAD::AD<double>> u_t = autopilot::unpack_trim_input_T<CppAD::AD<double>>(z_vec);
+        const autopilot::TrimStateDot<CppAD::AD<double>> trim_state_dot = autopilot::compute_trim_state_dot_T<CppAD::AD<double>>(x_t, u_t, model, trim_sol.conditions);
+        const autopilot::TrimStateDotVector_T<CppAD::AD<double>> x_dot_vec = autopilot::pack_trim_state_dot_T(trim_state_dot);
+        const CppAD::eigen_vector<CppAD::AD<double>> x_dot_t = util::cppad_vector_from_eigen_vector(x_dot_vec);
+        CppAD::ADFun<double> f(z_t, x_dot_t);
+        const Eigen::Matrix<double, autopilot::trim_state_dofs, autopilot::trim_variable_dofs> jac_map = util::compute_jac<autopilot::trim_state_dofs, autopilot::trim_variable_dofs>(f, z);
+
+        TrimLinearization out;
+        out.A = jac_map.leftCols<autopilot::trim_state_dofs>();
+        out.B = jac_map.rightCols<autopilot::trim_input_dofs>();
+        return out;
     }
 
-    TrimEigenAnalysis trim_linearization_eigen_analysis(const TrimLinearization& lin) {
-        Eigen::EigenSolver<TrimStateJacobian> solver(lin.A);
+    TrimEigenAnalysis trim_linearization_eigen_analysis(const TrimLinearization& lin_sol) {
+        Eigen::EigenSolver<TrimStateJacobian> solver(lin_sol.A);
         if (solver.info() != Eigen::Success) {
             throw std::runtime_error("analysis::trim_linearization_eigen_analysis: eigenvalue computation failed");
         }
@@ -67,10 +55,10 @@ namespace analysis {
         };
     }
 
-    std::string print_linearization_solution(const TrimLinearization& lin) {
+    std::string print_linearization_solution(const TrimLinearization& lin_sol) {
         std::ostringstream out;
-        out << "A:\n" << lin.A << "\n";
-        out << "B:\n" << lin.B << "\n";
+        out << "A:\n" << lin_sol.A << "\n";
+        out << "B:\n" << lin_sol.B << "\n";
         return out.str();
     }
 

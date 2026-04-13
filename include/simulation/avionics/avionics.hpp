@@ -55,7 +55,7 @@ namespace avionics {
         atmospheric::StaticAirPressure P;
         atmospheric::StagnationAirTemperature T0;
         dynamics::Position pI_BI;
-        dynamics::LinearVelocity pB_BI_dot;
+        dynamics::LinearVelocity vB_BI;
 
         atmospheric::StaticAirTemperature T;
         atmospheric::MachNumber Mach;
@@ -75,13 +75,13 @@ namespace avionics {
         StaticAirPressureMeasurement P;
         StagnationAirTemperatureMeasurement T0;
         PositionMeasurement pI_BI_gnss;
-        LinearVelocityMeasurement pB_BI_dot_gnss;
+        LinearVelocityMeasurement vB_BI_gnss;
         HeadingMeasurement heading_BE;
     };
 
     struct ComputerMeasurements {
         PositionMeasurement pI_BI_ins;
-        LinearVelocityMeasurement pB_BI_dot_ins;
+        LinearVelocityMeasurement vB_BI_ins;
         StaticAirTemperatureMeasurement T;
         MachNumberMeasurement Mach;
         OrientationMeasurement qIB;
@@ -131,7 +131,7 @@ namespace avionics {
     struct Accelerometer : Sensor {
         std::optional<Eigen::Vector3d> prev_accel_lag;
         LinearAccelerationMeasurement _measure(const dynamics::LinearAcceleration& accelB);
-        // Note: accelB = FB_net/m - gB, not pB_BI_ddot
+        // Note: accelB = FB_net/m - gB, not vB_BI_dot
         // That is, an accelerometer measures all accelerations excluding gravity 
     };
 
@@ -157,9 +157,9 @@ namespace avionics {
 
     struct GNSSReceiver : Sensor {
         std::optional<Eigen::Vector3d> prev_pI_BI_lag;
-        std::optional<Eigen::Vector3d> prev_pB_BI_dot_lag;
+        std::optional<Eigen::Vector3d> prev_vB_BI_lag;
         PositionMeasurement _measure(const dynamics::Position& pI_BI);
-        LinearVelocityMeasurement _measure(const dynamics::LinearVelocity& pB_BI_dot);
+        LinearVelocityMeasurement _measure(const dynamics::LinearVelocity& vB_BI);
     };
 
     struct Magnetometer : Sensor {
@@ -182,8 +182,8 @@ namespace avionics {
     };
 
     struct InertialNavigationSystem {
-        PositionMeasurement _calculate(const PositionMeasurement& prev_pI_BI, const LinearVelocityMeasurement& prev_pB_BI_dot, const LinearAccelerationMeasurement& accelB, const OrientationMeasurement& prev_qIB);
-        LinearVelocityMeasurement _calculate(const LinearVelocityMeasurement& prev_pB_BI_dot, const LinearAccelerationMeasurement& accelB, const PositionMeasurement& prev_pI_BI, const OrientationMeasurement& prev_qIB, const AngularVelocityMeasurement& wB_BI);
+        PositionMeasurement _calculate(const PositionMeasurement& prev_pI_BI, const LinearVelocityMeasurement& prev_vB_BI, const LinearAccelerationMeasurement& accelB, const OrientationMeasurement& prev_qIB);
+        LinearVelocityMeasurement _calculate(const LinearVelocityMeasurement& prev_vB_BI, const LinearAccelerationMeasurement& accelB, const PositionMeasurement& prev_pI_BI, const OrientationMeasurement& prev_qIB, const AngularVelocityMeasurement& wB_BI);
     };
 
 
@@ -215,14 +215,15 @@ namespace avionics {
     };
 
 
-    std::pair<dynamics::RigidBodyState, aerodynamics::AerodynamicState> get_state_from_avionics(
+    // std::pair<dynamics::RigidBodyState, aerodynamics::AerodynamicState> get_state_from_avionics(
+    dynamics::RigidBodyState get_state_from_avionics(
         const dynamics::RigidBodyState& xN_t, 
         const aerodynamics::AerodynamicState& ads_t, 
         const atmospheric::StaticAtmosphericState& static_atmo_t, 
         const geography::GeographicState& geo_t,
         const dynamics::Mass& mass,
         const atmospheric::Wind & wind,
-        const dynamics::Wrench WB_net,
+        const dynamics::Wrench& WB_net,
         AvionicsProperties& avionics_properties
     );
 

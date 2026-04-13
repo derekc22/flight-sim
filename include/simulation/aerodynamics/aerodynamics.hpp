@@ -6,7 +6,6 @@
 #include <cmath>
 #include <algorithm>
 #include "simulation/structural/structural.hpp"
-#include "simulation/control/control.hpp"
 #include "simulation/actuators/actuators.hpp"
 #include "simulation/constants/constants.hpp"
 #include "simulation/util/util.hpp"
@@ -14,6 +13,7 @@
 #include <simulation/atmospheric/atmospheric.hpp>
 
 namespace frames { struct Frame; } // forward declare
+namespace control { struct ControlSurfaceInputs; } // forward declare
 
 namespace aerodynamics {
 

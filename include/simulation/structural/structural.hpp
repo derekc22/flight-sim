@@ -32,7 +32,7 @@ namespace structural {
         dynamics::CenterOfGravity CG;
         dynamics::InertiaTensor J;
 
-        StructuralProperties(std::vector<Geometry> g);
+        StructuralProperties(const std::vector<Geometry>& g);
 
         double compute_Mass();
         Eigen::Vector3d compute_CG();

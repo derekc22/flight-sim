@@ -14,6 +14,7 @@
 #include <simulation/atmospheric/atmospheric.hpp>
 #include "simulation/constants/constants.hpp"
 #include "simulation/util/util.hpp"
+#include "simulation/control/control.hpp"
 
 namespace aerodynamics {
 

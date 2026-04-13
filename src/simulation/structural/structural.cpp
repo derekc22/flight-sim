@@ -11,7 +11,7 @@
 
 namespace structural {
 
-    StructuralProperties::StructuralProperties(std::vector<Geometry> g) : geometries(g) {
+    StructuralProperties::StructuralProperties(const std::vector<Geometry>& g) : geometries(g) {
         Mass = dynamics::Mass{ compute_Mass() };
         CG = dynamics::CenterOfGravity{ compute_CG() };
         J = dynamics::InertiaTensor{ compute_J() };
