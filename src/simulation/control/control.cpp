@@ -217,7 +217,7 @@ namespace control {
         return autopilot::pack_trim_state_T(xN_meas_in_trim_state_form);
     }
 
-    FullStateControlLawInput ControlProperties::make_full_state_control_input(const dynamics::RigidBodyState& xN_meas_t, const analysis::TrimLinearization& lin_sol, const actuators::Actuators& actuators, ControlType control_type){
+    FullStateControlLawInput ControlProperties::make_full_state_control_input(const dynamics::RigidBodyState& xN_meas_t, const linearization::TrimLinearization& lin_sol, const actuators::Actuators& actuators, ControlType control_type){
 
         switch (control_type) {
             case ControlType::LinearQuadraticRegulator:
@@ -235,7 +235,7 @@ namespace control {
         }
     }
 
-    ControlSurfaceInputs ControlProperties::step(const dynamics::RigidBodyState& xN_meas_t, const analysis::TrimLinearization& lin_sol, const autopilot::TrimControlSurfaceInputs<double>& trim_sol_input, const actuators::Actuators& actuators) {
+    ControlSurfaceInputs ControlProperties::step(const dynamics::RigidBodyState& xN_meas_t, const linearization::TrimLinearization& lin_sol, const autopilot::TrimControlSurfaceInputs<double>& trim_sol_input, const actuators::Actuators& actuators) {
         ControlSurfaceInputs u;
 
         Eigen::VectorXd u_deviation = full_state_controller(

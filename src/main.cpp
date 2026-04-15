@@ -20,6 +20,7 @@
 #include "simulation/actuators/actuators.hpp"
 #include "simulation/autopilot/autopilot.hpp"
 #include "simulation/analysis/analysis.hpp"
+#include "simulation/linearization/linearization.hpp"
 #include "core/io/io.hpp"
 #include "core/json/json.hpp"
 #include "core/connection/connection.hpp"
@@ -46,7 +47,7 @@ struct SimulationOutput {
     std::optional<io::DataMatrix> F_DM;
     std::optional<io::DataMatrix> M_DM;
     autopilot::TrimSolution trim_sol;
-    analysis::TrimLinearization lin_sol;
+    linearization::TrimLinearization lin_sol;
     analysis::TrimEigenAnalysis eig_sol;
 }; 
 
@@ -86,7 +87,7 @@ void cleanup(const SimulationInput& sim_in, const SimulationOutput& sim_out) {
             
             // log linearization and eigenanalysis
             if (sim_out.trim_sol.converged) {
-                io::write_txt(analysis::print_linearization_solution(sim_out.lin_sol), out_dir_path, "lin_sol");
+                io::write_txt(linearization::print_linearization_solution(sim_out.lin_sol), out_dir_path, "lin_sol");
                 io::write_csv(Eigen::MatrixXd(sim_out.lin_sol.A), out_dir_path, "lin_sol_A");
                 io::write_csv(Eigen::MatrixXd(sim_out.lin_sol.B), out_dir_path, "lin_sol_B");
                 io::write_txt(analysis::print_eigen_analysis(sim_out.eig_sol), out_dir_path, "eig_sol");
@@ -114,7 +115,7 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
 
     // intialize trim and linearization solutions
     autopilot::TrimSolution trim_sol;
-    analysis::TrimLinearization lin_sol;
+    linearization::TrimLinearization lin_sol;
 
     // initialize net forces
     dynamics::Force FB_net{ constants::Zero3 };
@@ -259,7 +260,7 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
                 autopilot::update_actuators_from_trim(aircraft.actuator_properties.actuators, trim_sol);
 
                 // linearize
-                lin_sol = analysis::linearize_trim_solution(aircraft, trim_sol);
+                lin_sol = linearization::linearize_trim_solution(aircraft, trim_sol);
 
                 // perform eigenanalysis
                 const analysis::TrimEigenAnalysis eig_sol = analysis::trim_linearization_eigen_analysis(lin_sol);

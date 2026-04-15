@@ -6,6 +6,7 @@
 #include "simulation/actuators/actuators.hpp"
 #include "simulation/autopilot/autopilot.hpp"
 #include "simulation/analysis/analysis.hpp"
+#include "simulation/linearization/linearization.hpp"
 
 namespace control {
 
@@ -54,8 +55,8 @@ namespace control {
     };
 
     struct FullStateControlLawInput {
-        const analysis::TrimStateJacobian& A;
-        const analysis::TrimInputJacobian& B;
+        const linearization::TrimStateJacobian& A;
+        const linearization::TrimInputJacobian& B;
         autopilot::TrimStateVector_T<double> meas;
         autopilot::TrimStateVector_T<double> meas_des;
         const actuators::Actuators& actuators;
@@ -161,10 +162,10 @@ namespace control {
         FullStateControlSetpoint full_state_setpoint;
         
         AxisControlLawInput make_axis_control_input(const dynamics::RigidBodyState& xN_meas_t, const actuators::Actuator& actuator, ControlType control_type);
-        FullStateControlLawInput make_full_state_control_input(const dynamics::RigidBodyState& xN_meas_t, const analysis::TrimLinearization& lin_sol, const actuators::Actuators& actuators, ControlType control_type);
+        FullStateControlLawInput make_full_state_control_input(const dynamics::RigidBodyState& xN_meas_t, const linearization::TrimLinearization& lin_sol, const actuators::Actuators& actuators, ControlType control_type);
 
         ControlSurfaceInputs step(const dynamics::RigidBodyState& xN_meas_t, const actuators::Actuators& actuators);
-        ControlSurfaceInputs step(const dynamics::RigidBodyState& xN_meas_t, const analysis::TrimLinearization& lin_sol, const autopilot::TrimControlSurfaceInputs<double>& trim_sol_input, const actuators::Actuators& actuators);
+        ControlSurfaceInputs step(const dynamics::RigidBodyState& xN_meas_t, const linearization::TrimLinearization& lin_sol, const autopilot::TrimControlSurfaceInputs<double>& trim_sol_input, const actuators::Actuators& actuators);
     };
 
 }

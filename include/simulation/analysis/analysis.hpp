@@ -3,28 +3,18 @@
 #include <Eigen/Dense>
 #include <complex>
 #include "simulation/autopilot/autopilot.hpp"
+#include "simulation/linearization/linearization.hpp"
 
 namespace analysis {
-    using TrimStateJacobian = Eigen::Matrix<double, autopilot::trim_state_dofs, autopilot::trim_state_dofs>;
-    using TrimInputJacobian = Eigen::Matrix<double, autopilot::trim_state_dofs, autopilot::trim_input_dofs>;
     using TrimEigenvalues = Eigen::Matrix<std::complex<double>, autopilot::trim_state_dofs, 1>;
     using TrimEigenvectors = Eigen::Matrix<std::complex<double>, autopilot::trim_state_dofs, autopilot::trim_state_dofs>;
-
-    struct TrimLinearization {
-        TrimStateJacobian A = TrimStateJacobian::Zero();
-        TrimInputJacobian B = TrimInputJacobian::Zero();
-    };
 
     struct TrimEigenAnalysis {
         TrimEigenvalues eigenvalues = TrimEigenvalues::Zero();
         TrimEigenvectors eigenvectors = TrimEigenvectors::Zero();
     };
 
-    TrimLinearization linearize_trim_solution(vehicles::Aircraft& aircraft, const autopilot::TrimSolution& trim_sol);
-
-    TrimEigenAnalysis trim_linearization_eigen_analysis(const TrimLinearization& lin);
-
-    std::string print_linearization_solution(const TrimLinearization& lin);
+    TrimEigenAnalysis trim_linearization_eigen_analysis(const linearization::TrimLinearization& lin);
 
     std::string print_eigen_analysis(const TrimEigenAnalysis& eig);
 
