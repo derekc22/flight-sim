@@ -1,70 +1,11 @@
-#include "simulation/control/control.hpp"
 #include <algorithm>
-#include "simulation/constants/constants.hpp"
-#include "simulation/transforms/transforms.hpp"
+#include "simulation/control/control.hpp"
+#include "simulation/control/pid.hpp"
+#include "simulation/control/lqr.hpp"
 #include "simulation/actuators/actuators.hpp"
-#include "simulation/analysis/analysis.hpp"
-#include "simulation/control/care.hpp"
 #include "simulation/autopilot/autopilot.hpp"
-#include "simulation/analysis/analysis.hpp"
 
 namespace control {
-
-    PIDController::PIDController(const ControlLawParameters& params) :
-        Kp(params.gains.Kp),
-        Kd(params.gains.Kd),
-        Ki(params.gains.Ki),
-        tau(params.tau)
-    {}
-
-    RollPIDController::RollPIDController(const ControlLawParameters& params) : PIDController(params) {}
-
-    PitchPIDController::PitchPIDController(const ControlLawParameters& params) : PIDController(params) {}
-
-    YawPIDController::YawPIDController(const ControlLawParameters& params) : PIDController(params) {}
-
-    RollDamper::RollDamper(const ControlLawParameters& params) : PIDController(params) {
-        Kd = 0.0;
-        Ki = 0.0;
-    }
-
-    PitchDamper::PitchDamper(const ControlLawParameters& params) : PIDController(params) {
-        Kd = 0.0;
-        Ki = 0.0;
-    }
-
-    YawDamper::YawDamper(const ControlLawParameters& params) : PIDController(params) {
-        Kd = 0.0;
-        Ki = 0.0;
-    }
-
-    double PIDController::_step(const AxisControlLawInput& ctrl_law_input) {
-        double err = ctrl_law_input.meas_des - ctrl_law_input.meas;
-
-        double d_term = ctrl_law_input.meas_dot.has_value()
-                ? ctrl_law_input.meas_dot.value()           // PI-D
-                : (prev_err - err) / constants::dt;         // PID
-
-        // filtered deriative
-        d_filtered = util::first_order_lag(d_term, d_filtered, tau);
-
-        // integral candidate
-        double i_new = integral + err * constants::dt;
-
-        // unsaturated control
-        double u_unsat = Kp * err - Kd * d_filtered + Ki * i_new;
-
-        // saturate
-        double u = std::clamp(u_unsat, ctrl_law_input.limit_min, ctrl_law_input.limit_max);
-
-        // anti-windup
-        if ((u == u_unsat) || (u == ctrl_law_input.limit_max && err < 0.0) || (u == ctrl_law_input.limit_min && err > 0.0)) { integral = i_new; }
-
-        prev_err = err;
-
-        return u;
-    }
-
 
     AxisControlLawInput ControlProperties::make_axis_control_input(const dynamics::RigidBodyState& xN_meas_t, const actuators::Actuator& actuator, ControlType control_type) {
         dynamics::EulerAngles eul_meas_t;
@@ -154,30 +95,6 @@ namespace control {
             );
         }
         return u;
-    }
-
-    LinearQuadraticController::LinearQuadraticController(const ControlLawParameters& params) :
-        Q(params.gains.Q),
-        R(params.gains.R)
-    {}
-
-    LinearQuadraticRegulator::LinearQuadraticRegulator(const ControlLawParameters& params) : LinearQuadraticController(params) {};
-
-    LinearQuadraticTracker::LinearQuadraticTracker(const ControlLawParameters& params) : LinearQuadraticController(params) {};
-
-
-
-    Eigen::VectorXd LinearQuadraticController::_step(const FullStateControlLawInput& ctrl_law_input) {
-
-        if (!K_lqr.has_value()){
-            const control::CareSolution care_sol = control::solve_care(ctrl_law_input.A, ctrl_law_input.B, Q, R);
-            K_lqr = control::lqr_gain(ctrl_law_input.B, R, care_sol.P);
-        }
-
-        autopilot::TrimStateVector_T<double> meas_deviation = ctrl_law_input.meas - ctrl_law_input.meas_des;
-        Eigen::VectorXd u_deviation = -K_lqr.value() * meas_deviation;
-
-        return u_deviation;
     }
 
     autopilot::TrimStateVector_T<double> full_state_control_setpoint_to_trim_state_vector(const FullStateControlSetpoint& full_state_setpoint){
