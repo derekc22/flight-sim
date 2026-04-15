@@ -9,14 +9,12 @@
 
 namespace control {
 
-    struct ControlSetpoint {};
-
-    struct AxisControlSetpoint : ControlSetpoint{
+    struct AxisControlSetpoint {
         dynamics::EulerAngles eulIB;
         dynamics::AngularVelocity wB_BI;
     };
 
-    struct FullStateControlSetpoint : ControlSetpoint {
+    struct FullStateControlSetpoint {
         dynamics::LinearVelocity vB_BI;
         dynamics::AngularVelocity wB_BI;
         dynamics::EulerAngles eulIB;
@@ -143,7 +141,8 @@ namespace control {
         YawDamper,
         YawPIDController,
         LinearQuadraticRegulator,
-        LinearQuadraticTracker
+        LinearQuadraticTracker,
+        LinearQuadraticIntegrator
     };
 
     struct ControlProperties {

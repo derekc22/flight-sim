@@ -13,7 +13,7 @@
 //     Q << 1.0;
 //     R << 1.0;
 
-//     const control::CareSolution care = control::solve_care_lqr(A, B, Q, R);
+//     const control::CareSolution care = control::solve_care(A, B, Q, R);
 //     const Eigen::MatrixXd K = control::lqr_gain(B, R, care.P);
 //     const Eigen::MatrixXd A_cl = A - B * K;
 

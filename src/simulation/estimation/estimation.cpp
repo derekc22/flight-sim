@@ -31,12 +31,12 @@ namespace estimation {
 
     void KalmanFilter::_validate_init(const Eigen::VectorXd& x0, const Eigen::MatrixXd& B, const Eigen::MatrixXd& C, const Eigen::MatrixXd& P0, const Eigen::MatrixXd& Q0, const Eigen::MatrixXd& R0) {
         std::string err_context = "estimation::KalmanFilter";
-        util::require_shape(x0, n, 1, err_context, "x0");
-        util::require_shape(B, n, m, err_context, "B");
-        util::require_shape(C, k, n, err_context, "C");
-        util::require_shape(P0, n, n, err_context, "P0");
-        util::require_shape(Q0, k, k, err_context, "Q0");
-        util::require_shape(R0, n, n, err_context, "R0");
+        util::validate_shape(x0, n, 1, err_context, "x0");
+        util::validate_shape(B, n, m, err_context, "B");
+        util::validate_shape(C, k, n, err_context, "C");
+        util::validate_shape(P0, n, n, err_context, "P0");
+        util::validate_shape(Q0, k, k, err_context, "Q0");
+        util::validate_shape(R0, n, n, err_context, "R0");
     }
 
     KalmanState KalmanFilter::_predict(const Eigen::VectorXd& u) {
@@ -68,8 +68,8 @@ namespace estimation {
 
     KalmanState KalmanFilter::step(const Eigen::VectorXd& zt, const Eigen::VectorXd& u) {
         std::string err_context = "estimation::KalmanFilter::step";
-        util::require_shape(zt, k, 1, err_context, "zt");
-        util::require_shape(u, m, 1, err_context, "u");
+        util::validate_shape(zt, k, 1, err_context, "zt");
+        util::validate_shape(u, m, 1, err_context, "u");
         return _correct(_predict(u), zt);
     }
 

@@ -1,8 +1,8 @@
 {
     "aerodynamics_config": "aerodynamics/default.json",
     "structural_config": "structural/default.json",
-    "initialization_config": "initialization/trim_level.json",
-    "control_config": "control/lqr.json",
-    "avionics_config": "avionics/ideal.json",
-    "actuator_config": "actuators/ideal.json"
+    "initialization_config": "initialization/trim_bank.json",
+    "control_config": "control/lqr_bank.json",
+    "avionics_config": "avionics/default.json",
+    "actuator_config": "actuators/default.json"
 }

@@ -3,7 +3,7 @@ module slicot_care_wrapper_mod
     implicit none
 contains
 
-    subroutine control_solve_care_sb02md(n, a_ptr, g_ptr, q_ptr, x_ptr, rcond, info) bind(C, name="control_solve_care_sb02md")
+    subroutine slicot_solve_care_sb02md(n, a_ptr, g_ptr, q_ptr, x_ptr, rcond, info) bind(C, name="slicot_solve_care_sb02md")
         integer(c_int), value :: n
         type(c_ptr), value :: a_ptr, g_ptr, q_ptr, x_ptr
         real(c_double), intent(out) :: rcond
@@ -50,6 +50,6 @@ contains
         end if
 
         deallocate(a_work, g_work, q_work, s, u, wr, wi, dwork, iwork, bwork)
-    end subroutine control_solve_care_sb02md
+    end subroutine slicot_solve_care_sb02md
 
 end module slicot_care_wrapper_mod

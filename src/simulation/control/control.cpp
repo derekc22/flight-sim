@@ -170,8 +170,8 @@ namespace control {
     Eigen::VectorXd LinearQuadraticController::_step(const FullStateControlLawInput& ctrl_law_input) {
 
         if (!K_lqr.has_value()){
-            const control::CareSolution care = control::solve_care_lqr(ctrl_law_input.A, ctrl_law_input.B, Q, R);
-            K_lqr = control::lqr_gain(ctrl_law_input.B, R, care.P);
+            const control::CareSolution care_sol = control::solve_care(ctrl_law_input.A, ctrl_law_input.B, Q, R);
+            K_lqr = control::lqr_gain(ctrl_law_input.B, R, care_sol.P);
         }
 
         autopilot::TrimStateVector_T<double> meas_deviation = ctrl_law_input.meas - ctrl_law_input.meas_des;
