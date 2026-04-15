@@ -14,8 +14,6 @@
 #include "simulation/avionics/avionics.hpp"
 #include "simulation/constants/constants.hpp"
 #include "simulation/control/control.hpp"
-#include "simulation/control/pid.hpp"
-#include "simulation/control/lqr.hpp"
 #include "simulation/dynamics/dynamics.hpp"
 #include "simulation/frames/frames.hpp"
 #include "simulation/geography/geography.hpp"

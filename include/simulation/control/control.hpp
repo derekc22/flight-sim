@@ -6,6 +6,8 @@
 #include "simulation/actuators/actuators.hpp"
 #include "simulation/autopilot/autopilot.hpp"
 #include "simulation/linearization/linearization.hpp"
+#include "simulation/control/pid.hpp"
+#include "simulation/control/lqr.hpp"
 
 namespace control {
 

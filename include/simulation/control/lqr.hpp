@@ -1,7 +1,8 @@
 #pragma once
 #include <Eigen/Dense>
 #include <optional>
-#include "simulation/control/control.hpp"
+
+namespace control { struct ControlLawParameters; struct FullStateControlLawInput;} // forward declare
 
 namespace control {
 

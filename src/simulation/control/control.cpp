@@ -1,7 +1,5 @@
 #include <algorithm>
 #include "simulation/control/control.hpp"
-#include "simulation/control/pid.hpp"
-#include "simulation/control/lqr.hpp"
 #include "simulation/actuators/actuators.hpp"
 #include "simulation/autopilot/autopilot.hpp"
 
