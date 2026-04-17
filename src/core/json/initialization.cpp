@@ -190,7 +190,7 @@ namespace json {
         if (config.contains("NEDFrameECEF")) { opts.NEDFrameECEFStepOpts = parse_NEDFrameECEF_step_options(config.at("NEDFrameECEF")); }
         if (config.contains("FRDFrameECEF")) { opts.FRDFrameECEFStepOpts = parse_FRDFrameECEF_step_options(config.at("FRDFrameECEF")); }
         if (config.contains("FRDFrameNED")) { opts.FRDFrameNEDStepOpts = parse_FRDFrameNED_step_options(config.at("FRDFrameNED")); }
-        if (config.contains("STABFrameFRD")) { opts.STABFrameFRDStepOpts = parse_STABFrameFRD_step_options(config.at("STABFrameFRD")); }
+        // if (config.contains("STABFrameFRD")) { opts.STABFrameFRDStepOpts = parse_STABFrameFRD_step_options(config.at("STABFrameFRD")); }
         if (config.contains("WINDFrameSTAB")) { opts.WINDFrameSTABStepOpts = parse_WINDFrameSTAB_step_options(config.at("WINDFrameSTAB")); }
         return opts;
     }

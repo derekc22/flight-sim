@@ -40,28 +40,29 @@ namespace json {
     }
 
     void validate_control_law_tau(const nlohmann::json& parameters_json, const control::ControlType& control_type) {
+
         switch (control_type) {
             case control::ControlType::PitchPIDController:
             case control::ControlType::RollPIDController:
             case control::ControlType::YawPIDController:
-                if (!parameters_json.contains("tau")) {
-                    throw std::runtime_error("json::parse_control_law_parameters missing tau");
-                }
+                if (!parameters_json.contains("tau")) { throw std::runtime_error("json::validate_control_law_tau missing tau"); }
+                if (parameters_json.at("tau").get<double>() < 0.0) { throw std::runtime_error("json::validate_control_law_tau tau must be non-negative"); }
                 return;
             default:
+                if (parameters_json.contains("tau")) { throw std::runtime_error("json::validate_control_law_tau controller does not require tau"); }
                 return;
         }
     }
 
     void validate_control_law_gains(const nlohmann::json& gains_json, control::ControlType& control_type) {
-        if (!gains_json.is_object()) { throw std::runtime_error("json::parse_control_gains expected gains object"); }
+        if (!gains_json.is_object()) { throw std::runtime_error("json::validate_control_law_gains expected gains object"); }
 
         switch (control_type) {
             case control::ControlType::PitchPIDController:
             case control::ControlType::RollPIDController:
             case control::ControlType::YawPIDController:
                 if (!gains_json.contains("Kp") || !gains_json.contains("Kd") || !gains_json.contains("Ki")) {
-                    throw std::runtime_error("json::parse_control_gains PID control requires Kp, Kd, Ki");
+                    throw std::runtime_error("json::validate_control_law_gains PID control requires Kp, Kd, Ki");
                 }
                 break;
 
@@ -69,14 +70,14 @@ namespace json {
             case control::ControlType::RollDamper:
             case control::ControlType::YawDamper:
                 if (!gains_json.contains("Kp")) {
-                    throw std::runtime_error("json::parse_control_gains damper control requires Kp");
+                    throw std::runtime_error("json::validate_control_law_gains damper control requires Kp");
                 }
                 break;
 
             case control::ControlType::LinearQuadraticRegulator:
             case control::ControlType::LinearQuadraticTracker:
                 if (!gains_json.contains("Q") || !gains_json.contains("R")) {
-                    throw std::runtime_error("json::parse_control_gains LQ control requires Q and R");
+                    throw std::runtime_error("json::validate_control_law_gains LQ control requires Q and R");
                 }
                 break;
             default:
@@ -180,7 +181,7 @@ namespace json {
         validate_control_law_parameters(parameters_json, gains_json, control_type);
 
         control::ControlLawGains gains = parse_control_gains(gains_json, control_type);
-        double tau = parameters_json.value("tau", constants::eps);
+        double tau = parameters_json.contains("tau") ? parameters_json.at("tau").get<double>() : 0.0;
 
         return { .gains = gains, .tau = tau };
     }

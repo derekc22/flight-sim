@@ -6,27 +6,34 @@
 
 namespace json {
 
-    double parse_sensor_scalar_bias(const nlohmann::json& sensor_json) {
-        return sensor_json.at("bias").get<double>();
-    }
+    void validate_sensor_json(const nlohmann::json& sensor_json) {
+        if (!sensor_json.contains("mean")) { throw std::runtime_error("json::validate_sensor_json: sensor noise mean not present"); }
+        if (!sensor_json.contains("stddev")) { throw std::runtime_error("json::validate_sensor_json: sensor noise stddev not present"); }
+        if (!sensor_json.contains("bias")) { throw std::runtime_error("json::validate_sensor_json: sensor bias not present"); }
+        if (!sensor_json.contains("tau")) { throw std::runtime_error("json::validate_sensor_json: sensor tau not present"); }
 
-    Eigen::Vector3d parse_sensor_3d_bias(const nlohmann::json& sensor_json) {
-        return parse_Vector3d(sensor_json.at("bias"));
+        const double stddev = sensor_json.at("stddev").get<double>();
+        const double tau = sensor_json.at("tau").get<double>();
+
+        if (stddev < 0.0) { throw std::runtime_error("json::validate_sensor_json: sensor noise stddev must be non-negative"); }
+        if (tau < 0.0) { throw std::runtime_error("json::validate_sensor_json: sensor tau must be non-negative"); }
     }
 
     template <typename SensorType>
     SensorType parse_sensor(const nlohmann::json& config, const std::string& key) {
         const auto& sensor_json = config.at(key);
+        validate_sensor_json(sensor_json);
+
         const bool has_vector_bias = sensor_json.at("bias").is_array();
-        const double bias = has_vector_bias ? 0.0 : parse_sensor_scalar_bias(sensor_json);
-        const Eigen::Vector3d bias_3d = has_vector_bias ? parse_sensor_3d_bias(sensor_json) : constants::Zero3;
+        const double bias = has_vector_bias ? 0.0 : sensor_json.at("bias").get<double>();
+        const Eigen::Vector3d bias_3d = has_vector_bias ? parse_Vector3d(sensor_json.at("bias")) : constants::Zero3;
 
         SensorType sensor{ avionics::Sensor(
-            sensor_json.value("mean", 0.0),
-            sensor_json.value("stddev", 0.0),
+            sensor_json.at("mean").get<double>(),
+            sensor_json.at("stddev").get<double>(),
             bias,
             bias_3d,
-            sensor_json.value("tau", constants::eps)
+            sensor_json.at("tau").get<double>()
         ) };
 
         return sensor;

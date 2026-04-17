@@ -7,29 +7,37 @@ C++ flight simulator with FlightGear integration
 
 - Install FlightGear: https://www.flightgear.org/download/
 
-- Create Conda environment:
+- Create the Conda environment:
   - `conda env create -f environment.yml`
   - `conda activate ame532`
 
 - Install dependencies:
-  - `sudo apt install libeigen3-dev libcppad-dev nlohmann-json3-dev` (Linux)
-  - `brew install eigen cppad nlohmann-json` (macOS)
+  - `sudo apt install libeigen3-dev libcppad-dev nlohmann-json3-dev libslicot-dev gfortran` (Ubuntu)
+  - `brew install eigen cppad nlohmann-json slicot gcc` (macOS)
 
 ## Usage
 
-- Edit the following environment variables in `.env`:
-  - `DIR`: Project path on your machine
-  - `SRC`: Path to the project `config` folder on your machine
-  - `DEST`: Path to the FlightGear `Protocol` folder on your machine
-  - `FG`: Path to the FlightGear executable on your machine
+- The simulator is configured via JSON files in the `config/` directory
+- `config/run.json` selects which configuration JSON files are active for a given run
+- `.env` stores local machine paths for the repo, FlightGear, and the FlightGear protocol directory.
+- `scripts/run.sh` is the main entry point. It handles the normal run workflow, including launching FlightGear and running the simulator with the selected options
+- Run `scripts/run.sh -h` to see the available command-line options
+
+## Run
+
+- Update the following environment variables in `.env` with the corresponding paths on your machine:
+  - `DIR`: Project root
+  - `SRC`: Project `config` directory
+  - `DEST`: FlightGear `Protocol` directory 
+  - `FG`: FlightGear executable
   
-- Edit the following JSON configuration file paths in `config/run.json`:
-  - `aerodynamics_config`: Path to the aerodynamic properties JSON
-  - `actuator_config`: Path to the actuator properties JSON
-  - `structural_config`: Path to the structural properties JSON
-  - `control_config`: Path to the control properties JSON
-  - `avionics_config`: Path to the avionics properties JSON
-  - `initialization_config`: Path to the initial conditions JSON
+- Update the following JSON configuration file paths in `config/run.json`:
+  - `initialization_config`: Initial conditions
+  - `structural_config`: Structural properties
+  - `aerodynamics_config`: Aerodynamic properties
+  - `control_config`: Control properties
+  - `avionics_config`: Avionics properties
+  - `actuator_config`: Actuator properties
   
 - To run the simulation: `scripts/run.sh -a <AIRCRAFT> -t <TIME_SEC> [-r <TRIM>] [-s <SENSOR>] [-c <CONTROL>] [-v <VERBOSE>] [-d <DATA>] [-o <OUT_DIR>] [-p <PLOT>]`
   - `-a AIRCRAFT`: Aircraft to simulate (e.g. ASW28)
@@ -40,12 +48,11 @@ C++ flight simulator with FlightGear integration
   - `-v VERBOSE`: Enable verbose output
   - `-d DATA`: Enable data logging
   - `-o OUT_DIR`: Output directory
-  - `-p PLOT`: Enable automatic plotting
-
-- To plot manually: `scripts/plot.sh <OUT_DIR>`
-  - `OUT_DIR`: Ouput directory specified at simulation runtime
+  - `-p PLOT`: Enable plotting
 
 ## References:
 https://hopsan.github.io/tutorials/tutorial_flightgear.pdf
 
 https://wiki.flightgear.org/Property_browser
+
+https://github.com/c172p-team/c172p

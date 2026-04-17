@@ -21,16 +21,19 @@ namespace control {
     RollDamper::RollDamper(const ControlLawParameters& params) : PIDController(params) {
         Kd = 0.0;
         Ki = 0.0;
+        tau = 0.0;
     }
 
     PitchDamper::PitchDamper(const ControlLawParameters& params) : PIDController(params) {
         Kd = 0.0;
         Ki = 0.0;
+        tau = 0.0;
     }
 
     YawDamper::YawDamper(const ControlLawParameters& params) : PIDController(params) {
         Kd = 0.0;
         Ki = 0.0;
+        tau = 0.0;
     }
 
     double PIDController::_step(const AxisControlLawInput& ctrl_law_input) {

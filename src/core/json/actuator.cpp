@@ -8,14 +8,28 @@
 
 namespace json {
 
+    void validate_actuator_json(const nlohmann::json& actuator_json) {
+        if (!actuator_json.contains("limit_max")) { throw std::runtime_error("json::validate_actuator_json: actuator maximum limit not present"); }
+        if (!actuator_json.contains("limit_min")) { throw std::runtime_error("json::validate_actuator_json: actuator minimum limit not present"); }
+        if (!actuator_json.contains("tau")) { throw std::runtime_error("json::validate_actuator_json: actuator tau not present"); }
+
+        const double limit_max = actuator_json.at("limit_max").get<double>();
+        const double limit_min = actuator_json.at("limit_min").get<double>();
+        const double tau = actuator_json.at("tau").get<double>();
+
+        if (limit_max < limit_min) { throw std::runtime_error("json::validate_actuator_json: actuator maximum limit must be greater than or equal to minimum limit"); }
+        if (tau < 0.0) { throw std::runtime_error("json::validate_actuator_json: actuator tau must be non-negative"); }
+    }
+
     template <typename ActuatorType>
     ActuatorType parse_actuator(const nlohmann::json& config, const std::string& key) {
         const auto& actuator_json = config.at(key);
+        validate_actuator_json(actuator_json);
 
         ActuatorType actuator{ actuators::Actuator{
-            .limit_max = util::deg_to_rad(actuator_json.value("limit_max", 0.0)),
-            .limit_min = util::deg_to_rad(actuator_json.value("limit_min", 0.0)),
-            .tau = actuator_json.value("tau", constants::eps),
+            .limit_max = util::deg_to_rad(actuator_json.at("limit_max").get<double>()),
+            .limit_min = util::deg_to_rad(actuator_json.at("limit_min").get<double>()),
+            .tau = actuator_json.at("tau").get<double>(),
         } };
 
         return actuator;
