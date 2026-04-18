@@ -18,7 +18,7 @@
 #include "simulation/structural/structural.hpp"
 #include "simulation/aerodynamics/aerodynamics.hpp"
 #include "simulation/actuators/actuators.hpp"
-#include "simulation/autopilot/autopilot.hpp"
+#include "simulation/trim/trim.hpp"
 #include "simulation/analysis/analysis.hpp"
 #include "simulation/linearization/linearization.hpp"
 #include "core/io/io.hpp"
@@ -46,7 +46,7 @@ struct SimulationOutput {
     std::optional<io::DataMatrix> u_DM;
     std::optional<io::DataMatrix> F_DM;
     std::optional<io::DataMatrix> M_DM;
-    autopilot::TrimSolution trim_sol;
+    trim::TrimSolution trim_sol;
     linearization::TrimLinearization lin_sol;
     analysis::TrimEigenAnalysis eig_sol;
 }; 
@@ -83,7 +83,7 @@ void cleanup(const SimulationInput& sim_in, const SimulationOutput& sim_out) {
         
         // log trim
         if (sim_in.trim_bool){
-            io::write_txt(autopilot::print_trim_solution(sim_out.trim_sol), out_dir_path, "trim_sol");
+            io::write_txt(trim::print_trim_solution(sim_out.trim_sol), out_dir_path, "trim_sol");
             
             // log linearization and eigenanalysis
             if (sim_out.trim_sol.converged) {
@@ -113,11 +113,11 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
     dynamics::Mass mass = structural_properties.Mass;
     dynamics::InertiaTensor J = structural_properties.J;
 
-    // intialize trim and linearization solutions
-    autopilot::TrimSolution trim_sol;
+    // initialize trim and linearization solutions
+    trim::TrimSolution trim_sol;
     linearization::TrimLinearization lin_sol;
 
-    // initialize net forces
+    // initialize net force and moment
     dynamics::Force FB_net{ constants::Zero3 };
     dynamics::Moment MB_net{ constants::Zero3 };
 
@@ -199,7 +199,7 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
         }
 
         // apply actuator dynamics
-        control::ControlSurfaceInputs u_actual = aircraft.actuator_properties.step(u_cmd);
+        control::ControlSurfaceInputs u_actual = actuator_properties.step(u_cmd);
 
         // compute aerodynamics forces and moments
         /** @deprecated */
@@ -232,12 +232,12 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
 
         // trim and linearization
         if (sim_in.trim_bool && !trim_sol.attempted) {
-            trim_sol = autopilot::inspect_trim(aircraft, wind);
+            trim_sol = trim::inspect_trim(aircraft, wind);
             sim_out.trim_sol = trim_sol;
 
             if (trim_sol.converged){
                 // obtain full state from trim solution
-                auto [xN_t_trim, ads_t_trim] = autopilot::update_state_from_trim(xN_t, trim_sol);
+                auto [xN_t_trim, ads_t_trim] = trim::update_state_from_trim(xN_t, trim_sol);
 
                 dynamics::Wrench WB_net_trim = trim_sol.wrench;
 
@@ -257,7 +257,7 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
                 WB_net = WB_net_trim;
 
                 // overwrite actuator lag state with trim controls
-                autopilot::update_actuators_from_trim(aircraft.actuator_properties.actuators, trim_sol);
+                trim::update_actuators_from_trim(actuator_properties.actuators, trim_sol);
 
                 // linearize
                 lin_sol = linearization::linearize_trim_solution(aircraft, trim_sol);
@@ -299,7 +299,7 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
         std::this_thread::sleep_until(next);
 
         // print state
-        if (sim_in.verbose_bool) aircraft.print_state(t, wind);
+        if (sim_in.verbose_bool) { aircraft.print_state(t, wind); }
     }
 
     // cleanup

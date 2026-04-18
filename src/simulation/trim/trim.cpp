@@ -2,11 +2,11 @@
 #include <sstream>
 #include <utility> // For std::pair
 #include <stdexcept>
-#include "simulation/autopilot/autopilot.hpp"
+#include "simulation/trim/trim.hpp"
 #include "simulation/actuators/actuators.hpp"
 #include "simulation/vehicles/vehicles.hpp"
 
-namespace autopilot { // to encompass autonomy and trim
+namespace trim {
 
     static double _send_control_to_solver_space(double u, const actuators::Actuator& actuator) {
         const double mid = 0.5 * (actuator.limit_max + actuator.limit_min);
@@ -49,16 +49,16 @@ namespace autopilot { // to encompass autonomy and trim
     }
 
     static void _validate_trim_solve_options(const TrimSolveOptions& options) {
-        if (options.residual_tolerance < 0.0) throw std::invalid_argument("autopilot::_validate_trim_solve_options: residual_tolerance must be nonnegative");
-        if (options.step_tolerance < 0.0) throw std::invalid_argument("autopilot::_validate_trim_solve_options: step_tolerance must be nonnegative");
-        if (options.initial_damping < 0.0) throw std::invalid_argument("autopilot::_validate_trim_solve_options: initial_damping must be nonnegative");
-        if (options.damping_growth <= 1.0) throw std::invalid_argument("autopilot::_validate_trim_solve_options: damping_growth must be greater than 1");
-        if (options.linear_accel_scale <= 0.0) throw std::invalid_argument("autopilot::_validate_trim_solve_options: linear_accel_scale must be positive");
-        if (options.angular_accel_scale <= 0.0) throw std::invalid_argument("autopilot::_validate_trim_solve_options: angular_accel_scale must be positive");
-        if (options.angle_rate_scale <= 0.0) throw std::invalid_argument("autopilot::_validate_trim_solve_options: angle_rate_scale must be positive");
-        if (options.angle_error_scale <= 0.0) throw std::invalid_argument("autopilot::_validate_trim_solve_options: angle_error_scale must be positive");
-        if (options.backtrack_scale <= 0.0 || options.backtrack_scale >= 1.0) throw std::invalid_argument("autopilot::_validate_trim_solve_options: backtrack_scale must be in (0, 1)");
-        if (options.min_step_scale <= 0.0 || options.min_step_scale > 1.0) throw std::invalid_argument("autopilot::_validate_trim_solve_options: min_step_scale must be in (0, 1]");
+        if (options.residual_tolerance < 0.0) throw std::invalid_argument("trim::_validate_trim_solve_options: residual_tolerance must be nonnegative");
+        if (options.step_tolerance < 0.0) throw std::invalid_argument("trim::_validate_trim_solve_options: step_tolerance must be nonnegative");
+        if (options.initial_damping < 0.0) throw std::invalid_argument("trim::_validate_trim_solve_options: initial_damping must be nonnegative");
+        if (options.damping_growth <= 1.0) throw std::invalid_argument("trim::_validate_trim_solve_options: damping_growth must be greater than 1");
+        if (options.linear_accel_scale <= 0.0) throw std::invalid_argument("trim::_validate_trim_solve_options: linear_accel_scale must be positive");
+        if (options.angular_accel_scale <= 0.0) throw std::invalid_argument("trim::_validate_trim_solve_options: angular_accel_scale must be positive");
+        if (options.angle_rate_scale <= 0.0) throw std::invalid_argument("trim::_validate_trim_solve_options: angle_rate_scale must be positive");
+        if (options.angle_error_scale <= 0.0) throw std::invalid_argument("trim::_validate_trim_solve_options: angle_error_scale must be positive");
+        if (options.backtrack_scale <= 0.0 || options.backtrack_scale >= 1.0) throw std::invalid_argument("trim::_validate_trim_solve_options: backtrack_scale must be in (0, 1)");
+        if (options.min_step_scale <= 0.0 || options.min_step_scale > 1.0) throw std::invalid_argument("trim::_validate_trim_solve_options: min_step_scale must be in (0, 1]");
     }
 
     static dynamics::Wrench _compute_trim_wrench(const TrimState<double>& x, const TrimControlSurfaceInputs<double>& u, const TrimModel& model, const TrimConditions& conditions) {
@@ -223,8 +223,8 @@ namespace autopilot { // to encompass autonomy and trim
         };
 
         const TrimSolution trim_sol = solve_trim(problem, model);
-        // if (!trim_sol.converged) { std::cerr << "autopilot::inspect_trim: Warning, trim failed to converge" << std::endl; }
-        if (!trim_sol.converged) { throw std::runtime_error("autopilot::inspect_trim: Error, trim failed to converge"); }
+        // if (!trim_sol.converged) { std::cerr << "trim::inspect_trim: Warning, trim failed to converge" << std::endl; }
+        if (!trim_sol.converged) { throw std::runtime_error("trim::inspect_trim: Error, trim failed to converge"); }
 
         return trim_sol;
     }
