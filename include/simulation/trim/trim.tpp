@@ -1,6 +1,6 @@
 #pragma once
 
-namespace autopilot {
+namespace trim {
     template <typename T>
     dynamics::Twist_T<T> _build_twist_from_trim_state_T(const TrimState<T>& x) {
         dynamics::Twist_T<T> twist;

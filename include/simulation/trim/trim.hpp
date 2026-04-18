@@ -14,7 +14,7 @@
 
 namespace vehicles { struct Aircraft; } // forward declare
 
-namespace autopilot { // to encompass autonomy and trim
+namespace trim {
 
     inline constexpr std::size_t trim_state_dofs = 8;
     inline constexpr std::size_t trim_input_dofs = 3;
@@ -194,4 +194,4 @@ namespace autopilot { // to encompass autonomy and trim
     void update_actuators_from_trim(actuators::Actuators& actuators,  const TrimSolution& trim_sol);
 }
 
-#include "simulation/autopilot/autopilot.tpp"
+#include "simulation/trim/trim.tpp"

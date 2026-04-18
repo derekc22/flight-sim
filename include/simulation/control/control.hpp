@@ -4,7 +4,7 @@
 #include <optional>
 #include "simulation/dynamics/dynamics.hpp"
 #include "simulation/actuators/actuators.hpp"
-#include "simulation/autopilot/autopilot.hpp"
+#include "simulation/trim/trim.hpp"
 #include "simulation/linearization/linearization.hpp"
 #include "simulation/control/pid.hpp"
 #include "simulation/control/lqr.hpp"
@@ -58,8 +58,8 @@ namespace control {
     struct FullStateControlLawInput {
         const linearization::TrimStateJacobian& A;
         const linearization::TrimInputJacobian& B;
-        autopilot::TrimStateVector_T<double> meas;
-        autopilot::TrimStateVector_T<double> meas_des;
+        trim::TrimStateVector_T<double> meas;
+        trim::TrimStateVector_T<double> meas_des;
         const actuators::Actuators& actuators;
     };
 
@@ -108,7 +108,7 @@ namespace control {
         FullStateControlLawInput make_full_state_control_input(const dynamics::RigidBodyState& xN_meas_t, const linearization::TrimLinearization& lin_sol, const actuators::Actuators& actuators, ControlType control_type);
 
         ControlSurfaceInputs step(const dynamics::RigidBodyState& xN_meas_t, const actuators::Actuators& actuators);
-        ControlSurfaceInputs step(const dynamics::RigidBodyState& xN_meas_t, const linearization::TrimLinearization& lin_sol, const autopilot::TrimControlSurfaceInputs<double>& trim_sol_input, const actuators::Actuators& actuators);
+        ControlSurfaceInputs step(const dynamics::RigidBodyState& xN_meas_t, const linearization::TrimLinearization& lin_sol, const trim::TrimControlSurfaceInputs<double>& trim_sol_input, const actuators::Actuators& actuators);
     };
 
 }

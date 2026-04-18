@@ -2,12 +2,12 @@
 
 #include <Eigen/Dense>
 #include <complex>
-#include "simulation/autopilot/autopilot.hpp"
+#include "simulation/trim/trim.hpp"
 #include "simulation/linearization/linearization.hpp"
 
 namespace analysis {
-    using TrimEigenvalues = Eigen::Matrix<std::complex<double>, autopilot::trim_state_dofs, 1>;
-    using TrimEigenvectors = Eigen::Matrix<std::complex<double>, autopilot::trim_state_dofs, autopilot::trim_state_dofs>;
+    using TrimEigenvalues = Eigen::Matrix<std::complex<double>, trim::trim_state_dofs, 1>;
+    using TrimEigenvectors = Eigen::Matrix<std::complex<double>, trim::trim_state_dofs, trim::trim_state_dofs>;
 
     struct TrimEigenAnalysis {
         TrimEigenvalues eigenvalues = TrimEigenvalues::Zero();

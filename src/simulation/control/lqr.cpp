@@ -2,7 +2,7 @@
 #include "simulation/control/control.hpp"
 #include "simulation/control/lqr.hpp"
 #include "simulation/control/care.hpp"
-#include "simulation/autopilot/autopilot.hpp"
+#include "simulation/trim/trim.hpp"
 
 namespace control {
 
@@ -23,7 +23,7 @@ namespace control {
             K = control::lqr_gain(ctrl_law_input.B, R, care_sol.P);
         }
 
-        autopilot::TrimStateVector_T<double> meas_deviation = ctrl_law_input.meas - ctrl_law_input.meas_des;
+        trim::TrimStateVector_T<double> meas_deviation = ctrl_law_input.meas - ctrl_law_input.meas_des;
         Eigen::VectorXd u_deviation = -K.value() * meas_deviation;
 
         return u_deviation;

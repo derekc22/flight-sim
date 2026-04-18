@@ -1,7 +1,7 @@
 #include <algorithm>
 #include "simulation/control/control.hpp"
 #include "simulation/actuators/actuators.hpp"
-#include "simulation/autopilot/autopilot.hpp"
+#include "simulation/trim/trim.hpp"
 
 namespace control {
 
@@ -95,12 +95,12 @@ namespace control {
         return u;
     }
 
-    autopilot::TrimStateVector_T<double> full_state_control_setpoint_to_trim_state_vector(const FullStateControlSetpoint& full_state_setpoint){
+    trim::TrimStateVector_T<double> full_state_control_setpoint_to_trim_state_vector(const FullStateControlSetpoint& full_state_setpoint){
         dynamics::LinearVelocity vB_BI = full_state_setpoint.vB_BI;
         dynamics::AngularVelocity wB_BI = full_state_setpoint.wB_BI;
         dynamics::EulerAngles eulIB = full_state_setpoint.eulIB;
 
-        autopilot::TrimState<double> full_state_setpoint_in_trim_state_form { 
+        trim::TrimState<double> full_state_setpoint_in_trim_state_form { 
             .vx = vB_BI.data(0),
             .vy = vB_BI.data(1),
             .vz = vB_BI.data(2),
@@ -110,16 +110,16 @@ namespace control {
             .phi = eulIB.phi(),
             .theta = eulIB.theta(),
         };
-        return autopilot::pack_trim_state_T(full_state_setpoint_in_trim_state_form);
+        return trim::pack_trim_state_T(full_state_setpoint_in_trim_state_form);
     }
 
-    autopilot::TrimStateVector_T<double> rigid_body_state_to_trim_state_vector(const dynamics::RigidBodyState& xN_meas_t){
+    trim::TrimStateVector_T<double> rigid_body_state_to_trim_state_vector(const dynamics::RigidBodyState& xN_meas_t){
         dynamics::LinearVelocity vB_BI = xN_meas_t.v;
         dynamics::AngularVelocity wB_BI = xN_meas_t.w;
         dynamics::EulerAngles eulIB;
         eulIB.set(xN_meas_t.q);
 
-        autopilot::TrimState<double> xN_meas_in_trim_state_form { 
+        trim::TrimState<double> xN_meas_in_trim_state_form { 
             .vx = vB_BI.data(0),
             .vy = vB_BI.data(1),
             .vz = vB_BI.data(2),
@@ -129,7 +129,7 @@ namespace control {
             .phi = eulIB.phi(),
             .theta = eulIB.theta(),
         };
-        return autopilot::pack_trim_state_T(xN_meas_in_trim_state_form);
+        return trim::pack_trim_state_T(xN_meas_in_trim_state_form);
     }
 
     FullStateControlLawInput ControlProperties::make_full_state_control_input(const dynamics::RigidBodyState& xN_meas_t, const linearization::TrimLinearization& lin_sol, const actuators::Actuators& actuators, ControlType control_type){
@@ -150,13 +150,13 @@ namespace control {
         }
     }
 
-    ControlSurfaceInputs ControlProperties::step(const dynamics::RigidBodyState& xN_meas_t, const linearization::TrimLinearization& lin_sol, const autopilot::TrimControlSurfaceInputs<double>& trim_sol_input, const actuators::Actuators& actuators) {
+    ControlSurfaceInputs ControlProperties::step(const dynamics::RigidBodyState& xN_meas_t, const linearization::TrimLinearization& lin_sol, const trim::TrimControlSurfaceInputs<double>& trim_sol_input, const actuators::Actuators& actuators) {
         ControlSurfaceInputs u;
 
         Eigen::VectorXd u_deviation = full_state_controller(
             make_full_state_control_input(xN_meas_t, lin_sol, actuators, full_state_control_type)
         );
-        Eigen::VectorXd u_sol_trim = autopilot::pack_trim_control_surface_inputs_T(trim_sol_input);
+        Eigen::VectorXd u_sol_trim = trim::pack_trim_control_surface_inputs_T(trim_sol_input);
 
         Eigen::VectorXd u_cmd = u_deviation + u_sol_trim;
 
