@@ -58,10 +58,10 @@ namespace transforms {
         else throw std::invalid_argument("Unsupported Euler order: " + order);
     };
 
-    // All vector rotations (as opposed to frame rotations) are, by definition, extrinsic. The concept of an "intrinsic" rotation only applies to frames
+    // All vector rotations (as opposed to frame rotations/coordinate transformations) are, by definition, extrinsic. The concept of an "intrinsic" rotation only applies to frames
     // That is, the concept of an "intrinsic" vector rotation is not defined
     // So the function '_eul_to_R_intr' does not technically make sense
-    // However, for consistency with the extrinsic case, it is still implemented since transposing the result of this function indeed gives the correct result for an intrinsic frame rotation
+    // However, for consistency with the extrinsic case, it is still implemented since transposing the result of this function indeed gives the correct result for an intrinsic frame rotation/coordinate transformation
     Eigen::Matrix3d _eul_to_R_intr(double a, double b, double c, const std::string& order){
         return _eul_to_R_extr(-a, -b, -c, order).transpose();
     }
@@ -235,10 +235,10 @@ namespace transforms {
 
 
     // Given the orientation (of the frame/vector) obtained via the nth rotation, how is the n+1 rotation applied
-    // Whether the net matrix represents an intrinsic or extrinsic rotation depends on whether the matrices passed to the function represent active rotations (ie vector rotations) or passive rotations (ie frame rotations/coordinate transformations)
+    // Whether the net matrix represents an intrinsic or extrinsic rotation depends on whether the matrices passed to the function represent active rotations (ie vector rotations) or passive rotations (ie frame rotations/coordinate transformations/coordinate transformations)
     // Active: extrinsic -> pre-multiply, intrinsic -> not defined
     // Passive: extrinsic -> post-multiply, intrinsic -> pre-multiply
-    // All vector rotations (as opposed to frame rotations) are, by definition, extrinsic. The concept of an "intrinsic" rotation only applies to frames
+    // All vector rotations (as opposed to frame rotations/coordinate transformations) are, by definition, extrinsic. The concept of an "intrinsic" rotation only applies to frames
     // That is, the concept of an "intrinsic" vector rotation is not defined
     // Given the orientation (of the frame/vector) obtained via the nth rotation, how is the n+1 rotation applied
     Eigen::Matrix3d chain_rot_post(const std::vector<Eigen::Matrix3d>& rot_list) {
@@ -274,11 +274,26 @@ namespace transforms {
         throw std::invalid_argument("Unsupported type: " + type);
     }
 
+    // Recall from above that the premise of an "intrinsic" vector rotation (as opposed to an intrinsic frame rotations/coordinate transformations) is rejected
+    // Thus, the "intr" branch of `eul_to_R` exists only for parallelity with `eul_to_C`
+    // As such, it should not be called externally to avoid confusion
+    // In its place is the more semantically appropriate/correct definition of `eul_to_R`, below
+    /** @warning *DO NOT CALL PUBLICLY* @warning */
     Eigen::Matrix3d eul_to_R(double a, double b, double c, const std::string& order, const std::string& type){
         if (type == "extr") return _eul_to_R_extr(a, b, c, order);
         if (type == "intr") return _eul_to_R_intr(a, b, c, order);
         throw std::invalid_argument("Unsupported type: " + type);
     }
+
+    // This version explicity removes the 'type' argument and appropriately ONLY calls `_eul_to_R_extr` internally
+    // THIS is the version that can and should be called publicly to generate an active rotation matrix from euler angles
+    // Once again, this new defintion is created to avoid the confusion introduced by the definition of `eul_to_R` above, which implies that active rotation matrices, R, can apply intrinsic rotations
+    // Once again, this is not true. Active rotation matrices CANNOT apply intrinsic rotations
+    // And `eul_to_R` from above is implemented with the 'type' argument SOLELY to maintain congruence/parallelity with `eul_to_C`
+    Eigen::Matrix3d eul_to_R(double a, double b, double c, const std::string& order){
+        return _eul_to_R_extr(a, b, c, order);
+    }
+
 
 
     Eigen::Vector3d C_to_eul(const Eigen::Matrix3d& C, const std::string& order, const std::string& type) {

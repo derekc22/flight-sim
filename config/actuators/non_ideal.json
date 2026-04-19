@@ -1,27 +1,53 @@
 {
-    "elevator": {
-        "limit_max": 50.0,
-        "limit_min": -50.0,
-        "tau": 0.1
+    "surfaces": {
+        "elevator": {
+            "limit_max": 50.0,
+            "limit_min": -50.0,
+            "tau": 0.1
+        },
+        "aileron": {
+            "limit_max": 20.0,
+            "limit_min": -20.0,
+            "tau": 0.1
+        },
+        "rudder": {
+            "limit_max": 31.0,
+            "limit_min": -31.0,
+            "tau": 0.1
+        },
+        "flap": {
+            "limit_max": 0.0,
+            "limit_min": 0.0,
+            "tau": 0.1
+        },
+        "spoiler": {
+            "limit_max": 90.0,
+            "limit_min": 0.0,
+            "tau": 0.1
+        }
     },
-    "aileron": {
-        "limit_max": 20.0,
-        "limit_min": -20.0,
-        "tau": 0.1
-    },
-    "rudder": {
-        "limit_max": 31.0,
-        "limit_min": -31.0,
-        "tau": 0.1
-    },
-    "flaps": {
-        "limit_max": 0.0,
-        "limit_min": 0.0,
-        "tau": 0.1
-    },
-    "spoilers": {
-        "limit_max": 90.0,
-        "limit_min": 0.0,
-        "tau": 0.1
+    "propulsors": {
+        "front_propulsor": {
+            "limit_max": 90.0,
+            "limit_min": 0.0,
+            "tau": 0.1,
+            "inclination_angle": 0,
+            "toe_angle": 0,
+            "pB_prop_cg": [1, 0, 0]
+        },
+        "left_propulsor": {
+            "limit_max": 0.0,
+            "limit_min": 0.0,
+            "tau": 0.1,
+            "inclination_angle": 0,
+            "toe_angle": 0
+        },
+        "right_propulsor": {
+            "limit_max": 0.0,
+            "limit_min": 0.0,
+            "tau": 0.1,
+            "inclination_angle": 0,
+            "toe_angle": 0
+        }
     }
 }

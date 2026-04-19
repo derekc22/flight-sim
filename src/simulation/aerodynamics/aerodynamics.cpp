@@ -46,106 +46,93 @@ namespace aerodynamics {
         return m;
     }
 
-
-    SurfaceKinematics compute_surface_kinematics(
-        const Surface& s,
-        const structural::StructuralProperties& structural_properties,
-        const dynamics::RigidBodyState& rigid_body_state,
-        const atmospheric::StaticAtmosphericState& static_atmospheric_state,
-        const atmospheric::Wind& windB
-    ) {
-        const dynamics::Twist_T<double> twist{
-            .v = rigid_body_state.v.data,
-            .w = rigid_body_state.w.data,
-        };
-
-        const SurfaceKinematics_T<double> sk = compute_surface_kinematics_T<double>(s, structural_properties, twist, static_atmospheric_state, windB);
-
-        return {
-            .r_ac_B = sk.r_ac_B,
-            .v_rel_B = sk.v_rel_B,
-            .V = sk.V,
-            .qbar = sk.qbar,
-            .alpha = sk.alpha,
-            .p_hat = sk.p_hat,
-            .q_hat = sk.q_hat,
-            .r_hat = sk.r_hat,
-        };
-    }
-
-
     /** @deprecated */
-    // SurfaceCoefficients compute_surface_coefficients(const Surface& s, const SurfaceKinematics& sk, const control::ControlSurfaceInputs& u, const actuators::ActuatorProperties& actuator_properties) {
-    
-    SurfaceCoefficients compute_surface_coefficients(const Surface& s, const SurfaceKinematics& sk, const control::ControlSurfaceInputs& u) {
-        const SurfaceCoefficients_T<double> sc = compute_surface_coefficients_T<double>(
-            s,
-            SurfaceKinematics_T<double>{
-                .r_ac_B = sk.r_ac_B,
-                .v_rel_B = sk.v_rel_B,
-                .V = sk.V,
-                .qbar = sk.qbar,
-                .alpha = sk.alpha,
-                .p_hat = sk.p_hat,
-                .q_hat = sk.q_hat,
-                .r_hat = sk.r_hat,
-            },
-            ControlSurfaceInputs_T<double>{
-                .elevator = u.elevator,
-                .aileron = u.aileron,
-                .rudder = u.rudder,
-                .flaps = u.flaps,
-                .spoilers = u.spoilers,
-            }
-            // actuator_properties.actuators
-        );
-
-        return {
-            .CL = LiftCoefficient{ sc.CL },
-            .CD = DragCoefficient{ sc.CD },
-            .CM = MomentCoefficient{ sc.CM },
-        };
-    }
-
-    AerodynamicLoad compute_surface_loads(const Surface& s, const SurfaceKinematics& sk, const SurfaceCoefficients& sc) {
-        const AerodynamicLoad_T<double> loads = compute_surface_loads_T<double>(
-            s,
-            SurfaceKinematics_T<double>{
-                .r_ac_B = sk.r_ac_B,
-                .v_rel_B = sk.v_rel_B,
-                .V = sk.V,
-                .qbar = sk.qbar,
-                .alpha = sk.alpha,
-                .p_hat = sk.p_hat,
-                .q_hat = sk.q_hat,
-                .r_hat = sk.r_hat,
-            },
-            SurfaceCoefficients_T<double>{
-                .CL = sc.CL.data,
-                .CD = sc.CD.data,
-                .CM = sc.CM.data,
-            }
-        );
-
-        return { dynamics::Force{ loads.F }, dynamics::Moment{ loads.M } };
-    }
-
-    /** @deprecated */
-    // AerodynamicLoad step_aero_forces_moments(
-    //     const AerodynamicProperties& aerodynamic_properties,
+    // SurfaceKinematics compute_surface_kinematics(
+    //     const Surface& s,
     //     const structural::StructuralProperties& structural_properties,
     //     const dynamics::RigidBodyState& rigid_body_state,
     //     const atmospheric::StaticAtmosphericState& static_atmospheric_state,
-    //     const control::ControlSurfaceInputs& u,
-    //     const actuators::ActuatorProperties& actuator_properties,
     //     const atmospheric::Wind& windB
     // ) {
-    AerodynamicLoad step_aero_forces_moments(
+    //     const dynamics::Twist_T<double> twist{
+    //         .v = rigid_body_state.v.data,
+    //         .w = rigid_body_state.w.data,
+    //     };
+
+    //     const SurfaceKinematics_T<double> sk = compute_surface_kinematics_T<double>(s, structural_properties, twist, static_atmospheric_state, windB);
+
+    //     return {
+    //         .r_ac_B = sk.r_ac_B,
+    //         .v_rel_B = sk.v_rel_B,
+    //         .V = sk.V,
+    //         .qbar = sk.qbar,
+    //         .alpha = sk.alpha,
+    //         .p_hat = sk.p_hat,
+    //         .q_hat = sk.q_hat,
+    //         .r_hat = sk.r_hat,
+    //     };
+    // }
+
+    /** @deprecated */
+    // SurfaceCoefficients compute_surface_coefficients(const Surface& s, const SurfaceKinematics& sk, const control::SurfaceActuatorInputs& u) {
+    //     const SurfaceCoefficients_T<double> sc = compute_surface_coefficients_T<double>(
+    //         s,
+    //         SurfaceKinematics_T<double>{
+    //             .r_ac_B = sk.r_ac_B,
+    //             .v_rel_B = sk.v_rel_B,
+    //             .V = sk.V,
+    //             .qbar = sk.qbar,
+    //             .alpha = sk.alpha,
+    //             .p_hat = sk.p_hat,
+    //             .q_hat = sk.q_hat,
+    //             .r_hat = sk.r_hat,
+    //         },
+    //         SurfaceActuatorInputs_T<double>{
+    //             .elevator_cmd = u.elevator_cmd,
+    //             .aileron_cmd = u.aileron_cmd,
+    //             .rudder_cmd = u.rudder_cmd,
+    //             .flap_cmd = u.flap_cmd,
+    //             .spoiler_cmd = u.spoiler_cmd,
+    //         }
+    //     );
+
+    //     return {
+    //         .CL = LiftCoefficient{ sc.CL },
+    //         .CD = DragCoefficient{ sc.CD },
+    //         .CM = MomentCoefficient{ sc.CM },
+    //     };
+    // }
+
+    /** @deprecated */
+    // AerodynamicWrench compute_surface_loads(const Surface& s, const SurfaceKinematics& sk, const SurfaceCoefficients& sc) {
+    //     const AerodynamicWrench_T<double> loads = compute_surface_loads_T<double>(
+    //         s,
+    //         SurfaceKinematics_T<double>{
+    //             .r_ac_B = sk.r_ac_B,
+    //             .v_rel_B = sk.v_rel_B,
+    //             .V = sk.V,
+    //             .qbar = sk.qbar,
+    //             .alpha = sk.alpha,
+    //             .p_hat = sk.p_hat,
+    //             .q_hat = sk.q_hat,
+    //             .r_hat = sk.r_hat,
+    //         },
+    //         SurfaceCoefficients_T<double>{
+    //             .CL = sc.CL.data,
+    //             .CD = sc.CD.data,
+    //             .CM = sc.CM.data,
+    //         }
+    //     );
+
+    //     return { dynamics::Force{ loads.F }, dynamics::Moment{ loads.M } };
+    // }
+
+    AerodynamicWrench step_aero_forces_moments(
         const AerodynamicProperties& aerodynamic_properties,
         const structural::StructuralProperties& structural_properties,
         const dynamics::RigidBodyState& rigid_body_state,
         const atmospheric::StaticAtmosphericState& static_atmospheric_state,
-        const control::ControlSurfaceInputs& u,
+        const control::SurfaceActuatorInputs& u,
         const atmospheric::Wind& windB
     ) {
         const dynamics::Twist_T<double> twist{
@@ -153,19 +140,18 @@ namespace aerodynamics {
             .w = rigid_body_state.w.data,
         };
 
-        const AerodynamicLoad_T<double> loads = step_aero_forces_moments_T<double>(
+        const AerodynamicWrench_T<double> loads = step_aero_forces_moments_T<double>(
             aerodynamic_properties,
             structural_properties,
             twist,
             static_atmospheric_state,
-            ControlSurfaceInputs_T<double>{
-                .elevator = u.elevator,
-                .aileron = u.aileron,
-                .rudder = u.rudder,
-                .flaps = u.flaps,
-                .spoilers = u.spoilers,
+            SurfaceActuatorInputs_T<double>{
+                .elevator_cmd = u.elevator_cmd,
+                .aileron_cmd = u.aileron_cmd,
+                .rudder_cmd = u.rudder_cmd,
+                .flap_cmd = u.flap_cmd,
+                .spoiler_cmd = u.spoiler_cmd,
             },
-            // actuator_properties.actuators,
             windB
         );
 

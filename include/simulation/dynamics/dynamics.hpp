@@ -172,10 +172,6 @@ namespace dynamics {
     /** @warning The parent of F must be an inertial frame: ECEFFrame or NEDFrameECEF */
     RigidBodyState rigid_body_state(const frames::Frame& F);
 
-    /** @deprecated */
-    // struct InertialRigidBodyState : RigidBodyState{
-    // };
-
     struct Wrench {
         dynamics::Force F;          
         dynamics::Moment M;         
@@ -187,37 +183,31 @@ namespace dynamics {
     };
 
     template <typename T>
-    using Vector3_T = Eigen::Matrix<T, 3, 1>;
-
-    template <typename T>
     struct Twist_T {
-        Vector3_T<T> v = Vector3_T<T>::Zero();
-        Vector3_T<T> w = Vector3_T<T>::Zero();
+        constants::Vector3_T<T> v = constants::Zero3_T<T>;
+        constants::Vector3_T<T> w = constants::Zero3_T<T>;
     };
 
     template <typename T>
-    using Matrix3_T = Eigen::Matrix<T, 3, 3>;
+    constants::Matrix3_T<T> _eul_dot_to_wB_BI_mat_T(const T& theta, const T& phi);
 
     template <typename T>
-    Matrix3_T<T> _eul_dot_to_wB_BI_mat_T(const T& theta, const T& phi);
+    constants::Matrix3_T<T> _wB_BI_to_eul_dot_mat_T(const T& theta, const T& phi);
 
     template <typename T>
-    Matrix3_T<T> _wB_BI_to_eul_dot_mat_T(const T& theta, const T& phi);
+    constants::Vector3_T<T> _ddtB_vB_BI_T(const constants::Vector3_T<T>& vB, const constants::Vector3_T<T>& wB_BI, double mass, const constants::Vector3_T<T>& FB_net);
 
     template <typename T>
-    Vector3_T<T> _ddtB_vB_BI_T(const Vector3_T<T>& vB, const Vector3_T<T>& wB_BI, double mass, const Vector3_T<T>& FB_net);
+    constants::Vector3_T<T> _ddtB_wB_BI_T(const constants::Vector3_T<T>& wB_BI, const Eigen::Matrix3d& J, const constants::Vector3_T<T>& MB_net);
 
     template <typename T>
-    Vector3_T<T> _ddtB_wB_BI_T(const Vector3_T<T>& wB_BI, const Eigen::Matrix3d& J, const Vector3_T<T>& MB_net);
+    constants::Vector3_T<T> _ddtB_to_ddtI_T(const constants::Vector3_T<T>& ddtB_v, const constants::Vector3_T<T>& v, const constants::Vector3_T<T>& w);
 
     template <typename T>
-    Vector3_T<T> _ddtB_to_ddtI_T(const Vector3_T<T>& ddtB_v, const Vector3_T<T>& v, const Vector3_T<T>& w);
+    constants::Vector3_T<T> _eul_dot_to_wB_BI_T(const constants::Vector3_T<T>& eul_dot, const T& theta, const T& phi);
 
     template <typename T>
-    Vector3_T<T> _eul_dot_to_wB_BI_T(const Vector3_T<T>& eul_dot, const T& theta, const T& phi);
-
-    template <typename T>
-    Vector3_T<T> _wB_BI_to_eul_dot_T(const Vector3_T<T>& wB_BI, const T& theta, const T& phi);
+    constants::Vector3_T<T> _wB_BI_to_eul_dot_T(const constants::Vector3_T<T>& wB_BI, const T& theta, const T& phi);
 
 
 

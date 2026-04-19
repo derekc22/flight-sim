@@ -29,4 +29,15 @@ namespace constants {
 
     // Special Quaternions
     inline const Eigen::Quaterniond qI = Eigen::Quaterniond::Identity();
+
+
+    // template
+    template <typename T>
+    using Vector3_T = Eigen::Matrix<T, 3, 1>;
+
+    template <typename T>
+    inline const Vector3_T<T> Zero3_T = Vector3_T<T>::Zero();
+
+    template <typename T>
+    using Matrix3_T = Eigen::Matrix<T, 3, 3>;
 }

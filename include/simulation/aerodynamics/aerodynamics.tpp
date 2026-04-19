@@ -2,18 +2,6 @@
 
 namespace aerodynamics {
 
-    /** @deprecated */
-    // template <typename T>
-    // ControlSurfaceInputs_T<T> clamp_control_inputs_T(const ControlSurfaceInputs_T<T>& u, const actuators::Actuators& actuators) {
-    //     return ControlSurfaceInputs_T<T>{
-    //         .elevator = util::clamp(u.elevator, actuators.elevator.limit_min, actuators.elevator.limit_max),
-    //         .aileron = util::clamp(u.aileron, actuators.aileron.limit_min, actuators.aileron.limit_max),
-    //         .rudder = util::clamp(u.rudder, actuators.rudder.limit_min, actuators.rudder.limit_max),
-    //         .flaps = util::clamp(u.flaps, actuators.flaps.limit_min, actuators.flaps.limit_max),
-    //         .spoilers = util::clamp(u.spoilers, actuators.spoilers.limit_min, actuators.spoilers.limit_max),
-    //     };
-    // }
-
     template <typename T>
     SurfaceKinematics_T<T> compute_surface_kinematics_T(const Surface& s, const structural::StructuralProperties& structural_properties, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& static_atmospheric_state, const atmospheric::Wind& windB) {
         SurfaceKinematics_T<T> out;
@@ -25,8 +13,8 @@ namespace aerodynamics {
             return out;
         }
 
-        const Vector3_T<T> n_B = s.n.template cast<T>();
-        const Vector3_T<T> n_hat = util::norm(n_B);
+        const constants::Vector3_T<T> n_B = s.n.template cast<T>();
+        const constants::Vector3_T<T> n_hat = util::norm(n_B);
         const T arg = util::clamp_to_1(out.v_rel_B.dot(n_hat) / out.V);
 
         out.alpha = T(s.i) - util::asin(arg);
@@ -37,29 +25,19 @@ namespace aerodynamics {
         return out;
     }
 
-    /** @deprecated */
-    // template <typename T>
-    // SurfaceCoefficients_T<T> compute_surface_coefficients_T(const Surface& s, const SurfaceKinematics_T<T>& sk, const ControlSurfaceInputs_T<T>& u, const actuators::Actuators& actuators, bool clamp_controls) {
-    
     template <typename T>
-    SurfaceCoefficients_T<T> compute_surface_coefficients_T(const Surface& s, const SurfaceKinematics_T<T>& sk, const ControlSurfaceInputs_T<T>& u) {
-        // const ControlSurfaceInputs_T<T> u_eval = clamp_controls ? clamp_control_inputs_T(u, actuators) : u;
+    SurfaceCoefficients_T<T> compute_surface_coefficients_T(const Surface& s, const SurfaceKinematics_T<T>& sk, const SurfaceActuatorInputs_T<T>& u) {
         const double CLalpha = 2.0 * constants::pi * (s.AR / (2.0 + s.AR));
 
         SurfaceCoefficients_T<T> out;
         out.CL = T(s.CL0) + T(CLalpha) * sk.alpha;
         out.CM = T(s.CM0) + T(s.CMa) * sk.alpha;
 
-        // const T elevator_abs = util::smooth_abs(u_eval.elevator);
-        // const T aileron_abs = util::smooth_abs(u_eval.aileron);
-        // const T rudder_abs = util::smooth_abs(u_eval.rudder);
-        // const T flap_abs = util::smooth_abs(u_eval.flaps);
-        // const T spoiler_abs = util::smooth_abs(u_eval.spoilers);
-        const T elevator_abs = util::smooth_abs(u.elevator);
-        const T aileron_abs = util::smooth_abs(u.aileron);
-        const T rudder_abs = util::smooth_abs(u.rudder);
-        const T flap_abs = util::smooth_abs(u.flaps);
-        const T spoiler_abs = util::smooth_abs(u.spoilers);
+        const T elevator_cmd_abs = util::smooth_abs(u.elevator_cmd);
+        const T aileron_cmd_abs = util::smooth_abs(u.aileron_cmd);
+        const T rudder_cmd_abs = util::smooth_abs(u.rudder_cmd);
+        const T flap_cmd_abs = util::smooth_abs(u.flap_cmd);
+        const T spoiler_cmd_abs = util::smooth_abs(u.spoiler_cmd);
 
         T dCD_extra = T(0);
 
@@ -67,30 +45,28 @@ namespace aerodynamics {
         out.CM += T(s.dyn.CM_phat) * sk.p_hat + T(s.dyn.CM_qhat) * sk.q_hat + T(s.dyn.CM_rhat) * sk.r_hat;
         dCD_extra += T(s.dyn.CD_phat) * sk.p_hat + T(s.dyn.CD_qhat) * sk.q_hat + T(s.dyn.CD_rhat) * sk.r_hat;
 
-        // out.CL += T(s.ctrl.dCL_de) * u_eval.elevator + T(s.ctrl.dCL_da) * u_eval.aileron + T(s.ctrl.dCL_dr) * u_eval.rudder + T(s.ctrl.dCL_df) * u_eval.flaps + T(s.ctrl.dCL_ds) * u_eval.spoilers;
-        // out.CM += T(s.ctrl.dCM_de) * u_eval.elevator + T(s.ctrl.dCM_da) * u_eval.aileron + T(s.ctrl.dCM_dr) * u_eval.rudder + T(s.ctrl.dCM_df) * u_eval.flaps + T(s.ctrl.dCM_ds) * u_eval.spoilers;
-        out.CL += T(s.ctrl.dCL_de) * u.elevator + T(s.ctrl.dCL_da) * u.aileron + T(s.ctrl.dCL_dr) * u.rudder + T(s.ctrl.dCL_df) * u.flaps + T(s.ctrl.dCL_ds) * u.spoilers;
-        out.CM += T(s.ctrl.dCM_de) * u.elevator + T(s.ctrl.dCM_da) * u.aileron + T(s.ctrl.dCM_dr) * u.rudder + T(s.ctrl.dCM_df) * u.flaps + T(s.ctrl.dCM_ds) * u.spoilers;
-        dCD_extra += T(s.ctrl.dCD_de) * elevator_abs + T(s.ctrl.dCD_da) * aileron_abs + T(s.ctrl.dCD_dr) * rudder_abs + T(s.ctrl.dCD_df) * flap_abs + T(s.ctrl.dCD_ds) * spoiler_abs;
+        out.CL += T(s.ctrl.dCL_de) * u.elevator_cmd + T(s.ctrl.dCL_da) * u.aileron_cmd + T(s.ctrl.dCL_dr) * u.rudder_cmd + T(s.ctrl.dCL_df) * u.flap_cmd + T(s.ctrl.dCL_ds) * u.spoiler_cmd;
+        out.CM += T(s.ctrl.dCM_de) * u.elevator_cmd + T(s.ctrl.dCM_da) * u.aileron_cmd + T(s.ctrl.dCM_dr) * u.rudder_cmd + T(s.ctrl.dCM_df) * u.flap_cmd + T(s.ctrl.dCM_ds) * u.spoiler_cmd;
+        dCD_extra += T(s.ctrl.dCD_de) * elevator_cmd_abs + T(s.ctrl.dCD_da) * aileron_cmd_abs + T(s.ctrl.dCD_dr) * rudder_cmd_abs + T(s.ctrl.dCD_df) * flap_cmd_abs + T(s.ctrl.dCD_ds) * spoiler_cmd_abs;
 
         out.CD = T(s.CD0) + T(s.CDa) * (sk.alpha - T(s.a0)) * (sk.alpha - T(s.a0)) + (out.CL * out.CL) / T(constants::pi * s.e * s.AR) + dCD_extra;
         return out;
     }
 
     template <typename T>
-    AerodynamicLoad_T<T> compute_surface_loads_T(const Surface& s, const SurfaceKinematics_T<T>& sk, const SurfaceCoefficients_T<T>& sc) {
-        AerodynamicLoad_T<T> out;
+    AerodynamicWrench_T<T> compute_surface_loads_T(const Surface& s, const SurfaceKinematics_T<T>& sk, const SurfaceCoefficients_T<T>& sc) {
+        AerodynamicWrench_T<T> out;
         if (sk.V < T(constants::eps)) {
             return out;
         }
 
-        const Vector3_T<T> n_B = s.n.template cast<T>();
-        const Vector3_T<T> n_hat = util::norm(n_B);
-        const Vector3_T<T> d_hat = -sk.v_rel_B / sk.V;
-        const Vector3_T<T> lift_axis = n_hat - n_hat.dot(d_hat) * d_hat;
-        const Vector3_T<T> l_hat = util::norm(lift_axis);
-        const Vector3_T<T> moment_axis = l_hat.cross(d_hat);
-        const Vector3_T<T> m_hat = util::norm(moment_axis);
+        const constants::Vector3_T<T> n_B = s.n.template cast<T>();
+        const constants::Vector3_T<T> n_hat = util::norm(n_B);
+        const constants::Vector3_T<T> d_hat = -sk.v_rel_B / sk.V;
+        const constants::Vector3_T<T> lift_axis = n_hat - n_hat.dot(d_hat) * d_hat;
+        const constants::Vector3_T<T> l_hat = util::norm(lift_axis);
+        const constants::Vector3_T<T> moment_axis = l_hat.cross(d_hat);
+        const constants::Vector3_T<T> m_hat = util::norm(moment_axis);
 
         const T L = sk.qbar * T(s.area) * sc.CL;
         const T D = sk.qbar * T(s.area) * sc.CD;
@@ -101,17 +77,13 @@ namespace aerodynamics {
         return out;
     }
 
-    /** @deprecated */
-    // template <typename T>
-    // AerodynamicLoad_T<T> step_aero_forces_moments_T(const AerodynamicProperties& aerodynamic_properties, const structural::StructuralProperties& structural_properties, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& static_atmospheric_state, const ControlSurfaceInputs_T<T>& u, const actuators::Actuators& actuators, const atmospheric::Wind& windB, bool clamp_controls) {
     template <typename T>
-    AerodynamicLoad_T<T> step_aero_forces_moments_T(const AerodynamicProperties& aerodynamic_properties, const structural::StructuralProperties& structural_properties, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& static_atmospheric_state, const ControlSurfaceInputs_T<T>& u, const atmospheric::Wind& windB) {
-        AerodynamicLoad_T<T> total;
+    AerodynamicWrench_T<T> step_aero_forces_moments_T(const AerodynamicProperties& aerodynamic_properties, const structural::StructuralProperties& structural_properties, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& static_atmospheric_state, const SurfaceActuatorInputs_T<T>& u, const atmospheric::Wind& windB) {
+        AerodynamicWrench_T<T> total;
         for (const Surface& s : aerodynamic_properties.surfaces) {
             const SurfaceKinematics_T<T> sk = compute_surface_kinematics_T<T>(s, structural_properties, twist, static_atmospheric_state, windB);
-            // const SurfaceCoefficients_T<T> sc = compute_surface_coefficients_T<T>(s, sk, u, actuators, clamp_controls);
             const SurfaceCoefficients_T<T> sc = compute_surface_coefficients_T<T>(s, sk, u);
-            const AerodynamicLoad_T<T> loads = compute_surface_loads_T<T>(s, sk, sc);
+            const AerodynamicWrench_T<T> loads = compute_surface_loads_T<T>(s, sk, sc);
             total.F += loads.F;
             total.M += loads.M;
         }
@@ -121,7 +93,7 @@ namespace aerodynamics {
     template <typename T>
     AerodynamicState_T<T> compute_aerodynamic_state_T(const dynamics::Twist_T<T>& twist, const atmospheric::Wind& windB) {
         AerodynamicState_T<T> out;
-        const Vector3_T<T> vB_rel = twist.v - windB.data.template cast<T>();
+        const constants::Vector3_T<T> vB_rel = twist.v - windB.data.template cast<T>();
         out.Vinf = util::vector_norm(vB_rel);
 
         if (out.Vinf > T(constants::eps)) {

@@ -4,7 +4,7 @@
 #include <Eigen/Dense>
 #include <nlohmann/json.hpp>
 #include "core/json/aerodynamics.hpp"
-#include "core/json/actuator.hpp"
+#include "core/json/actuators.hpp"
 #include "core/json/control.hpp"
 #include "core/json/initialization.hpp"
 #include "core/json/structural.hpp"

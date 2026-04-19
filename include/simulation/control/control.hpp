@@ -22,12 +22,23 @@ namespace control {
         dynamics::EulerAngles eulIB;
     };
 
-    struct ControlSurfaceInputs {
-        double elevator = 0.0;  // rad
-        double aileron = 0.0;   // rad
-        double rudder = 0.0;    // rad
-        double flaps = 0.0;     // rad
-        double spoilers = 0.0;  // rad
+    struct SurfaceActuatorInputs {
+        double elevator_cmd = 0.0;  // [rad]
+        double aileron_cmd = 0.0;   // [rad]
+        double rudder_cmd = 0.0;    // [rad]
+        double flap_cmd = 0.0;      // [rad]
+        double spoiler_cmd = 0.0;   // [rad]
+    };
+
+    struct PropulsorActuatorInputs {
+        double front_propulsor_cmd = 0.0;  // [N]
+        double left_propulsor_cmd = 0.0;   // [N]
+        double right_propulsor_cmd = 0.0;  // [N]
+    };
+
+    struct ControlInputs {
+        SurfaceActuatorInputs surface_inputs;
+        PropulsorActuatorInputs propulsor_inputs;
     };
 
     struct ControlLawGains {
@@ -60,7 +71,8 @@ namespace control {
         const linearization::TrimInputJacobian& B;
         trim::TrimStateVector_T<double> meas;
         trim::TrimStateVector_T<double> meas_des;
-        const actuators::Actuators& actuators;
+        const actuators::SurfaceActuators& surface_actuators;
+        const actuators::PropulsorActuators& propulsor_actuators;
     };
 
     template <typename ControlLawCommand>
@@ -104,11 +116,32 @@ namespace control {
         AxisControlSetpoint axis_setpoint;
         FullStateControlSetpoint full_state_setpoint;
         
-        AxisControlLawInput make_axis_control_input(const dynamics::RigidBodyState& xN_meas_t, const actuators::Actuator& actuator, ControlType control_type);
-        FullStateControlLawInput make_full_state_control_input(const dynamics::RigidBodyState& xN_meas_t, const linearization::TrimLinearization& lin_sol, const actuators::Actuators& actuators, ControlType control_type);
+        AxisControlLawInput make_axis_control_input(
+            const dynamics::RigidBodyState& xN_meas_t, 
+            const actuators::SurfaceActuator& surface_actuator, 
+            ControlType control_type
+        );
 
-        ControlSurfaceInputs step(const dynamics::RigidBodyState& xN_meas_t, const actuators::Actuators& actuators);
-        ControlSurfaceInputs step(const dynamics::RigidBodyState& xN_meas_t, const linearization::TrimLinearization& lin_sol, const trim::TrimControlSurfaceInputs<double>& trim_sol_input, const actuators::Actuators& actuators);
+        FullStateControlLawInput make_full_state_control_input(
+            const dynamics::RigidBodyState& xN_meas_t, 
+            const linearization::TrimLinearization& lin_sol, 
+            const actuators::SurfaceActuators& surface_actuators,
+            const actuators::PropulsorActuators& propulsor_actuators,
+            ControlType control_type
+        );
+
+        ControlInputs step(
+            const dynamics::RigidBodyState& xN_meas_t, 
+            const actuators::SurfaceActuators& surface_actuators
+        );
+
+        ControlInputs step(
+            const dynamics::RigidBodyState& xN_meas_t, 
+            const linearization::TrimLinearization& lin_sol, 
+            const trim::TrimActuatorInputs<double>& trim_sol_input, 
+            const actuators::SurfaceActuators& surface_actuators,
+            const actuators::PropulsorActuators& propulsor_actuators
+        );
     };
 
 }
