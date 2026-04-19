@@ -95,7 +95,7 @@ namespace trim {
         double phi = 0.0;
         double theta = 0.0;
         double vx = 0.0;
-        double alpha = 0.0;
+        double vz = 0.0;
         double psi_dot = 0.0;
     };
 
@@ -144,7 +144,7 @@ namespace trim {
         T theta_err = T(0);
 
         T vx_err = T(0);
-        T alpha_err = T(0);
+        T vz_err = T(0);
         T psi_dot_err = T(0);
     };
 
@@ -154,12 +154,15 @@ namespace trim {
         TrimConditions conditions;
         dynamics::Wrench wrench{};
         TrimResidual<double> residual;
+        TrimResidual<double> weighted_residual;
         TrimVariableVector_T<double> variables = TrimVariableVector_T<double>::Zero();
         bool attempted = false;
         bool converged = false;
         std::size_t iterations = 0;
         double residual_norm_2 = 0.0;
         double residual_norm_inf = 0.0;
+        double weighted_residual_norm_2 = 0.0;
+        double weighted_residual_norm_inf = 0.0;
     };
 
     template <typename T>

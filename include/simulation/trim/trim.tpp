@@ -133,7 +133,7 @@ namespace trim {
             .phi_err = x.phi - T(target.phi),
             .theta_err = x.theta - T(target.theta),
             .vx_err = x.vx - T(target.vx),
-            .alpha_err = ads.alpha - T(target.alpha),
+            .vz_err = x.vz - T(target.vz),
             .psi_dot_err = eul_dot.z() - T(target.psi_dot)
         };
     }
@@ -217,7 +217,7 @@ namespace trim {
                residual.phi_err,
                residual.theta_err,
                residual.vx_err,
-               residual.alpha_err,
+               residual.vz_err,
                residual.psi_dot_err;
         return out;
     }

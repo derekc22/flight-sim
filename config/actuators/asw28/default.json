@@ -28,26 +28,28 @@
     },
     "propulsors": {
         "front_propulsor": {
-            "limit_max": 90.0,
+            "limit_max": 0.0,
             "limit_min": 0.0,
-            "tau": 0.001,
-            "inclination_angle": 5.0,
+            "tau": 0.0,
+            "inclination_angle": 0.0,
             "toe_angle": 0.0,
-            "pB_prop_cg": [0.25, 0, 0]
+            "pB_prop_cg": [0, 0, 0]
         },
         "left_propulsor": {
             "limit_max": 0.0,
             "limit_min": 0.0,
-            "tau": 0.001,
+            "tau": 0.0,
             "inclination_angle": 0.0,
-            "toe_angle": 0.0
+            "toe_angle": 0.0,
+            "pB_prop_cg": [0, 0, 0]
         },
         "right_propulsor": {
             "limit_max": 0.0,
             "limit_min": 0.0,
-            "tau": 0.001,
+            "tau": 0.0,
             "inclination_angle": 0.0,
-            "toe_angle": 0.0
+            "toe_angle": 0.0,
+            "pB_prop_cg": [0, 0, 0]
         }
     }
 }

@@ -93,15 +93,17 @@ namespace json {
         };
     }
 
-    vehicles::STABFrameFRDStepOptions parse_STABFrameFRD_step_options(const nlohmann::json& frame_json) {
-        const ParsedStepOptions fields = parse_step_options(frame_json);
-        return { .alpha = fields.alpha };
-    }
+    /** @deprecated */
+    // vehicles::STABFrameFRDStepOptions parse_STABFrameFRD_step_options(const nlohmann::json& frame_json) {
+    //     const ParsedStepOptions fields = parse_step_options(frame_json);
+    //     return { .alpha = fields.alpha };
+    // }
 
-    vehicles::WINDFrameSTABStepOptions parse_WINDFrameSTAB_step_options(const nlohmann::json& frame_json) {
-        const ParsedStepOptions fields = parse_step_options(frame_json);
-        return { .beta = fields.beta };
-    }
+    /** @deprecated */
+    // vehicles::WINDFrameSTABStepOptions parse_WINDFrameSTAB_step_options(const nlohmann::json& frame_json) {
+    //     const ParsedStepOptions fields = parse_step_options(frame_json);
+    //     return { .beta = fields.beta };
+    // }
 
     void _validate_NEDFrameECEF_initialization_config(const nlohmann::json& frame_json) {
         const ParsedStepOptions fields = parse_step_options(frame_json);
@@ -162,23 +164,25 @@ namespace json {
         if (!has_angular_velocity) { throw std::runtime_error("json::_validate_FRDFrameNED_initialization_config: one angular velocity representation required"); }
     }
 
-    void _validate_WINDFrameSTAB_initialization_config(const nlohmann::json& frame_json) {
-        const ParsedStepOptions fields = parse_step_options(frame_json);
-        if (!fields.beta.has_value()) { throw std::runtime_error("json::_validate_WINDFrameSTAB_initialization_config: beta required"); }
-    }
+    /** @deprecated */
+    // void _validate_WINDFrameSTAB_initialization_config(const nlohmann::json& frame_json) {
+    //     const ParsedStepOptions fields = parse_step_options(frame_json);
+    //     if (!fields.beta.has_value()) { throw std::runtime_error("json::_validate_WINDFrameSTAB_initialization_config: beta required"); }
+    // }
 
     void _validate_initialization_config(const nlohmann::json& config, bool trim_bool) {
         if (!config.contains("NEDFrameECEF") && !config.contains("FRDFrameECEF")) { throw std::runtime_error("json::_validate_initialization_config: One of NEDFrameECEF, FRDFrameECEF required"); }
         if (!config.contains("FRDFrameECEF") && !config.contains("FRDFrameNED")) { throw std::runtime_error("json::_validate_initialization_config: One of FRDFrameECEF, FRDFrameNED required"); }
+        if (config.contains("WINDFrameSTAB")) { throw std::runtime_error("json::_validate_initialization_config: WINDFrameSTAB initialization not allowed"); }
         if (config.contains("STABFrameFRD")) { throw std::runtime_error("json::_validate_initialization_config: STABFrameFRD initialization not allowed"); }
-        if (!trim_bool && config.contains("WINDFrameSTAB")) { throw std::runtime_error("json::_validate_initialization_config: WINDFrameSTAB requires trim to be enabled"); }
-        if (trim_bool && !config.contains("WINDFrameSTAB")) { throw std::runtime_error("json::_validate_initialization_config: trim requires WINDFrameSTAB"); }
+        // if (!trim_bool && config.contains("WINDFrameSTAB")) { throw std::runtime_error("json::_validate_initialization_config: WINDFrameSTAB requires trim to be enabled"); }
+        // if (trim_bool && !config.contains("WINDFrameSTAB")) { throw std::runtime_error("json::_validate_initialization_config: trim requires WINDFrameSTAB"); }
         if (trim_bool && !config.contains("FRDFrameNED")) { throw std::runtime_error("json::_validate_initialization_config: FRDFrameNED required for trim"); }
 
         if (config.contains("NEDFrameECEF")) { _validate_NEDFrameECEF_initialization_config(config.at("NEDFrameECEF")); }
         if (config.contains("FRDFrameECEF")) { _validate_FRDFrameECEF_initialization_config(config.at("FRDFrameECEF")); }
         if (config.contains("FRDFrameNED")) { _validate_FRDFrameNED_initialization_config(config.at("FRDFrameNED")); }
-        if (config.contains("WINDFrameSTAB")) { _validate_WINDFrameSTAB_initialization_config(config.at("WINDFrameSTAB")); }
+        // if (config.contains("WINDFrameSTAB")) { _validate_WINDFrameSTAB_initialization_config(config.at("WINDFrameSTAB")); }
     }
 
     vehicles::StepOptions parse_initialization_config(bool trim_bool) {
@@ -191,7 +195,7 @@ namespace json {
         if (config.contains("FRDFrameECEF")) { opts.FRDFrameECEFStepOpts = parse_FRDFrameECEF_step_options(config.at("FRDFrameECEF")); }
         if (config.contains("FRDFrameNED")) { opts.FRDFrameNEDStepOpts = parse_FRDFrameNED_step_options(config.at("FRDFrameNED")); }
         // if (config.contains("STABFrameFRD")) { opts.STABFrameFRDStepOpts = parse_STABFrameFRD_step_options(config.at("STABFrameFRD")); }
-        if (config.contains("WINDFrameSTAB")) { opts.WINDFrameSTABStepOpts = parse_WINDFrameSTAB_step_options(config.at("WINDFrameSTAB")); }
+        // if (config.contains("WINDFrameSTAB")) { opts.WINDFrameSTABStepOpts = parse_WINDFrameSTAB_step_options(config.at("WINDFrameSTAB")); }
         return opts;
     }
 

@@ -50,7 +50,7 @@ namespace trim {
              1.0 / options.angle_err_scale,
              1.0 / options.angle_err_scale,
              1.0 / options.vel_err_scale,
-             1.0 / options.angle_err_scale,
+             1.0 / options.vel_err_scale,
              1.0 / options.angle_rate_scale;
         return w;
     }
@@ -82,7 +82,7 @@ namespace trim {
         };
     }
 
-    static TrimSolution build_trim_solution(const TrimVariableVector_T<double>& z, const TrimResidualVector_T<double>& residual, const TrimModel& model, const TrimConditions& conditions, bool converged, std::size_t iterations) {
+    static TrimSolution build_trim_solution(const TrimVariableVector_T<double>& z, const TrimResidualVector_T<double>& residual, const TrimResidualVector_T<double>& weighted_residual, const TrimModel& model, const TrimConditions& conditions, bool converged, std::size_t iterations) {
         TrimSolution out;
         out.state = unpack_trim_state_T<double>(z);
         out.input = unpack_trim_solver_input_T<double>(z, model.surface_actuators, model.propulsor_actuators);
@@ -105,11 +105,29 @@ namespace trim {
             .phi_err = residual(9),
             .theta_err = residual(10),
             .vx_err = residual(11),
-            .alpha_err = residual(12),
+            .vz_err = residual(12),
             .psi_dot_err = residual(13)
+        };
+        out.weighted_residual = TrimResidual<double>{
+            .vx_dot = weighted_residual(0),
+            .vy_dot = weighted_residual(1),
+            .vz_dot = weighted_residual(2),
+            .p_dot = weighted_residual(3),
+            .q_dot = weighted_residual(4),
+            .r_dot = weighted_residual(5),
+            .phi_dot = weighted_residual(6),
+            .theta_dot = weighted_residual(7),
+            .beta_err = weighted_residual(8),
+            .phi_err = weighted_residual(9),
+            .theta_err = weighted_residual(10),
+            .vx_err = weighted_residual(11),
+            .vz_err = weighted_residual(12),
+            .psi_dot_err = weighted_residual(13)
         };
         out.residual_norm_2 = residual.norm();
         out.residual_norm_inf = _residual_norm_inf(residual);
+        out.weighted_residual_norm_2 = weighted_residual.norm();
+        out.weighted_residual_norm_inf = _residual_norm_inf(weighted_residual);
         return out;
     }
 
@@ -137,17 +155,17 @@ namespace trim {
         const bool use_physical_controls = false;
         TrimVariableVector_T<double> z = pack_trim_solver_variables(problem.state_guess, problem.input_guess, model.surface_actuators, model.propulsor_actuators);
         TrimResidualVector_T<double> residual = compute_trim_residual_vector(z, model, problem.target, problem.conditions, use_physical_controls);
+        const TrimResidualVector_T<double> weights = trim_residual_weights(options);
+        TrimResidualVector_T<double> weighted_residual = weights.cwiseProduct(residual);
         double damping = options.initial_damping;
         std::size_t iterations_completed = 0;
-        const TrimResidualVector_T<double> weights = trim_residual_weights(options);
 
         for (std::size_t iteration = 0; iteration < options.max_iterations; ++iteration) {
             iterations_completed = iteration;
-            const TrimResidualVector_T<double> weighted_residual = weights.cwiseProduct(residual);
             const double weighted_residual_norm_inf = _residual_norm_inf(weighted_residual);
 
             if (weighted_residual_norm_inf <= options.residual_tolerance) {
-                return build_trim_solution(z, residual, model, problem.conditions, true, iteration);
+                return build_trim_solution(z, residual, weighted_residual, model, problem.conditions, true, iteration);
             }
 
             const TrimResidualJacobian jac_raw = compute_trim_residual_jac(z, model, problem.target, problem.conditions, use_physical_controls);
@@ -162,21 +180,22 @@ namespace trim {
             }
 
             if (step.norm() <= options.step_tolerance) {
-                return build_trim_solution(z, residual, model, problem.conditions, weighted_residual_norm_inf <= options.residual_tolerance, iteration);
+                return build_trim_solution(z, residual, weighted_residual, model, problem.conditions, weighted_residual_norm_inf <= options.residual_tolerance, iteration);
             }
 
             bool accepted = false;
             double step_scale = 1.0;
-            const double residual_norm_2 = weighted_residual.norm();
+            const double weighted_residual_norm_2 = weighted_residual.norm();
 
             while (step_scale >= options.min_step_scale) {
                 const TrimVariableVector_T<double> z_trial = z + step_scale * step;
                 const TrimResidualVector_T<double> residual_trial = compute_trim_residual_vector(z_trial, model, problem.target, problem.conditions, use_physical_controls);
-                const double residual_trial_norm_2 = weights.cwiseProduct(residual_trial).norm();
+                const double weighted_residual_trial_norm_2 = weights.cwiseProduct(residual_trial).norm();
 
-                if (residual_trial_norm_2 < residual_norm_2) {
+                if (weighted_residual_trial_norm_2 < weighted_residual_norm_2) {
                     z = z_trial;
                     residual = residual_trial;
+                    weighted_residual = weights.cwiseProduct(residual_trial);
                     damping = std::max(options.initial_damping, damping / options.damping_growth);
                     accepted = true;
                     break;
@@ -189,7 +208,7 @@ namespace trim {
             }
         }
 
-        return build_trim_solution(z, residual, model, problem.conditions, false, iterations_completed);
+        return build_trim_solution(z, residual, weighted_residual, model, problem.conditions, false, iterations_completed);
     }
 
     TrimSolution inspect_trim(vehicles::Aircraft& aircraft, const atmospheric::Wind& wind) {
@@ -213,7 +232,7 @@ namespace trim {
                 .phi = aircraft.FRDFrameNED.eulNB.phi(),
                 .theta = aircraft.FRDFrameNED.eulNB.theta(),
                 .vx = aircraft.FRDFrameNED.vB_BN.data(0),
-                .alpha = target_ads.alpha.data,
+                .vz = aircraft.FRDFrameNED.vB_BN.data(2),
                 .psi_dot = aircraft.FRDFrameNED.eulNB_dot.psi_dot()
             },
             .conditions = TrimConditions{
@@ -261,28 +280,37 @@ namespace trim {
         const dynamics::EulerAngleRates trim_eul_dot = dynamics::_wB_BI_to_eul_dot(trim_w, trim_eul);
         std::ostringstream out;
         out << "trim_sol.converged: " << trim_sol.converged << "\n";
-        out << "trim_sol.iterations: " << trim_sol.iterations << "\n";
+        out << "trim_sol.iterations: " << trim_sol.iterations << "\n\n";
+
         out << "trim_sol.residual_norm_2: " << trim_sol.residual_norm_2 << "\n";
-        out << "trim_sol.residual_norm_inf: " << trim_sol.residual_norm_inf << "\n";
+        out << "trim_sol.residual_norm_inf: " << trim_sol.residual_norm_inf << "\n\n";
+
+        out << "trim_sol.weighted_residual_norm_2: " << trim_sol.weighted_residual_norm_2 << "\n";
+        out << "trim_sol.weighted_residual_norm_inf: " << trim_sol.weighted_residual_norm_inf << "\n\n";
+
         out << "trim_sol.state.vB_BN: [" << trim_sol.state.vx << ", " << trim_sol.state.vy << ", " << trim_sol.state.vz << "]\n";
         out << "trim_sol.state.wB_BN: [" << trim_sol.state.p << ", " << trim_sol.state.q << ", " << trim_sol.state.r << "]\n";
         out << "trim_sol.state.phi_deg: " << util::rad_to_deg(trim_sol.state.phi) << "\n";
         out << "trim_sol.state.theta_deg: " << util::rad_to_deg(trim_sol.state.theta) << "\n";
-        out << "trim_sol.ads: [Vinf=" << trim_sol_ads.Vinf
-            << ", alpha_deg=" << util::rad_to_deg(trim_sol_ads.alpha)
-            << ", beta_deg=" << util::rad_to_deg(trim_sol_ads.beta) << "]\n";
         out << "trim_sol.state.euler_dot_deg_s: ["
             << util::rad_to_deg(trim_eul_dot.phi_dot()) << ", "
             << util::rad_to_deg(trim_eul_dot.theta_dot()) << ", "
-            << util::rad_to_deg(trim_eul_dot.psi_dot()) << "]\n";
+            << util::rad_to_deg(trim_eul_dot.psi_dot()) << "]\n\n";
+
+        out << "trim_sol.ads: [Vinf=" << trim_sol_ads.Vinf
+            << ", alpha_deg=" << util::rad_to_deg(trim_sol_ads.alpha)
+            << ", beta_deg=" << util::rad_to_deg(trim_sol_ads.beta) << "]\n\n";
+
         out << "trim_sol.input.elevator_cmd_deg: " << util::rad_to_deg(trim_sol.input.elevator_cmd) << "\n";
         out << "trim_sol.input.aileron_cmd_deg: " << util::rad_to_deg(trim_sol.input.aileron_cmd) << "\n";
         out << "trim_sol.input.rudder_cmd_deg: " << util::rad_to_deg(trim_sol.input.rudder_cmd) << "\n";
         out << "trim_sol.input.front_propulsor_cmd: " << trim_sol.input.front_propulsor_cmd << "\n";
         out << "trim_sol.input.left_propulsor_cmd: " << trim_sol.input.left_propulsor_cmd << "\n";
-        out << "trim_sol.input.right_propulsor_cmd: " << trim_sol.input.right_propulsor_cmd << "\n";
+        out << "trim_sol.input.right_propulsor_cmd: " << trim_sol.input.right_propulsor_cmd << "\n\n";
+
         out << "trim_sol.wrench.F: [" << trim_sol.wrench.F.data.x() << ", " << trim_sol.wrench.F.data.y() << ", " << trim_sol.wrench.F.data.z() << "]\n";
-        out << "trim_sol.wrench.M: [" << trim_sol.wrench.M.data.x() << ", " << trim_sol.wrench.M.data.y() << ", " << trim_sol.wrench.M.data.z() << "]\n";
+        out << "trim_sol.wrench.M: [" << trim_sol.wrench.M.data.x() << ", " << trim_sol.wrench.M.data.y() << ", " << trim_sol.wrench.M.data.z() << "]\n\n";
+        
         out << "trim_sol.residual:\n"
             << "vx_dot: " << trim_sol.residual.vx_dot << "\n"
             << "vy_dot: " << trim_sol.residual.vy_dot << "\n"
@@ -296,8 +324,24 @@ namespace trim {
             << "phi_err: " << trim_sol.residual.phi_err << "\n"
             << "theta_err: " << trim_sol.residual.theta_err << "\n"
             << "vx_err: " << trim_sol.residual.vx_err << "\n"
-            << "alpha_err: " << trim_sol.residual.alpha_err << "\n"
-            << "psi_dot_err: " << trim_sol.residual.psi_dot_err << "\n";
+            << "vz_err: " << trim_sol.residual.vz_err << "\n"
+            << "psi_dot_err: " << trim_sol.residual.psi_dot_err << "\n\n";
+
+        out << "trim_sol.weighted_residual:\n"
+            << "vx_dot: " << trim_sol.weighted_residual.vx_dot << "\n"
+            << "vy_dot: " << trim_sol.weighted_residual.vy_dot << "\n"
+            << "vz_dot: " << trim_sol.weighted_residual.vz_dot << "\n"
+            << "p_dot: " << trim_sol.weighted_residual.p_dot << "\n"
+            << "q_dot: " << trim_sol.weighted_residual.q_dot << "\n"
+            << "r_dot: " << trim_sol.weighted_residual.r_dot << "\n"
+            << "phi_dot: " << trim_sol.weighted_residual.phi_dot << "\n"
+            << "theta_dot: " << trim_sol.weighted_residual.theta_dot << "\n"
+            << "beta_err: " << trim_sol.weighted_residual.beta_err << "\n"
+            << "phi_err: " << trim_sol.weighted_residual.phi_err << "\n"
+            << "theta_err: " << trim_sol.weighted_residual.theta_err << "\n"
+            << "vx_err: " << trim_sol.weighted_residual.vx_err << "\n"
+            << "vz_err: " << trim_sol.weighted_residual.vz_err << "\n"
+            << "psi_dot_err: " << trim_sol.weighted_residual.psi_dot_err << "\n";
         return out.str();
     }
 
