@@ -7,6 +7,7 @@
 #include "core/json/actuators.hpp"
 #include "core/json/control.hpp"
 #include "core/json/initialization.hpp"
+#include "core/json/operating.hpp"
 #include "core/json/structural.hpp"
 #include "core/json/avionics.hpp"
 

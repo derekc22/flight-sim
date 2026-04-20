@@ -721,7 +721,8 @@ namespace vehicles {
         const aerodynamics::AerodynamicProperties& aerodynamic_properties,
         const actuators::ActuatorProperties& actuator_properties,
         const control::ControlProperties& control_properties,
-        const avionics::AvionicsProperties& avionics_properties
+        const avionics::AvionicsProperties& avionics_properties,
+        const operating::OperatingProperties& operating_properties
     ) :
         NEDFrameECEF{},
         FRDFrameECEF{},
@@ -732,7 +733,8 @@ namespace vehicles {
         aerodynamic_properties(aerodynamic_properties),
         actuator_properties(actuator_properties),
         control_properties(control_properties),
-        avionics_properties(avionics_properties)
+        avionics_properties(avionics_properties),
+        operating_properties(operating_properties)
     {
         _init_frames();
     }

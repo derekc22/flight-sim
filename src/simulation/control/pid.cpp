@@ -40,8 +40,8 @@ namespace control {
         double err = ctrl_law_input.meas_des - ctrl_law_input.meas;
 
         double d_term = ctrl_law_input.meas_dot.has_value()
-                ? ctrl_law_input.meas_dot.value()           // PI-D
-                : (prev_err - err) / constants::dt;         // PID
+                        ? ctrl_law_input.meas_dot.value()           // PI-D
+                        : (prev_err - err) / constants::dt;         // PID
 
         // filtered deriative
         d_filtered = util::first_order_lag(d_term, d_filtered, tau);

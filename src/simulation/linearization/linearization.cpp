@@ -15,8 +15,8 @@ namespace linearization {
             .surface_actuators = aircraft.actuator_properties.surface_actuators,
             .propulsor_actuators = aircraft.actuator_properties.propulsor_actuators,
             .fixed_controls = trim::TrimFixedActuatorInputs{
-                .flap = 0.0,
-                .spoiler = 0.0,
+                .flap = aircraft.operating_properties.fixed_controls.flap,
+                .spoiler = aircraft.operating_properties.fixed_controls.spoiler,
             },
         };
 

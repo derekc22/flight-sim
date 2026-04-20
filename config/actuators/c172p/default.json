@@ -29,7 +29,7 @@
   "propulsors": {
     "front_propulsor": {
       "limit_max": 2250.0,
-      "limit_min": 0.0,
+      "limit_min": 290.0,
       "tau": 0.0,
       "inclination_angle": 0.0,
       "toe_angle": 0.0,

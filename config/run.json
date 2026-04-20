@@ -4,5 +4,6 @@
     "initialization_config": "initialization/c172p/trim_pitch.json",
     "control_config": "control/lqr_pitch.json",
     "avionics_config": "avionics/ideal.json",
-    "actuator_config": "actuators/c172p/default.json"
+    "actuator_config": "actuators/c172p/default.json",
+    "operating_config": "operating/c172p/default.json"
 }

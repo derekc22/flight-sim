@@ -65,7 +65,8 @@ vehicles::Aircraft load(bool trim_bool) {
         json::parse_aerodynamics_config(),
         json::parse_actuator_config(),
         json::parse_control_config(),
-        json::parse_avionics_config()
+        json::parse_avionics_config(),
+        json::parse_operating_config()
     };
 
     // set initial conditions from config
@@ -120,9 +121,12 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
     aerodynamics::AerodynamicProperties& aerodynamic_properties = aircraft.aerodynamic_properties;
     control::ControlProperties& control_properties = aircraft.control_properties;
     actuators::ActuatorProperties& actuator_properties = aircraft.actuator_properties;
+    operating::OperatingProperties& operating_properties = aircraft.operating_properties;
 
     dynamics::Mass mass = structural_properties.Mass;
     dynamics::InertiaTensor J = structural_properties.J;
+
+    control::SurfaceActuatorInputs fixed_surface_inputs = operating::fixed_surface_actuator_inputs(operating_properties);
 
     // initialize trim and linearization solutions
     trim::TrimSolution trim_sol;
@@ -211,6 +215,9 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
                 actuator_properties.propulsor_actuators
             );
         }
+
+        u_cmd.surface_inputs.flap_cmd = fixed_surface_inputs.flap_cmd;
+        u_cmd.surface_inputs.spoiler_cmd = fixed_surface_inputs.spoiler_cmd;
 
         // apply actuator dynamics
         control::SurfaceActuatorInputs u_surface_actual = actuator_properties.step(u_cmd.surface_inputs);
