@@ -11,6 +11,17 @@ namespace json {
         if (!fixed_controls_json.is_object()) { throw std::runtime_error("json::validate_fixed_controls_json: fixed_controls must be an object"); }
     }
 
+    static void validate_fixed_control(double cmd, const actuators::Actuator& actuator, const std::string& key) {
+        if (cmd < actuator.limit_min || cmd > actuator.limit_max) {
+            throw std::runtime_error("json::validate_fixed_control: " + key + " command exceeds actuator limits");
+        }
+    }
+
+    static void validate_operating_properties(const operating::OperatingProperties& operating_properties, const actuators::ActuatorProperties& actuator_properties) {
+        validate_fixed_control(operating_properties.fixed_controls.flap, actuator_properties.surface_actuators.flap, "flap");
+        validate_fixed_control(operating_properties.fixed_controls.spoiler, actuator_properties.surface_actuators.spoiler, "spoiler");
+    }
+
     static operating::OperatingProperties parse_operating_properties(const nlohmann::json& config) {
         operating::OperatingProperties operating_properties;
         if (!config.contains("fixed_controls")) { return operating_properties; }
@@ -29,10 +40,12 @@ namespace json {
         return operating_properties;
     }
 
-    operating::OperatingProperties parse_operating_config() {
+    operating::OperatingProperties parse_operating_config(const actuators::ActuatorProperties& actuator_properties) {
         const auto config_path = resolve_run_config_entry_path("operating_config");
         const auto config = read_json_file(config_path);
-        return parse_operating_properties(config);
+        const operating::OperatingProperties operating_properties = parse_operating_properties(config);
+        validate_operating_properties(operating_properties, actuator_properties);
+        return operating_properties;
     }
 
 }

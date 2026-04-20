@@ -59,14 +59,16 @@ struct SimulationOutput {
 
 
 vehicles::Aircraft load(bool trim_bool) {
+    const actuators::ActuatorProperties actuator_properties = json::parse_actuator_config();
+
     // create vehicle from config
     vehicles::Aircraft aircraft { 
         json::parse_structural_config(), 
         json::parse_aerodynamics_config(),
-        json::parse_actuator_config(),
+        actuator_properties,
         json::parse_control_config(),
         json::parse_avionics_config(),
-        json::parse_operating_config()
+        json::parse_operating_config(actuator_properties)
     };
 
     // set initial conditions from config
@@ -301,17 +303,13 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
         if (sim_in.data_bool) {
             dynamics::EulerAngles eul_meas_t;
             eul_meas_t.set(xN_meas_t.q);
-            Eigen::VectorXd u_surface_t(5);
-            Eigen::VectorXd u_propulsor_t(3);
-            u_surface_t << u_surface_actual.elevator_cmd, u_surface_actual.aileron_cmd, u_surface_actual.rudder_cmd, u_surface_actual.flap_cmd, u_surface_actual.spoiler_cmd;
-            u_propulsor_t << u_propulsor_actual.front_propulsor_cmd, u_propulsor_actual.left_propulsor_cmd, u_propulsor_actual.right_propulsor_cmd;
 
             sim_out.p_DM->insert(t, xN_meas_t.p.data);
             sim_out.eul_DM->insert(t, eul_meas_t.data);
             sim_out.w_DM->insert(t, xN_meas_t.w.data);
             sim_out.v_DM->insert(t, xN_meas_t.v.data);
-            sim_out.u_surface_DM->insert(t, u_surface_t);
-            sim_out.u_propulsor_DM->insert(t, u_propulsor_t);
+            sim_out.u_surface_DM->insert(t, control::surface_actuator_inputs_to_vector(u_surface_actual));
+            sim_out.u_propulsor_DM->insert(t, control::propulsor_actuator_inputs_to_vector(u_propulsor_actual));
             sim_out.F_net_DM->insert(t, FB_net.data);
             sim_out.M_net_DM->insert(t, MB_net.data);
             sim_out.F_aero_DM->insert(t, FB_aero.data);

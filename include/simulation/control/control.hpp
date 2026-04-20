@@ -144,4 +144,6 @@ namespace control {
         );
     };
 
+    Eigen::VectorXd surface_actuator_inputs_to_vector(const SurfaceActuatorInputs& u_surface);
+    Eigen::VectorXd propulsor_actuator_inputs_to_vector(const PropulsorActuatorInputs& u_propulsor);
 }

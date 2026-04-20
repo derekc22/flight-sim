@@ -195,5 +195,15 @@ namespace control {
         return { u_surface, u_propulsor };
     }
 
+    Eigen::VectorXd surface_actuator_inputs_to_vector(const SurfaceActuatorInputs& u_surface) {
+        Eigen::VectorXd out(5);
+        out << u_surface.elevator_cmd, u_surface.aileron_cmd, u_surface.rudder_cmd, u_surface.flap_cmd, u_surface.spoiler_cmd;
+        return out;
+    }
 
+    Eigen::VectorXd propulsor_actuator_inputs_to_vector(const PropulsorActuatorInputs& u_propulsor) {
+        Eigen::VectorXd out(3);
+        out << u_propulsor.front_propulsor_cmd, u_propulsor.left_propulsor_cmd, u_propulsor.right_propulsor_cmd;
+        return out;
+    }
 }
