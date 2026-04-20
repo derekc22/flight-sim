@@ -178,10 +178,9 @@ namespace dynamics {
 
     RigidBodyState step_rigid_body(const RigidBodyState& xB_BI_t, const Mass& mass, const InertiaTensor& J, const Force& FB_net_t, const Moment& MB_net_t){
 
-        // Yes, this is structurally correct now. 
         // ddtB_vB_BI_t is the body derivative of velocity expressed in the body frame, 
         // ddtI_vB_BI_t is the inertial derivative of velocity expressed in the body frame, 
-        // and aI_BI_t = CBI_t * aB_BI_t.data gives the inertial derivative of velocity expressed in the inertial frame for your inertial-position kinematics update. 
+        // and aI_BI_t = CBI_t * aB_BI_t.data gives the inertial derivative of velocity expressed in the inertial frame for the inertial-position kinematics update
         // This assumes CBI maps body components to inertial components 
         // and that _ddtB_vB_BI returns the body derivative of velocity expressed in the body frame
 

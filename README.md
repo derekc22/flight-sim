@@ -41,7 +41,7 @@ C++ flight simulator with FlightGear integration
   - `operating_config`: Operating properties
   
 - To run the simulation: `scripts/run.sh -a <AIRCRAFT> -t <TIME_SEC> [-r <TRIM>] [-s <SENSOR>] [-c <CONTROL>] [-v <VERBOSE>] [-d <DATA>] [-o <OUT_DIR>] [-p <PLOT>]`
-  - `-a AIRCRAFT`: Aircraft to simulate (e.g. ASW28)
+  - `-a AIRCRAFT`: Aircraft to simulate (e.g. ASW28, C172P)
   - `-t TIME_SEC`: Simulation time in seconds
   - `-r TRIM`: Enable trim, linearization, and eigenanalysis
   - `-s SENSOR`: Enable sensors and avionics
@@ -50,6 +50,12 @@ C++ flight simulator with FlightGear integration
   - `-d DATA`: Enable data logging
   - `-o OUT_DIR`: Output directory
   - `-p PLOT`: Enable plotting
+  
+## Example
+Run a 60 second simulation of the C172 with trim, control, and avionics. Data and plots are saved to `data/c172_test` and `plots/c172_test`
+```
+scripts/run.sh -a c172p -t 60 -r -c -s -d -p -o c172_test
+```
 
 ## References:
 https://hopsan.github.io/tutorials/tutorial_flightgear.pdf
