@@ -278,6 +278,8 @@ namespace trim {
         const dynamics::AngularVelocity trim_w{ Eigen::Vector3d(trim_sol.state.p, trim_sol.state.q, trim_sol.state.r) };
         const dynamics::EulerAngles trim_eul{ Eigen::Vector3d(0.0, trim_sol.state.theta, trim_sol.state.phi) };
         const dynamics::EulerAngleRates trim_eul_dot = dynamics::_wB_BI_to_eul_dot(trim_w, trim_eul);
+        
+        constexpr const char* section_rule = "---------------------------";
         std::ostringstream out;
         out << "trim_sol.converged: " << trim_sol.converged << "\n";
         out << "trim_sol.iterations: " << trim_sol.iterations << "\n\n";
@@ -288,30 +290,45 @@ namespace trim {
         out << "trim_sol.weighted_residual_norm_2: " << trim_sol.weighted_residual_norm_2 << "\n";
         out << "trim_sol.weighted_residual_norm_inf: " << trim_sol.weighted_residual_norm_inf << "\n\n";
 
-        out << "trim_sol.state.vB_BN: [" << trim_sol.state.vx << ", " << trim_sol.state.vy << ", " << trim_sol.state.vz << "]\n";
-        out << "trim_sol.state.wB_BN: [" << trim_sol.state.p << ", " << trim_sol.state.q << ", " << trim_sol.state.r << "]\n";
-        out << "trim_sol.state.phi_deg: " << util::rad_to_deg(trim_sol.state.phi) << "\n";
-        out << "trim_sol.state.theta_deg: " << util::rad_to_deg(trim_sol.state.theta) << "\n";
-        out << "trim_sol.state.euler_dot_deg_s: ["
+        out << "trim_sol.state:\n" << section_rule << "\n";
+        out << "vB_BN: [" << trim_sol.state.vx << ", " << trim_sol.state.vy << ", " << trim_sol.state.vz << "]\n";
+        out << "wB_BN: [" << trim_sol.state.p << ", " << trim_sol.state.q << ", " << trim_sol.state.r << "]\n";
+        out << "eulNB: [n/a, "
+            << trim_sol.state.theta << ", "
+            << trim_sol.state.phi << "]\n";
+        out << "eulNB_dot: ["
+            << trim_eul_dot.phi_dot() << ", "
+            << trim_eul_dot.theta_dot() << ", "
+            << trim_eul_dot.psi_dot() << "]\n\n";
+
+        out << "eulNB_deg: [n/a, "
+            << util::rad_to_deg(trim_sol.state.theta) << ", "
+            << util::rad_to_deg(trim_sol.state.phi) << "]\n";
+        out << "eulNB_dot_deg_s: ["
             << util::rad_to_deg(trim_eul_dot.phi_dot()) << ", "
             << util::rad_to_deg(trim_eul_dot.theta_dot()) << ", "
             << util::rad_to_deg(trim_eul_dot.psi_dot()) << "]\n\n";
 
-        out << "trim_sol.ads: [Vinf=" << trim_sol_ads.Vinf
-            << ", alpha_deg=" << util::rad_to_deg(trim_sol_ads.alpha)
-            << ", beta_deg=" << util::rad_to_deg(trim_sol_ads.beta) << "]\n\n";
+        out << "trim_sol.ads:\n"
+            << section_rule << "\n"
+            << "Vinf: " << trim_sol_ads.Vinf << "\n"
+            << "alpha_deg: " << util::rad_to_deg(trim_sol_ads.alpha) << "\n"
+            << "beta_deg: " << util::rad_to_deg(trim_sol_ads.beta) << "\n\n";
 
-        out << "trim_sol.input.elevator_cmd_deg: " << util::rad_to_deg(trim_sol.input.elevator_cmd) << "\n";
-        out << "trim_sol.input.aileron_cmd_deg: " << util::rad_to_deg(trim_sol.input.aileron_cmd) << "\n";
-        out << "trim_sol.input.rudder_cmd_deg: " << util::rad_to_deg(trim_sol.input.rudder_cmd) << "\n";
-        out << "trim_sol.input.front_propulsor_cmd: " << trim_sol.input.front_propulsor_cmd << "\n";
-        out << "trim_sol.input.left_propulsor_cmd: " << trim_sol.input.left_propulsor_cmd << "\n";
-        out << "trim_sol.input.right_propulsor_cmd: " << trim_sol.input.right_propulsor_cmd << "\n\n";
+        out << "trim_sol.input:\n" << section_rule << "\n";
+        out << "elevator_cmd_deg: " << util::rad_to_deg(trim_sol.input.elevator_cmd) << "\n";
+        out << "aileron_cmd_deg: " << util::rad_to_deg(trim_sol.input.aileron_cmd) << "\n";
+        out << "rudder_cmd_deg: " << util::rad_to_deg(trim_sol.input.rudder_cmd) << "\n";
+        out << "front_propulsor_cmd: " << trim_sol.input.front_propulsor_cmd << "\n";
+        out << "left_propulsor_cmd: " << trim_sol.input.left_propulsor_cmd << "\n";
+        out << "right_propulsor_cmd: " << trim_sol.input.right_propulsor_cmd << "\n\n";
 
-        out << "trim_sol.wrench.F: [" << trim_sol.wrench.F.data.x() << ", " << trim_sol.wrench.F.data.y() << ", " << trim_sol.wrench.F.data.z() << "]\n";
-        out << "trim_sol.wrench.M: [" << trim_sol.wrench.M.data.x() << ", " << trim_sol.wrench.M.data.y() << ", " << trim_sol.wrench.M.data.z() << "]\n\n";
+        out << "trim_sol.wrench:\n" << section_rule << "\n";
+        out << "F: [" << trim_sol.wrench.F.data.x() << ", " << trim_sol.wrench.F.data.y() << ", " << trim_sol.wrench.F.data.z() << "]\n";
+        out << "M: [" << trim_sol.wrench.M.data.x() << ", " << trim_sol.wrench.M.data.y() << ", " << trim_sol.wrench.M.data.z() << "]\n\n";
         
         out << "trim_sol.residual:\n"
+            << section_rule << "\n"
             << "vx_dot: " << trim_sol.residual.vx_dot << "\n"
             << "vy_dot: " << trim_sol.residual.vy_dot << "\n"
             << "vz_dot: " << trim_sol.residual.vz_dot << "\n"
@@ -328,6 +345,7 @@ namespace trim {
             << "psi_dot_err: " << trim_sol.residual.psi_dot_err << "\n\n";
 
         out << "trim_sol.weighted_residual:\n"
+            << section_rule << "\n"
             << "vx_dot: " << trim_sol.weighted_residual.vx_dot << "\n"
             << "vy_dot: " << trim_sol.weighted_residual.vy_dot << "\n"
             << "vz_dot: " << trim_sol.weighted_residual.vz_dot << "\n"

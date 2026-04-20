@@ -12,7 +12,7 @@ namespace actuators {
         double inclination_angle;
         double toe_angle;
         Eigen::Vector3d pB_prop_cg;
-        Eigen::Vector3d axis;
+        Eigen::Vector3d n_prop;
 
         PropulsorActuator(double limit_max, double limit_min, double tau, double inclination_angle, double toe_angle, const Eigen::Vector3d& pB_prop_cg);
     };

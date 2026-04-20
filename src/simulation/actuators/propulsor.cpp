@@ -18,7 +18,7 @@ namespace actuators {
         pB_prop_cg(pB_prop_cg)
     {
         Eigen::Matrix3d RBP = transforms::eul_to_R(toe_angle, inclination_angle, 0, "ZYX");
-        axis = RBP * constants::ei;
+        n_prop = RBP * constants::ei;
     }
 
 }

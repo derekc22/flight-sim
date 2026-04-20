@@ -63,7 +63,7 @@ if [ "$QUICK_BOOL" -eq 0 ]; then
 fi
 
 if [[ "$QUICK_BOOL" -eq 1 && "$TEST_BOOL" -eq 0 ]]; then
-	sleep 15
+	sleep 10
 fi
 
 cmake -B build -S .

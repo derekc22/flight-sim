@@ -21,10 +21,22 @@ namespace json {
         if (tau < 0.0) { throw std::runtime_error("json::validate_actuator_json: actuator tau must be non-negative"); }
     }
 
-    void validate_propulsor_actuator_json(const nlohmann::json& propulsor_actuator_json) {
+    void validate_propulsor_actuator_json(const nlohmann::json& propulsor_actuator_json, const std::string& key) {
         validate_actuator_json(propulsor_actuator_json);
         if (!propulsor_actuator_json.contains("inclination_angle")) { throw std::runtime_error("json::validate_propulsor_actuator_json: propulsor inclination_angle not present"); }
         if (!propulsor_actuator_json.contains("toe_angle")) { throw std::runtime_error("json::validate_propulsor_actuator_json: propulsor toe_angle not present"); }
+        if (!propulsor_actuator_json.contains("pB_prop_cg")) { throw std::runtime_error("json::validate_propulsor_actuator_json: propulsor pB_prop_cg not present"); }
+
+        Eigen::Vector3d prop_pos = parse_Vector3d(propulsor_actuator_json.at("pB_prop_cg"));
+        if (key == "front_propulsor"){
+            if (prop_pos(1) != 0.0) { throw std::runtime_error("json::validate_propulsor_actuator_json: front propulsor must have pB_prop_cg[1] = 0"); }
+        }
+        if (key == "left_propulsor"){
+            if (prop_pos(1) > 0.0) { throw std::runtime_error("json::validate_propulsor_actuator_json: left propulsor must have pB_prop_cg[1] <= 0"); }
+        }
+        if (key == "right_propulsor"){
+            if (prop_pos(1) < 0.0) { throw std::runtime_error("json::validate_propulsor_actuator_json: right propulsor must have pB_prop_cg[1] >= 0"); }
+        }
     }
 
     template <typename SurfaceActuatorType>
@@ -42,7 +54,7 @@ namespace json {
     template <typename PropulsorActuatorType>
     PropulsorActuatorType parse_propulsor_actuator(const nlohmann::json& config, const std::string& key) {
         const auto& actuator_json = config.at(key);
-        validate_propulsor_actuator_json(actuator_json);
+        validate_propulsor_actuator_json(actuator_json, key);
 
         return PropulsorActuatorType(
             actuator_json.at("limit_max").get<double>(),
@@ -50,8 +62,7 @@ namespace json {
             actuator_json.at("tau").get<double>(),
             util::deg_to_rad(actuator_json.at("inclination_angle").get<double>()),
             util::deg_to_rad(actuator_json.at("toe_angle").get<double>()),
-            actuator_json.contains("pB_prop_cg") ? parse_Vector3d(actuator_json.at("pB_prop_cg")) : constants::Zero3
-
+            parse_Vector3d(actuator_json.at("pB_prop_cg"))
         );
     }
 
