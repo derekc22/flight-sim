@@ -169,7 +169,7 @@ namespace frames {
         // Child side (for each child C in dependents):
         for (auto it = dependents.begin(); it != dependents.end(); ) {
             Frame* dep = *it;
-            dep->dependent_on.erase(this);  // Remove A from C’s dependent_on.
+            dep->dependent_on.erase(this);  // Remove A from C’s dependent_on
             it = dependents.erase(it);      // Remove C from A’s dependents
         }
     }
@@ -229,10 +229,6 @@ namespace frames {
         }
         return p;
     }
-
-    // Eigen::Matrix4d HRF(const ECEFFrame&) {
-    //     return constants::HI;
-    // }
 
     Eigen::Matrix4d HRF(const Frame& F) {
         return transforms::make_HC(CRF(F), pRF(F), "translate");

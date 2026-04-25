@@ -3,17 +3,27 @@
 C++ flight simulator with FlightGear integration
 
 ## Setup
-- Clone the repository
-
 - Install FlightGear: https://www.flightgear.org/download/
 
-- Create the Conda environment:
-  - `conda env create -f environment.yml`
-  - `conda activate ame532`
+- Clone the repository
+  ```bash
+  git clone git@github.com:derekc22/flight-sim.git
+  ```
 
-- Install dependencies:
-  - `sudo apt install libeigen3-dev libcppad-dev nlohmann-json3-dev libslicot-dev gfortran` (Ubuntu)
-  - `brew install eigen cppad nlohmann-json slicot gcc` (macOS)
+- Create Conda environment:
+  ```bash
+  conda env create -f environment.yml
+  conda activate ame532
+  ```
+
+- Install C++ dependencies:
+  ```bash
+  # Ubuntu
+  sudo apt install libeigen3-dev libcppad-dev nlohmann-json3-dev libslicot-dev gfortran
+
+  # macOS
+  brew install eigen cppad nlohmann-json slicot gcc
+  ```
 
 ## Usage
 
@@ -52,8 +62,8 @@ C++ flight simulator with FlightGear integration
   - `-p PLOT`: Enable plotting
   
 ## Example
-Run a 60 second simulation of the C172 with trim, control, and avionics. Data and plots are saved to `data/c172_test` and `plots/c172_test`
-```
+Run a 60 second simulation of the C172 with trim, control, and avionics. Outputs are saved to `data/c172_test` and `plots/c172_test`
+```bash
 scripts/run.sh -a c172p -t 60 -r -c -s -d -p -o c172_test
 ```
 

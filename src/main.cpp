@@ -59,11 +59,12 @@ struct SimulationOutput {
 
 
 vehicles::Aircraft load(bool trim_bool) {
-    const actuators::ActuatorProperties actuator_properties = json::parse_actuator_config();
+    structural::StructuralProperties structural_properties = json::parse_structural_config();
+    actuators::ActuatorProperties actuator_properties = json::parse_actuator_config(structural_properties);
 
     // create vehicle from config
     vehicles::Aircraft aircraft { 
-        json::parse_structural_config(), 
+        structural_properties,
         json::parse_aerodynamics_config(),
         actuator_properties,
         json::parse_control_config(),
@@ -233,7 +234,7 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
         dynamics::Moment MB_aero = WB_aero.M;
 
         // compute propulsive forces and momments
-        propulsion::PropulsiveWrench WB_propulsive = propulsion::step_propulsive_forces_moments(actuator_properties.propulsor_actuators, u_propulsor_actual);
+        propulsion::PropulsiveWrench WB_propulsive = propulsion::step_propulsive_forces_moments(actuator_properties.propulsor_actuators, u_propulsor_actual, xN_t, static_atmospheric_state);
         dynamics::Force FB_propulsive = WB_propulsive.F;
         dynamics::Moment MB_propulsive = WB_propulsive.M;
 
@@ -285,8 +286,9 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
                 xN_t = xN_t_trim;
                 WB_net = WB_net_trim;
 
+                /** @deprecated DO NOT REFERENCE */
                 // overwrite actuator lag state with trim controls
-                trim::update_actuators_from_trim(actuator_properties.surface_actuators, actuator_properties.propulsor_actuators, trim_sol);
+                // trim::update_actuators_from_trim(actuator_properties.surface_actuators, actuator_properties.propulsor_actuators, trim_sol);
 
                 // linearize
                 lin_sol = linearization::linearize_trim_solution(aircraft, trim_sol);

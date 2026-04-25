@@ -55,7 +55,7 @@ namespace trim {
     }
 
     template <typename T>
-    constants::Vector3_T<T> _gB_T(const T& phi, const T& theta) {
+    constants::Vector3_T<T> gB_T(const T& phi, const T& theta) {
         constants::Vector3_T<T> gB;
         gB << -T(constants::g_earth) * util::sin(theta),
                T(constants::g_earth) * util::sin(phi) * util::cos(theta),
@@ -84,11 +84,14 @@ namespace trim {
         const propulsion::PropulsorActuatorInputs_T<T> propulsor_actuator_inputs = build_propulsor_actuator_inputs_from_trim_T(u);
         const propulsion::PropulsiveWrench_T<T> prop_wrench = propulsion::step_propulsive_forces_moments_T<T>(
             model.propulsor_actuators,
-            propulsor_actuator_inputs
+            propulsor_actuator_inputs,
+            twist,
+            conditions.static_atmospheric_state,
+            propulsion::PropulsorOmegaDot_T<T>{}
         );
 
         return {
-            .F = aero_wrench.F + prop_wrench.F + T(model.structural.Mass.data) * _gB_T(x.phi, x.theta),
+            .F = aero_wrench.F + prop_wrench.F + T(model.structural.Mass.data) * gB_T(x.phi, x.theta),
             .M = aero_wrench.M + prop_wrench.M,
         };
     }

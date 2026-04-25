@@ -10,12 +10,14 @@ namespace actuators {
         double tau, 
         double inclination_angle, 
         double toe_angle,
-        const Eigen::Vector3d& pB_prop_cg
-    ) : 
+        const Eigen::Vector3d& pB_prop_cg,
+        std::optional<PropellerProperties> propellers
+    ) :
         Actuator(limit_max, limit_min, tau),
         inclination_angle(inclination_angle),
         toe_angle(toe_angle),
-        pB_prop_cg(pB_prop_cg)
+        pB_prop_cg(pB_prop_cg),
+        propellers(propellers)
     {
         Eigen::Matrix3d RBP = transforms::eul_to_R(toe_angle, inclination_angle, 0, "ZYX");
         n_prop = RBP * constants::ei;

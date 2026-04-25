@@ -159,8 +159,8 @@ namespace trim {
         bool attempted = false;
         bool converged = false;
         std::size_t iterations = 0;
-        double residual_norm_2 = 0.0;
-        double residual_norm_inf = 0.0;
+        // double residual_norm_2 = 0.0;
+        // double residual_norm_inf = 0.0;
         double weighted_residual_norm_2 = 0.0;
         double weighted_residual_norm_inf = 0.0;
     };
@@ -207,7 +207,8 @@ namespace trim {
 
     std::pair<dynamics::RigidBodyState, aerodynamics::AerodynamicState> update_state_from_trim(const dynamics::RigidBodyState& xN_t, const TrimSolution& trim_sol);
 
-    void update_actuators_from_trim(actuators::SurfaceActuators& surface_actuators,  actuators::PropulsorActuators& propulsor_actuators, const TrimSolution& trim_sol);
+    /** @deprecated DO NOT REFERENCE */
+    // void update_actuators_from_trim(actuators::SurfaceActuators& surface_actuators,  actuators::PropulsorActuators& propulsor_actuators, const TrimSolution& trim_sol);
 
     control::ControlInputs update_control_inputs_from_trim(const TrimSolution& trim_sol);
 }

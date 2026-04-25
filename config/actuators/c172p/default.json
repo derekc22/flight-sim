@@ -30,14 +30,22 @@
     "front_propulsor": {
       "limit_max": 2250.0,
       "limit_min": 290.0,
-      "tau": 0.0,
+      "tau": 1.0,
       "inclination_angle": 0.0,
       "toe_angle": 0.0,
       "pB_prop_cg": [
         1.949704,
         0.0,
         -0.10922
-      ]
+      ],
+      "propellers": {
+        "geometry_ids": [
+          "prop"
+        ],
+        "spin_sign": 1,
+        "thrust_coeff": 0.1,
+        "torque_coeff": 0.01
+      }
     },
     "left_propulsor": {
       "limit_max": 0.0,

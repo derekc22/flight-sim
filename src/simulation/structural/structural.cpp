@@ -18,6 +18,12 @@ namespace structural {
         geometryIDs = build_IDs();
     }
 
+    Geometry& StructuralProperties::get_geometry(const std::string& id) {
+        const auto it = geometryIDs.find(id);
+        if (it == geometryIDs.end()) { throw std::runtime_error("structural::StructuralProperties::get_geometry: geometry id not found: " + id); }
+        return geometries[it->second];
+    }
+
     double StructuralProperties::compute_Mass() {
         double m = 0.0;
         for (const Geometry& geom : geometries) {
@@ -43,14 +49,7 @@ namespace structural {
 
         for (const Geometry& geom : geometries) {
             double m = geom.mass;
-            double lx = geom.x_size;
-            double ly = geom.y_size;
-            double lz = geom.z_size;
-
-            // Moments of inertia of rectangular prism about its own center
-            double Ixx_local = (1.0 / 12.0) * m * (ly * ly + lz * lz);
-            double Iyy_local = (1.0 / 12.0) * m * (lx * lx + lz * lz);
-            double Izz_local = (1.0 / 12.0) * m * (lx * lx + ly * ly);
+            Eigen::Matrix3d j_local = compute_local_J(geom);
 
             // Distance from geometry CG to system CG
             double dx = geom.x_loc - CG.data(0);
@@ -58,9 +57,9 @@ namespace structural {
             double dz = geom.z_loc - CG.data(2);
 
             // Parallel axis theorem
-            j(0, 0) += Ixx_local + m * (dy * dy + dz * dz);
-            j(1, 1) += Iyy_local + m * (dx * dx + dz * dz);
-            j(2, 2) += Izz_local + m * (dx * dx + dy * dy);
+            j(0, 0) += j_local(0, 0) + m * (dy * dy + dz * dz);   // Ixx
+            j(1, 1) += j_local(1, 1) + m * (dx * dx + dz * dz);   // Iyy
+            j(2, 2) += j_local(2, 2) + m * (dx * dx + dy * dy);   // Izz
 
             // Off-diagonal terms (products of inertia)
             j(0, 1) += -m * dx * dy;
@@ -77,6 +76,26 @@ namespace structural {
         if (std::abs(detj) < constants::eps) { throw std::runtime_error("structural::StructuralProperties::compute_j: Inertia tensor is singular"); }
 
         return j;
+    }
+
+    Eigen::Matrix3d StructuralProperties::compute_local_J(const Geometry& geom) {
+        double m = geom.mass;
+        double lx = geom.x_size;
+        double ly = geom.y_size;
+        double lz = geom.z_size;
+
+        // Moments of inertia of rectangular prism about its own center
+        Eigen::Matrix3d j = constants::Zero3x3;
+        j(0, 0) = (1.0 / 12.0) * m * (ly * ly + lz * lz);   // Ixx
+        j(1, 1) = (1.0 / 12.0) * m * (lx * lx + lz * lz);   // Iyy
+        j(2, 2) = (1.0 / 12.0) * m * (lx * lx + ly * ly);   // Izz    
+        return j;
+    }
+
+    double StructuralProperties::compute_spin_inertia(const Geometry& geom, const Eigen::Vector3d& axis) {
+        Eigen::Vector3d axis_hat = util::norm(axis);
+        if (axis_hat.norm() < constants::eps) { throw std::runtime_error("structural::StructuralProperties::compute_spin_inertia: spin axis cannot be zero"); }
+        return axis_hat.dot(compute_local_J(geom) * axis_hat);
     }
 
     std::unordered_map<std::string, size_t> StructuralProperties::build_IDs() {

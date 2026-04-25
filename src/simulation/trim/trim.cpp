@@ -124,8 +124,8 @@ namespace trim {
             .vz_err = weighted_residual(12),
             .psi_dot_err = weighted_residual(13)
         };
-        out.residual_norm_2 = residual.norm();
-        out.residual_norm_inf = _residual_norm_inf(residual);
+        // out.residual_norm_2 = residual.norm();
+        // out.residual_norm_inf = _residual_norm_inf(residual);
         out.weighted_residual_norm_2 = weighted_residual.norm();
         out.weighted_residual_norm_inf = _residual_norm_inf(weighted_residual);
         return out;
@@ -284,8 +284,8 @@ namespace trim {
         out << "trim_sol.converged: " << trim_sol.converged << "\n";
         out << "trim_sol.iterations: " << trim_sol.iterations << "\n\n";
 
-        out << "trim_sol.residual_norm_2: " << trim_sol.residual_norm_2 << "\n";
-        out << "trim_sol.residual_norm_inf: " << trim_sol.residual_norm_inf << "\n\n";
+        // out << "trim_sol.residual_norm_2: " << trim_sol.residual_norm_2 << "\n";
+        // out << "trim_sol.residual_norm_inf: " << trim_sol.residual_norm_inf << "\n\n";
 
         out << "trim_sol.weighted_residual_norm_2: " << trim_sol.weighted_residual_norm_2 << "\n";
         out << "trim_sol.weighted_residual_norm_inf: " << trim_sol.weighted_residual_norm_inf << "\n\n";
@@ -293,13 +293,13 @@ namespace trim {
         out << "trim_sol.state:\n" << section_rule << "\n";
         out << "vB_BN: [" << trim_sol.state.vx << ", " << trim_sol.state.vy << ", " << trim_sol.state.vz << "]\n";
         out << "wB_BN: [" << trim_sol.state.p << ", " << trim_sol.state.q << ", " << trim_sol.state.r << "]\n";
-        out << "eulNB: [n/a, "
-            << trim_sol.state.theta << ", "
-            << trim_sol.state.phi << "]\n";
-        out << "eulNB_dot: ["
-            << trim_eul_dot.phi_dot() << ", "
-            << trim_eul_dot.theta_dot() << ", "
-            << trim_eul_dot.psi_dot() << "]\n\n";
+        // out << "eulNB: [n/a, "
+        //     << trim_sol.state.theta << ", "
+        //     << trim_sol.state.phi << "]\n";
+        // out << "eulNB_dot: ["
+        //     << trim_eul_dot.phi_dot() << ", "
+        //     << trim_eul_dot.theta_dot() << ", "
+        //     << trim_eul_dot.psi_dot() << "]\n\n";
 
         out << "eulNB_deg: [n/a, "
             << util::rad_to_deg(trim_sol.state.theta) << ", "
@@ -398,14 +398,15 @@ namespace trim {
         return { surface_actuator_cmd_trim,  propulsor_actuator_cmd_trim };
     }
 
-    void update_actuators_from_trim(actuators::SurfaceActuators& surface_actuators,  actuators::PropulsorActuators& propulsor_actuators, const TrimSolution& trim_sol) {
-        surface_actuators.aileron.prev_cmd = trim_sol.input.aileron_cmd;
-        surface_actuators.elevator.prev_cmd = trim_sol.input.elevator_cmd;
-        surface_actuators.rudder.prev_cmd = trim_sol.input.rudder_cmd;
+    /** @deprecated DO NOT REFERENCE */
+    // void update_actuators_from_trim(actuators::SurfaceActuators& surface_actuators,  actuators::PropulsorActuators& propulsor_actuators, const TrimSolution& trim_sol) {
+    //     surface_actuators.aileron.prev_cmd = trim_sol.input.aileron_cmd;
+    //     surface_actuators.elevator.prev_cmd = trim_sol.input.elevator_cmd;
+    //     surface_actuators.rudder.prev_cmd = trim_sol.input.rudder_cmd;
 
-        propulsor_actuators.front_propulsor.prev_cmd = trim_sol.input.front_propulsor_cmd;
-        propulsor_actuators.left_propulsor.prev_cmd = trim_sol.input.left_propulsor_cmd;
-        propulsor_actuators.right_propulsor.prev_cmd = trim_sol.input.right_propulsor_cmd;
-    }
+    //     propulsor_actuators.front_propulsor.prev_cmd = trim_sol.input.front_propulsor_cmd;
+    //     propulsor_actuators.left_propulsor.prev_cmd = trim_sol.input.left_propulsor_cmd;
+    //     propulsor_actuators.right_propulsor.prev_cmd = trim_sol.input.right_propulsor_cmd;
+    // }
 
 }
