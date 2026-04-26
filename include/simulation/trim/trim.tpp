@@ -84,9 +84,9 @@ namespace trim {
         const propulsion::PropulsorActuatorInputs_T<T> propulsor_actuator_inputs = build_propulsor_actuator_inputs_from_trim_T(u);
         const propulsion::PropulsiveWrench_T<T> prop_wrench = propulsion::step_propulsive_forces_moments_T<T>(
             model.propulsor_actuators,
-            propulsor_actuator_inputs,
             twist,
             conditions.static_atmospheric_state,
+            propulsor_actuator_inputs,
             propulsion::PropulsorOmegaDot_T<T>{}
         );
 

@@ -230,12 +230,12 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
         control::PropulsorActuatorInputs u_propulsor_actual = actuator_properties.step(u_cmd.propulsor_inputs);
 
         // compute aerodynamics forces and moments
-        aerodynamics::AerodynamicWrench WB_aero = step_aero_forces_moments(aerodynamic_properties, structural_properties, xN_t, static_atmospheric_state, u_surface_actual, wind);
+        aerodynamics::AerodynamicWrench WB_aero = aerodynamics::step_aero_forces_moments(aerodynamic_properties, structural_properties, xN_t, static_atmospheric_state, u_surface_actual, wind);
         dynamics::Force FB_aero = WB_aero.F;
         dynamics::Moment MB_aero = WB_aero.M;
 
         // compute propulsive forces and momments
-        propulsion::PropulsiveWrench WB_propulsive = propulsion::step_propulsive_forces_moments(actuator_properties.propulsor_actuators, u_propulsor_actual, xN_t, static_atmospheric_state);
+        propulsion::PropulsiveWrench WB_propulsive = propulsion::step_propulsive_forces_moments(actuator_properties.propulsor_actuators, xN_t, static_atmospheric_state, u_propulsor_actual);
         dynamics::Force FB_propulsive = WB_propulsive.F;
         dynamics::Moment MB_propulsive = WB_propulsive.M;
 
@@ -287,7 +287,7 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
                 xN_t = xN_t_trim;
                 WB_net = WB_net_trim;
 
-                /** @deprecated DO NOT REFERENCE */
+                /** @deprecated */
                 // overwrite actuator lag state with trim controls
                 // trim::update_actuators_from_trim(actuator_properties.surface_actuators, actuator_properties.propulsor_actuators, trim_sol);
 

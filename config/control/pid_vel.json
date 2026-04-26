@@ -1,11 +1,35 @@
 {
     "controllers": {
+        "axial": {
+            "longitudinal": {
+                "control_type": "PitchPIDController",
+                "parameters": {
+                    "gains": {
+                        "Kp": 20,
+                        "Ki": 5,
+                        "Kd": 1
+                    },
+                    "tau": 0.001
+                }
+            },
+            "lateral": {
+                "control_type": "RollPIDController",
+                "parameters": {
+                    "gains": {
+                        "Kp": 20,
+                        "Ki": 5,
+                        "Kd": 1
+                    },
+                    "tau": 0.001
+                }
+            }
+        },
         "velocity": {
             "control_type": "VelocityPIDController",
             "parameters": {
                 "gains": {
-                    "Kp": 20,
-                    "Ki": 5,
+                    "Kp": 200,
+                    "Ki": 50,
                     "Kd": 1
                 },
                 "tau": 0.001
@@ -13,6 +37,7 @@
         }
     },
     "setpoint": {
-        "v": [100.0, 0.0, 0.0]
+        "v": [40.0, 0.0, 0.0],
+        "eul": [0.0, 0.0, 0.0]
     }
 }
