@@ -1,0 +1,18 @@
+{
+    "controllers": {
+        "velocity": {
+            "control_type": "VelocityPIDController",
+            "parameters": {
+                "gains": {
+                    "Kp": 20,
+                    "Ki": 5,
+                    "Kd": 1
+                },
+                "tau": 0.001
+            }
+        }
+    },
+    "setpoint": {
+        "v": [100.0, 0.0, 0.0]
+    }
+}

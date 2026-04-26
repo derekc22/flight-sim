@@ -23,6 +23,16 @@ namespace json {
         return axis_ctrl_setpoint;
     }
 
+    control::VelocityControlSetpoint parse_velocity_control_setpoint(const nlohmann::json& setpoint_json, const control::ControlType& veloctiy_control_type) {
+        control::VelocityControlSetpoint velocity_ctrl_setpoint;
+
+        if (veloctiy_control_type == control::ControlType::VelocityPIDController) {
+            if (setpoint_json.contains("v")) { velocity_ctrl_setpoint.vB_BI = dynamics::LinearVelocity{ parse_Vector3d(setpoint_json.at("v")) }; }
+            else { throw std::runtime_error("json::parse_velocity_control_setpoint: VelocityControl controller requires v"); }
+        }
+        return velocity_ctrl_setpoint;
+    }
+
     control::FullStateControlSetpoint parse_full_state_control_setpoint(const nlohmann::json& setpoint_json, const control::ControlType& full_state_control_type) {
         control::FullStateControlSetpoint full_state_ctrl_setpoint;
 
@@ -45,6 +55,7 @@ namespace json {
             case control::ControlType::PitchPIDController:
             case control::ControlType::RollPIDController:
             case control::ControlType::YawPIDController:
+            case control::ControlType::VelocityPIDController:
                 if (!parameters_json.contains("tau")) { throw std::runtime_error("json::validate_control_law_tau missing tau"); }
                 if (parameters_json.at("tau").get<double>() < 0.0) { throw std::runtime_error("json::validate_control_law_tau tau must be non-negative"); }
                 return;
@@ -61,6 +72,7 @@ namespace json {
             case control::ControlType::PitchPIDController:
             case control::ControlType::RollPIDController:
             case control::ControlType::YawPIDController:
+            case control::ControlType::VelocityPIDController:
                 if (!gains_json.contains("Kp") || !gains_json.contains("Kd") || !gains_json.contains("Ki")) {
                     throw std::runtime_error("json::validate_control_law_gains PID control requires Kp, Kd, Ki");
                 }
@@ -95,6 +107,7 @@ namespace json {
             case control::ControlType::PitchPIDController:
             case control::ControlType::RollPIDController:
             case control::ControlType::YawPIDController:
+            case control::ControlType::VelocityPIDController:
                 return {
                     .Kp = gains_json.at("Kp").get<double>(),
                     .Kd = gains_json.at("Kd").get<double>(),
@@ -122,7 +135,14 @@ namespace json {
 
     template <typename ControlType, typename ControlLawCommand>
     control::AxisControlLaw<ControlLawCommand> make_stateful_axis_control_law(const control::ControlLawParameters& params) {
-        return [controller = ControlType(params)](const control::AxisControlLawInput& ctrl_law_input) mutable {
+        return [controller = ControlType(params)](const control::PIDControlLawInput& ctrl_law_input) mutable {
+            return controller._step(ctrl_law_input);
+        };
+    }
+
+    template <typename ControlType, typename ControlLawCommand>
+    control::VelocityControlLaw<ControlLawCommand> make_stateful_velocity_control_law(const control::ControlLawParameters& params) {
+        return [controller = ControlType(params)](const control::PIDControlLawInput& ctrl_law_input) mutable {
             return controller._step(ctrl_law_input);
         };
     }
@@ -161,6 +181,16 @@ namespace json {
     }
 
     template <typename ControlLawCommand>
+    control::VelocityControlLaw<ControlLawCommand> make_velocity_control_law(control::ControlType control_type, const control::ControlLawParameters& params) {
+        switch (control_type) {
+            case control::ControlType::VelocityPIDController:
+                return make_stateful_velocity_control_law<control::VelocityPIDController, double>(params);
+            default:
+                throw std::runtime_error("json::make_velocity_control_law unknown control type");
+        }
+    }
+
+    template <typename ControlLawCommand>
     control::FullStateControlLaw<ControlLawCommand> make_full_state_control_law(control::ControlType control_type, const control::ControlLawParameters& params) {
         switch (control_type) {
             case control::ControlType::LinearQuadraticRegulator:
@@ -195,6 +225,7 @@ namespace json {
         if (control_type_str == "YawDamper") { return control::ControlType::YawDamper; }
         if (control_type_str == "LinearQuadraticRegulator") { return control::ControlType::LinearQuadraticRegulator; }
         if (control_type_str == "LinearQuadraticTracker") { return control::ControlType::LinearQuadraticTracker; }
+        if (control_type_str == "VelocityPIDController") { return control::ControlType::VelocityPIDController; }
         throw std::runtime_error("json::map_control_type unknown control type: " + control_type_str);
     }
 
@@ -208,6 +239,14 @@ namespace json {
         control_law = make_axis_control_law<double>(control_type, control_law_parameters); 
     }
 
+    void parse_velocity_controller(const nlohmann::json& controller_json, control::ControlType& control_type, control::VelocityControlLaw<double>& control_law) {
+        std::string control_type_str = controller_json.at("control_type").get<std::string>();
+
+        control_type = map_control_type(control_type_str);
+        control::ControlLawParameters control_law_parameters = parse_control_law_parameters(controller_json, control_type);
+        control_law = make_velocity_control_law<double>(control_type, control_law_parameters); 
+    }
+
     void parse_full_state_controller(const nlohmann::json& controller_json, control::ControlType& control_type, control::FullStateControlLaw<Eigen::VectorXd>& control_law) {
         std::string control_type_str = controller_json.at("control_type").get<std::string>();
 
@@ -219,8 +258,10 @@ namespace json {
     control::ControlProperties parse_control_properties(const nlohmann::json& config) {
         const auto& controllers_json = config.at("controllers");
         bool axial_bool = controllers_json.contains("axial");
+        bool velocity_bool = controllers_json.contains("velocity");
         bool full_state_bool = controllers_json.contains("full_state");
         if (axial_bool && full_state_bool) { throw std::runtime_error("json::parse_control_properties: axial and full state control laws cannot both be present"); }
+        if (velocity_bool && full_state_bool) { throw std::runtime_error("json::parse_control_properties: velocity and full state control laws cannot both be present"); }
 
         const auto& setpoint_json = config.at("setpoint");
         control::ControlProperties control_properties;
@@ -254,6 +295,17 @@ namespace json {
             );
         }
 
+        if (velocity_bool) {
+            const auto& velocity_controller_json = controllers_json.at("velocity");
+            parse_velocity_controller(
+                velocity_controller_json, 
+                control_properties.velocity_control_type, 
+                control_properties.velocity_controller
+            );
+
+            control_properties.velocity_setpoint = parse_velocity_control_setpoint(setpoint_json, control_properties.velocity_control_type);
+        }
+
         if (full_state_bool) {
             const auto& full_state_controller_json = controllers_json.at("full_state");
             parse_full_state_controller(
@@ -261,6 +313,7 @@ namespace json {
                 control_properties.full_state_control_type, 
                 control_properties.full_state_controller
             );
+
             control_properties.full_state_setpoint = parse_full_state_control_setpoint(setpoint_json, control_properties.full_state_control_type);
         }
 

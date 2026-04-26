@@ -1,6 +1,6 @@
 #pragma once
 
-namespace control { struct ControlLawParameters; struct AxisControlLawInput; struct FullStateControlLawInput;} // forward declare
+namespace control { struct ControlLawParameters; struct PIDControlLawInput; struct FullStateControlLawInput;} // forward declare
 
 namespace control {
 
@@ -16,7 +16,7 @@ namespace control {
 
         PIDController(const ControlLawParameters& params);
 
-        double _step(const AxisControlLawInput& ctrl_law_input);
+        double _step(const PIDControlLawInput& ctrl_law_input);
     };
 
     struct RollPIDController : PIDController {
@@ -43,4 +43,7 @@ namespace control {
         YawDamper(const ControlLawParameters& params);
     };
 
+    struct VelocityPIDController : PIDController {
+        VelocityPIDController(const ControlLawParameters& params);
+    };
 }

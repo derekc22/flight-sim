@@ -5,10 +5,10 @@
 
 namespace util {
 
-    double clamp(double x, double min_value, double max_value) {
-        if (max_value <= min_value) return min_value;
-        if (x > max_value) return max_value;
-        if (x < min_value) return min_value;
+    double clamp(double x, double min_val, double max_val) {
+        if (max_val <= min_val) return min_val;
+        if (x > max_val) return max_val;
+        if (x < min_val) return min_val;
         return x;
     }
 
@@ -17,9 +17,9 @@ namespace util {
         return std::clamp(x, -max_abs, max_abs);
     }
 
-    double clamp_positive(double x, double max_value) {
-        if (max_value <= 0.0) return 0.0;
-        return std::clamp(x, 0.0, max_value);
+    double clamp_positive(double x, double max_val) {
+        if (max_val <= 0.0) return 0.0;
+        return std::clamp(x, 0.0, max_val);
     }
 
     double clamp_to_1(double x) {

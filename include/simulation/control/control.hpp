@@ -16,6 +16,10 @@ namespace control {
         dynamics::AngularVelocity wB_BI;
     };
 
+    struct VelocityControlSetpoint {
+        dynamics::LinearVelocity vB_BI;
+    };
+
     struct FullStateControlSetpoint {
         dynamics::LinearVelocity vB_BI;
         dynamics::AngularVelocity wB_BI;
@@ -54,9 +58,7 @@ namespace control {
         double tau;
     };
 
-    // struct ControlLawInput {};
-
-    struct AxisControlLawInput {
+    struct PIDControlLawInput {
         double meas;
         double meas_des;
 
@@ -76,7 +78,10 @@ namespace control {
     };
 
     template <typename ControlLawCommand>
-    using AxisControlLaw = std::function<ControlLawCommand(const AxisControlLawInput&)>;
+    using AxisControlLaw = std::function<ControlLawCommand(const PIDControlLawInput&)>;
+
+    template <typename ControlLawCommand>
+    using VelocityControlLaw = std::function<ControlLawCommand(const PIDControlLawInput&)>;
 
     template <typename ControlLawCommand>
     using FullStateControlLaw = std::function<ControlLawCommand(const FullStateControlLawInput&)>;
@@ -98,7 +103,8 @@ namespace control {
         YawPIDController,
         LinearQuadraticRegulator,
         LinearQuadraticTracker,
-        LinearQuadraticIntegrator
+        LinearQuadraticIntegrator,
+        VelocityPIDController
     };
 
     struct ControlProperties {
@@ -106,19 +112,28 @@ namespace control {
         AxisControlLaw<double> longitudinal_controller;
         AxisControlLaw<double> lateral_controller;
         AxisControlLaw<double> vertical_controller;
+        VelocityControlLaw<double> velocity_controller;
         FullStateControlLaw<Eigen::VectorXd> full_state_controller;
 
         ControlType longitudinal_control_type = ControlType::None;
         ControlType lateral_control_type = ControlType::None;
         ControlType vertical_control_type = ControlType::None;
+        ControlType velocity_control_type = ControlType::None;
         ControlType full_state_control_type = ControlType::None;
 
         AxisControlSetpoint axis_setpoint;
+        VelocityControlSetpoint velocity_setpoint;
         FullStateControlSetpoint full_state_setpoint;
         
-        AxisControlLawInput make_axis_control_input(
+        PIDControlLawInput make_axis_control_input(
             const dynamics::RigidBodyState& xN_meas_t, 
             const actuators::SurfaceActuator& surface_actuator, 
+            ControlType control_type
+        );
+
+        PIDControlLawInput make_velocity_control_input(
+            const dynamics::RigidBodyState& xN_meas_t, 
+            const actuators::PropulsorActuators& propulsor_actuators,
             ControlType control_type
         );
 
@@ -133,6 +148,11 @@ namespace control {
         ControlInputs step(
             const dynamics::RigidBodyState& xN_meas_t, 
             const actuators::SurfaceActuators& surface_actuators
+        );
+
+        ControlInputs step(
+            const dynamics::RigidBodyState& xN_meas_t, 
+            const actuators::PropulsorActuators& propulsor_actuators
         );
 
         ControlInputs step(

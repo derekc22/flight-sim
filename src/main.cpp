@@ -207,7 +207,8 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
             u_cmd = trim::update_control_inputs_from_trim(trim_sol);
         }
         else if (sim_in.control_bool && !sim_in.trim_bool) {
-            u_cmd = control_properties.step(xN_meas_t, actuator_properties.surface_actuators);
+            u_cmd.surface_inputs = control_properties.step(xN_meas_t, actuator_properties.surface_actuators).surface_inputs;
+            u_cmd.propulsor_inputs = control_properties.step(xN_meas_t, actuator_properties.propulsor_actuators).propulsor_inputs;
         }
         else if (sim_in.control_bool && sim_in.trim_bool && trim_sol.converged) {
             u_cmd = control_properties.step(

@@ -57,9 +57,9 @@ namespace structural {
             double dz = geom.z_loc - CG.data(2);
 
             // Parallel axis theorem
-            j(0, 0) += j_local(0, 0) + m * (dy * dy + dz * dz);   // Ixx
-            j(1, 1) += j_local(1, 1) + m * (dx * dx + dz * dz);   // Iyy
-            j(2, 2) += j_local(2, 2) + m * (dx * dx + dy * dy);   // Izz
+            j(0, 0) += j_local(0, 0) + m * (dy * dy + dz * dz);   // Jxx
+            j(1, 1) += j_local(1, 1) + m * (dx * dx + dz * dz);   // Jyy
+            j(2, 2) += j_local(2, 2) + m * (dx * dx + dy * dy);   // Jzz
 
             // Off-diagonal terms (products of inertia)
             j(0, 1) += -m * dx * dy;
@@ -86,9 +86,9 @@ namespace structural {
 
         // Moments of inertia of rectangular prism about its own center
         Eigen::Matrix3d j = constants::Zero3x3;
-        j(0, 0) = (1.0 / 12.0) * m * (ly * ly + lz * lz);   // Ixx
-        j(1, 1) = (1.0 / 12.0) * m * (lx * lx + lz * lz);   // Iyy
-        j(2, 2) = (1.0 / 12.0) * m * (lx * lx + ly * ly);   // Izz    
+        j(0, 0) = (1.0 / 12.0) * m * (ly * ly + lz * lz);   // Jxx
+        j(1, 1) = (1.0 / 12.0) * m * (lx * lx + lz * lz);   // Jyy
+        j(2, 2) = (1.0 / 12.0) * m * (lx * lx + ly * ly);   // Jzz    
         return j;
     }
 

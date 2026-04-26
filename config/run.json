@@ -2,7 +2,7 @@
     "aerodynamics_config": "aerodynamics/c172p/default.json",
     "structural_config": "structural/c172p/default.json",
     "initialization_config": "initialization/c172p/default.json",
-    "control_config": "control/pid_roll.json",
+    "control_config": "control/pid_vel.json",
     "avionics_config": "avionics/ideal.json",
     "actuator_config": "actuators/c172p/default.json",
     "operating_config": "operating/c172p/default.json"

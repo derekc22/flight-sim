@@ -5,8 +5,8 @@
                 "control_type": "PitchPIDController",
                 "parameters": {
                     "gains": {
-                        "Kp": 50,
-                        "Ki": 20,
+                        "Kp": 20,
+                        "Ki": 5,
                         "Kd": 1
                     },
                     "tau": 0.001
@@ -26,6 +26,6 @@
         }
     },
     "setpoint": {
-        "eul": [0.0, 0.1672665, 0.0]
+        "eul": [0.0, 0.0, 0.0]
     }
 }

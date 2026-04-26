@@ -36,7 +36,9 @@ namespace control {
         tau = 0.0;
     }
 
-    double PIDController::_step(const AxisControlLawInput& ctrl_law_input) {
+    VelocityPIDController::VelocityPIDController(const ControlLawParameters& params) : PIDController(params) {}
+
+    double PIDController::_step(const PIDControlLawInput& ctrl_law_input) {
         double err = ctrl_law_input.meas_des - ctrl_law_input.meas;
 
         double d_term = ctrl_law_input.meas_dot.has_value()
