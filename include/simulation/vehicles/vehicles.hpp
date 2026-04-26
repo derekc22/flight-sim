@@ -229,13 +229,7 @@ namespace vehicles {
         void _step_dependent(frames::Frame& F);
         void _step_gravity();
         void _init_frames();
-
-        /** @deprecated */
-        // void _set(const dynamics::RigidBodyState& rigid_body_state, frames::Frame& F);
-        // void _set(const geography::GeographicState& geographic_state, frames::Frame& F);
-
         void print_state(int t, const atmospheric::Wind& wind);
-
     };
 
 

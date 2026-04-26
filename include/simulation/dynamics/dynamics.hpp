@@ -37,13 +37,6 @@ namespace dynamics {
     struct Wrench;
     struct Twist;
 
-    /** @deprecated */
-    // using DynamicsFunction =
-    // std::function<Eigen::Vector3d(
-    //     const Eigen::Vector3d&,
-    //     const Eigen::Vector3d&
-    // )>;
-
     struct Position {
         Eigen::Vector3d data; // e.g. pI_BI
     };
@@ -219,9 +212,6 @@ namespace dynamics {
         This may change in the future, but, for now, always assume inertial <=> ECEF and NEVER pass arguments corresponding to other frames to the below dynamics functions
     */
 
-    /** @deprecated */
-    // std::array<Eigen::Vector3d, 2> fwd_euler(Eigen::Vector3d xt, Eigen::Vector3d xt_dot, DynamicsFunction f, double tf);
-
     EulerAngleRates _wB_BI_to_eul_dot(const AngularVelocity& wB_BI, const EulerAngles& eul);
     Position _trans_kin(const Position& xt, const LinearVelocity& xt_dot, const LinearAcceleration& xt_ddot);
     LinearVelocity _trans_kin_vel(const LinearVelocity& xt_dot, const LinearAcceleration& xt_ddot);
@@ -260,9 +250,6 @@ namespace dynamics {
     OrientationMatrixRate _qIB_dot_to_CIB_dot(const OrientationQuaternionRate& qIB_dot, const OrientationQuaternion& qIB, const OrientationMatrix& CIB);
     AngularVelocity _eul_dot_to_wB_BI(const EulerAngleRates& eul_dot, const EulerAngles& eul);
     EulerAngleRates _wB_BI_to_eul_dot(const AngularVelocity& wB_BI, const EulerAngles& eul);
-
-    /** @deprecated */
-    // Eigen::Vector3d f_cv(Eigen::Vector3d xt, Eigen::Vector3d xt_dot); // constant velocity
 
     Eigen::Matrix3d _eul_dot_to_wB_BI_mat(double theta, double phi);
 

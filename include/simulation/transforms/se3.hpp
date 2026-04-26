@@ -3,6 +3,7 @@
 
 
 namespace transforms {
+	/** @warning ALL OF THE DESCRIPTIONS LISTED HERE ARE TO BE TREATED AS @deprecated AS THEY HAVE NOT BEEN UPDATED IN A LONG TIME. DO NOT READ OR TRUST THEM UNTIL THEY ARE UPDATED @warning */
 
     /**
     This description @deprecated because H can either be a passive or active transformation based on your interpretation of what the input C/R do

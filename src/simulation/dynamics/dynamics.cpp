@@ -14,11 +14,6 @@
 
 namespace dynamics {
 
-    /** @deprecated */
-    // Eigen::Vector3d f_cv(Eigen::Vector3d xt, Eigen::Vector3d xt_dot){
-    //     return Eigen::Vector3d(0, 0, 0);
-    // }
-
     Eigen::Matrix3d _eul_dot_to_wB_BI_mat(double theta, double phi){
         return _eul_dot_to_wB_BI_mat_T(theta, phi);
     }
@@ -26,19 +21,6 @@ namespace dynamics {
     Eigen::Matrix3d _wB_BI_to_eul_dot_mat(double theta, double phi) {
         return _wB_BI_to_eul_dot_mat_T(theta, phi);
     }
-
-    /** @deprecated */
-    // std::array<Eigen::Vector3d, 2> fwd_euler(Eigen::Vector3d xt, Eigen::Vector3d xt_dot, DynamicsFunction f, double tf){
-    //     int steps = static_cast<int>(std::floor(tf / constants::dt));
-    //     Eigen::Vector3d xt_ddot;
-
-    //     for (int i = 0; i < steps; ++i){
-    //         xt_ddot = f(xt, xt_dot);
-    //         xt += xt_dot * constants::dt;
-    //         xt_dot += xt_ddot * constants::dt;
-    //     }
-    //     return std::array<Eigen::Vector3d, 2>{xt, xt_dot};
-    // }
 
     RigidBodyState rigid_body_state(const frames::Frame& F) {
         if (F.parent != nullptr && F.parent->name != "NEDFrameECEF") {

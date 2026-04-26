@@ -114,8 +114,8 @@ namespace aerodynamics {
     };
 
     struct SurfaceKinematics {
-        Eigen::Vector3d r_ac_B  = constants::Zero3;   // CG -> AC
-        Eigen::Vector3d v_rel_B = constants::Zero3;   // local air-relative velocity at surface
+        Eigen::Vector3d rB_ac  = constants::Zero3;   // CG -> AC
+        Eigen::Vector3d vB_rel = constants::Zero3;   // local air-relative velocity at surface
         double V = 0.0;                               // local speed magnitude
         double qbar = 0.0;                            // dynamic pressure
         double alpha = 0.0;                           // local alpha
@@ -154,8 +154,8 @@ namespace aerodynamics {
 
     template <typename T>
     struct SurfaceKinematics_T {
-        constants::Vector3_T<T> r_ac_B =  constants::Zero3_T<T>;
-        constants::Vector3_T<T> v_rel_B = constants::Zero3_T<T>;
+        constants::Vector3_T<T> rB_ac =  constants::Zero3_T<T>;
+        constants::Vector3_T<T> vB_rel = constants::Zero3_T<T>;
         T V = T(0);
         T qbar = T(0);
         T alpha = T(0);
@@ -198,25 +198,6 @@ namespace aerodynamics {
 
     template <typename T>
     AerodynamicState_T<T> compute_aerodynamic_state_T(const dynamics::Twist_T<T>& twist, const atmospheric::Wind& windB);
-
-    /** @deprecated */
-    // SurfaceKinematics compute_surface_kinematics(
-    //     const Surface& s,
-    //     const structural::StructuralProperties& structural_properties,
-    //     const dynamics::RigidBodyState& rigid_body_state,
-    //     const atmospheric::StaticAtmosphericState& static_atmospheric_state,
-    //     const atmospheric::Wind& windB
-    // );
-
-    /** @deprecated */
-    // SurfaceCoefficients compute_surface_coefficients(
-    //     const Surface& s,
-    //     const SurfaceKinematics& sk,
-    //     const control::SurfaceActuatorInputs& u
-    // );
-
-    /** @deprecated */
-    // AerodynamicWrench compute_surface_loads(const Surface& s,const SurfaceKinematics& sk,const SurfaceCoefficients& sc);
 
     AerodynamicWrench step_aero_forces_moments(
         const AerodynamicProperties& aerodynamic_properties,

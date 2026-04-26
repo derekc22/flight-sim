@@ -5,9 +5,9 @@ namespace aerodynamics {
     template <typename T>
     SurfaceKinematics_T<T> compute_surface_kinematics_T(const Surface& s, const structural::StructuralProperties& structural_properties, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& static_atmospheric_state, const atmospheric::Wind& windB) {
         SurfaceKinematics_T<T> out;
-        out.r_ac_B = s.p_ac.template cast<T>() - structural_properties.CG.data.template cast<T>();
-        out.v_rel_B = (twist.v - windB.data.template cast<T>()) + twist.w.cross(out.r_ac_B);
-        out.V = util::vector_norm(out.v_rel_B);
+        out.rB_ac = s.p_ac.template cast<T>() - structural_properties.CG.data.template cast<T>();
+        out.vB_rel = (twist.v - windB.data.template cast<T>()) + twist.w.cross(out.rB_ac);
+        out.V = util::vector_norm(out.vB_rel);
 
         if (out.V < T(constants::eps)) {
             return out;
@@ -15,7 +15,7 @@ namespace aerodynamics {
 
         const constants::Vector3_T<T> n_B = s.n.template cast<T>();
         const constants::Vector3_T<T> n_hat = util::norm(n_B);
-        const T arg = util::clamp_to_1(out.v_rel_B.dot(n_hat) / out.V);
+        const T arg = util::clamp_to_1(out.vB_rel.dot(n_hat) / out.V);
 
         out.alpha = T(s.i) - util::asin(arg);
         out.qbar = T(0.5 * static_atmospheric_state.rho.data) * out.V * out.V;
@@ -62,7 +62,7 @@ namespace aerodynamics {
 
         const constants::Vector3_T<T> n_B = s.n.template cast<T>();
         const constants::Vector3_T<T> n_hat = util::norm(n_B);
-        const constants::Vector3_T<T> d_hat = -sk.v_rel_B / sk.V;
+        const constants::Vector3_T<T> d_hat = -sk.vB_rel / sk.V;
         const constants::Vector3_T<T> lift_axis = n_hat - n_hat.dot(d_hat) * d_hat;
         const constants::Vector3_T<T> l_hat = util::norm(lift_axis);
         const constants::Vector3_T<T> moment_axis = l_hat.cross(d_hat);
@@ -73,7 +73,7 @@ namespace aerodynamics {
         const T Mmag = sk.qbar * T(s.area * s.chord) * sc.CM;
 
         out.F = L * l_hat + D * d_hat;
-        out.M = sk.r_ac_B.cross(out.F) + Mmag * m_hat;
+        out.M = sk.rB_ac.cross(out.F) + Mmag * m_hat;
         return out;
     }
 
