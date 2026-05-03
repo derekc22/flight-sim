@@ -3,7 +3,7 @@
 
 namespace control {
 
-    VelocityPID::VelocityPID(const VelocityPIDParamters& params) :
+    VelocityPID::VelocityPID(const VelocityPIDParameters& params) :
         policy( PIDControlLaw({ 
                 .Kp = params.Kp, 
                 .Ki = params.Ki, 

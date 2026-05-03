@@ -6,7 +6,7 @@
 
 namespace control {
 
-    LinearQuadraticControlLaw::LinearQuadraticControlLaw(const LinearQuadraticControlLawParamters& params) : params(params) {}
+    LinearQuadraticControlLaw::LinearQuadraticControlLaw(const LinearQuadraticControlLawParameters& params) : params(params) {}
 
     Eigen::VectorXd LinearQuadraticControlLaw::step(const LinearQuadraticControlLawInput& ctrl_law_input) {
 

@@ -25,15 +25,13 @@ namespace control {
         LinearQuadraticRegulatorSetpoint setpoint;
     };
 
-    struct LinearQuadraticRegulatorParamters : LinearFullStateFeedbackControlLawParameters {
-        Eigen::MatrixXd Qi;
-    };
+    struct LinearQuadraticRegulatorParameters : LinearQuadraticControlLawParameters, LinearFullStateFeedbackControlLawParameters {};
 
     struct LinearQuadraticRegulator {
-        LinearQuadraticRegulatorParamters params;
+        LinearQuadraticRegulatorParameters params;
         LinearQuadraticControlLaw policy;
 
-        LinearQuadraticRegulator(const LinearQuadraticRegulatorParamters& params);
+        LinearQuadraticRegulator(const LinearQuadraticRegulatorParameters& params);
         ControlOutput step(const LinearQuadraticRegulatorInput& ctrl_law_input);
 
         virtual LinearQuadraticControlLawInput make_linear_quadratic_control_law_input(

@@ -1,10 +1,9 @@
+#pragma once
 
-#include "simulation/control/linear_quadratic/controllers/lqr.hpp"
-
-namespace control { ControlOutput; }
+namespace control { struct ControlOutput; } // forward declare
 
 namespace control {
 
-    struct LinearQuadraticTracker {}
+    struct LinearQuadraticTracker {};
 
 }

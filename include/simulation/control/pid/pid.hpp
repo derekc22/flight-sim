@@ -11,7 +11,7 @@ namespace control {
         double limit_min;
     };
 
-    struct PIDControlLawParamters {
+    struct PIDControlLawParameters {
         double Kp;
         double Kd;
         double Ki;
@@ -19,12 +19,12 @@ namespace control {
     };
 
     struct PIDControlLaw {
-        const PIDControlLawParamters& params;
+        const PIDControlLawParameters& params;
         double integral = 0.0;
         double d_filtered = 0.0;
         double prev_err = 0.0;
 
-        PIDControlLaw(const PIDControlLawParamters& params);
+        PIDControlLaw(const PIDControlLawParameters& params);
         double step(const PIDControlLawInput& ctrl_law_input);
     };
 }

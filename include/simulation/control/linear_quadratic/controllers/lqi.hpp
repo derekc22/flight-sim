@@ -5,12 +5,12 @@ namespace control { struct ControlOutput; } // forward declare
 
 namespace control {
 
-    struct LinearQuadraticIntegratorParamters : LinearQuadraticRegulatorParamters {
+    struct LinearQuadraticIntegratorParameters : LinearQuadraticRegulatorParameters {
         Eigen::MatrixXd Qi;
     };
 
     struct LinearQuadraticIntegrator : LinearQuadraticRegulator {
-        LinearQuadraticIntegrator(const LinearQuadraticIntegratorParamters& params);
+        LinearQuadraticIntegrator(const LinearQuadraticIntegratorParameters& params);
 
         LinearQuadraticControlLawInput make_linear_quadratic_control_law_input(
             const LinearQuadraticRegulatorInput& ctrl_law_input

@@ -19,7 +19,7 @@ namespace control {
         AxialPIDSetpoint setpoint;
     };
 
-    struct AxialPIDParamters : AxialControlLawParameters {
+    struct AxialPIDParameters : AxialControlLawParameters {
         double Kp_lateral = 0.0;
         double Ki_lateral = 0.0;
         double Kd_lateral = 0.0;
@@ -38,12 +38,12 @@ namespace control {
 
     struct AxialPID {
         enum ControlAxis { Longitudinal, Lateral, Vertical };
-        AxialPIDParamters params;
+        AxialPIDParameters params;
         PIDControlLaw lateral_policy;
         PIDControlLaw longitudinal_policy;
         PIDControlLaw vertical_policy;
 
-        AxialPID(const AxialPIDParamters& params);
+        AxialPID(const AxialPIDParameters& params);
         ControlOutput step(const AxialPIDInput& ctrl_law_input);
 
         virtual PIDControlLawInput make_pid_control_law_input(

@@ -4,7 +4,7 @@
 
 namespace control {
 
-    AxialPID::AxialPID(const AxialPIDParamters& params) :
+    AxialPID::AxialPID(const AxialPIDParameters& params) :
         lateral_policy( PIDControlLaw({ 
                 .Kp = params.Kp_lateral, 
                 .Ki = params.Ki_lateral, 

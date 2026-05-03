@@ -14,7 +14,7 @@ namespace control {
         Eigen::MatrixXd B;
     };
 
-    struct LinearQuadraticControlLawParamters {
+    struct LinearQuadraticControlLawParameters {
         Eigen::MatrixXd Q;
         Eigen::MatrixXd R;
         std::optional<Eigen::MatrixXd> K;
@@ -22,9 +22,9 @@ namespace control {
     };
 
     struct LinearQuadraticControlLaw {
-        const LinearQuadraticControlLawParamters& params;
+        const LinearQuadraticControlLawParameters& params;
 
-        LinearQuadraticControlLaw(const LinearQuadraticControlLawParamters& params);
+        LinearQuadraticControlLaw(const LinearQuadraticControlLawParameters& params);
         Eigen::VectorXd step(const LinearQuadraticControlLawInput& ctrl_law_input);
     };
 }

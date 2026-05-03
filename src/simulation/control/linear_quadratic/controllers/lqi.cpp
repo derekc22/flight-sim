@@ -4,7 +4,7 @@
 
 namespace control {
 
-    LinearQuadraticIntegrator::LinearQuadraticIntegrator(const LinearQuadraticIntegratorParamters& params) {
+    LinearQuadraticIntegrator::LinearQuadraticIntegrator(const LinearQuadraticIntegratorParameters& params) {
         double n = constants::state_dim;
         MatrixXd Q_aug = MatrixXd::Zero(2 * n, 2 * n);
         Q_aug.block(0, 0, n, n) = params.Q;

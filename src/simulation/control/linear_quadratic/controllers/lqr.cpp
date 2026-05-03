@@ -2,7 +2,7 @@
 
 namespace control {
 
-    LinearQuadraticRegulator::LinearQuadraticRegulator(const LinearQuadraticRegulatorParamters& params) :
+    LinearQuadraticRegulator::LinearQuadraticRegulator(const LinearQuadraticRegulatorParameters& params) :
         policy( LinearQuadraticControlLaw({ 
                 .Q = params.Q, 
                 .R = params.R

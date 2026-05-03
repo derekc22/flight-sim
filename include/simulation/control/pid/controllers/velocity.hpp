@@ -18,17 +18,13 @@ namespace control {
         VelocityPIDSetpoint setpoint;
     };
 
-    struct VelocityPIDParamters : VelocityControlLawParameters {
-        double Kp = 0;
-        double Ki = 0;
-        double Kd = 0;
-    };
+    struct VelocityPIDParameters : PIDControlLawParameters, VelocityControlLawParameters {};
 
     struct VelocityPID {
-        VelocityPIDParamters params;
+        VelocityPIDParameters params;
         PIDControlLaw policy;
 
-        VelocityPID(const VelocityPIDParamters& params);
+        VelocityPID(const VelocityPIDParameters& params);
         ControlOutput step(const VelocityPIDInput& ctrl_law_input);
 
         PIDControlLawInput make_pid_control_law_input(

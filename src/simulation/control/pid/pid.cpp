@@ -4,7 +4,7 @@
 
 namespace control {
 
-    PIDControlLaw::PIDControlLaw(const PIDControlLawParamters& params) : params(params) {}
+    PIDControlLaw::PIDControlLaw(const PIDControlLawParameters& params) : params(params) {}
 
     double PIDControlLaw::step(const PIDControlLawInput& ctrl_law_input) {
         double err = ctrl_law_input.meas_des - ctrl_law_input.meas;

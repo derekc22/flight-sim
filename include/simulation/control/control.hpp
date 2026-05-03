@@ -8,10 +8,11 @@
 #include "simulation/control/linear_quadratic/linear_quadratic.hpp"
 #include "simulation/control/linear_quadratic/controllers/lqr.hpp"
 #include "simulation/control/linear_quadratic/controllers/lqi.hpp"
+#include "simulation/control/linear_quadratic/controllers/lqt.hpp"
 
 namespace control {
 
-    enum ControlType {
+    enum class ControlType {
         None,
         // Axial
         AxialPID,

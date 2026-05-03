@@ -6,6 +6,8 @@ namespace control { struct PIDControlLawInput; struct ControlOutput; } // forwar
 namespace control {
 
     struct DamperPID : AxialPID {
+        using AxialPID::AxialPID;
+
         PIDControlLawInput make_pid_control_law_input(
             const AxialPIDInput& ctrl_law_input,
             ControlAxis control_axis
