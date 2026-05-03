@@ -116,7 +116,7 @@ void cleanup(const SimulationInput& sim_in, const SimulationOutput& sim_out) {
 
 
 void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
-    // unpack aircraft object
+    // pack aircraft object
     vehicles::Aircraft& aircraft = sim_in.aircraft;
 
     // get aircraft properties
@@ -174,7 +174,7 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
         dynamics::RigidBodyState xN_t = dynamics::rigid_body_state(aircraft.FRDFrameNED);
 
         // initialize measurements to ground truth
-        dynamics::RigidBodyState xN_meas_t = xN_t;
+        dynamics::RigidBodyState zN_t = xN_t;
 
         // step timer by dt
         next += std::chrono::duration_cast<clock::duration>(std::chrono::duration<double>(constants::dt));
@@ -197,22 +197,22 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
             dynamics::RigidBodyState xN_t_sensor = avionics::get_state_from_avionics(xN_t, ads_t, static_atmospheric_state, geo_t, mass, wind, WB_net, aircraft.avionics_properties);
 
             // overwrite local measurement state with sensor measurements
-            xN_meas_t = xN_t_sensor;
+            zN_t = xN_t_sensor;
         }
 
         // specify control commands
-        control::ControlInputs u_cmd{};
+        control::ControlOutput u_cmd{};
 
         if (sim_in.trim_bool && trim_sol.converged && !sim_in.control_bool) {
-            u_cmd = trim::update_control_inputs_from_trim(trim_sol);
+            u_cmd = trim::set_control_inputs_from_trim(trim_sol);
         }
         else if (sim_in.control_bool && !sim_in.trim_bool) {
-            u_cmd.surface_inputs = control_properties.step(xN_meas_t, actuator_properties.surface_actuators).surface_inputs;
-            u_cmd.propulsor_inputs = control_properties.step(xN_meas_t, actuator_properties.propulsor_actuators).propulsor_inputs;
+            u_cmd.surface_inputs = control_properties.step(zN_t, actuator_properties.surface_actuators).surface_inputs;
+            u_cmd.propulsor_inputs = control_properties.step(zN_t, actuator_properties.propulsor_actuators).propulsor_inputs;
         }
         else if (sim_in.control_bool && sim_in.trim_bool && trim_sol.converged) {
             u_cmd = control_properties.step(
-                xN_meas_t,
+                zN_t,
                 lin_sol,
                 trim_sol.input,
                 actuator_properties.surface_actuators,
@@ -305,14 +305,14 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
         // update data matrix
         if (sim_in.data_bool) {
             dynamics::EulerAngles eul_meas_t;
-            eul_meas_t.set(xN_meas_t.q);
+            eul_meas_t.set(zN_t.q);
 
-            sim_out.p_DM->insert(t, xN_meas_t.p.data);
+            sim_out.p_DM->insert(t, zN_t.p.data);
             sim_out.eul_DM->insert(t, eul_meas_t.data);
-            sim_out.w_DM->insert(t, xN_meas_t.w.data);
-            sim_out.v_DM->insert(t, xN_meas_t.v.data);
-            sim_out.u_surface_DM->insert(t, control::surface_actuator_inputs_to_vector(u_surface_actual));
-            sim_out.u_propulsor_DM->insert(t, control::propulsor_actuator_inputs_to_vector(u_propulsor_actual));
+            sim_out.w_DM->insert(t, zN_t.w.data);
+            sim_out.v_DM->insert(t, zN_t.v.data);
+            sim_out.u_surface_DM->insert(t, control::unpack_full_surface_actuator_inputs(u_surface_actual));
+            sim_out.u_propulsor_DM->insert(t, control::unpack_full_propulsor_actuator_inputs(u_propulsor_actual));
             sim_out.F_net_DM->insert(t, FB_net.data);
             sim_out.M_net_DM->insert(t, MB_net.data);
             sim_out.F_aero_DM->insert(t, FB_aero.data);

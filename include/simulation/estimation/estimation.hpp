@@ -4,52 +4,43 @@
 #include <cmath>
 #include <tuple>
 #include <algorithm>
+#include "simulation/estimation/kalman.hpp"
+#include "simulation/dynamics/dynamics.hpp"
+#include "simulation/trim/trim.hpp"
 
 namespace estimation {
 
-    struct KalmanState {
-        Eigen::VectorXd x;
-        Eigen::MatrixXd P;
+    struct EstimationOutput {
+        dynamics::RigidBodyState state_estimate;
+    }
+
+    struct KalmanFilterInput {
+        const linearization::TrimStateJacobian& A;
+        const linearization::TrimInputJacobian& B;
+        const Eigen::MatrixXd& C;
+        const Eigen::MatrixXd& P0;
+        const Eigen::MatrixXd& Q0; 
+        const Eigen::MatrixXd& R0;
     };
 
+    enum EstimatorType {
+        None,
+        // Kalman Filter
+        LinearKalmanFilter,
+        ExtendedKalmanFilter,
+    };
 
-    struct KalmanFilter {
+    struct EstimationProperties {
+        KalmanFilter kalman_filter;
 
-        Eigen::VectorXd xt; // state estimate
-        Eigen::MatrixXd A;  // state transition matrix
-        Eigen::MatrixXd B;  // input matrix
-        Eigen::MatrixXd C;  // measurement matrix
-        Eigen::MatrixXd Pt; // state estimate error covariance matrix
-        Eigen::MatrixXd Rt; // process noise covariance matrix
-        Eigen::MatrixXd Qt; // measurement noise covariance matrix
-
-        int n;
-        int m;
-        int k;
-
-        KalmanFilter(
-            const Eigen::VectorXd& x0, 
-            const Eigen::MatrixXd& A, 
-            const Eigen::MatrixXd& B, 
-            const Eigen::MatrixXd& C, 
-            const Eigen::MatrixXd& P0, 
-            const Eigen::MatrixXd& Q0, 
-            const Eigen::MatrixXd& R0 
+        EstimationOutput step(
+            const dynamics::RigidBodyState& zN_t, 
+            const linearization::TrimLinearization& lin_sol, 
+            const trim::TrimSolution& trim_sol, 
+            const control::SurfaceActuatorInputs& u_surface_actual_prev, 
+            const control::PropulsorActuatorInputs& u_propulsor_actual_prev
         );
 
-        void _validate_init(const Eigen::VectorXd& x0, const Eigen::MatrixXd& B, const Eigen::MatrixXd& C, const Eigen::MatrixXd& P0, const Eigen::MatrixXd& Q0, const Eigen::MatrixXd& R0);
-
-        KalmanState _predict(const Eigen::VectorXd& u);
-
-        KalmanState _correct(const KalmanState& pred, const Eigen::VectorXd& zt);
-
-        KalmanState step(const Eigen::VectorXd& zt, const Eigen::VectorXd& u);
-
-        
-
-    };
-
-
-
+    }
 
 }

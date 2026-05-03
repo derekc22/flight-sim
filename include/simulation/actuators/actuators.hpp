@@ -1,6 +1,7 @@
 #pragma once
 #include "simulation/actuators/surface.hpp"
 #include "simulation/actuators/propulsor.hpp"
+#include "simulation/control/shared.hpp"
 
 namespace actuators {
 

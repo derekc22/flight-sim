@@ -37,7 +37,7 @@ namespace dynamics {
 
 
 
-    // TODO make sure every _kin function returns both velocity and position
+    /** @todo make sure every _kin function returns both velocity and position */
     Position _trans_kin(const Position& xt, const LinearVelocity& xt_dot, const LinearAcceleration& xt_ddot){
         const Eigen::Vector3d xt1 = xt.data + xt_dot.data * constants::dt + 0.5 * xt_ddot.data * (constants::dt * constants::dt);
 
@@ -260,7 +260,6 @@ namespace dynamics {
     void HomogenousFrameTransformationMatrix::set(const OrientationQuaternion& q){ data = transforms::make_HC(transforms::quat_to_rot(q.data), p().data, "translate"); }
     void HomogenousFrameTransformationMatrix::set(const EulerAngles& eul) { data = transforms::make_HC(transforms::eul_to_C(eul.psi(), eul.theta(), eul.phi(), "ZYX", "intr"), p().data, "translate"); }
 
-    // void OrientationQuaternion::set(double a, double b, double c, const std::string& order, const std::string& type) { data = transforms::eul_to_quatC(a, b, c, order, type); }
     void OrientationQuaternion::set(const OrientationMatrix& C) { data = transforms::normalize_and_canonicalize(transforms::rot_to_quat(C.data)); }
     void OrientationQuaternion::set(const EulerAngles& eul) { data = transforms::normalize_and_canonicalize(transforms::eul_to_quatC(eul.psi(), eul.theta(), eul.phi(), "ZYX", "intr")); }
 

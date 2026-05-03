@@ -1,6 +1,6 @@
 {
     "controllers": {
-        "full_state": {
+        "linear_quadratic": {
             "control_type": "LinearQuadraticTracker",
             "parameters": {
                 "gains": {

@@ -1,6 +1,6 @@
-#include "simulation/control/care.hpp"
 #include <stdexcept>
-#include "simulation/control/slicot_care_wrapper.h"
+#include "simulation/control/linear_quadratic/care.hpp"
+#include "simulation/control/linear_quadratic/slicot_care_wrapper.h"
 #include "simulation/util/validate.hpp"
 
 namespace control {

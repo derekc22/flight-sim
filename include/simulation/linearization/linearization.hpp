@@ -2,10 +2,11 @@
 
 #include <Eigen/Dense>
 #include "simulation/trim/trim.hpp"
+#include "simulation/constants/constants.hpp"
 
 namespace linearization {
-    using TrimStateJacobian = Eigen::Matrix<double, trim::trim_state_dofs, trim::trim_state_dofs>;
-    using TrimInputJacobian = Eigen::Matrix<double, trim::trim_state_dofs, trim::trim_input_dofs>;
+    using TrimStateJacobian = Eigen::Matrix<double, constants::state_dim, constants::state_dim>;
+    using TrimInputJacobian = Eigen::Matrix<double, constants::state_dim, constants::input_dim>;
 
     struct TrimLinearization {
         TrimStateJacobian A = TrimStateJacobian::Zero();
@@ -16,4 +17,10 @@ namespace linearization {
 
     std::string print_linearization_solution(const TrimLinearization& lin);
 
+    struct DiscretizedTrimLinearization {
+        TrimStateJacobian A = TrimStateJacobian::Zero();
+        TrimInputJacobian B = TrimInputJacobian::Zero();
+    };
+
+    DiscretizedTrimLinearization discretize(const linearization::TrimLinearization& lin_sol);
 }

@@ -1,5 +1,4 @@
 #pragma once
-
 #include <cstddef>
 #include <utility> // For std::pair
 #include <Eigen/Dense>
@@ -13,31 +12,29 @@
 #include "simulation/propulsion/propulsion.hpp"
 
 namespace vehicles { struct Aircraft; } // forward declare
-namespace control { struct ControlInputs; } // forward declare
+namespace control { struct ControlOutput; } // forward declare
 
 namespace trim {
 
-    inline constexpr std::size_t trim_state_dofs = 8;
-    inline constexpr std::size_t trim_input_dofs = 6;
-    inline constexpr std::size_t trim_variable_dofs = trim_state_dofs + trim_input_dofs;
-    inline constexpr std::size_t trim_residual_dofs = trim_variable_dofs;
+    inline constexpr std::size_t trim_variable_dim = constants::state_dim + constants::input_dim; 
+    inline constexpr std::size_t trim_residual_dim = trim_variable_dim;
 
     template <typename T>
-    using TrimVariableVector_T = Eigen::Matrix<T, trim_variable_dofs, 1>;
+    using TrimVariableVector_T = Eigen::Matrix<T, trim_variable_dim, 1>;
 
     template <typename T>
-    using TrimActuatorInputsVector_T = Eigen::Matrix<T, trim_input_dofs, 1>;
+    using TrimActuatorInputsVector_T = Eigen::Matrix<T, constants::input_dim, 1>;
 
     template <typename T>
-    using TrimStateVector_T = Eigen::Matrix<T, trim_state_dofs, 1>;
+    using TrimStateVector_T = Eigen::Matrix<T, constants::state_dim, 1>;
 
     template <typename T>
-    using TrimStateDotVector_T = Eigen::Matrix<T, trim_state_dofs, 1>;
+    using TrimStateDotVector_T = Eigen::Matrix<T, constants::state_dim, 1>;
 
     template <typename T>
-    using TrimResidualVector_T = Eigen::Matrix<T, trim_residual_dofs, 1>;
+    using TrimResidualVector_T = Eigen::Matrix<T, trim_residual_dim, 1>;
 
-    using TrimResidualJacobian = Eigen::Matrix<double, trim_residual_dofs, trim_variable_dofs>;
+    using TrimResidualJacobian = Eigen::Matrix<double, trim_residual_dim, trim_variable_dim>;
 
     struct TrimFixedActuatorInputs {
         double flap = 0.0;
@@ -172,25 +169,25 @@ namespace trim {
     TrimResidual<T> compute_trim_residual(const TrimState<T>& x, const TrimActuatorInputs<T>& u, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions);
 
     template <typename T>
-    TrimVariableVector_T<T> pack_trim_variables_T(const TrimState<T>& x, const TrimActuatorInputs<T>& u);
+    TrimVariableVector_T<T> unpack_trim_variables_T(const TrimState<T>& x, const TrimActuatorInputs<T>& u);
 
     template <typename T>
-    TrimActuatorInputsVector_T<T> pack_trim_control_surface_inputs_T(const TrimActuatorInputs<T>& u);
+    TrimActuatorInputsVector_T<T> unpack_trim_control_inputs_T(const TrimActuatorInputs<T>& u);
 
     template <typename T>
-    TrimStateVector_T<T> pack_trim_state_T(const TrimState<T>& x);
+    TrimStateVector_T<T> unpack_trim_state_T(const TrimState<T>& x);
 
     template <typename T>
-    TrimStateDotVector_T<T> pack_trim_state_dot_T(const TrimStateDot<T>& x_dot);
+    TrimStateDotVector_T<T> unpack_trim_state_dot_T(const TrimStateDot<T>& x_dot);
 
     template <typename T>
-    TrimState<T> unpack_trim_state_T(const TrimVariableVector_T<T>& z);
+    TrimState<T> pack_trim_state_T(const TrimVariableVector_T<T>& z);
 
     template <typename T>
-    TrimActuatorInputs<T> unpack_trim_input_T(const TrimVariableVector_T<T>& z);
+    TrimActuatorInputs<T> pack_trim_input_T(const TrimVariableVector_T<T>& z);
 
     template <typename T>
-    TrimResidualVector_T<T> pack_trim_residual_T(const TrimResidual<T>& residual);
+    TrimResidualVector_T<T> unpack_trim_residual_T(const TrimResidual<T>& residual);
 
     template <typename T>
     TrimResidualVector_T<T> compute_trim_residual_vector_T(const TrimVariableVector_T<T>& z, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions, bool use_physical_controls);
@@ -210,7 +207,9 @@ namespace trim {
     /** @deprecated DO NOT REFERENCE */
     // void update_actuators_from_trim(actuators::SurfaceActuators& surface_actuators,  actuators::PropulsorActuators& propulsor_actuators, const TrimSolution& trim_sol);
 
-    control::ControlInputs update_control_inputs_from_trim(const TrimSolution& trim_sol);
+    control::ControlOutput set_control_inputs_from_trim(const TrimSolution& trim_sol);
+
+    TrimStateVector_T<double> unpack_rigid_body_state(const dynamics::RigidBodyState& zN_t);
 }
 
 #include "simulation/trim/trim.tpp"
