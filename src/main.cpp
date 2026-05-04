@@ -43,8 +43,11 @@ struct SimulationInput {
 struct SimulationOutput {
     std::optional<io::DataMatrix> p_DM;
     std::optional<io::DataMatrix> eul_DM;
+    std::optional<io::DataMatrix> eul_ref_DM;
     std::optional<io::DataMatrix> w_DM;
+    std::optional<io::DataMatrix> w_ref_DM;
     std::optional<io::DataMatrix> v_DM;
+    std::optional<io::DataMatrix> v_ref_DM;
     std::optional<io::DataMatrix> u_surface_DM;
     std::optional<io::DataMatrix> u_propulsor_DM;
     std::optional<io::DataMatrix> F_net_DM;
@@ -88,8 +91,11 @@ void cleanup(const SimulationInput& sim_in, const SimulationOutput& sim_out) {
         // save data
         io::write_csv(sim_out.p_DM->data, out_dir_path, "p");
         io::write_csv(sim_out.eul_DM->data, out_dir_path, "eul");
+        io::write_csv(sim_out.eul_ref_DM->data, out_dir_path, "eul_ref");
         io::write_csv(sim_out.w_DM->data, out_dir_path, "w");
+        io::write_csv(sim_out.w_ref_DM->data, out_dir_path, "w_ref");
         io::write_csv(sim_out.v_DM->data, out_dir_path, "v");
+        io::write_csv(sim_out.v_ref_DM->data, out_dir_path, "v_ref");
         io::write_csv(sim_out.u_surface_DM->data, out_dir_path, "u_surface");
         io::write_csv(sim_out.u_propulsor_DM->data, out_dir_path, "u_propulsor");
         io::write_csv(sim_out.F_net_DM->data, out_dir_path, "F_net");
@@ -149,8 +155,11 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
     if (sim_in.data_bool) {
         sim_out.p_DM = io::DataMatrix{ Eigen::MatrixXd::Zero(tf, 3+1) };
         sim_out.eul_DM = io::DataMatrix{ Eigen::MatrixXd::Zero(tf, 3+1) };
+        sim_out.eul_ref_DM = io::DataMatrix{ Eigen::MatrixXd::Zero(tf, 3+1) };
         sim_out.w_DM = io::DataMatrix{ Eigen::MatrixXd::Zero(tf, 3+1) };
+        sim_out.w_ref_DM = io::DataMatrix{ Eigen::MatrixXd::Zero(tf, 3+1) };
         sim_out.v_DM = io::DataMatrix{ Eigen::MatrixXd::Zero(tf, 3+1) };
+        sim_out.v_ref_DM = io::DataMatrix{ Eigen::MatrixXd::Zero(tf, 3+1) };
         sim_out.u_surface_DM = io::DataMatrix{ Eigen::MatrixXd::Zero(tf, 5+1) };
         sim_out.u_propulsor_DM = io::DataMatrix{ Eigen::MatrixXd::Zero(tf, 3+1) };
         sim_out.F_net_DM = io::DataMatrix{ Eigen::MatrixXd::Zero(tf, 3+1) };
@@ -310,8 +319,11 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
 
             sim_out.p_DM->insert(t, zN_t.p.data);
             sim_out.eul_DM->insert(t, eul_meas_t.data);
+            sim_out.eul_ref_DM->insert(t, guidance_setpoint.eulIB.data);
             sim_out.w_DM->insert(t, zN_t.w.data);
+            sim_out.w_ref_DM->insert(t, guidance_setpoint.wB_BI.data);
             sim_out.v_DM->insert(t, zN_t.v.data);
+            sim_out.v_ref_DM->insert(t, guidance_setpoint.vB_BI.data);
             sim_out.u_surface_DM->insert(t, control::unpack_full_surface_actuator_inputs(u_surface_actual));
             sim_out.u_propulsor_DM->insert(t, control::unpack_full_propulsor_actuator_inputs(u_propulsor_actual));
             sim_out.F_net_DM->insert(t, FB_net.data);
