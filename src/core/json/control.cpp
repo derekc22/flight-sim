@@ -8,10 +8,10 @@
 
 namespace json {
 
-    template <typename ControlLawType, typename ControlLawClass, typename ControlLawParametersType, typename BaseControlLawInputType, typename ControlLawInputType>
+    template <typename ControlLawType, typename ControlLawClass, typename ControlLawParametersType, typename ControlLawInputType>
     ControlLawClass make_stateful_control_law(const ControlLawParametersType& params) {
-        return [controller = ControlLawType{ params }](const BaseControlLawInputType& input) mutable {
-            return controller.step(static_cast<const ControlLawInputType&>(input));
+        return [controller = ControlLawType{ params }](const ControlLawInputType& input) mutable {
+            return controller.step(input);
         };
     }
 
@@ -108,12 +108,12 @@ namespace json {
         switch (control_type) {
             case control::ControlType::AxialPID: {
                 control::AxialPIDParameters params = parse_axial_pid_parameters(controller_json);
-                return make_stateful_control_law<struct control::AxialPID, control::AxialControlLaw, control::AxialPIDParameters, control::AxialControlLawInput, control::AxialPIDInput>(params);
+                return make_stateful_control_law<struct control::AxialPID, control::AxialControlLaw, control::AxialPIDParameters, control::AxialControlLawInput>(params);
             }
 
             case control::ControlType::DamperPID: {
                 control::AxialPIDParameters params = parse_damper_pid_parameters(controller_json);
-                return make_stateful_control_law<struct control::DamperPID, control::AxialControlLaw, control::AxialPIDParameters, control::AxialControlLawInput, control::AxialPIDInput>(params);
+                return make_stateful_control_law<struct control::DamperPID, control::AxialControlLaw, control::AxialPIDParameters, control::AxialControlLawInput>(params);
             }
 
             default:
@@ -125,7 +125,7 @@ namespace json {
         switch (control_type) {
             case control::ControlType::VelocityPID: {
                 control::VelocityPIDParameters params = parse_velocity_pid_parameters(controller_json);
-                return make_stateful_control_law<struct control::VelocityPID, control::VelocityControlLaw, control::VelocityPIDParameters, control::VelocityControlLawInput, control::VelocityPIDInput>(params);
+                return make_stateful_control_law<struct control::VelocityPID, control::VelocityControlLaw, control::VelocityPIDParameters, control::VelocityControlLawInput>(params);
             }
 
             default:
@@ -137,12 +137,12 @@ namespace json {
         switch (control_type) {
             case control::ControlType::LinearQuadraticRegulator: {
                 control::LinearQuadraticRegulatorParameters params = parse_linear_quadratic_regulator_parameters(controller_json);
-                return make_stateful_control_law<struct control::LinearQuadraticRegulator, control::LinearFullStateFeedbackControlLaw, control::LinearQuadraticRegulatorParameters, control::LinearFullStateFeedbackControlLawInput, control::LinearQuadraticRegulatorInput>(params);
+                return make_stateful_control_law<struct control::LinearQuadraticRegulator, control::LinearFullStateFeedbackControlLaw, control::LinearQuadraticRegulatorParameters, control::LinearFullStateFeedbackControlLawInput>(params);
             }
 
             case control::ControlType::LinearQuadraticIntegrator: {
                 control::LinearQuadraticIntegratorParameters params = parse_linear_quadratic_integrator_parameters(controller_json);
-                return make_stateful_control_law<struct control::LinearQuadraticIntegrator, control::LinearFullStateFeedbackControlLaw, control::LinearQuadraticIntegratorParameters, control::LinearFullStateFeedbackControlLawInput, control::LinearQuadraticRegulatorInput>(params);
+                return make_stateful_control_law<struct control::LinearQuadraticIntegrator, control::LinearFullStateFeedbackControlLaw, control::LinearQuadraticIntegratorParameters, control::LinearFullStateFeedbackControlLawInput>(params);
             }
 
             case control::ControlType::LinearQuadraticTracker:

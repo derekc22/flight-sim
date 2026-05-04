@@ -55,7 +55,7 @@ namespace control {
         LinearFullStateFeedbackControlLaw linear_full_state_feedback_control_law;
         NonlinearControlLaw nonlinear_control_law;
 
-        ControlOutput step(const ControlLawInput& ctrl_law_input);
+        ControlOutput step(const ControlLawInput& ctrl_law_input, bool trim_bool);
     };
 
     Eigen::VectorXd unpack_full_surface_actuator_inputs(const SurfaceActuatorInputs& u_surface);

@@ -12,9 +12,7 @@ namespace control {
     struct LinearQuadraticIntegrator : LinearQuadraticRegulator {
         LinearQuadraticIntegrator(const LinearQuadraticIntegratorParameters& params);
 
-        LinearQuadraticControlLawInput make_linear_quadratic_control_law_input(
-            const LinearQuadraticRegulatorInput& ctrl_law_input
-        ) override;
+        LinearQuadraticControlLawInput make_linear_quadratic_control_law_input(const LinearFullStateFeedbackControlLawInput& ctrl_law_input) override;
     };
 
 }

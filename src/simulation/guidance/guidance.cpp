@@ -23,7 +23,7 @@ namespace guidance {
         return { .vB_BI = v, .wB_BI = w, .eulIB = eul };
     }   
 
-    GuidanceSetpoint GuidanceProperties::step(int t, int T) {
+    GuidanceSetpoint GuidanceProperties::step(int t, int tf) {
         switch (trajectory_type) {
             case TrajectoryType::Stationary: {
                 return pack_guidance_setpoint(trajectory.data.row(0).transpose());
@@ -37,8 +37,8 @@ namespace guidance {
             break;
 
             case TrajectoryType::Interpolated: {
-                if (T <= 0) { throw std::runtime_error("GuidanceProperties::step: T = 0 for interpolated trajectory"); }
-                GuidanceStateVector setpoint_t = ((trajectory.data.row(1) - trajectory.data.row(0)) * (static_cast<double>(t) / T) + trajectory.data.row(0)).transpose();
+                if (tf <= 1) { throw std::runtime_error("GuidanceProperties::step: T <= 1 for interpolated trajectory"); }
+                GuidanceStateVector setpoint_t = ((trajectory.data.row(1) - trajectory.data.row(0)) * (static_cast<double>(t) / (tf - 1)) + trajectory.data.row(0)).transpose();
                 return pack_guidance_setpoint(setpoint_t);
             }
             break;

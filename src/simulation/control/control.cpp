@@ -3,20 +3,25 @@
 
 namespace control {
 
-    ControlOutput ControlProperties::step(const ControlLawInput& ctrl_law_input) {
+    ControlOutput ControlProperties::step(const ControlLawInput& ctrl_law_input, bool trim_bool) {
         ControlOutput out{};
 
-        if (axial_control_law) { 
-            out.surface_inputs = axial_control_law(ctrl_law_input.axial_control_law_input).surface_inputs; 
+        if (!trim_bool) {
+            if (axial_control_law) {
+                out.surface_inputs = axial_control_law(ctrl_law_input.axial_control_law_input).surface_inputs;
+            }
+            if (velocity_control_law) {
+                out.propulsor_inputs = velocity_control_law(ctrl_law_input.velocity_control_law_input).propulsor_inputs;
+            }
         }
-        if (velocity_control_law) { 
-            out.propulsor_inputs = velocity_control_law(ctrl_law_input.velocity_control_law_input).propulsor_inputs; 
-        }
-        if (linear_full_state_feedback_control_law) { 
-            out = linear_full_state_feedback_control_law(ctrl_law_input.linear_full_state_feedback_control_law_input); 
-        }
-        if (nonlinear_control_law) { 
-            out = nonlinear_control_law(ctrl_law_input.nonlinear_control_law_input); 
+
+        if (trim_bool) {
+            if (linear_full_state_feedback_control_law) {
+                out = linear_full_state_feedback_control_law(ctrl_law_input.linear_full_state_feedback_control_law_input);
+            }
+            if (nonlinear_control_law) {
+                out = nonlinear_control_law(ctrl_law_input.nonlinear_control_law_input);
+            }
         }
 
         return out;

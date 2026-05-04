@@ -1,5 +1,10 @@
 #pragma once
 #include "simulation/dynamics/dynamics.hpp"
+#include "simulation/actuators/surface.hpp"
+#include "simulation/actuators/propulsor.hpp"
+#include "simulation/guidance/guidance.hpp"
+#include "simulation/trim/types.hpp"
+#include "simulation/linearization/types.hpp"
 
 namespace control {
 
@@ -22,15 +27,34 @@ namespace control {
         PropulsorActuatorInputs propulsor_inputs;
     };
 
-    struct AxialControlLawInput {};
+    struct AxialControlLawInput {
+        dynamics::RigidBodyState zN_t;
+        actuators::SurfaceActuators surface_actuators;
+        guidance::AxialSetpoint setpoint;
+    };
     struct AxialControlLawParameters {};
 
-    struct VelocityControlLawInput {};
+    struct VelocityControlLawInput {
+        dynamics::RigidBodyState zN_t;
+        actuators::PropulsorActuators propulsor_actuators;
+        guidance::VelocitySetpoint setpoint;
+    };
     struct VelocityControlLawParameters {};
 
-    struct LinearFullStateFeedbackControlLawInput {};
+    struct LinearFullStateFeedbackControlLawInput {
+        dynamics::RigidBodyState zN_t;
+        trim::TrimActuatorInputs<double> u_sol_trim;
+        linearization::TrimStateJacobian A;
+        linearization::TrimInputJacobian B;
+        guidance::LinearFullStateFeedbackSetpoint setpoint;
+    };
     struct LinearFullStateFeedbackControlLawParameters {};
 
-    struct NonlinearControlLawInput {};
+    struct NonlinearControlLawInput {
+        dynamics::RigidBodyState zN_t;
+        actuators::SurfaceActuators surface_actuators;
+        actuators::PropulsorActuators propulsor_actuators;
+        guidance::NonlinearSetpoint setpoint;
+    };
     struct NonlinearControlLawParameters {};
 }

@@ -9,12 +9,6 @@ namespace control { struct ControlOutput; struct AxialControlLawInput; } // forw
 
 namespace control {
 
-    struct AxialPIDInput : AxialControlLawInput {
-        dynamics::RigidBodyState& zN_t;
-        actuators::SurfaceActuators& surface_actuators;
-        guidance::AxialSetpoint setpoint;
-    };
-
     struct AxialPIDParameters : AxialControlLawParameters {
         double Kp_roll = 0.0;
         double Ki_roll = 0.0;
@@ -39,12 +33,9 @@ namespace control {
         PIDControlLaw vertical_policy;
 
         AxialPID(const AxialPIDParameters& params);
-        ControlOutput step(const AxialPIDInput& ctrl_law_input);
+        ControlOutput step(const AxialControlLawInput& ctrl_law_input);
 
-        virtual PIDControlLawInput make_pid_control_law_input(
-            const AxialPIDInput& ctrl_law_input,
-            ControlAxis control_axis
-        );
+        virtual PIDControlLawInput make_pid_control_law_input(const AxialControlLawInput& ctrl_law_input, ControlAxis control_axis);
     };
 
 }

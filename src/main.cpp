@@ -177,12 +177,6 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
         // get rigid body state
         dynamics::RigidBodyState xN_t = dynamics::rigid_body_state(aircraft.FRDFrameNED);
 
-        // initialize measurements to ground truth
-        dynamics::RigidBodyState zN_t = xN_t;
-
-        // step timer by dt
-        next += std::chrono::duration_cast<clock::duration>(std::chrono::duration<double>(constants::dt));
-
         // compute static atmospheric state at current altitude
         atmospheric::StaticAtmosphericState static_atmospheric_state = atmospheric::static_atmospheric_state(aircraft.FRDFrameECEF);
 
@@ -191,6 +185,50 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
             // use out_pkt->wind_heading, out_pkt->wind_speed
         }
         atmospheric::Wind wind{ constants::Zero3 }; // no wind for now
+
+        // trim and linearization
+        if (sim_in.trim_bool && !trim_sol.attempted) {
+            trim_sol = trim::inspect_trim(aircraft, wind);
+            sim_out.trim_sol = trim_sol;
+
+            if (trim_sol.converged){
+                // obtain full state from trim solution
+                auto [xN_t_trim, ads_t_trim] = trim::update_state_from_trim(xN_t, trim_sol);
+
+                dynamics::Wrench WB_net_trim = trim_sol.wrench;
+
+                // define TrimStepOptions
+                vehicles::StepOptions TrimStepOptions;
+
+                // overwrite state with trim state
+                TrimStepOptions.FRDFrameNEDStepOpts = vehicles::FRDFrameNEDStepOptions { .rbs_BN = xN_t_trim };
+                TrimStepOptions.STABFrameFRDStepOpts = vehicles::STABFrameFRDStepOptions{ .ads = ads_t_trim };
+                TrimStepOptions.WINDFrameSTABStepOpts = vehicles::WINDFrameSTABStepOptions{ .ads = ads_t_trim };
+
+                // step frames
+                aircraft.step(TrimStepOptions);
+
+                // overwrite local state with trim state
+                xN_t = xN_t_trim;
+                WB_net = WB_net_trim;
+
+                /** @deprecated */
+                // overwrite actuator lag state with trim controls
+                // trim::update_actuators_from_trim(actuator_properties.surface_actuators, actuator_properties.propulsor_actuators, trim_sol);
+
+                // linearize
+                lin_sol = linearization::linearize_trim_solution(aircraft, trim_sol);
+
+                // perform eigenanalysis
+                const analysis::TrimEigenAnalysis eig_sol = analysis::trim_linearization_eigen_analysis(lin_sol);
+                
+                sim_out.lin_sol = lin_sol;
+                sim_out.eig_sol = eig_sol;
+            }            
+        }
+
+        // initialize measurements to ground truth
+        dynamics::RigidBodyState zN_t = xN_t;
 
         // use sensors 
         if (sim_in.sensor_bool){
@@ -208,61 +246,20 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
         guidance::GuidanceSetpoint guidance_setpoint = guidance_properties.step(t, tf);
 
         // specify control commands
-        control::ControlLawInput ctrl_law_input;
         control::ControlOutput u_cmd{};
 
-        if (sim_in.trim_bool && trim_sol.converged && !sim_in.control_bool) {
+        if (sim_in.trim_bool && !sim_in.control_bool) {
             u_cmd = trim::set_control_inputs_from_trim(trim_sol);
         }
 
         if (sim_in.control_bool) {
-            if (!sim_in.trim_bool) {
-                switch (control_properties.axial_control_type) {
-                    case control::ControlType::AxialPID:
-                    case control::ControlType::DamperPID: {
-                        ctrl_law_input.axial_control_law_input = control::AxialPIDInput {
-                            .zN_t = zN_t,
-                            .surface_actuators = actuator_properties.surface_actuators,
-                            .setpoint = guidance_setpoint
-                        };
-                    }
-                    break;
-                    default:
-                        break;
-                }
-                switch (control_properties.velocity_control_type) {
-                    case control::ControlType::VelocityPID: {
-                        ctrl_law_input.velocity_control_law_input = control::VelocityPIDInput {
-                            .zN_t = zN_t,
-                            .propulsor_actuators = actuator_properties.propulsor_actuators,
-                            .setpoint = guidance_setpoint
-                        };
-                    }
-                    break;
-                    default:
-                        break;
-                }
-            }
-            else if (sim_in.trim_bool && trim_sol.converged) {
-                switch (control_properties.linear_full_state_feedback_control_type) {
-                    case control::ControlType::LinearQuadraticRegulator: 
-                    case control::ControlType::LinearQuadraticIntegrator: {
-                        ctrl_law_input.linear_full_state_feedback_control_law_input = control::LinearQuadraticRegulatorInput {
-                            .zN_t = zN_t,
-                            .u_sol_trim = trim_sol.input,
-                            .A = lin_sol.A,
-                            .B = lin_sol.B,
-                            .setpoint = guidance_setpoint
-                        };
-                    }
-                    break;
-                    default:
-                        break;
-                }
-            }
-
-            u_cmd.surface_inputs = control_properties.step(ctrl_law_input).surface_inputs;
-            u_cmd.propulsor_inputs = control_properties.step(ctrl_law_input).propulsor_inputs;
+            control::ControlLawInput ctrl_law_input {
+                .axial_control_law_input = control::AxialControlLawInput{ .zN_t = zN_t, .surface_actuators = actuator_properties.surface_actuators, .setpoint = guidance::AxialSetpoint{ guidance_setpoint } },
+                .velocity_control_law_input = control::VelocityControlLawInput{ .zN_t = zN_t, .propulsor_actuators = actuator_properties.propulsor_actuators, .setpoint = guidance::VelocitySetpoint{ guidance_setpoint } },
+                .linear_full_state_feedback_control_law_input = control::LinearFullStateFeedbackControlLawInput{ .zN_t = zN_t, .u_sol_trim = trim_sol.input, .A = lin_sol.A, .B = lin_sol.B, .setpoint = guidance::LinearFullStateFeedbackSetpoint{ guidance_setpoint } },
+                .nonlinear_control_law_input = control::NonlinearControlLawInput{ .zN_t = zN_t, .surface_actuators = actuator_properties.surface_actuators, .propulsor_actuators = actuator_properties.propulsor_actuators, .setpoint = guidance::NonlinearSetpoint{ guidance_setpoint } }
+            };
+            u_cmd = control_properties.step(ctrl_law_input, sim_in.trim_bool);
         }
 
         u_cmd.surface_inputs.flap_cmd = fixed_surface_inputs.flap_cmd;
@@ -306,47 +303,6 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
         // step frames
         aircraft.step(StepOpts);
 
-        // trim and linearization
-        if (sim_in.trim_bool && !trim_sol.attempted) {
-            trim_sol = trim::inspect_trim(aircraft, wind);
-            sim_out.trim_sol = trim_sol;
-
-            if (trim_sol.converged){
-                // obtain full state from trim solution
-                auto [xN_t_trim, ads_t_trim] = trim::update_state_from_trim(xN_t, trim_sol);
-
-                dynamics::Wrench WB_net_trim = trim_sol.wrench;
-
-                // define TrimStepOptions
-                vehicles::StepOptions TrimStepOptions;
-
-                // overwrite state with trim state
-                TrimStepOptions.FRDFrameNEDStepOpts = vehicles::FRDFrameNEDStepOptions { .rbs_BN = xN_t_trim };
-                TrimStepOptions.STABFrameFRDStepOpts = vehicles::STABFrameFRDStepOptions{ .ads = ads_t_trim };
-                TrimStepOptions.WINDFrameSTABStepOpts = vehicles::WINDFrameSTABStepOptions{ .ads = ads_t_trim };
-
-                // step frames
-                aircraft.step(TrimStepOptions);
-
-                // overwrite local state with trim state
-                xN_t = xN_t_trim;
-                WB_net = WB_net_trim;
-
-                /** @deprecated */
-                // overwrite actuator lag state with trim controls
-                // trim::update_actuators_from_trim(actuator_properties.surface_actuators, actuator_properties.propulsor_actuators, trim_sol);
-
-                // linearize
-                lin_sol = linearization::linearize_trim_solution(aircraft, trim_sol);
-
-                // perform eigenanalysis
-                const analysis::TrimEigenAnalysis eig_sol = analysis::trim_linearization_eigen_analysis(lin_sol);
-                
-                sim_out.lin_sol = lin_sol;
-                sim_out.eig_sol = eig_sol;
-            }            
-        }
-
         // update data matrix
         if (sim_in.data_bool) {
             dynamics::EulerAngles eul_meas_t;
@@ -375,11 +331,14 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
         // send packet
         udp_in.send(in_pkt);
 
-        // sleep to maintain frequency dictated by dt
-        std::this_thread::sleep_until(next);
-
         // print state
         if (sim_in.verbose_bool) { aircraft.print_state(t, wind); }
+
+        // step timer by dt
+        next += std::chrono::duration_cast<clock::duration>(std::chrono::duration<double>(constants::dt));
+
+        // sleep to maintain frequency dictated by dt
+        std::this_thread::sleep_until(next);
     }
 
     // cleanup

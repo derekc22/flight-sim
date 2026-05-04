@@ -20,9 +20,7 @@ namespace control {
         });
     };
 
-    LinearQuadraticControlLawInput LinearQuadraticIntegrator::make_linear_quadratic_control_law_input(
-        const LinearQuadraticRegulatorInput& ctrl_law_input
-    ){
+    LinearQuadraticControlLawInput LinearQuadraticIntegrator::make_linear_quadratic_control_law_input(const LinearFullStateFeedbackControlLawInput& ctrl_law_input){
         /** @todo: Add augmentation structure for LQI */
         linearization::TrimStateJacobian A_aug;
         linearization::TrimInputJacobian B_aug;

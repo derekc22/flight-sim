@@ -7,7 +7,8 @@ namespace control {
         policy( PIDControlLaw({ 
                 .Kp = params.Kp, 
                 .Ki = params.Ki, 
-                .Kd = params.Kd
+                .Kd = params.Kd,
+                .tau = params.tau
             })
         )
     {};
@@ -46,9 +47,7 @@ namespace control {
         return { T_front, T_left, T_right };
     }
 
-    PIDControlLawInput VelocityPID::make_pid_control_law_input(
-        const VelocityPIDInput& ctrl_law_input
-    ){
+    PIDControlLawInput VelocityPID::make_pid_control_law_input(const VelocityControlLawInput& ctrl_law_input){
         dynamics::RigidBodyState zN_t = ctrl_law_input.zN_t;
         actuators::PropulsorActuators propulsor_actuators = ctrl_law_input.propulsor_actuators;
         guidance::VelocitySetpoint setpoint = ctrl_law_input.setpoint;
@@ -64,7 +63,7 @@ namespace control {
         };
     }
 
-    ControlOutput VelocityPID::step(const VelocityPIDInput& ctrl_law_input) {
+    ControlOutput VelocityPID::step(const VelocityControlLawInput& ctrl_law_input) {
         SurfaceActuatorInputs u_surface{};
         PropulsorActuatorInputs u_propulsor{};
 

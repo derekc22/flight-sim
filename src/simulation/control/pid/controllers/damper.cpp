@@ -4,10 +4,7 @@
 
 namespace control {
 
-    PIDControlLawInput DamperPID::make_pid_control_law_input(
-        const AxialPIDInput& ctrl_law_input,
-        ControlAxis control_axis
-    ){
+    PIDControlLawInput DamperPID::make_pid_control_law_input(const AxialControlLawInput& ctrl_law_input, ControlAxis control_axis){
         dynamics::RigidBodyState zN_t = ctrl_law_input.zN_t;
         actuators::SurfaceActuators surface_actuators = ctrl_law_input.surface_actuators;
 

@@ -11,14 +11,6 @@ namespace control { struct ControlOutput; struct LinearFullStateFeedbackControlL
 
 namespace control {
 
-    struct LinearQuadraticRegulatorInput : LinearFullStateFeedbackControlLawInput {
-        dynamics::RigidBodyState& zN_t;
-        trim::TrimActuatorInputs<double>& u_sol_trim;
-        const linearization::TrimStateJacobian& A;
-        const linearization::TrimInputJacobian& B;
-        guidance::LinearFullStateFeedbackSetpoint setpoint;
-    };
-
     struct LinearQuadraticRegulatorParameters : LinearQuadraticControlLawParameters, LinearFullStateFeedbackControlLawParameters {};
 
     struct LinearQuadraticRegulator {
@@ -26,13 +18,9 @@ namespace control {
         LinearQuadraticControlLaw policy;
 
         LinearQuadraticRegulator(const LinearQuadraticRegulatorParameters& params);
-        ControlOutput step(const LinearQuadraticRegulatorInput& ctrl_law_input);
+        ControlOutput step(const LinearFullStateFeedbackControlLawInput& ctrl_law_input);
 
-        virtual LinearQuadraticControlLawInput make_linear_quadratic_control_law_input(
-            const LinearQuadraticRegulatorInput& ctrl_law_input
-        );
-        trim::TrimStateVector_T<double> unpack_linear_quadratic_regulator_setpoint(
-            const guidance::LinearFullStateFeedbackSetpoint& linear_quadratic_regulator_setpoint
-        );
+        virtual LinearQuadraticControlLawInput make_linear_quadratic_control_law_input(const LinearFullStateFeedbackControlLawInput& ctrl_law_input);
+        trim::TrimStateVector_T<double> unpack_linear_quadratic_regulator_setpoint(const guidance::LinearFullStateFeedbackSetpoint& linear_quadratic_regulator_setpoint);
     };
 }

@@ -28,10 +28,7 @@ namespace control {
         )
     {};
 
-    PIDControlLawInput AxialPID::make_pid_control_law_input(
-        const AxialPIDInput& ctrl_law_input,
-        ControlAxis control_axis
-    ){
+    PIDControlLawInput AxialPID::make_pid_control_law_input(const AxialControlLawInput& ctrl_law_input, ControlAxis control_axis){
         dynamics::RigidBodyState zN_t = ctrl_law_input.zN_t;
         actuators::SurfaceActuators surface_actuators = ctrl_law_input.surface_actuators;
         guidance::AxialSetpoint setpoint = ctrl_law_input.setpoint;
@@ -72,7 +69,7 @@ namespace control {
         }
     }
 
-    ControlOutput AxialPID::step(const AxialPIDInput& ctrl_law_input){
+    ControlOutput AxialPID::step(const AxialControlLawInput& ctrl_law_input){
         SurfaceActuatorInputs u_surface{};
         PropulsorActuatorInputs u_propulsor{};
 

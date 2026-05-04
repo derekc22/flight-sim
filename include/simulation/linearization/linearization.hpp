@@ -1,26 +1,12 @@
 #pragma once
-
-#include <Eigen/Dense>
+#include <iostream>
 #include "simulation/trim/trim.hpp"
-#include "simulation/constants/constants.hpp"
+#include "simulation/linearization/types.hpp"
 
 namespace linearization {
-    using TrimStateJacobian = Eigen::Matrix<double, constants::state_dim, constants::state_dim>;
-    using TrimInputJacobian = Eigen::Matrix<double, constants::state_dim, constants::input_dim>;
-
-    struct TrimLinearization {
-        TrimStateJacobian A = TrimStateJacobian::Zero();
-        TrimInputJacobian B = TrimInputJacobian::Zero();
-    };
-
     TrimLinearization linearize_trim_solution(vehicles::Aircraft& aircraft, const trim::TrimSolution& trim_sol);
 
     std::string print_linearization_solution(const TrimLinearization& lin);
-
-    struct DiscretizedTrimLinearization {
-        TrimStateJacobian A = TrimStateJacobian::Zero();
-        TrimInputJacobian B = TrimInputJacobian::Zero();
-    };
 
     DiscretizedTrimLinearization discretize(const linearization::TrimLinearization& lin_sol);
 }

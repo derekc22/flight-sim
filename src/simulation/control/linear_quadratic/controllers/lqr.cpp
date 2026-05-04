@@ -28,9 +28,7 @@ namespace control {
         return trim::unpack_trim_state_T(setpoint_packed);
     }
 
-    LinearQuadraticControlLawInput LinearQuadraticRegulator::make_linear_quadratic_control_law_input(
-        const LinearQuadraticRegulatorInput& ctrl_law_input
-    ){
+    LinearQuadraticControlLawInput LinearQuadraticRegulator::make_linear_quadratic_control_law_input(const LinearFullStateFeedbackControlLawInput& ctrl_law_input){
         dynamics::RigidBodyState zN_t = ctrl_law_input.zN_t;
         guidance::LinearFullStateFeedbackSetpoint setpoint = ctrl_law_input.setpoint;
 
@@ -42,7 +40,7 @@ namespace control {
         };
     }
 
-    ControlOutput LinearQuadraticRegulator::step(const LinearQuadraticRegulatorInput& ctrl_law_input){
+    ControlOutput LinearQuadraticRegulator::step(const LinearFullStateFeedbackControlLawInput& ctrl_law_input){
         SurfaceActuatorInputs u_surface{};
         PropulsorActuatorInputs u_propulsor{};
 
