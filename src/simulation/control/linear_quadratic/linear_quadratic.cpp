@@ -5,9 +5,9 @@
 
 namespace control {
 
-    LinearQuadraticControlLaw::LinearQuadraticControlLaw(const LinearQuadraticControlLawParameters& params) : params(params) {}
+    LinearQuadraticController::LinearQuadraticController(const LinearQuadraticControllerParameters& params) : params(params) {}
 
-    Eigen::VectorXd LinearQuadraticControlLaw::step(const LinearQuadraticControlLawInput& ctrl_law_input) {
+    Eigen::VectorXd LinearQuadraticController::step(const LinearQuadraticControllerInput& ctrl_law_input) {
 
         if (!params.K.has_value()){
             const CareSolution care_sol = control::solve_care(ctrl_law_input.A, ctrl_law_input.B, params.Q, params.R);

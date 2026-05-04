@@ -1,15 +1,15 @@
 
 #include "simulation/control/pid/controllers/axial.hpp"
 
-namespace control { struct PIDControlLawInput; struct ControlOutput; } // forward declare
+namespace control { struct PIDControllerInput; struct ControlOutput; } // forward declare
 
 namespace control {
 
     struct DamperPID : AxialPID {
         using AxialPID::AxialPID;
 
-        PIDControlLawInput make_pid_control_law_input(
-            const AxialControlLawInput& ctrl_law_input,
+        PIDControllerInput make_pid_controller_input(
+            const AxialControllerInput& ctrl_law_input,
             ControlAxis control_axis
         ) override;
     };

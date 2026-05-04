@@ -4,7 +4,7 @@
 namespace control {
 
     VelocityPID::VelocityPID(const VelocityPIDParameters& params) :
-        policy( PIDControlLaw({ 
+        policy( PIDController({ 
                 .Kp = params.Kp, 
                 .Ki = params.Ki, 
                 .Kd = params.Kd,
@@ -47,7 +47,7 @@ namespace control {
         return { T_front, T_left, T_right };
     }
 
-    PIDControlLawInput VelocityPID::make_pid_control_law_input(const VelocityControlLawInput& ctrl_law_input){
+    PIDControllerInput VelocityPID::make_pid_controller_input(const VelocityControllerInput& ctrl_law_input){
         dynamics::RigidBodyState zN_t = ctrl_law_input.zN_t;
         actuators::PropulsorActuators propulsor_actuators = ctrl_law_input.propulsor_actuators;
         guidance::VelocitySetpoint setpoint = ctrl_law_input.setpoint;
@@ -63,12 +63,12 @@ namespace control {
         };
     }
 
-    ControlOutput VelocityPID::step(const VelocityControlLawInput& ctrl_law_input) {
+    ControlOutput VelocityPID::step(const VelocityControllerInput& ctrl_law_input) {
         SurfaceActuatorInputs u_surface{};
         PropulsorActuatorInputs u_propulsor{};
 
         double T_tot = policy.step(
-            make_pid_control_law_input(ctrl_law_input)
+            make_pid_controller_input(ctrl_law_input)
         );
 
         auto [T_front, T_left, T_right] = allocate_thrust(T_tot, ctrl_law_input.propulsor_actuators);

@@ -5,11 +5,11 @@
 #include "simulation/control/pid/pid.hpp"
 #include "simulation/guidance/guidance.hpp"
 
-namespace control { struct ControlOutput; struct AxialControlLawInput; } // forward declare
+namespace control { struct ControlOutput; struct AxialControllerInput; } // forward declare
 
 namespace control {
 
-    struct AxialPIDParameters : AxialControlLawParameters {
+    struct AxialPIDParameters : AxialControllerParameters {
         double Kp_roll = 0.0;
         double Ki_roll = 0.0;
         double Kd_roll = 0.0;
@@ -28,14 +28,14 @@ namespace control {
     struct AxialPID {
         enum ControlAxis { Longitudinal, Lateral, Vertical };
         AxialPIDParameters params;
-        PIDControlLaw lateral_policy;
-        PIDControlLaw longitudinal_policy;
-        PIDControlLaw vertical_policy;
+        PIDController lateral_policy;
+        PIDController longitudinal_policy;
+        PIDController vertical_policy;
 
         AxialPID(const AxialPIDParameters& params);
-        ControlOutput step(const AxialControlLawInput& ctrl_law_input);
+        ControlOutput step(const AxialControllerInput& ctrl_law_input);
 
-        virtual PIDControlLawInput make_pid_control_law_input(const AxialControlLawInput& ctrl_law_input, ControlAxis control_axis);
+        virtual PIDControllerInput make_pid_controller_input(const AxialControllerInput& ctrl_law_input, ControlAxis control_axis);
     };
 
 }

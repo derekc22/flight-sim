@@ -29,19 +29,19 @@ namespace control {
         IncrementalNonlinearDynamicInversion
     };
 
-    using AxialControlLaw = std::function<ControlOutput(const AxialControlLawInput&)>;
+    using AxialController = std::function<ControlOutput(const AxialControllerInput&)>;
 
-    using VelocityControlLaw = std::function<ControlOutput(const VelocityControlLawInput&)>;
+    using VelocityController = std::function<ControlOutput(const VelocityControllerInput&)>;
 
-    using LinearFullStateFeedbackControlLaw = std::function<ControlOutput(const LinearFullStateFeedbackControlLawInput&)>;
+    using LinearFullStateFeedbackController = std::function<ControlOutput(const LinearFullStateFeedbackControllerInput&)>;
 
-    using NonlinearControlLaw = std::function<ControlOutput(const NonlinearControlLawInput&)>;
+    using NonlinearController = std::function<ControlOutput(const NonlinearControllerInput&)>;
 
-    struct ControlLawInput {
-        AxialControlLawInput axial_control_law_input;
-        VelocityControlLawInput velocity_control_law_input;
-        LinearFullStateFeedbackControlLawInput linear_full_state_feedback_control_law_input;
-        NonlinearControlLawInput nonlinear_control_law_input;
+    struct ControllerInput {
+        AxialControllerInput axial_controller_input;
+        VelocityControllerInput velocity_controller_input;
+        LinearFullStateFeedbackControllerInput linear_full_state_feedback_controller_input;
+        NonlinearControllerInput nonlinear_controller_input;
     };
 
     struct ControlProperties {
@@ -50,12 +50,12 @@ namespace control {
         ControlType linear_full_state_feedback_control_type = ControlType::None;
         ControlType nonlinear_control_type = ControlType::None;
 
-        AxialControlLaw axial_control_law;
-        VelocityControlLaw velocity_control_law;
-        LinearFullStateFeedbackControlLaw linear_full_state_feedback_control_law;
-        NonlinearControlLaw nonlinear_control_law;
+        AxialController axial_controller;
+        VelocityController velocity_controller;
+        LinearFullStateFeedbackController linear_full_state_feedback_controller;
+        NonlinearController nonlinear_controller;
 
-        ControlOutput step(const ControlLawInput& ctrl_law_input, bool trim_bool);
+        ControlOutput step(const ControllerInput& ctrl_law_input, bool trim_bool);
     };
 
     Eigen::VectorXd unpack_full_surface_actuator_inputs(const SurfaceActuatorInputs& u_surface);

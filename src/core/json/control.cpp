@@ -8,9 +8,9 @@
 
 namespace json {
 
-    template <typename ControlLawType, typename ControlLawClass, typename ControlLawParametersType, typename ControlLawInputType>
-    ControlLawClass make_stateful_control_law(const ControlLawParametersType& params) {
-        return [controller = ControlLawType{ params }](const ControlLawInputType& input) mutable {
+    template <typename ControllerType, typename ControllerClass, typename ControllerParametersType, typename ControllerInputType>
+    ControllerClass make_stateful_controller(const ControllerParametersType& params) {
+        return [controller = ControllerType{ params }](const ControllerInputType& input) mutable {
             return controller.step(input);
         };
     }
@@ -104,56 +104,56 @@ namespace json {
         return params;
     }
 
-    control::AxialControlLaw make_axial_control_law(control::ControlType control_type, const nlohmann::json& controller_json) {
+    control::AxialController make_axial_controller(control::ControlType control_type, const nlohmann::json& controller_json) {
         switch (control_type) {
             case control::ControlType::AxialPID: {
                 control::AxialPIDParameters params = parse_axial_pid_parameters(controller_json);
-                return make_stateful_control_law<struct control::AxialPID, control::AxialControlLaw, control::AxialPIDParameters, control::AxialControlLawInput>(params);
+                return make_stateful_controller<struct control::AxialPID, control::AxialController, control::AxialPIDParameters, control::AxialControllerInput>(params);
             }
 
             case control::ControlType::DamperPID: {
                 control::AxialPIDParameters params = parse_damper_pid_parameters(controller_json);
-                return make_stateful_control_law<struct control::DamperPID, control::AxialControlLaw, control::AxialPIDParameters, control::AxialControlLawInput>(params);
+                return make_stateful_controller<struct control::DamperPID, control::AxialController, control::AxialPIDParameters, control::AxialControllerInput>(params);
             }
 
             default:
-                throw std::runtime_error("json::make_axial_control_law unknown control type");
+                throw std::runtime_error("json::make_axial_controller unknown control type");
         }
     }
 
-    control::VelocityControlLaw make_velocity_control_law(control::ControlType control_type, const nlohmann::json& controller_json) {
+    control::VelocityController make_velocity_controller(control::ControlType control_type, const nlohmann::json& controller_json) {
         switch (control_type) {
             case control::ControlType::VelocityPID: {
                 control::VelocityPIDParameters params = parse_velocity_pid_parameters(controller_json);
-                return make_stateful_control_law<struct control::VelocityPID, control::VelocityControlLaw, control::VelocityPIDParameters, control::VelocityControlLawInput>(params);
+                return make_stateful_controller<struct control::VelocityPID, control::VelocityController, control::VelocityPIDParameters, control::VelocityControllerInput>(params);
             }
 
             default:
-                throw std::runtime_error("json::make_velocity_control_law unknown control type");
+                throw std::runtime_error("json::make_velocity_controller unknown control type");
         }
     }
 
-    control::LinearFullStateFeedbackControlLaw make_linear_full_state_feedback_control_law(control::ControlType control_type, const nlohmann::json& controller_json) {
+    control::LinearFullStateFeedbackController make_linear_full_state_feedback_controller(control::ControlType control_type, const nlohmann::json& controller_json) {
         switch (control_type) {
             case control::ControlType::LinearQuadraticRegulator: {
                 control::LinearQuadraticRegulatorParameters params = parse_linear_quadratic_regulator_parameters(controller_json);
-                return make_stateful_control_law<struct control::LinearQuadraticRegulator, control::LinearFullStateFeedbackControlLaw, control::LinearQuadraticRegulatorParameters, control::LinearFullStateFeedbackControlLawInput>(params);
+                return make_stateful_controller<struct control::LinearQuadraticRegulator, control::LinearFullStateFeedbackController, control::LinearQuadraticRegulatorParameters, control::LinearFullStateFeedbackControllerInput>(params);
             }
 
             case control::ControlType::LinearQuadraticIntegrator: {
                 control::LinearQuadraticIntegratorParameters params = parse_linear_quadratic_integrator_parameters(controller_json);
-                return make_stateful_control_law<struct control::LinearQuadraticIntegrator, control::LinearFullStateFeedbackControlLaw, control::LinearQuadraticIntegratorParameters, control::LinearFullStateFeedbackControlLawInput>(params);
+                return make_stateful_controller<struct control::LinearQuadraticIntegrator, control::LinearFullStateFeedbackController, control::LinearQuadraticIntegratorParameters, control::LinearFullStateFeedbackControllerInput>(params);
             }
 
             case control::ControlType::LinearQuadraticTracker:
                 throw std::runtime_error("TODO: NOT IMPLEMENTED");
 
             default:
-                throw std::runtime_error("json::make_linear_full_state_feedback_control_law unknown control type");
+                throw std::runtime_error("json::make_linear_full_state_feedback_controller unknown control type");
         }
     }
 
-    control::NonlinearControlLaw make_nonlinear_control_law(control::ControlType control_type, const nlohmann::json& controller_json) {
+    control::NonlinearController make_nonlinear_controller(control::ControlType control_type, const nlohmann::json& controller_json) {
         switch (control_type) {
             case control::ControlType::FeedbackLinearization:
                 throw std::runtime_error("TODO: NOT IMPLEMENTED");
@@ -165,7 +165,7 @@ namespace json {
                 throw std::runtime_error("TODO: NOT IMPLEMENTED");
 
             default:
-                throw std::runtime_error("json::make_nonlinear_control_law unknown control type");
+                throw std::runtime_error("json::make_nonlinear_controller unknown control type");
         }
     }
 
@@ -187,88 +187,88 @@ namespace json {
         return map_control_type(control_type_str);
     }
 
-    void parse_axial_control_law(const nlohmann::json& controller_json, control::AxialControlLaw& control_law, control::ControlType& ctrl_type) {
+    void parse_axial_controller(const nlohmann::json& controller_json, control::AxialController& controller, control::ControlType& ctrl_type) {
         ctrl_type = fetch_control_type(controller_json);
-        control_law = make_axial_control_law(
+        controller = make_axial_controller(
             ctrl_type, 
             controller_json
         );
     }
 
-    void parse_velocity_control_law(const nlohmann::json& controller_json, control::VelocityControlLaw& control_law, control::ControlType& ctrl_type) {
+    void parse_velocity_controller(const nlohmann::json& controller_json, control::VelocityController& controller, control::ControlType& ctrl_type) {
         ctrl_type = fetch_control_type(controller_json);
-        control_law = make_velocity_control_law(
+        controller = make_velocity_controller(
             ctrl_type, 
             controller_json
         );    }
 
-    void parse_linear_full_state_feedback_control_law(const nlohmann::json& controller_json, control::LinearFullStateFeedbackControlLaw& control_law, control::ControlType& ctrl_type) {
+    void parse_linear_full_state_feedback_controller(const nlohmann::json& controller_json, control::LinearFullStateFeedbackController& controller, control::ControlType& ctrl_type) {
         ctrl_type = fetch_control_type(controller_json);
-        control_law = make_linear_full_state_feedback_control_law(
+        controller = make_linear_full_state_feedback_controller(
             ctrl_type, 
             controller_json
         );
     }
 
-    void parse_nonlinear_control_law(const nlohmann::json& controller_json, control::NonlinearControlLaw& control_law, control::ControlType& ctrl_type) {
+    void parse_nonlinear_controller(const nlohmann::json& controller_json, control::NonlinearController& controller, control::ControlType& ctrl_type) {
         ctrl_type = fetch_control_type(controller_json);
-        control_law = make_nonlinear_control_law(
+        controller = make_nonlinear_controller(
             ctrl_type, 
             controller_json
         );
     }
 
-    void validate_control_laws(const nlohmann::json& controllers_json){
+    void validate_controllers(const nlohmann::json& controllers_json){
         bool axial_bool = controllers_json.contains("axial");
         bool velocity_bool = controllers_json.contains("velocity");
         bool linear_full_state_feedback_bool = controllers_json.contains("linear_full_state_feedback");
         bool nonlinear_bool = controllers_json.contains("nonlinear");
 
-        if (axial_bool && linear_full_state_feedback_bool) { throw std::runtime_error("json::validate_control_laws: axial and linear_full_state_feedback control laws cannot both be present"); }
-        if (axial_bool && nonlinear_bool) { throw std::runtime_error("json::validate_control_laws: axial and nonlinear control laws cannot both be present"); }
+        if (axial_bool && linear_full_state_feedback_bool) { throw std::runtime_error("json::validate_controllers: axial and linear_full_state_feedback control laws cannot both be present"); }
+        if (axial_bool && nonlinear_bool) { throw std::runtime_error("json::validate_controllers: axial and nonlinear control laws cannot both be present"); }
 
-        if (linear_full_state_feedback_bool && nonlinear_bool) { throw std::runtime_error("json::validate_control_laws: linear_full_state_feedback and nonlinear control laws cannot both be present"); }
+        if (linear_full_state_feedback_bool && nonlinear_bool) { throw std::runtime_error("json::validate_controllers: linear_full_state_feedback and nonlinear control laws cannot both be present"); }
 
-        if (velocity_bool && linear_full_state_feedback_bool) { throw std::runtime_error("json::validate_control_laws: velocity and linear_full_state_feedback control laws cannot both be present"); }
-        if (velocity_bool && nonlinear_bool) { throw std::runtime_error("json::validate_control_laws: velocity and nonlinear control laws cannot both be present"); }
+        if (velocity_bool && linear_full_state_feedback_bool) { throw std::runtime_error("json::validate_controllers: velocity and linear_full_state_feedback control laws cannot both be present"); }
+        if (velocity_bool && nonlinear_bool) { throw std::runtime_error("json::validate_controllers: velocity and nonlinear control laws cannot both be present"); }
     }
 
     control::ControlProperties parse_control_properties(const nlohmann::json& config) {
-        validate_control_laws(config);
+        validate_controllers(config);
         control::ControlProperties control_properties;
 
         if (config.contains("axial")) {
             const auto& axial_controller_json = config.at("axial");
-            parse_axial_control_law(
+            parse_axial_controller(
                 axial_controller_json,
-                control_properties.axial_control_law,
+                control_properties.axial_controller,
                 control_properties.axial_control_type
             );
         }
 
         if (config.contains("velocity")) {
             const auto& velocity_controller_json = config.at("velocity");
-            parse_velocity_control_law(
+            parse_velocity_controller(
                 velocity_controller_json,
-                control_properties.velocity_control_law,
+                control_properties.velocity_controller,
                 control_properties.velocity_control_type
             );
         }
 
         if (config.contains("linear_full_state_feedback")) {
             const auto& linear_full_state_feedback_controller_json = config.at("linear_full_state_feedback");
-            parse_linear_full_state_feedback_control_law(
+            parse_linear_full_state_feedback_controller(
                 linear_full_state_feedback_controller_json,
-                control_properties.linear_full_state_feedback_control_law,
+                control_properties.linear_full_state_feedback_controller,
                 control_properties.linear_full_state_feedback_control_type
             );
         }
 
         if (config.contains("nonlinear")) {
             const auto& nonlinear_controller_json = config.at("nonlinear");
-            parse_nonlinear_control_law(
+            parse_nonlinear_controller(
                 nonlinear_controller_json,
-                control_properties.nonlinear_control_law,
+                control_properties.nonlinear_controller,
                 control_properties.nonlinear_control_type
             );
         }

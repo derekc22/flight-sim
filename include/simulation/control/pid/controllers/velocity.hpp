@@ -5,20 +5,20 @@
 #include "simulation/control/pid/pid.hpp"
 #include "simulation/guidance/guidance.hpp"
 
-namespace control { struct ControlOutput; struct VelocityControlLawInput; } // forward declare
+namespace control { struct ControlOutput; struct VelocityControllerInput; } // forward declare
 
 namespace control {
 
-    struct VelocityPIDParameters : PIDControlLawParameters, VelocityControlLawParameters {};
+    struct VelocityPIDParameters : PIDControllerParameters, VelocityControllerParameters {};
 
     struct VelocityPID {
         VelocityPIDParameters params;
-        PIDControlLaw policy;
+        PIDController policy;
 
         VelocityPID(const VelocityPIDParameters& params);
-        ControlOutput step(const VelocityControlLawInput& ctrl_law_input);
+        ControlOutput step(const VelocityControllerInput& ctrl_law_input);
 
-        PIDControlLawInput make_pid_control_law_input(const VelocityControlLawInput& ctrl_law_input);
+        PIDControllerInput make_pid_controller_input(const VelocityControllerInput& ctrl_law_input);
         std::tuple<double, double, double> allocate_thrust(double T_tot, const actuators::PropulsorActuators& propulsor_actuators);
     };
 }

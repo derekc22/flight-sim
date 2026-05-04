@@ -3,24 +3,24 @@
 
 namespace control {
 
-    ControlOutput ControlProperties::step(const ControlLawInput& ctrl_law_input, bool trim_bool) {
+    ControlOutput ControlProperties::step(const ControllerInput& ctrl_law_input, bool trim_bool) {
         ControlOutput out{};
 
         if (!trim_bool) {
-            if (axial_control_law) {
-                out.surface_inputs = axial_control_law(ctrl_law_input.axial_control_law_input).surface_inputs;
+            if (axial_controller) {
+                out.surface_inputs = axial_controller(ctrl_law_input.axial_controller_input).surface_inputs;
             }
-            if (velocity_control_law) {
-                out.propulsor_inputs = velocity_control_law(ctrl_law_input.velocity_control_law_input).propulsor_inputs;
+            if (velocity_controller) {
+                out.propulsor_inputs = velocity_controller(ctrl_law_input.velocity_controller_input).propulsor_inputs;
             }
         }
 
         if (trim_bool) {
-            if (linear_full_state_feedback_control_law) {
-                out = linear_full_state_feedback_control_law(ctrl_law_input.linear_full_state_feedback_control_law_input);
+            if (linear_full_state_feedback_controller) {
+                out = linear_full_state_feedback_controller(ctrl_law_input.linear_full_state_feedback_controller_input);
             }
-            if (nonlinear_control_law) {
-                out = nonlinear_control_law(ctrl_law_input.nonlinear_control_law_input);
+            if (nonlinear_controller) {
+                out = nonlinear_controller(ctrl_law_input.nonlinear_controller_input);
             }
         }
 

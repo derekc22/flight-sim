@@ -27,34 +27,34 @@ namespace control {
         PropulsorActuatorInputs propulsor_inputs;
     };
 
-    struct AxialControlLawInput {
+    struct AxialControllerInput {
         dynamics::RigidBodyState zN_t;
         actuators::SurfaceActuators surface_actuators;
         guidance::AxialSetpoint setpoint;
     };
-    struct AxialControlLawParameters {};
+    struct AxialControllerParameters {};
 
-    struct VelocityControlLawInput {
+    struct VelocityControllerInput {
         dynamics::RigidBodyState zN_t;
         actuators::PropulsorActuators propulsor_actuators;
         guidance::VelocitySetpoint setpoint;
     };
-    struct VelocityControlLawParameters {};
+    struct VelocityControllerParameters {};
 
-    struct LinearFullStateFeedbackControlLawInput {
+    struct LinearFullStateFeedbackControllerInput {
         dynamics::RigidBodyState zN_t;
         trim::TrimActuatorInputs<double> u_sol_trim;
         linearization::TrimStateJacobian A;
         linearization::TrimInputJacobian B;
         guidance::LinearFullStateFeedbackSetpoint setpoint;
     };
-    struct LinearFullStateFeedbackControlLawParameters {};
+    struct LinearFullStateFeedbackControllerParameters {};
 
-    struct NonlinearControlLawInput {
+    struct NonlinearControllerInput {
         dynamics::RigidBodyState zN_t;
         actuators::SurfaceActuators surface_actuators;
         actuators::PropulsorActuators propulsor_actuators;
         guidance::NonlinearSetpoint setpoint;
     };
-    struct NonlinearControlLawParameters {};
+    struct NonlinearControllerParameters {};
 }

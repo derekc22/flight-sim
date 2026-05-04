@@ -3,7 +3,7 @@
 
 namespace control {
 
-    struct PIDControlLawInput {
+    struct PIDControllerInput {
         double meas;
         double meas_des;
         std::optional<double> meas_dot;
@@ -11,20 +11,20 @@ namespace control {
         double limit_min;
     };
 
-    struct PIDControlLawParameters {
+    struct PIDControllerParameters {
         double Kp;
         double Kd;
         double Ki;
         double tau;
     };
 
-    struct PIDControlLaw {
-        PIDControlLawParameters params;
+    struct PIDController {
+        PIDControllerParameters params;
         double integral = 0.0;
         double d_filtered = 0.0;
         double prev_err = 0.0;
 
-        PIDControlLaw(const PIDControlLawParameters& params);
-        double step(const PIDControlLawInput& ctrl_law_input);
+        PIDController(const PIDControllerParameters& params);
+        double step(const PIDControllerInput& ctrl_law_input);
     };
 }

@@ -13,14 +13,14 @@ namespace control {
         Q_aug.block(0, 0, n, n) = params.Q;
         Q_aug.block(n, n, n, n) = params.Qi;
 
-        policy = LinearQuadraticControlLaw({ 
+        policy = LinearQuadraticController({ 
             .Q = Q_aug, 
             .R = params.R,
             .integrator_bool = true
         });
     };
 
-    LinearQuadraticControlLawInput LinearQuadraticIntegrator::make_linear_quadratic_control_law_input(const LinearFullStateFeedbackControlLawInput& ctrl_law_input){
+    LinearQuadraticControllerInput LinearQuadraticIntegrator::make_linear_quadratic_controller_input(const LinearFullStateFeedbackControllerInput& ctrl_law_input){
         /** @todo: Add augmentation structure for LQI */
         linearization::TrimStateJacobian A_aug;
         linearization::TrimInputJacobian B_aug;

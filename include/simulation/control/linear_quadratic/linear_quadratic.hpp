@@ -6,24 +6,24 @@
 
 namespace control {
 
-    struct LinearQuadraticControlLawInput {
+    struct LinearQuadraticControllerInput {
         trim::TrimStateVector_T<double> meas;
         trim::TrimStateVector_T<double> meas_des;
         Eigen::MatrixXd A;
         Eigen::MatrixXd B;
     };
 
-    struct LinearQuadraticControlLawParameters {
+    struct LinearQuadraticControllerParameters {
         Eigen::MatrixXd Q;
         Eigen::MatrixXd R;
         std::optional<Eigen::MatrixXd> K;
         bool integrator_bool = false;
     };
 
-    struct LinearQuadraticControlLaw {
-        LinearQuadraticControlLawParameters params;
+    struct LinearQuadraticController {
+        LinearQuadraticControllerParameters params;
 
-        LinearQuadraticControlLaw(const LinearQuadraticControlLawParameters& params);
-        Eigen::VectorXd step(const LinearQuadraticControlLawInput& ctrl_law_input);
+        LinearQuadraticController(const LinearQuadraticControllerParameters& params);
+        Eigen::VectorXd step(const LinearQuadraticControllerInput& ctrl_law_input);
     };
 }
