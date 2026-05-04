@@ -1,6 +1,7 @@
 #include <algorithm>
 #include "simulation/control/pid/pid.hpp"
 #include "simulation/constants/constants.hpp"
+#include "simulation/util/util.hpp"
 
 namespace control {
 
@@ -14,7 +15,7 @@ namespace control {
                         : (prev_err - err) / constants::dt;         // PID
 
         // filtered deriative
-        d_filtered = util::first_order_lag(d_term, d_filtered, tau);
+        d_filtered = util::first_order_lag(d_term, d_filtered, params.tau);
 
         // integral candidate
         double i_new = integral + err * constants::dt;

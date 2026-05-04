@@ -10,6 +10,7 @@
 #include "core/json/operating.hpp"
 #include "core/json/structural.hpp"
 #include "core/json/avionics.hpp"
+#include "core/json/guidance.hpp"
 
 namespace json {
 

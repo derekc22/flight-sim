@@ -20,7 +20,7 @@ namespace trim {
     inline constexpr std::size_t trim_residual_dim = trim_variable_dim;
 
     template <typename T>
-    using TrimVariableVector_T = Eigen::Matrix<T, trim_variable_dim, 1>;
+    using TrimVariablesVector_T = Eigen::Matrix<T, trim_variable_dim, 1>;
 
     template <typename T>
     using TrimActuatorInputsVector_T = Eigen::Matrix<T, constants::input_dim, 1>;
@@ -152,7 +152,7 @@ namespace trim {
         dynamics::Wrench wrench{};
         TrimResidual<double> residual;
         TrimResidual<double> weighted_residual;
-        TrimVariableVector_T<double> variables = TrimVariableVector_T<double>::Zero();
+        TrimVariablesVector_T<double> variables = TrimVariablesVector_T<double>::Zero();
         bool attempted = false;
         bool converged = false;
         std::size_t iterations = 0;
@@ -169,10 +169,10 @@ namespace trim {
     TrimResidual<T> compute_trim_residual(const TrimState<T>& x, const TrimActuatorInputs<T>& u, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions);
 
     template <typename T>
-    TrimVariableVector_T<T> unpack_trim_variables_T(const TrimState<T>& x, const TrimActuatorInputs<T>& u);
+    TrimVariablesVector_T<T> unpack_trim_variables_T(const TrimState<T>& x, const TrimActuatorInputs<T>& u);
 
     template <typename T>
-    TrimActuatorInputsVector_T<T> unpack_trim_control_inputs_T(const TrimActuatorInputs<T>& u);
+    TrimActuatorInputsVector_T<T> unpack_trim_actuator_inputs_T(const TrimActuatorInputs<T>& u);
 
     template <typename T>
     TrimStateVector_T<T> unpack_trim_state_T(const TrimState<T>& x);
@@ -181,20 +181,20 @@ namespace trim {
     TrimStateDotVector_T<T> unpack_trim_state_dot_T(const TrimStateDot<T>& x_dot);
 
     template <typename T>
-    TrimState<T> pack_trim_state_T(const TrimVariableVector_T<T>& z);
+    TrimState<T> pack_trim_state_T(const TrimVariablesVector_T<T>& z);
 
     template <typename T>
-    TrimActuatorInputs<T> pack_trim_input_T(const TrimVariableVector_T<T>& z);
+    TrimActuatorInputs<T> pack_trim_actuator_inputs_T(const TrimVariablesVector_T<T>& z);
 
     template <typename T>
     TrimResidualVector_T<T> unpack_trim_residual_T(const TrimResidual<T>& residual);
 
     template <typename T>
-    TrimResidualVector_T<T> compute_trim_residual_vector_T(const TrimVariableVector_T<T>& z, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions, bool use_physical_controls);
+    TrimResidualVector_T<T> compute_trim_residual_vector_T(const TrimVariablesVector_T<T>& z, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions, bool use_physical_controls);
 
-    TrimResidualVector_T<double> compute_trim_residual_vector(const TrimVariableVector_T<double>& z, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions, bool use_physical_controls);
+    TrimResidualVector_T<double> compute_trim_residual_vector(const TrimVariablesVector_T<double>& z, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions, bool use_physical_controls);
 
-    TrimResidualJacobian compute_trim_residual_jac(const TrimVariableVector_T<double>& z, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions, bool use_physical_controls);
+    TrimResidualJacobian compute_trim_residual_jac(const TrimVariablesVector_T<double>& z, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions, bool use_physical_controls);
 
     TrimSolution solve_trim(const TrimProblem<double>& problem, const TrimModel& model, TrimSolveOptions options = {});
 
@@ -209,7 +209,7 @@ namespace trim {
 
     control::ControlOutput set_control_inputs_from_trim(const TrimSolution& trim_sol);
 
-    TrimStateVector_T<double> unpack_rigid_body_state(const dynamics::RigidBodyState& zN_t);
+    TrimStateVector_T<double> unpack_rigid_body_state(const dynamics::RigidBodyState& xN_t);
 }
 
 #include "simulation/trim/trim.tpp"

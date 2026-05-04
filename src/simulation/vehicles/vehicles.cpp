@@ -13,6 +13,8 @@
 #include "simulation/transforms/transforms.hpp"
 #include "simulation/constants/constants.hpp"
 #include "simulation/util/util.hpp"
+#include "simulation/operating/operating.hpp"
+#include "simulation/guidance/guidance.hpp"
 
 
 
@@ -722,7 +724,8 @@ namespace vehicles {
         const actuators::ActuatorProperties& actuator_properties,
         const control::ControlProperties& control_properties,
         const avionics::AvionicsProperties& avionics_properties,
-        const operating::OperatingProperties& operating_properties
+        const operating::OperatingProperties& operating_properties,
+        const guidance::GuidanceProperties& guidance_properties
     ) :
         NEDFrameECEF{},
         FRDFrameECEF{},
@@ -734,7 +737,8 @@ namespace vehicles {
         actuator_properties(actuator_properties),
         control_properties(control_properties),
         avionics_properties(avionics_properties),
-        operating_properties(operating_properties)
+        operating_properties(operating_properties),
+        guidance_properties(guidance_properties)
     {
         _init_frames();
     }

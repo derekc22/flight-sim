@@ -45,6 +45,11 @@ namespace control {
     };
 
     struct ControlProperties {
+        ControlType axial_control_type = ControlType::None;
+        ControlType velocity_control_type = ControlType::None;
+        ControlType linear_full_state_feedback_control_type = ControlType::None;
+        ControlType nonlinear_control_type = ControlType::None;
+
         AxialControlLaw axial_control_law;
         VelocityControlLaw velocity_control_law;
         LinearFullStateFeedbackControlLaw linear_full_state_feedback_control_law;

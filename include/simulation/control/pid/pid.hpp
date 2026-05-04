@@ -19,7 +19,7 @@ namespace control {
     };
 
     struct PIDControlLaw {
-        const PIDControlLawParameters& params;
+        PIDControlLawParameters params;
         double integral = 0.0;
         double d_filtered = 0.0;
         double prev_err = 0.0;

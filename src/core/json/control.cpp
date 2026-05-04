@@ -18,14 +18,14 @@ namespace json {
     control::AxialPIDParameters parse_damper_pid_parameters(const nlohmann::json& controller_json) {
         const auto& parameters_json = controller_json.at("parameters");
         if (!parameters_json.is_object()) { throw std::runtime_error("json::parse_damper_pid_parameters expected parameters object"); }
-        if (!parameters_json.contains("Kp_lateral") || !parameters_json.contains("Kp_longitudinal") || !parameters_json.contains("Kp_vertical")) {
-            throw std::runtime_error("json::parse_damper_pid_parameters requires Kp_lateral, Kp_longitudinal, Kp_vertical");
+        if (!parameters_json.contains("Kp_roll") || !parameters_json.contains("Kp_pitch") || !parameters_json.contains("Kp_yaw")) {
+            throw std::runtime_error("json::parse_damper_pid_parameters requires Kp_roll, Kp_pitch, Kp_yaw");
         }
 
         control::AxialPIDParameters params{};
-        params.Kp_lateral = parameters_json.at("Kp_lateral").get<double>();
-        params.Kp_longitudinal = parameters_json.at("Kp_longitudinal").get<double>();
-        params.Kp_vertical = parameters_json.at("Kp_vertical").get<double>();
+        params.Kp_roll = parameters_json.at("Kp_roll").get<double>();
+        params.Kp_pitch = parameters_json.at("Kp_pitch").get<double>();
+        params.Kp_yaw = parameters_json.at("Kp_yaw").get<double>();
         return params;
     }
 
@@ -33,32 +33,30 @@ namespace json {
         const auto& parameters_json = controller_json.at("parameters");
         if (!parameters_json.is_object()) { throw std::runtime_error("json::parse_axial_pid_parameters expected parameters object"); }
         if (
-            !parameters_json.contains("Kp_lateral") || !parameters_json.contains("Ki_lateral") || !parameters_json.contains("Kd_lateral") ||
-            !parameters_json.contains("Kp_longitudinal") || !parameters_json.contains("Ki_longitudinal") || !parameters_json.contains("Kd_longitudinal") ||
-            !parameters_json.contains("Kp_vertical") || !parameters_json.contains("Ki_vertical") || !parameters_json.contains("Kd_vertical")
+            !parameters_json.contains("Kp_roll") || !parameters_json.contains("Ki_roll") || !parameters_json.contains("Kd_roll") ||
+            !parameters_json.contains("Kp_pitch") || !parameters_json.contains("Ki_pitch") || !parameters_json.contains("Kd_pitch") ||
+            !parameters_json.contains("Kp_yaw") || !parameters_json.contains("Ki_yaw") || !parameters_json.contains("Kd_yaw")
         ) {
             throw std::runtime_error("json::parse_axial_pid_parameters requires Kp, Ki, and Kd for the lateral, longitudinal, and vertical axes");
         }
-        if (!parameters_json.contains("tau_lateral") || !parameters_json.contains("tau_longitudinal") || !parameters_json.contains("tau_vertical")) {
-            throw std::runtime_error("json::parse_axial_pid_parameters requires tau for the lateral, longitudinal, and vertical axes");
+        if (!parameters_json.contains("tau")) {
+            throw std::runtime_error("json::parse_axial_pid_parameters requires tau");
         }
-        if (parameters_json.at("tau_lateral").get<double>() < 0.0 || parameters_json.at("tau_longitudinal").get<double>() < 0.0 || parameters_json.at("tau_vertical").get<double>() < 0.0) {
+        if (parameters_json.at("tau").get<double>() < 0.0) {
             throw std::runtime_error("json::parse_axial_pid_parameters requires non-negative tau");
         }
 
         control::AxialPIDParameters params{};
-        params.Kp_lateral = parameters_json.at("Kp_lateral").get<double>();
-        params.Ki_lateral = parameters_json.at("Ki_lateral").get<double>();
-        params.Kd_lateral = parameters_json.at("Kd_lateral").get<double>();
-        params.tau_lateral = parameters_json.at("tau_lateral").get<double>();
-        params.Kp_longitudinal = parameters_json.at("Kp_longitudinal").get<double>();
-        params.Ki_longitudinal = parameters_json.at("Ki_longitudinal").get<double>();
-        params.Kd_longitudinal = parameters_json.at("Kd_longitudinal").get<double>();
-        params.tau_longitudinal = parameters_json.at("tau_longitudinal").get<double>();
-        params.Kp_vertical = parameters_json.at("Kp_vertical").get<double>();
-        params.Ki_vertical = parameters_json.at("Ki_vertical").get<double>();
-        params.Kd_vertical = parameters_json.at("Kd_vertical").get<double>();
-        params.tau_vertical = parameters_json.at("tau_vertical").get<double>();
+        params.Kp_roll = parameters_json.at("Kp_roll").get<double>();
+        params.Ki_roll = parameters_json.at("Ki_roll").get<double>();
+        params.Kd_roll = parameters_json.at("Kd_roll").get<double>();
+        params.Kp_pitch = parameters_json.at("Kp_pitch").get<double>();
+        params.Ki_pitch = parameters_json.at("Ki_pitch").get<double>();
+        params.Kd_pitch = parameters_json.at("Kd_pitch").get<double>();
+        params.Kp_yaw = parameters_json.at("Kp_yaw").get<double>();
+        params.Ki_yaw = parameters_json.at("Ki_yaw").get<double>();
+        params.Kd_yaw = parameters_json.at("Kd_yaw").get<double>();
+        params.tau = parameters_json.at("tau").get<double>();
         return params;
     }
 
@@ -148,7 +146,7 @@ namespace json {
             }
 
             case control::ControlType::LinearQuadraticTracker:
-                throw std::runtime_error("json::make_linear_full_state_feedback_control_law LinearQuadraticTracker is not implemented");
+                throw std::runtime_error("TODO: NOT IMPLEMENTED");
 
             default:
                 throw std::runtime_error("json::make_linear_full_state_feedback_control_law unknown control type");
@@ -158,13 +156,13 @@ namespace json {
     control::NonlinearControlLaw make_nonlinear_control_law(control::ControlType control_type, const nlohmann::json& controller_json) {
         switch (control_type) {
             case control::ControlType::FeedbackLinearization:
-                throw std::runtime_error("json::make_nonlinear_control_law FeedbackLinearization is not implemented");
+                throw std::runtime_error("TODO: NOT IMPLEMENTED");
 
             case control::ControlType::NonlinearDynamicInversion:
-                throw std::runtime_error("json::make_nonlinear_control_law NonlinearDynamicInversion is not implemented");
+                throw std::runtime_error("TODO: NOT IMPLEMENTED");
 
             case control::ControlType::IncrementalNonlinearDynamicInversion:
-                throw std::runtime_error("json::make_nonlinear_control_law IncrementalNonlinearDynamicInversion is not implemented");
+                throw std::runtime_error("TODO: NOT IMPLEMENTED");
 
             default:
                 throw std::runtime_error("json::make_nonlinear_control_law unknown control type");
@@ -184,32 +182,40 @@ namespace json {
         throw std::runtime_error("json::map_control_type unknown control type: " + control_type_str);
     }
 
-    void parse_axial_control_law(const nlohmann::json& controller_json, control::AxialControlLaw& control_law) {
+    control::ControlType fetch_control_type(const nlohmann::json& controller_json){
         std::string control_type_str = controller_json.at("control_type").get<std::string>();
-
-        control::ControlType control_type = map_control_type(control_type_str);
-        control_law = make_axial_control_law(control_type, controller_json);
+        return map_control_type(control_type_str);
     }
 
-    void parse_velocity_control_law(const nlohmann::json& controller_json, control::VelocityControlLaw& control_law) {
-        std::string control_type_str = controller_json.at("control_type").get<std::string>();
-
-        control::ControlType control_type = map_control_type(control_type_str);
-        control_law = make_velocity_control_law(control_type, controller_json);
+    void parse_axial_control_law(const nlohmann::json& controller_json, control::AxialControlLaw& control_law, control::ControlType& ctrl_type) {
+        ctrl_type = fetch_control_type(controller_json);
+        control_law = make_axial_control_law(
+            ctrl_type, 
+            controller_json
+        );
     }
 
-    void parse_linear_full_state_feedback_control_law(const nlohmann::json& controller_json, control::LinearFullStateFeedbackControlLaw& control_law) {
-        std::string control_type_str = controller_json.at("control_type").get<std::string>();
+    void parse_velocity_control_law(const nlohmann::json& controller_json, control::VelocityControlLaw& control_law, control::ControlType& ctrl_type) {
+        ctrl_type = fetch_control_type(controller_json);
+        control_law = make_velocity_control_law(
+            ctrl_type, 
+            controller_json
+        );    }
 
-        control::ControlType control_type = map_control_type(control_type_str);
-        control_law = make_linear_full_state_feedback_control_law(control_type, controller_json);
+    void parse_linear_full_state_feedback_control_law(const nlohmann::json& controller_json, control::LinearFullStateFeedbackControlLaw& control_law, control::ControlType& ctrl_type) {
+        ctrl_type = fetch_control_type(controller_json);
+        control_law = make_linear_full_state_feedback_control_law(
+            ctrl_type, 
+            controller_json
+        );
     }
 
-    void parse_nonlinear_control_law(const nlohmann::json& controller_json, control::NonlinearControlLaw& control_law) {
-        std::string control_type_str = controller_json.at("control_type").get<std::string>();
-
-        control::ControlType control_type = map_control_type(control_type_str);
-        control_law = make_nonlinear_control_law(control_type, controller_json);
+    void parse_nonlinear_control_law(const nlohmann::json& controller_json, control::NonlinearControlLaw& control_law, control::ControlType& ctrl_type) {
+        ctrl_type = fetch_control_type(controller_json);
+        control_law = make_nonlinear_control_law(
+            ctrl_type, 
+            controller_json
+        );
     }
 
     void validate_control_laws(const nlohmann::json& controllers_json){
@@ -218,56 +224,53 @@ namespace json {
         bool linear_full_state_feedback_bool = controllers_json.contains("linear_full_state_feedback");
         bool nonlinear_bool = controllers_json.contains("nonlinear");
 
-        if (axial_bool && linear_full_state_feedback_bool) { throw std::runtime_error("json::parse_control_properties: axial and linear_full_state_feedback control laws cannot both be present"); }
-        if (axial_bool && nonlinear_bool) { throw std::runtime_error("json::parse_control_properties: axial and nonlinear control laws cannot both be present"); }
+        if (axial_bool && linear_full_state_feedback_bool) { throw std::runtime_error("json::validate_control_laws: axial and linear_full_state_feedback control laws cannot both be present"); }
+        if (axial_bool && nonlinear_bool) { throw std::runtime_error("json::validate_control_laws: axial and nonlinear control laws cannot both be present"); }
 
-        if (linear_full_state_feedback_bool && nonlinear_bool) { throw std::runtime_error("json::parse_control_properties: linear_full_state_feedback and nonlinear control laws cannot both be present"); }
+        if (linear_full_state_feedback_bool && nonlinear_bool) { throw std::runtime_error("json::validate_control_laws: linear_full_state_feedback and nonlinear control laws cannot both be present"); }
 
-        if (velocity_bool && linear_full_state_feedback_bool) { throw std::runtime_error("json::parse_control_properties: velocity and linear_full_state_feedback control laws cannot both be present"); }
-        if (velocity_bool && nonlinear_bool) { throw std::runtime_error("json::parse_control_properties: velocity and nonlinear control laws cannot both be present"); }
+        if (velocity_bool && linear_full_state_feedback_bool) { throw std::runtime_error("json::validate_control_laws: velocity and linear_full_state_feedback control laws cannot both be present"); }
+        if (velocity_bool && nonlinear_bool) { throw std::runtime_error("json::validate_control_laws: velocity and nonlinear control laws cannot both be present"); }
     }
 
     control::ControlProperties parse_control_properties(const nlohmann::json& config) {
-        const auto& controllers_json = config.at("controllers");
-        validate_control_laws(controllers_json);
-
-        const auto& setpoint_json = config.at("setpoint");
+        validate_control_laws(config);
         control::ControlProperties control_properties;
 
-        if (controllers_json.contains("axial")) {
-            const auto& axial_controller_json = controllers_json.at("axial");
+        if (config.contains("axial")) {
+            const auto& axial_controller_json = config.at("axial");
             parse_axial_control_law(
                 axial_controller_json,
-                control_properties.axial_control_law
+                control_properties.axial_control_law,
+                control_properties.axial_control_type
             );
-            // control_properties.axial_setpoint = parse_axial_control_setpoint(setpoint_json);
         }
 
-        if (controllers_json.contains("velocity")) {
-            const auto& velocity_controller_json = controllers_json.at("velocity");
+        if (config.contains("velocity")) {
+            const auto& velocity_controller_json = config.at("velocity");
             parse_velocity_control_law(
                 velocity_controller_json,
-                control_properties.velocity_control_law
+                control_properties.velocity_control_law,
+                control_properties.velocity_control_type
             );
-            // control_properties.velocity_setpoint = parse_velocity_control_setpoint(setpoint_json, control_properties.velocity_control_type);
         }
 
-        if (controllers_json.contains("linear_full_state_feedback")) {
-            const auto& linear_full_state_feedback_controller_json = controllers_json.at("linear_full_state_feedback");
+        if (config.contains("linear_full_state_feedback")) {
+            const auto& linear_full_state_feedback_controller_json = config.at("linear_full_state_feedback");
             parse_linear_full_state_feedback_control_law(
                 linear_full_state_feedback_controller_json,
-                control_properties.linear_full_state_feedback_control_law
+                control_properties.linear_full_state_feedback_control_law,
+                control_properties.linear_full_state_feedback_control_type
             );
-            // control_properties.linear_full_state_feedback_setpoint = parse_linear_full_state_feedback_control_setpoint(setpoint_json, control_properties.linear_full_state_feedback_control_type);
         }
 
-        if (controllers_json.contains("nonlinear")) {
-            const auto& nonlinear_controller_json = controllers_json.at("nonlinear");
+        if (config.contains("nonlinear")) {
+            const auto& nonlinear_controller_json = config.at("nonlinear");
             parse_nonlinear_control_law(
                 nonlinear_controller_json,
-                control_properties.nonlinear_control_law
+                control_properties.nonlinear_control_law,
+                control_properties.nonlinear_control_type
             );
-            // control_properties.nonlinear_setpoint = parse_nonlinear_control_setpoint(setpoint_json, control_properties.linear_full_state_feedback_control_type);
         }
 
         return control_properties;

@@ -10,10 +10,10 @@ namespace control {
         )
     {};
 
-    trim::TrimStateVector_T<double> LinearQuadraticRegulator::unpack_linear_quadratic_regulator_setpoint(const LinearQuadraticRegulatorSetpoint& setpoint){
-        dynamics::LinearVelocity& vB_BI = setpoint.vB_BI;
-        dynamics::AngularVelocity& wB_BI = setpoint.wB_BI;
-        dynamics::EulerAngles& eulIB = setpoint.eulIB;
+    trim::TrimStateVector_T<double> LinearQuadraticRegulator::unpack_linear_quadratic_regulator_setpoint(const guidance::LinearFullStateFeedbackSetpoint& setpoint){
+        dynamics::LinearVelocity vB_BI = setpoint.vB_BI;
+        dynamics::AngularVelocity wB_BI = setpoint.wB_BI;
+        dynamics::EulerAngles eulIB = setpoint.eulIB;
 
         trim::TrimState<double> setpoint_packed { 
             .vx = vB_BI.data(0),
@@ -32,7 +32,7 @@ namespace control {
         const LinearQuadraticRegulatorInput& ctrl_law_input
     ){
         dynamics::RigidBodyState zN_t = ctrl_law_input.zN_t;
-        LinearQuadraticRegulatorSetpoint setpoint = ctrl_law_input.setpoint;
+        guidance::LinearFullStateFeedbackSetpoint setpoint = ctrl_law_input.setpoint;
 
         return {
             .meas = trim::unpack_rigid_body_state(ctrl_law_input.zN_t),
@@ -49,7 +49,7 @@ namespace control {
         Eigen::VectorXd u_deviation = policy.step(
             make_linear_quadratic_control_law_input(ctrl_law_input)
         );
-        Eigen::VectorXd u_trim = trim::unpack_trim_control_inputs_T(ctrl_law_input.u_sol_trim);
+        Eigen::VectorXd u_trim = trim::unpack_trim_actuator_inputs_T(ctrl_law_input.u_sol_trim);
 
         Eigen::VectorXd u_cmd = u_deviation + u_trim;
 

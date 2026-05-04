@@ -7,17 +7,19 @@ namespace control {
         ControlOutput out{};
 
         if (axial_control_law) { 
-            out.surface_inputs = axial_control_law(ctrl_law_input.axial_control_law_input); 
+            out.surface_inputs = axial_control_law(ctrl_law_input.axial_control_law_input).surface_inputs; 
         }
         if (velocity_control_law) { 
-            out.propulsor_inputs = axial_control_law(ctrl_law_input.velocity_control_law_input); 
+            out.propulsor_inputs = velocity_control_law(ctrl_law_input.velocity_control_law_input).propulsor_inputs; 
         }
-        if (linear_quadratic_control_law) { 
-            out = linear_quadratic_control_law(ctrl_law_input.linear_quadratic_control_law_input); 
+        if (linear_full_state_feedback_control_law) { 
+            out = linear_full_state_feedback_control_law(ctrl_law_input.linear_full_state_feedback_control_law_input); 
         }
         if (nonlinear_control_law) { 
             out = nonlinear_control_law(ctrl_law_input.nonlinear_control_law_input); 
         }
+
+        return out;
     }
 
     Eigen::VectorXd unpack_full_surface_actuator_inputs(const SurfaceActuatorInputs& u_surface) {

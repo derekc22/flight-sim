@@ -25,8 +25,8 @@ namespace trim {
         return ratio / std::sqrt(std::max(1.0 - ratio * ratio, constants::eps));
     }
 
-    static TrimVariableVector_T<double> unpack_trim_solver_variables(const TrimState<double>& x, const TrimActuatorInputs<double>& u, const actuators::SurfaceActuators& surface_actuators, const actuators::PropulsorActuators& propulsor_actuators) {
-        TrimVariableVector_T<double> z = unpack_trim_variables_T<double>(x, u);
+    static TrimVariablesVector_T<double> unpack_trim_solver_variables(const TrimState<double>& x, const TrimActuatorInputs<double>& u, const actuators::SurfaceActuators& surface_actuators, const actuators::PropulsorActuators& propulsor_actuators) {
+        TrimVariablesVector_T<double> z = unpack_trim_variables_T<double>(x, u);
         z(8) = send_control_to_solver_space(u.elevator_cmd, surface_actuators.elevator);
         z(9) = send_control_to_solver_space(u.aileron_cmd, surface_actuators.aileron);
         z(10) = send_control_to_solver_space(u.rudder_cmd, surface_actuators.rudder);
@@ -83,10 +83,10 @@ namespace trim {
         };
     }
 
-    static TrimSolution build_trim_solution(const TrimVariableVector_T<double>& z, const TrimResidualVector_T<double>& residual, const TrimResidualVector_T<double>& weighted_residual, const TrimModel& model, const TrimConditions& conditions, bool converged, std::size_t iterations) {
+    static TrimSolution build_trim_solution(const TrimVariablesVector_T<double>& z, const TrimResidualVector_T<double>& residual, const TrimResidualVector_T<double>& weighted_residual, const TrimModel& model, const TrimConditions& conditions, bool converged, std::size_t iterations) {
         TrimSolution out;
         out.state = pack_trim_state_T<double>(z);
-        out.input = pack_trim_solver_control_inputs_T<double>(z, model.surface_actuators, model.propulsor_actuators);
+        out.input = pack_trim_actuator_inputs_T<double>(z, model.surface_actuators, model.propulsor_actuators);
         out.conditions = conditions;
         out.wrench = compute_trim_wrench(out.state, out.input, model, out.conditions);
         out.variables = unpack_trim_variables_T<double>(out.state, out.input);
@@ -132,11 +132,11 @@ namespace trim {
         return out;
     }
 
-    TrimResidualVector_T<double> compute_trim_residual_vector(const TrimVariableVector_T<double>& z, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions, bool use_physical_controls) {
+    TrimResidualVector_T<double> compute_trim_residual_vector(const TrimVariablesVector_T<double>& z, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions, bool use_physical_controls) {
         return compute_trim_residual_vector_T<double>(z, model, target, conditions, use_physical_controls);
     }
 
-    TrimResidualJacobian compute_trim_residual_jac(const TrimVariableVector_T<double>& z, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions, bool use_physical_controls) {
+    TrimResidualJacobian compute_trim_residual_jac(const TrimVariablesVector_T<double>& z, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions, bool use_physical_controls) {
         CppAD::eigen_vector<CppAD::AD<double>> z_tracked_cppad = util::start_autodiff_tracking(z);
         const TrimResidualVector_T<CppAD::AD<double>> residual_tracked = compute_trim_residual_vector_T<CppAD::AD<double>>(
             util::eigen_vector_from_cppad_vector<CppAD::AD<double>, trim_variable_dim>(z_tracked_cppad),
@@ -154,7 +154,7 @@ namespace trim {
         _validate_trim_solve_options(options);
 
         const bool use_physical_controls = false;
-        TrimVariableVector_T<double> z = unpack_trim_solver_variables(problem.state_guess, problem.input_guess, model.surface_actuators, model.propulsor_actuators);
+        TrimVariablesVector_T<double> z = unpack_trim_solver_variables(problem.state_guess, problem.input_guess, model.surface_actuators, model.propulsor_actuators);
         TrimResidualVector_T<double> residual = compute_trim_residual_vector(z, model, problem.target, problem.conditions, use_physical_controls);
         const TrimResidualVector_T<double> weights = trim_residual_weights(options);
         TrimResidualVector_T<double> weighted_residual = weights.cwiseProduct(residual);
@@ -172,9 +172,9 @@ namespace trim {
             const TrimResidualJacobian jac_raw = compute_trim_residual_jac(z, model, problem.target, problem.conditions, use_physical_controls);
             const TrimResidualJacobian jac = weights.asDiagonal() * jac_raw;
             const Eigen::Matrix<double, trim_variable_dim, trim_variable_dim> hess = jac.transpose() * jac + damping * Eigen::Matrix<double, trim_variable_dim, trim_variable_dim>::Identity();
-            const TrimVariableVector_T<double> grad = jac.transpose() * weighted_residual;
+            const TrimVariablesVector_T<double> grad = jac.transpose() * weighted_residual;
             const Eigen::LDLT<Eigen::Matrix<double, trim_variable_dim, trim_variable_dim>> ldlt(hess);
-            const TrimVariableVector_T<double> step = ldlt.solve(-grad);
+            const TrimVariablesVector_T<double> step = ldlt.solve(-grad);
 
             if (ldlt.info() != Eigen::Success || !step.allFinite()) {
                 break;
@@ -189,7 +189,7 @@ namespace trim {
             const double weighted_residual_norm_2 = weighted_residual.norm();
 
             while (step_scale >= options.min_step_scale) {
-                const TrimVariableVector_T<double> z_trial = z + step_scale * step;
+                const TrimVariablesVector_T<double> z_trial = z + step_scale * step;
                 const TrimResidualVector_T<double> residual_trial = compute_trim_residual_vector(z_trial, model, problem.target, problem.conditions, use_physical_controls);
                 const double weighted_residual_trial_norm_2 = weights.cwiseProduct(residual_trial).norm();
 
@@ -410,13 +410,13 @@ namespace trim {
     //     propulsor_actuators.right_propulsor.prev_cmd = trim_sol.input.right_propulsor_cmd;
     // }
 
-    TrimStateVector_T<double> unpack_rigid_body_state(const dynamics::RigidBodyState& zN_t){
-        dynamics::LinearVelocity vB_BI = zN_t.v;
-        dynamics::AngularVelocity wB_BI = zN_t.w;
+    TrimStateVector_T<double> unpack_rigid_body_state(const dynamics::RigidBodyState& xN_t){
+        dynamics::LinearVelocity vB_BI = xN_t.v;
+        dynamics::AngularVelocity wB_BI = xN_t.w;
         dynamics::EulerAngles eulIB;
-        eulIB.set(zN_t.q);
+        eulIB.set(xN_t.q);
 
-        TrimState<double> zN_t_packed { 
+        TrimState<double> xN_t_packed { 
             .vx = vB_BI.data(0),
             .vy = vB_BI.data(1),
             .vz = vB_BI.data(2),
@@ -426,7 +426,7 @@ namespace trim {
             .phi = eulIB.phi(),
             .theta = eulIB.theta(),
         };
-        return unpack_trim_state_T(zN_t_packed);
+        return unpack_trim_state_T(xN_t_packed);
     }
 
 }

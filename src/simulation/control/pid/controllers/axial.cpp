@@ -6,24 +6,24 @@ namespace control {
 
     AxialPID::AxialPID(const AxialPIDParameters& params) :
         lateral_policy( PIDControlLaw({ 
-                .Kp = params.Kp_lateral, 
-                .Ki = params.Ki_lateral, 
-                .Kd = params.Kd_lateral, 
-                .tau = params.tau_lateral
+                .Kp = params.Kp_roll,
+                .Ki = params.Ki_roll,
+                .Kd = params.Kd_roll,
+                .tau = params.tau
             })
         ),
         longitudinal_policy( PIDControlLaw({ 
-                .Kp = params.Kp_longitudinal, 
-                .Ki = params.Ki_longitudinal, 
-                .Kd = params.Kd_longitudinal, 
-                .tau = params.tau_longitudinal
+                .Kp = params.Kp_pitch,
+                .Ki = params.Ki_pitch,
+                .Kd = params.Kd_pitch,
+                .tau = params.tau
             })
         ),
         vertical_policy( PIDControlLaw({ 
-                .Kp = params.Kp_vertical, 
-                .Ki = params.Ki_vertical, 
-                .Kd = params.Kd_vertical, 
-                .tau = params.tau_vertical
+                .Kp = params.Kp_yaw,
+                .Ki = params.Ki_yaw,
+                .Kd = params.Kd_yaw,
+                .tau = params.tau
             })
         )
     {};
@@ -34,7 +34,7 @@ namespace control {
     ){
         dynamics::RigidBodyState zN_t = ctrl_law_input.zN_t;
         actuators::SurfaceActuators surface_actuators = ctrl_law_input.surface_actuators;
-        AxialPIDSetpoint setpoint = ctrl_law_input.setpoint;
+        guidance::AxialSetpoint setpoint = ctrl_law_input.setpoint;
 
         dynamics::EulerAngles eul_meas_t;
         eul_meas_t.set(zN_t.q);

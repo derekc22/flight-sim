@@ -42,7 +42,7 @@ namespace trim {
     }
 
     template <typename T>
-    TrimActuatorInputs<T> pack_trim_solver_control_inputs_T(const TrimVariableVector_T<T>& z, const actuators::SurfaceActuators& surface_actuators, const actuators::PropulsorActuators& propulsor_actuators) {
+    TrimActuatorInputs<T> pack_trim_actuator_inputs_T(const TrimVariablesVector_T<T>& z, const actuators::SurfaceActuators& surface_actuators, const actuators::PropulsorActuators& propulsor_actuators) {
         return {
             .elevator_cmd = get_control_from_solver_space_T<T>(z(8), surface_actuators.elevator),
             .aileron_cmd = get_control_from_solver_space_T<T>(z(9), surface_actuators.aileron),
@@ -142,8 +142,8 @@ namespace trim {
     }
 
     template <typename T>
-    TrimVariableVector_T<T> unpack_trim_variables_T(const TrimState<T>& x, const TrimActuatorInputs<T>& u) {
-        TrimVariableVector_T<T> out;
+    TrimVariablesVector_T<T> unpack_trim_variables_T(const TrimState<T>& x, const TrimActuatorInputs<T>& u) {
+        TrimVariablesVector_T<T> out;
         out << x.vx, x.vy, x.vz,
                x.p, x.q, x.r,
                x.phi, x.theta,
@@ -153,7 +153,7 @@ namespace trim {
     }
 
     template <typename T>
-    TrimActuatorInputsVector_T<T> unpack_trim_control_inputs_T(const TrimActuatorInputs<T>& u) {
+    TrimActuatorInputsVector_T<T> unpack_trim_actuator_inputs_T(const TrimActuatorInputs<T>& u) {
         TrimActuatorInputsVector_T<T> out;
         out << u.elevator_cmd, u.aileron_cmd, u.rudder_cmd,
                u.front_propulsor_cmd, u.left_propulsor_cmd, u.right_propulsor_cmd;
@@ -179,7 +179,7 @@ namespace trim {
     }
 
     template <typename T>
-    TrimState<T> pack_trim_state_T(const TrimVariableVector_T<T>& z) {
+    TrimState<T> pack_trim_state_T(const TrimVariablesVector_T<T>& z) {
         return {
             .vx = z(0),
             .vy = z(1),
@@ -193,7 +193,7 @@ namespace trim {
     }
 
     template <typename T>
-    TrimActuatorInputs<T> pack_trim_input_T(const TrimVariableVector_T<T>& z) {
+    TrimActuatorInputs<T> pack_trim_actuator_inputs_T(const TrimVariablesVector_T<T>& z) {
         return {
             .elevator_cmd = z(8),
             .aileron_cmd = z(9),
@@ -226,12 +226,12 @@ namespace trim {
     }
 
     template <typename T>
-    TrimResidualVector_T<T> compute_trim_residual_vector_T(const TrimVariableVector_T<T>& z, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions, bool use_physical_controls) {
+    TrimResidualVector_T<T> compute_trim_residual_vector_T(const TrimVariablesVector_T<T>& z, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions, bool use_physical_controls) {
         const TrimState<T> x = pack_trim_state_T<T>(z);
 
         TrimActuatorInputs<T> u;
-        if (use_physical_controls) u = pack_trim_input_T<T>(z);
-        else u = pack_trim_solver_control_inputs_T<T>(z, model.surface_actuators, model.propulsor_actuators);
+        if (use_physical_controls) u = pack_trim_actuator_inputs_T<T>(z);
+        else u = pack_trim_actuator_inputs_T<T>(z, model.surface_actuators, model.propulsor_actuators);
 
         const TrimResidual<T> residual = compute_trim_residual<T>(x, u, model, target, conditions);
         return unpack_trim_residual_T(residual);

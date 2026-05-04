@@ -1,4 +1,5 @@
 #include <Eigen/Eigenvalues>
+#include <unsupported/Eigen/MatrixFunctions>
 #include <array>
 #include <iomanip>
 #include <sstream>
@@ -20,23 +21,23 @@ namespace linearization {
             },
         };
 
-        const trim::TrimVariableVector_T<double> z = trim::unpack_trim_variables_T<double>(trim_sol.state, trim_sol.input);
+        const trim::TrimVariablesVector_T<double> z = trim::unpack_trim_variables_T<double>(trim_sol.state, trim_sol.input);
         CppAD::eigen_vector<CppAD::AD<double>> z_t = util::start_autodiff_tracking(z);
 
-        const trim::TrimVariableVector_T<CppAD::AD<double>> z_vec = util::eigen_vector_from_cppad_vector<CppAD::AD<double>, trim::trim_variable_dim>(z_t);
+        const trim::TrimVariablesVector_T<CppAD::AD<double>> z_vec = util::eigen_vector_from_cppad_vector<CppAD::AD<double>, trim::trim_variable_dim>(z_t);
         const trim::TrimState<CppAD::AD<double>> x_t = trim::pack_trim_state_T<CppAD::AD<double>>(z_vec);
-        const trim::TrimActuatorInputs<CppAD::AD<double>> u_t = trim::pack_trim_input_T<CppAD::AD<double>>(z_vec);
+        const trim::TrimActuatorInputs<CppAD::AD<double>> u_t = trim::pack_trim_actuator_inputs_T<CppAD::AD<double>>(z_vec);
         
         const trim::TrimStateDot<CppAD::AD<double>> trim_state_dot = trim::compute_trim_state_dot_T<CppAD::AD<double>>(x_t, u_t, model, trim_sol.conditions);
         const trim::TrimStateDotVector_T<CppAD::AD<double>> x_dot_vec = trim::unpack_trim_state_dot_T(trim_state_dot);
         const CppAD::eigen_vector<CppAD::AD<double>> x_dot_t = util::cppad_vector_from_eigen_vector(x_dot_vec);
         
         CppAD::ADFun<double> f(z_t, x_dot_t);
-        const Eigen::Matrix<double, trim::constants::state_dim, trim::trim_variable_dim> jac_map = util::compute_jac<trim::constants::state_dim, trim::trim_variable_dim>(f, z);
+        const Eigen::Matrix<double, constants::state_dim, trim::trim_variable_dim> jac_map = util::compute_jac<constants::state_dim, trim::trim_variable_dim>(f, z);
 
         TrimLinearization out;
-        out.A = jac_map.leftCols<trim::constants::state_dim>();
-        out.B = jac_map.rightCols<trim::constants::input_dim>();
+        out.A = jac_map.leftCols<constants::state_dim>();
+        out.B = jac_map.rightCols<constants::input_dim>();
         return out;
     }
 

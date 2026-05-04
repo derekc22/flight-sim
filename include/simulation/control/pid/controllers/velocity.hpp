@@ -3,19 +3,16 @@
 #include "simulation/actuators/actuators.hpp"
 #include "simulation/control/shared.hpp"
 #include "simulation/control/pid/pid.hpp"
+#include "simulation/guidance/guidance.hpp"
 
 namespace control { struct ControlOutput; struct VelocityControlLawInput; } // forward declare
 
 namespace control {
 
-    struct VelocityPIDSetpoint {
-        dynamics::LinearVelocity vB_BI;
-    };
-
     struct VelocityPIDInput : VelocityControlLawInput {
         dynamics::RigidBodyState& zN_t;
         actuators::PropulsorActuators& propulsor_actuators;
-        VelocityPIDSetpoint setpoint;
+        guidance::VelocitySetpoint setpoint;
     };
 
     struct VelocityPIDParameters : PIDControlLawParameters, VelocityControlLawParameters {};
@@ -30,6 +27,6 @@ namespace control {
         PIDControlLawInput make_pid_control_law_input(
             const VelocityPIDInput& ctrl_law_input
         );
-        std::tuple<double, double, double> allocate_thrust(double T_tot);
+        std::tuple<double, double, double> allocate_thrust(double T_tot, const actuators::PropulsorActuators& propulsor_actuators);
     };
 }

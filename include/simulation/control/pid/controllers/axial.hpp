@@ -3,37 +3,32 @@
 #include "simulation/actuators/actuators.hpp"
 #include "simulation/control/shared.hpp"
 #include "simulation/control/pid/pid.hpp"
+#include "simulation/guidance/guidance.hpp"
 
 namespace control { struct ControlOutput; struct AxialControlLawInput; } // forward declare
 
 namespace control {
 
-    struct AxialPIDSetpoint {
-        dynamics::EulerAngles eulIB;
-        dynamics::AngularVelocity wB_BI;
-    };
-
     struct AxialPIDInput : AxialControlLawInput {
         dynamics::RigidBodyState& zN_t;
         actuators::SurfaceActuators& surface_actuators;
-        AxialPIDSetpoint setpoint;
+        guidance::AxialSetpoint setpoint;
     };
 
     struct AxialPIDParameters : AxialControlLawParameters {
-        double Kp_lateral = 0.0;
-        double Ki_lateral = 0.0;
-        double Kd_lateral = 0.0;
-        double tau_lateral = 0.0;
+        double Kp_roll = 0.0;
+        double Ki_roll = 0.0;
+        double Kd_roll = 0.0;
 
-        double Kp_longitudinal = 0.0;
-        double Ki_longitudinal = 0.0;
-        double Kd_longitudinal = 0.0;
-        double tau_longitudinal = 0.0;
+        double Kp_pitch = 0.0;
+        double Ki_pitch = 0.0;
+        double Kd_pitch = 0.0;
 
-        double Kp_vertical = 0.0;
-        double Ki_vertical = 0.0;
-        double Kd_vertical = 0.0;
-        double tau_vertical = 0.0;
+        double Kp_yaw = 0.0;
+        double Ki_yaw = 0.0;
+        double Kd_yaw = 0.0;
+
+        double tau = 0.0;
     };
 
     struct AxialPID {

@@ -1,5 +1,5 @@
 
-#include "simulation/control/pid/velocity.hpp"
+#include "simulation/control/pid/controllers/velocity.hpp"
 
 namespace control {
 
@@ -12,7 +12,7 @@ namespace control {
         )
     {};
 
-    std::tuple<double, double, double> VelocityPID::allocate_thrust(double T_tot) {
+    std::tuple<double, double, double> VelocityPID::allocate_thrust(double T_tot, const actuators::PropulsorActuators& propulsor_actuators) {
         const actuators::PropulsorActuator& front = propulsor_actuators.front_propulsor;
         const actuators::PropulsorActuator& left = propulsor_actuators.left_propulsor;
         const actuators::PropulsorActuator& right = propulsor_actuators.right_propulsor;
@@ -50,8 +50,8 @@ namespace control {
         const VelocityPIDInput& ctrl_law_input
     ){
         dynamics::RigidBodyState zN_t = ctrl_law_input.zN_t;
-        actuators::SurfaceActuators propulsor_actuators = ctrl_law_input.propulsor_actuators;
-        VelocityPIDSetpoint setpoint = ctrl_law_input.setpoint;
+        actuators::PropulsorActuators propulsor_actuators = ctrl_law_input.propulsor_actuators;
+        guidance::VelocitySetpoint setpoint = ctrl_law_input.setpoint;
 
         double limit_max_overall = propulsor_actuators.front_propulsor.limit_max + propulsor_actuators.left_propulsor.limit_max + propulsor_actuators.right_propulsor.limit_max;
         double limit_min_overall = propulsor_actuators.front_propulsor.limit_min + propulsor_actuators.left_propulsor.limit_min + propulsor_actuators.right_propulsor.limit_min;
@@ -64,12 +64,12 @@ namespace control {
         };
     }
 
-    ControlOutput VelocityPID::step(const VelocityPIDInput& ctrl_law_input){
+    ControlOutput VelocityPID::step(const VelocityPIDInput& ctrl_law_input) {
         SurfaceActuatorInputs u_surface{};
         PropulsorActuatorInputs u_propulsor{};
 
         double T_tot = policy.step(
-            make_pid_control_law_input(ctrl_law_input.zN_t, ctrl_law_input.propulsor_actuators, velocity_control_type)
+            make_pid_control_law_input(ctrl_law_input)
         );
 
         auto [T_front, T_left, T_right] = allocate_thrust(T_tot, ctrl_law_input.propulsor_actuators);

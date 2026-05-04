@@ -22,6 +22,7 @@
 #include "simulation/analysis/analysis.hpp"
 #include "simulation/linearization/linearization.hpp"
 #include "simulation/propulsion/propulsion.hpp"
+#include "simulation/guidance/guidance.hpp"
 #include "core/io/io.hpp"
 #include "core/json/json.hpp"
 #include "core/connection/connection.hpp"
@@ -61,15 +62,17 @@ struct SimulationOutput {
 vehicles::Aircraft load(bool trim_bool) {
     structural::StructuralProperties structural_properties = json::parse_structural_config();
     actuators::ActuatorProperties actuator_properties = json::parse_actuator_config(structural_properties);
+    control::ControlProperties control_properties = json::parse_control_config();
 
     // create vehicle from config
     vehicles::Aircraft aircraft { 
         structural_properties,
         json::parse_aerodynamics_config(),
         actuator_properties,
-        json::parse_control_config(),
+        control_properties,
         json::parse_avionics_config(),
-        json::parse_operating_config(actuator_properties)
+        json::parse_operating_config(actuator_properties),
+        json::parse_guidance_config(control_properties)
     };
 
     // set initial conditions from config
@@ -125,6 +128,7 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
     control::ControlProperties& control_properties = aircraft.control_properties;
     actuators::ActuatorProperties& actuator_properties = aircraft.actuator_properties;
     operating::OperatingProperties& operating_properties = aircraft.operating_properties;
+    guidance::GuidanceProperties& guidance_properties = aircraft.guidance_properties;
 
     dynamics::Mass mass = structural_properties.Mass;
     dynamics::InertiaTensor J = structural_properties.J;
@@ -200,24 +204,65 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
             zN_t = xN_t_sensor;
         }
 
+        // specify guidance setpoint
+        guidance::GuidanceSetpoint guidance_setpoint = guidance_properties.step(t, tf);
+
         // specify control commands
+        control::ControlLawInput ctrl_law_input;
         control::ControlOutput u_cmd{};
 
         if (sim_in.trim_bool && trim_sol.converged && !sim_in.control_bool) {
             u_cmd = trim::set_control_inputs_from_trim(trim_sol);
         }
-        else if (sim_in.control_bool && !sim_in.trim_bool) {
-            u_cmd.surface_inputs = control_properties.step(zN_t, actuator_properties.surface_actuators).surface_inputs;
-            u_cmd.propulsor_inputs = control_properties.step(zN_t, actuator_properties.propulsor_actuators).propulsor_inputs;
-        }
-        else if (sim_in.control_bool && sim_in.trim_bool && trim_sol.converged) {
-            u_cmd = control_properties.step(
-                zN_t,
-                lin_sol,
-                trim_sol.input,
-                actuator_properties.surface_actuators,
-                actuator_properties.propulsor_actuators
-            );
+
+        if (sim_in.control_bool) {
+            if (!sim_in.trim_bool) {
+                switch (control_properties.axial_control_type) {
+                    case control::ControlType::AxialPID:
+                    case control::ControlType::DamperPID: {
+                        ctrl_law_input.axial_control_law_input = control::AxialPIDInput {
+                            .zN_t = zN_t,
+                            .surface_actuators = actuator_properties.surface_actuators,
+                            .setpoint = guidance_setpoint
+                        };
+                    }
+                    break;
+                    default:
+                        break;
+                }
+                switch (control_properties.velocity_control_type) {
+                    case control::ControlType::VelocityPID: {
+                        ctrl_law_input.velocity_control_law_input = control::VelocityPIDInput {
+                            .zN_t = zN_t,
+                            .propulsor_actuators = actuator_properties.propulsor_actuators,
+                            .setpoint = guidance_setpoint
+                        };
+                    }
+                    break;
+                    default:
+                        break;
+                }
+            }
+            else if (sim_in.trim_bool && trim_sol.converged) {
+                switch (control_properties.linear_full_state_feedback_control_type) {
+                    case control::ControlType::LinearQuadraticRegulator: 
+                    case control::ControlType::LinearQuadraticIntegrator: {
+                        ctrl_law_input.linear_full_state_feedback_control_law_input = control::LinearQuadraticRegulatorInput {
+                            .zN_t = zN_t,
+                            .u_sol_trim = trim_sol.input,
+                            .A = lin_sol.A,
+                            .B = lin_sol.B,
+                            .setpoint = guidance_setpoint
+                        };
+                    }
+                    break;
+                    default:
+                        break;
+                }
+            }
+
+            u_cmd.surface_inputs = control_properties.step(ctrl_law_input).surface_inputs;
+            u_cmd.propulsor_inputs = control_properties.step(ctrl_law_input).propulsor_inputs;
         }
 
         u_cmd.surface_inputs.flap_cmd = fixed_surface_inputs.flap_cmd;

@@ -1,5 +1,4 @@
 #pragma once
-#include "simulation/control/control.hpp"
 #include "simulation/dynamics/dynamics.hpp"
 #include "simulation/actuators/actuators.hpp"
 #include "simulation/trim/trim.hpp"
@@ -22,7 +21,7 @@ namespace control {
     };
 
     struct LinearQuadraticControlLaw {
-        const LinearQuadraticControlLawParameters& params;
+        LinearQuadraticControlLawParameters params;
 
         LinearQuadraticControlLaw(const LinearQuadraticControlLawParameters& params);
         Eigen::VectorXd step(const LinearQuadraticControlLawInput& ctrl_law_input);
