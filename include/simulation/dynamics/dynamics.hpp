@@ -156,23 +156,23 @@ namespace dynamics {
     };
 
     struct RigidBodyState {
-        dynamics::Position p;               // e.g. pI_BI
-        dynamics::LinearVelocity v;         // e.g. vB_BI
-        dynamics::OrientationQuaternion q;  // e.g. qIB
-        dynamics::AngularVelocity w;        // e.g. wB_BI
+        Position p;               // e.g. pI_BI
+        LinearVelocity v;         // e.g. vB_BI
+        OrientationQuaternion q;  // e.g. qIB
+        AngularVelocity w;        // e.g. wB_BI
     };
 
     /** @warning The parent of F must be an inertial frame: ECEFFrame or NEDFrameECEF */
     RigidBodyState rigid_body_state(const frames::Frame& F);
 
     struct Wrench {
-        dynamics::Force F;          
-        dynamics::Moment M;         
+        Force F;          
+        Moment M;         
     };
 
     struct Twist {
-        dynamics::LinearVelocity v;         // e.g. vB_BI
-        dynamics::AngularVelocity w;        // e.g. wB_BI
+        LinearVelocity v;         // e.g. vB_BI
+        AngularVelocity w;        // e.g. wB_BI
     };
 
     template <typename T>

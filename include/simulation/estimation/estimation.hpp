@@ -1,55 +1,28 @@
 #pragma once
-
-#include <Eigen/Dense>
-#include <cmath>
-#include <tuple>
-#include <algorithm>
+#include <functional>
+#include "simulation/estimation/shared.hpp"
+#include "simulation/estimation/kalman/estimators/ekf.hpp"
+#include "simulation/estimation/kalman/estimators/lkf.hpp"
 
 namespace estimation {
 
-    struct KalmanState {
-        Eigen::VectorXd x;
-        Eigen::MatrixXd P;
+    enum class EstimatorType {
+        None,
+        LinearKalmanFilter,
+        ExtendedKalmanFilter
     };
 
+    using KalmanFilterEstimator = std::function<EstimationOutput(const KalmanFilterInput&)>;
 
-    struct KalmanFilter {
-
-        Eigen::VectorXd xt; // state estimate
-        Eigen::MatrixXd A;  // state transition matrix
-        Eigen::MatrixXd B;  // input matrix
-        Eigen::MatrixXd C;  // measurement matrix
-        Eigen::MatrixXd Pt; // state estimate error covariance matrix
-        Eigen::MatrixXd Rt; // process noise covariance matrix
-        Eigen::MatrixXd Qt; // measurement noise covariance matrix
-
-        int n;
-        int m;
-        int k;
-
-        KalmanFilter(
-            const Eigen::VectorXd& x0, 
-            const Eigen::MatrixXd& A, 
-            const Eigen::MatrixXd& B, 
-            const Eigen::MatrixXd& C, 
-            const Eigen::MatrixXd& P0, 
-            const Eigen::MatrixXd& Q0, 
-            const Eigen::MatrixXd& R0 
-        );
-
-        void _validate_init(const Eigen::VectorXd& x0, const Eigen::MatrixXd& B, const Eigen::MatrixXd& C, const Eigen::MatrixXd& P0, const Eigen::MatrixXd& Q0, const Eigen::MatrixXd& R0);
-
-        KalmanState _predict(const Eigen::VectorXd& u);
-
-        KalmanState _correct(const KalmanState& pred, const Eigen::VectorXd& zt);
-
-        KalmanState step(const Eigen::VectorXd& zt, const Eigen::VectorXd& u);
-
-        
-
+    struct EstimationInput {
+        dynamics::RigidBodyState zN_t;
+        KalmanFilterInput kalman_filter_input;
     };
 
+    struct EstimationProperties {
+        EstimatorType kalman_filter_estimator_type = EstimatorType::None;
+        KalmanFilterEstimator kalman_filter_estimator;
 
-
-
+        EstimationOutput step(const EstimationInput& estimation_input, bool trim_bool);
+    };
 }

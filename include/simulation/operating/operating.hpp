@@ -4,14 +4,12 @@
 
 namespace operating {
 
-    struct FixedControls {
-        double flap = 0.0;
-        double spoiler = 0.0;
+    struct FixedSurfaceActuatorInputs {
+        double flap = 0.0; // [rad]
+        double spoiler = 0.0; // [rad]
     };
 
     struct OperatingProperties {
-        FixedControls fixed_controls{};
+        FixedSurfaceActuatorInputs fixed_surface_actuator_inputs{};
     };
-
-    control::SurfaceActuatorInputs fixed_surface_actuator_inputs(const OperatingProperties& operating_properties);
 }

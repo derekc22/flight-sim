@@ -5,11 +5,13 @@
 #include "simulation/dynamics/dynamics.hpp"
 #include "simulation/aerodynamics/aerodynamics.hpp"
 #include "simulation/control/control.hpp"
+#include "simulation/estimation/estimation.hpp"
 #include "simulation/actuators/actuators.hpp"
 #include "simulation/operating/operating.hpp"
 #include "simulation/geography/geography.hpp"
 #include "simulation/atmospheric/atmospheric.hpp"
 #include "simulation/avionics/avionics.hpp"
+#include "simulation/guidance/guidance.hpp"
 
 
 
@@ -209,6 +211,8 @@ namespace vehicles {
         control::ControlProperties control_properties;
         avionics::AvionicsProperties avionics_properties;
         operating::OperatingProperties operating_properties;
+        guidance::GuidanceProperties guidance_properties;
+        estimation::EstimationProperties estimation_properties;
 
         Aircraft(
             const structural::StructuralProperties& structural_properties,
@@ -216,7 +220,9 @@ namespace vehicles {
             const actuators::ActuatorProperties& actuator_properties,
             const control::ControlProperties& control_properties,
             const avionics::AvionicsProperties& avionics_properties,
-            const operating::OperatingProperties& operating_properties
+            const operating::OperatingProperties& operating_properties,
+            const guidance::GuidanceProperties& guidance_properties,
+            const estimation::EstimationProperties& estimation_properties
         );
 
         void step(const StepOptions& opts);

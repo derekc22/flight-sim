@@ -1,5 +1,4 @@
 #pragma once
-
 #include <cstddef>
 #include <utility> // For std::pair
 #include <Eigen/Dense>
@@ -11,158 +10,19 @@
 #include "simulation/util/util.hpp"
 #include "simulation/structural/structural.hpp"
 #include "simulation/propulsion/propulsion.hpp"
+#include "simulation/trim/types.hpp"
 
 namespace vehicles { struct Aircraft; } // forward declare
-namespace control { struct ControlInputs; } // forward declare
+namespace control { struct ControlOutput; } // forward declare
 
 namespace trim {
-
-    inline constexpr std::size_t trim_state_dofs = 8;
-    inline constexpr std::size_t trim_input_dofs = 6;
-    inline constexpr std::size_t trim_variable_dofs = trim_state_dofs + trim_input_dofs;
-    inline constexpr std::size_t trim_residual_dofs = trim_variable_dofs;
-
-    template <typename T>
-    using TrimVariableVector_T = Eigen::Matrix<T, trim_variable_dofs, 1>;
-
-    template <typename T>
-    using TrimActuatorInputsVector_T = Eigen::Matrix<T, trim_input_dofs, 1>;
-
-    template <typename T>
-    using TrimStateVector_T = Eigen::Matrix<T, trim_state_dofs, 1>;
-
-    template <typename T>
-    using TrimStateDotVector_T = Eigen::Matrix<T, trim_state_dofs, 1>;
-
-    template <typename T>
-    using TrimResidualVector_T = Eigen::Matrix<T, trim_residual_dofs, 1>;
-
-    using TrimResidualJacobian = Eigen::Matrix<double, trim_residual_dofs, trim_variable_dofs>;
-
-    struct TrimFixedActuatorInputs {
-        double flap = 0.0;
-        double spoiler = 0.0;
-    };
 
     struct TrimModel {
         const structural::StructuralProperties& structural;
         const aerodynamics::AerodynamicProperties& aerodynamic;
         const actuators::SurfaceActuators& surface_actuators;
         const actuators::PropulsorActuators& propulsor_actuators;
-        TrimFixedActuatorInputs fixed_controls{};
-    };
-
-    template <typename T>
-    struct TrimState {
-        T vx = T(0);
-        T vy = T(0);
-        T vz = T(0);
-
-        T p = T(0);
-        T q = T(0);
-        T r = T(0);
-
-        T phi = T(0);
-        T theta = T(0);
-    };
-
-    template <typename T>
-    struct TrimStateDot {
-        T vx_dot = T(0);
-        T vy_dot = T(0);
-        T vz_dot = T(0);
-
-        T p_dot = T(0);
-        T q_dot = T(0);
-        T r_dot = T(0);
-
-        T phi_dot = T(0);
-        T theta_dot = T(0);
-    };
-
-    template <typename T>
-    struct TrimActuatorInputs {
-        T elevator_cmd = T(0);
-        T aileron_cmd = T(0);
-        T rudder_cmd = T(0);
-        T front_propulsor_cmd = T(0);
-        T left_propulsor_cmd = T(0);
-        T right_propulsor_cmd = T(0);
-    };
-
-    struct TrimTarget {
-        double beta = 0.0;
-        double phi = 0.0;
-        double theta = 0.0;
-        double vx = 0.0;
-        double vz = 0.0;
-        double psi_dot = 0.0;
-    };
-
-    struct TrimConditions {
-        atmospheric::StaticAtmosphericState static_atmospheric_state;
-        atmospheric::Wind windB{ constants::Zero3 };
-    };
-
-    struct TrimSolveOptions {
-        std::size_t max_iterations = 30;
-        double residual_tolerance = 1e-2;
-        double step_tolerance = 1e-8;
-        double initial_damping = 1e-6;
-        double damping_growth = 10.0;
-        double linear_accel_scale = constants::g_earth;
-        double angular_accel_scale = util::deg_to_rad(30.0);
-        double angle_rate_scale = util::deg_to_rad(10.0);
-        double angle_err_scale = util::deg_to_rad(5.0);
-        double vel_err_scale = 5.0;
-        double backtrack_scale = 0.5;
-        double min_step_scale = 1.0 / 1024.0;
-    };
-
-    template <typename T>
-    struct TrimProblem {
-        TrimTarget target;
-        TrimConditions conditions;
-        TrimState<T> state_guess;
-        TrimActuatorInputs<T> input_guess;
-    };
-
-    template <typename T>
-    struct TrimResidual {
-        T vx_dot = T(0);
-        T vy_dot = T(0);
-        T vz_dot = T(0);
-
-        T p_dot = T(0);
-        T q_dot = T(0);
-        T r_dot = T(0);
-
-        T phi_dot = T(0);
-        T theta_dot = T(0);
-        T beta_err = T(0);
-        T phi_err = T(0);
-        T theta_err = T(0);
-
-        T vx_err = T(0);
-        T vz_err = T(0);
-        T psi_dot_err = T(0);
-    };
-
-    struct TrimSolution {
-        TrimState<double> state;
-        TrimActuatorInputs<double> input;
-        TrimConditions conditions;
-        dynamics::Wrench wrench{};
-        TrimResidual<double> residual;
-        TrimResidual<double> weighted_residual;
-        TrimVariableVector_T<double> variables = TrimVariableVector_T<double>::Zero();
-        bool attempted = false;
-        bool converged = false;
-        std::size_t iterations = 0;
-        // double residual_norm_2 = 0.0;
-        // double residual_norm_inf = 0.0;
-        double weighted_residual_norm_2 = 0.0;
-        double weighted_residual_norm_inf = 0.0;
+        TrimFixedActuatorInputs fixed_surface_actuator_inputs{};
     };
 
     template <typename T>
@@ -172,32 +32,32 @@ namespace trim {
     TrimResidual<T> compute_trim_residual(const TrimState<T>& x, const TrimActuatorInputs<T>& u, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions);
 
     template <typename T>
-    TrimVariableVector_T<T> pack_trim_variables_T(const TrimState<T>& x, const TrimActuatorInputs<T>& u);
+    TrimVariablesVector_T<T> unpack_trim_variables_T(const TrimState<T>& x, const TrimActuatorInputs<T>& u);
 
     template <typename T>
-    TrimActuatorInputsVector_T<T> pack_trim_control_surface_inputs_T(const TrimActuatorInputs<T>& u);
+    TrimActuatorInputsVector_T<T> unpack_trim_actuator_inputs_T(const TrimActuatorInputs<T>& u);
 
     template <typename T>
-    TrimStateVector_T<T> pack_trim_state_T(const TrimState<T>& x);
+    TrimStateVector_T<T> unpack_trim_state_T(const TrimState<T>& x);
 
     template <typename T>
-    TrimStateDotVector_T<T> pack_trim_state_dot_T(const TrimStateDot<T>& x_dot);
+    TrimStateDotVector_T<T> unpack_trim_state_dot_T(const TrimStateDot<T>& x_dot);
 
     template <typename T>
-    TrimState<T> unpack_trim_state_T(const TrimVariableVector_T<T>& z);
+    TrimState<T> pack_trim_state_T(const TrimVariablesVector_T<T>& z);
 
     template <typename T>
-    TrimActuatorInputs<T> unpack_trim_input_T(const TrimVariableVector_T<T>& z);
+    TrimActuatorInputs<T> pack_trim_actuator_inputs_T(const TrimVariablesVector_T<T>& z);
 
     template <typename T>
-    TrimResidualVector_T<T> pack_trim_residual_T(const TrimResidual<T>& residual);
+    TrimResidualVector_T<T> unpack_trim_residual_T(const TrimResidual<T>& residual);
 
     template <typename T>
-    TrimResidualVector_T<T> compute_trim_residual_vector_T(const TrimVariableVector_T<T>& z, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions, bool use_physical_controls);
+    TrimResidualVector_T<T> compute_trim_residual_vector_T(const TrimVariablesVector_T<T>& z, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions, bool use_physical_controls);
 
-    TrimResidualVector_T<double> compute_trim_residual_vector(const TrimVariableVector_T<double>& z, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions, bool use_physical_controls);
+    TrimResidualVector_T<double> compute_trim_residual_vector(const TrimVariablesVector_T<double>& z, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions, bool use_physical_controls);
 
-    TrimResidualJacobian compute_trim_residual_jac(const TrimVariableVector_T<double>& z, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions, bool use_physical_controls);
+    TrimResidualJacobian compute_trim_residual_jac(const TrimVariablesVector_T<double>& z, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions, bool use_physical_controls);
 
     TrimSolution solve_trim(const TrimProblem<double>& problem, const TrimModel& model, TrimSolveOptions options = {});
 
@@ -210,7 +70,9 @@ namespace trim {
     /** @deprecated DO NOT REFERENCE */
     // void update_actuators_from_trim(actuators::SurfaceActuators& surface_actuators,  actuators::PropulsorActuators& propulsor_actuators, const TrimSolution& trim_sol);
 
-    control::ControlInputs update_control_inputs_from_trim(const TrimSolution& trim_sol);
+    control::ControlOutput set_control_inputs_from_trim(const TrimSolution& trim_sol);
+
+    TrimStateVector_T<double> unpack_rigid_body_state(const dynamics::RigidBodyState& xN_t);
 }
 
 #include "simulation/trim/trim.tpp"

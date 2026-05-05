@@ -6,8 +6,8 @@
 #include "simulation/linearization/linearization.hpp"
 
 namespace analysis {
-    using TrimEigenvalues = Eigen::Matrix<std::complex<double>, trim::trim_state_dofs, 1>;
-    using TrimEigenvectors = Eigen::Matrix<std::complex<double>, trim::trim_state_dofs, trim::trim_state_dofs>;
+    using TrimEigenvalues = Eigen::Matrix<std::complex<double>, constants::state_dim, 1>;
+    using TrimEigenvectors = Eigen::Matrix<std::complex<double>, constants::state_dim, constants::state_dim>;
 
     struct TrimEigenAnalysis {
         TrimEigenvalues eigenvalues = TrimEigenvalues::Zero();

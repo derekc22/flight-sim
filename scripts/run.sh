@@ -2,17 +2,18 @@
 set -e
 
 usage() {
-	echo "USAGE: $0 -a <AIRCRAFT> -t <TIME_SEC> [-r <TRIM_BOOL>] [-s <SENSOR_BOOL>] [-c <CONTROL_BOOL>] [-v <VERBOSE_BOOL>] [-d <DATA_BOOL>] [-o <OUT_DIR>] [-p <PLOT_BOOL>] [-z <TEST_BOOL>] [-q <QUICK_BOOL>]" >&2
+	echo "USAGE: $0 -a <AIRCRAFT> -t <TIME_SEC> [-r <TRIM_BOOL>] [-s <SENSOR_BOOL>] [-c <CONTROL_BOOL>] [-e <ESTIMATION_BOOL>] [-v <VERBOSE_BOOL>] [-d <DATA_BOOL>] [-o <OUT_DIR>] [-p <PLOT_BOOL>] [-z <TEST_BOOL>] [-q <QUICK_BOOL>]" >&2
 	exit 1
 }
 
-while getopts "a:t:o:rscvdpzqh" opt; do
+while getopts "a:t:o:rscevdpzqh" opt; do
 	case "$opt" in
 		a) AIRCRAFT="$OPTARG" ;;
 		t) TIME_SEC="$OPTARG" ;;
 		r) TRIM_BOOL=1 ;;
 		s) SENSOR_BOOL=1 ;;
 		c) CONTROL_BOOL=1 ;;
+		e) ESTIMATION_BOOL=1 ;;
 		v) VERBOSE_BOOL=1 ;;
 		d) DATA_BOOL=1 ;;
 		o) OUT_DIR="$OPTARG" ;;
@@ -28,6 +29,7 @@ done
 : "${TRIM_BOOL:=0}"
 : "${SENSOR_BOOL:=0}"
 : "${CONTROL_BOOL:=0}"
+: "${ESTIMATION_BOOL:=0}"
 : "${VERBOSE_BOOL:=0}"
 : "${DATA_BOOL:=0}"
 : "${PLOT_BOOL:=0}"
@@ -74,6 +76,7 @@ cmake --build build
 	"$TRIM_BOOL" \
 	"$SENSOR_BOOL" \
 	"$CONTROL_BOOL" \
+	"$ESTIMATION_BOOL" \
 	"$VERBOSE_BOOL" \
 	"$DATA_BOOL" \
 	"$OUT_DIR"
@@ -86,6 +89,7 @@ if [ "$DATA_BOOL" -eq 1 ]; then
 		"$TRIM_BOOL" \
 		"$SENSOR_BOOL" \
 		"$CONTROL_BOOL" \
+		"$ESTIMATION_BOOL" \
 		"$VERBOSE_BOOL" \
 		"$DATA_BOOL" \
 		"$PLOT_BOOL" \
@@ -96,4 +100,3 @@ fi
 if [ "$PLOT_BOOL" -eq 1 ]; then
 	./scripts/plot.sh "$OUT_DIR"
 fi
-

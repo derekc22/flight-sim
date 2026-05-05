@@ -1,0 +1,29 @@
+#include <algorithm>
+#include "simulation/control/control.hpp"
+#include "simulation/control/linear_quadratic/care.hpp"
+#include "simulation/trim/trim.hpp"
+
+namespace control {
+
+    LinearQuadraticController::LinearQuadraticController(const LinearQuadraticControllerParameters& params) : params(params) {}
+
+    Eigen::VectorXd LinearQuadraticController::step(const LinearQuadraticControllerInput& ctrl_law_input) {
+
+        if (!params.K.has_value()){
+            const CareSolution care_sol = control::solve_care(ctrl_law_input.A, ctrl_law_input.B, params.Q, params.R);
+            params.K = lqr_gain(ctrl_law_input.B, params.R, care_sol.P);
+        }
+
+        trim::TrimStateVector_T<double> meas_deviation = ctrl_law_input.meas - ctrl_law_input.meas_des;
+
+        Eigen::VectorXd u_deviation;
+        if (!params.integrator_bool){
+            u_deviation = -params.K.value() * meas_deviation;
+        } else {
+            ; // LQI logic
+        }
+
+        return u_deviation;
+    }
+
+}

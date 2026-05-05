@@ -31,7 +31,7 @@ namespace constants {
     inline const Eigen::Quaterniond qI = Eigen::Quaterniond::Identity();
 
 
-    // template
+    // Template
     template <typename T>
     using Vector3_T = Eigen::Matrix<T, 3, 1>;
 
@@ -40,4 +40,21 @@ namespace constants {
 
     template <typename T>
     using Matrix3_T = Eigen::Matrix<T, 3, 3>;
+
+
+    // Selected state and input dimension
+    inline constexpr std::size_t state_dim = 8; 
+
+    inline constexpr std::size_t surface_input_dim = 3;
+    inline constexpr std::size_t fixed_surface_input_dim = 2;
+
+    inline constexpr std::size_t propulsor_input_dim = 3;
+    inline constexpr std::size_t fixed_propulsor_input_dim = 0;
+
+    inline constexpr std::size_t full_surface_input_dim = surface_input_dim + fixed_surface_input_dim;
+    inline constexpr std::size_t full_propulsor_input_dim = propulsor_input_dim + fixed_propulsor_input_dim;
+
+    inline constexpr std::size_t fixed_input_dim = fixed_surface_input_dim + fixed_propulsor_input_dim;
+    inline constexpr std::size_t input_dim = surface_input_dim + propulsor_input_dim;
+    inline constexpr std::size_t full_input_dim = input_dim + fixed_input_dim;
 }
