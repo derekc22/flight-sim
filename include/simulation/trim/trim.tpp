@@ -10,13 +10,13 @@ namespace trim {
     }
 
     template <typename T>
-    aerodynamics::SurfaceActuatorInputs_T<T> build_surface_actuator_inputs_from_trim_T(const TrimActuatorInputs<T>& u, const TrimFixedActuatorInputs& fixed_controls) {
+    aerodynamics::SurfaceActuatorInputs_T<T> build_surface_actuator_inputs_from_trim_T(const TrimActuatorInputs<T>& u, const TrimFixedActuatorInputs& fixed_surface_actuator_inputs) {
         return {
             .elevator_cmd = u.elevator_cmd,
             .aileron_cmd = u.aileron_cmd,
             .rudder_cmd = u.rudder_cmd,
-            .flap_cmd = T(fixed_controls.flap),
-            .spoiler_cmd = T(fixed_controls.spoiler),
+            .flap_cmd = T(fixed_surface_actuator_inputs.flap),
+            .spoiler_cmd = T(fixed_surface_actuator_inputs.spoiler),
         };
     }
 
@@ -71,7 +71,7 @@ namespace trim {
 
     template <typename T>
     TrimNetWrench_T<T> compute_trim_net_wrench_T(const TrimState<T>& x, const dynamics::Twist_T<T>& twist, const TrimActuatorInputs<T>& u, const TrimModel& model, const TrimConditions& conditions) {
-        const aerodynamics::SurfaceActuatorInputs_T<T> surface_actuator_inputs = build_surface_actuator_inputs_from_trim_T(u, model.fixed_controls);
+        const aerodynamics::SurfaceActuatorInputs_T<T> surface_actuator_inputs = build_surface_actuator_inputs_from_trim_T(u, model.fixed_surface_actuator_inputs);
         const aerodynamics::AerodynamicWrench_T<T> aero_wrench = aerodynamics::step_aero_forces_moments_T<T>(
             model.aerodynamic,
             model.structural,

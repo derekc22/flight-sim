@@ -1,5 +1,5 @@
 {
-    "fixed_controls": {
+    "fixed_surface_actuator_inputs": {
         "flap": 25.0,
         "spoiler": 0.0
     }

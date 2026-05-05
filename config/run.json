@@ -1,10 +1,11 @@
 {
     "aerodynamics_config": "aerodynamics/c172p/default.json",
     "structural_config": "structural/c172p/default.json",
-    "initialization_config": "initialization/c172p/default.json",
-    "control_config": "control/pid_level.json",
-    "guidance_config": "guidance/pid_level.json",
-    "avionics_config": "avionics/ideal.json",
+    "initialization_config": "initialization/c172p/trim_level.json",
+    "control_config": "control/lqr_level.json",
+    "estimation_config": "estimation/lkf.json",
+    "guidance_config": "guidance/lqr_level.json",
+    "avionics_config": "avionics/default.json",
     "actuator_config": "actuators/c172p/default.json",
     "operating_config": "operating/c172p/default.json"
 }

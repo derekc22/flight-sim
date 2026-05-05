@@ -221,9 +221,9 @@ namespace trim {
             .aerodynamic = aircraft.aerodynamic_properties,
             .surface_actuators = aircraft.actuator_properties.surface_actuators,
             .propulsor_actuators = propulsor_actuators,
-            .fixed_controls = TrimFixedActuatorInputs{
-                .flap = aircraft.operating_properties.fixed_controls.flap,
-                .spoiler = aircraft.operating_properties.fixed_controls.spoiler,
+            .fixed_surface_actuator_inputs = TrimFixedActuatorInputs{
+                .flap = aircraft.operating_properties.fixed_surface_actuator_inputs.flap,
+                .spoiler = aircraft.operating_properties.fixed_surface_actuator_inputs.spoiler,
             },
         };
 

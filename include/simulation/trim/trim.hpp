@@ -22,7 +22,7 @@ namespace trim {
         const aerodynamics::AerodynamicProperties& aerodynamic;
         const actuators::SurfaceActuators& surface_actuators;
         const actuators::PropulsorActuators& propulsor_actuators;
-        TrimFixedActuatorInputs fixed_controls{};
+        TrimFixedActuatorInputs fixed_surface_actuator_inputs{};
     };
 
     template <typename T>

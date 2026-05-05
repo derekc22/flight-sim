@@ -725,7 +725,8 @@ namespace vehicles {
         const control::ControlProperties& control_properties,
         const avionics::AvionicsProperties& avionics_properties,
         const operating::OperatingProperties& operating_properties,
-        const guidance::GuidanceProperties& guidance_properties
+        const guidance::GuidanceProperties& guidance_properties,
+        const estimation::EstimationProperties& estimation_properties
     ) :
         NEDFrameECEF{},
         FRDFrameECEF{},
@@ -738,7 +739,8 @@ namespace vehicles {
         control_properties(control_properties),
         avionics_properties(avionics_properties),
         operating_properties(operating_properties),
-        guidance_properties(guidance_properties)
+        guidance_properties(guidance_properties),
+        estimation_properties(estimation_properties)
     {
         _init_frames();
     }

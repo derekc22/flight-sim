@@ -40,7 +40,7 @@ def main():
         plt.grid()
         
         if ref_data is not None:
-            plt.plot(t, ref_data[:, i + 1], linewidth=2, label="setpoint", linestyle="--")
+            plt.plot(t, ref_data[:, i + 1], linewidth=2, label="reference", linestyle="--")
             plt.legend()
 
     plt.suptitle(args.title)
