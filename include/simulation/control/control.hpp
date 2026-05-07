@@ -55,7 +55,7 @@ namespace control {
         LinearFullStateFeedbackController linear_full_state_feedback_controller;
         NonlinearController nonlinear_controller;
 
-        ControlOutput step(const ControllerInput& ctrl_law_input, bool trim_bool);
+        ControlOutput step(const ControllerInput& controller_input, bool trim_bool);
     };
 
     Eigen::VectorXd unpack_full_surface_actuator_inputs(const SurfaceActuatorInputs& u_surface);

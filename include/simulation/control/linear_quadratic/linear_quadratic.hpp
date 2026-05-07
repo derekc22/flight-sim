@@ -24,6 +24,6 @@ namespace control {
         LinearQuadraticControllerParameters params;
 
         LinearQuadraticController(const LinearQuadraticControllerParameters& params);
-        Eigen::VectorXd step(const LinearQuadraticControllerInput& ctrl_law_input);
+        Eigen::VectorXd step(const LinearQuadraticControllerInput& controller_input);
     };
 }

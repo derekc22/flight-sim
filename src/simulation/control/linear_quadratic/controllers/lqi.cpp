@@ -20,13 +20,13 @@ namespace control {
         });
     };
 
-    LinearQuadraticControllerInput LinearQuadraticIntegrator::make_linear_quadratic_controller_input(const LinearFullStateFeedbackControllerInput& ctrl_law_input){
+    LinearQuadraticControllerInput LinearQuadraticIntegrator::make_linear_quadratic_controller_input(const LinearFullStateFeedbackControllerInput& controller_input){
         /** @todo: Add augmentation structure for LQI */
         linearization::TrimStateJacobian A_aug;
         linearization::TrimInputJacobian B_aug;
         return {
-            .meas = trim::unpack_rigid_body_state(ctrl_law_input.zN_t),
-            .meas_des = unpack_linear_quadratic_regulator_setpoint(ctrl_law_input.setpoint),
+            .meas = trim::unpack_rigid_body_state(controller_input.zN_t),
+            .meas_des = unpack_linear_quadratic_regulator_setpoint(controller_input.setpoint),
             .A = A_aug,
             .B = B_aug
         };

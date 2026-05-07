@@ -5,7 +5,7 @@ namespace estimation {
 
     ExtendedKalmanFilter::ExtendedKalmanFilter(const ExtendedKalmanFilterParameters& params) {}
 
-    EstimationOutput ExtendedKalmanFilter::step(const KalmanFilterInput& kalman_filter_input) {
+    EstimationOutput ExtendedKalmanFilter::step(const KalmanFilterInput& estimator_input) {
         throw std::runtime_error("TODO: NOT IMPLEMENTED");
     }
 }

@@ -63,7 +63,7 @@ namespace json {
         if (torque_coeff < 0.0) { throw std::runtime_error("json::validate_propellers_json: propellers torque_coeff must be non-negative"); }
     }
 
-    actuators::PropellerProperties parse_propellers(const nlohmann::json& propellers_json, structural::StructuralProperties& structural_properties, const Eigen::Vector3d& n_prop) {
+    actuators::PropellerAssembly parse_propellers(const nlohmann::json& propellers_json, structural::StructuralProperties& structural_properties, const Eigen::Vector3d& n_prop) {
         validate_propellers_json(propellers_json);
 
         std::vector<std::string> geometry_ids = propellers_json.at("geometry_ids").get<std::vector<std::string>>();

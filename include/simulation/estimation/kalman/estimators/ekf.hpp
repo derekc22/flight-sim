@@ -3,10 +3,10 @@
 
 namespace estimation {
 
-    struct ExtendedKalmanFilterParameters : EstimatorParameters {};
+    struct ExtendedKalmanFilterParameters : KalmanFilterEstimatorParameters {};
 
     struct ExtendedKalmanFilter {
         ExtendedKalmanFilter(const ExtendedKalmanFilterParameters& params);
-        EstimationOutput step(const KalmanFilterInput& kalman_filter_input);
+        EstimationOutput step(const KalmanFilterInput& estimator_input);
     };
 }

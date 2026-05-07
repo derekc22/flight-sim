@@ -5,7 +5,7 @@ namespace propulsion {
     template <typename T>
     T compute_propeller_omega_T(const actuators::PropulsorActuator& propulsor, const T& thrust, const atmospheric::AirDensity& rho) {
         if (!propulsor.propellers) { return T(0); }
-        const actuators::PropellerProperties& propellers = propulsor.propellers.value();
+        const actuators::PropellerAssembly& propellers = propulsor.propellers.value();
         const double denom = propellers.thrust_coeff * rho.data * propellers.diameter * propellers.diameter * propellers.diameter * propellers.diameter;
         const T n = util::sqrt((thrust + T(constants::eps)) / T(denom));
         return T(2.0 * constants::pi) * n;
@@ -14,7 +14,7 @@ namespace propulsion {
     template <typename T>
     T compute_propeller_torque_T(const actuators::PropulsorActuator& propulsor, const T& omega, const atmospheric::AirDensity& rho) {
         if (!propulsor.propellers) { return T(0); }
-        const actuators::PropellerProperties& propellers = propulsor.propellers.value();
+        const actuators::PropellerAssembly& propellers = propulsor.propellers.value();
         const T n = omega / T(2.0 * constants::pi);
         return T(propellers.torque_coeff * rho.data * propellers.diameter * propellers.diameter * propellers.diameter * propellers.diameter * propellers.diameter) * n * n;
     }
@@ -33,7 +33,7 @@ namespace propulsion {
         out.M = r_prop.cross(out.F);
 
         if (propulsor.propellers.has_value()) {
-            const actuators::PropellerProperties& propellers = propulsor.propellers.value();
+            const actuators::PropellerAssembly& propellers = propulsor.propellers.value();
             const T omega = compute_propeller_omega_T<T>(propulsor, thrust, rho);
             const T q_prop = compute_propeller_torque_T<T>(propulsor, omega, rho);
             const constants::Vector3_T<T> H_prop = n_prop * (T(propellers.spin_inertia * propellers.spin_sign) * omega);

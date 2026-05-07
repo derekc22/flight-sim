@@ -16,7 +16,7 @@ namespace estimation {
 
     struct EstimationInput {
         dynamics::RigidBodyState zN_t;
-        KalmanFilterInput kalman_filter_input;
+        KalmanFilterInput estimator_input;
     };
 
     struct EstimationProperties {

@@ -9,7 +9,7 @@ namespace control {
         using AxialPID::AxialPID;
 
         PIDControllerInput make_pid_controller_input(
-            const AxialControllerInput& ctrl_law_input,
+            const AxialControllerInput& controller_input,
             ControlAxis control_axis
         ) override;
     };

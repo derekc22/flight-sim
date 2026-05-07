@@ -14,10 +14,10 @@ namespace estimation {
         bool initialized = false;
 
         LinearKalmanFilter(const LinearKalmanFilterParameters& params);
-        EstimationOutput step(const KalmanFilterInput& kalman_filter_input);
+        EstimationOutput step(const KalmanFilterInput& estimator_input);
 
-        Eigen::VectorXd make_measurement_deviation(const KalmanFilterInput& kalman_filter_input) const;
-        Eigen::VectorXd make_input_deviation(const KalmanFilterInput& kalman_filter_input) const;
-        dynamics::RigidBodyState pack_state_estimate(const KalmanFilterInput& kalman_filter_input, const Eigen::VectorXd& x_est_deviation) const;
+        Eigen::VectorXd make_measurement_deviation(const KalmanFilterInput& estimator_input);
+        Eigen::VectorXd make_input_deviation(const KalmanFilterInput& estimator_input);
+        dynamics::RigidBodyState pack_state_estimate(const KalmanFilterInput& estimator_input, const Eigen::VectorXd& x_est_deviation);
     };
 }

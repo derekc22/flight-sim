@@ -10,7 +10,7 @@ namespace estimation {
             if (kalman_filter_estimator_type == EstimatorType::LinearKalmanFilter && !trim_bool) {
                 throw std::runtime_error("estimation::EstimationProperties::step LinearKalmanFilter requires trim");
             }
-            out = kalman_filter_estimator(estimation_input.kalman_filter_input);
+            out = kalman_filter_estimator(estimation_input.estimator_input);
         }
 
         return out;

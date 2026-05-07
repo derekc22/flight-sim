@@ -18,5 +18,5 @@ namespace estimation {
         control::PropulsorActuatorInputs u_propulsor_actual_prev;
     };
 
-    struct EstimatorParameters {};
+    struct KalmanFilterEstimatorParameters {};
 }

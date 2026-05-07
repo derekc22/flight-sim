@@ -16,9 +16,9 @@ namespace control {
         PIDController policy;
 
         VelocityPID(const VelocityPIDParameters& params);
-        ControlOutput step(const VelocityControllerInput& ctrl_law_input);
+        ControlOutput step(const VelocityControllerInput& controller_input);
 
-        PIDControllerInput make_pid_controller_input(const VelocityControllerInput& ctrl_law_input);
+        PIDControllerInput make_pid_controller_input(const VelocityControllerInput& controller_input);
         std::tuple<double, double, double> allocate_thrust(double T_tot, const actuators::PropulsorActuators& propulsor_actuators);
     };
 }

@@ -25,6 +25,6 @@ namespace control {
         double prev_err = 0.0;
 
         PIDController(const PIDControllerParameters& params);
-        double step(const PIDControllerInput& ctrl_law_input);
+        double step(const PIDControllerInput& controller_input);
     };
 }

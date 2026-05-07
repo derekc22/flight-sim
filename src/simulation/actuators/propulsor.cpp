@@ -11,7 +11,7 @@ namespace actuators {
         double inclination_angle, 
         double toe_angle,
         const Eigen::Vector3d& pB_prop_cg,
-        std::optional<PropellerProperties> propellers
+        std::optional<PropellerAssembly> propellers
     ) :
         Actuator(limit_max, limit_min, tau),
         inclination_angle(inclination_angle),

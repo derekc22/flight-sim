@@ -7,11 +7,11 @@ namespace control {
 
     PIDController::PIDController(const PIDControllerParameters& params) : params(params) {}
 
-    double PIDController::step(const PIDControllerInput& ctrl_law_input) {
-        double err = ctrl_law_input.meas_des - ctrl_law_input.meas;
+    double PIDController::step(const PIDControllerInput& controller_input) {
+        double err = controller_input.meas_des - controller_input.meas;
 
-        double d_term = ctrl_law_input.meas_dot.has_value()
-                        ? ctrl_law_input.meas_dot.value()           // PI-D
+        double d_term = controller_input.meas_dot.has_value()
+                        ? controller_input.meas_dot.value()         // PI-D
                         : (prev_err - err) / constants::dt;         // PID
 
         // filtered deriative
@@ -24,10 +24,10 @@ namespace control {
         double u_unsat = params.Kp * err - params.Kd * d_filtered + params.Ki * i_new;
 
         // saturate
-        double u = std::clamp(u_unsat, ctrl_law_input.limit_min, ctrl_law_input.limit_max);
+        double u = std::clamp(u_unsat, controller_input.limit_min, controller_input.limit_max);
 
         // anti-windup
-        if ((u == u_unsat) || (u == ctrl_law_input.limit_max && err < 0.0) || (u == ctrl_law_input.limit_min && err > 0.0)) { integral = i_new; }
+        if ((u == u_unsat) || (u == controller_input.limit_max && err < 0.0) || (u == controller_input.limit_min && err > 0.0)) { integral = i_new; }
 
         prev_err = err;
 

@@ -300,7 +300,7 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
             aerodynamics::AerodynamicState ads_t = aerodynamics::compute_aerodynamic_state(xN_t, wind);
             
             // overwrite local measurement state with sensor measurements
-            dynamics::RigidBodyState zN_t = avionics::get_state_from_avionics(xN_t, ads_t, static_atmospheric_state, geo_t, mass, wind, WB_net, aircraft.avionics_properties);
+            zN_t = avionics::get_state_from_avionics(xN_t, ads_t, static_atmospheric_state, geo_t, mass, wind, WB_net, aircraft.avionics_properties);
         }
 
         // initialize estimated state to measurements
@@ -309,7 +309,7 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
         if (sim_in.estimation_bool) {
             estimation::EstimationInput estimation_input {
                 .zN_t = zN_t,
-                .kalman_filter_input = estimation::KalmanFilterInput {
+                .estimator_input = estimation::KalmanFilterInput {
                     .zN_t = zN_t,
                     .lin_sol = lin_sol,
                     .trim_sol = trim_sol,
@@ -333,13 +333,13 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
         }
 
         if (sim_in.control_bool) {
-            control::ControllerInput ctrl_law_input {
+            control::ControllerInput controller_input {
                 .axial_controller_input = control::AxialControllerInput{ .zN_t = zN_t_est, .surface_actuators = actuator_properties.surface_actuators, .setpoint = guidance::AxialSetpoint{ guidance_setpoint } },
                 .velocity_controller_input = control::VelocityControllerInput{ .zN_t = zN_t_est, .propulsor_actuators = actuator_properties.propulsor_actuators, .setpoint = guidance::VelocitySetpoint{ guidance_setpoint } },
                 .linear_full_state_feedback_controller_input = control::LinearFullStateFeedbackControllerInput{ .zN_t = zN_t_est, .u_sol_trim = trim_sol.input, .A = lin_sol.A, .B = lin_sol.B, .setpoint = guidance::LinearFullStateFeedbackSetpoint{ guidance_setpoint } },
                 .nonlinear_controller_input = control::NonlinearControllerInput{ .zN_t = zN_t_est, .surface_actuators = actuator_properties.surface_actuators, .propulsor_actuators = actuator_properties.propulsor_actuators, .setpoint = guidance::NonlinearSetpoint{ guidance_setpoint } }
             };
-            u_cmd = control_properties.step(ctrl_law_input, sim_in.trim_bool);
+            u_cmd = control_properties.step(controller_input, sim_in.trim_bool);
         }
 
         u_cmd.surface_inputs.flap_cmd = operating_properties.fixed_surface_actuator_inputs.flap;

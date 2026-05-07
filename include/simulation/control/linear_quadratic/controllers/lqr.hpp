@@ -18,9 +18,9 @@ namespace control {
         LinearQuadraticController policy;
 
         LinearQuadraticRegulator(const LinearQuadraticRegulatorParameters& params);
-        ControlOutput step(const LinearFullStateFeedbackControllerInput& ctrl_law_input);
+        ControlOutput step(const LinearFullStateFeedbackControllerInput& controller_input);
 
-        virtual LinearQuadraticControllerInput make_linear_quadratic_controller_input(const LinearFullStateFeedbackControllerInput& ctrl_law_input);
+        virtual LinearQuadraticControllerInput make_linear_quadratic_controller_input(const LinearFullStateFeedbackControllerInput& controller_input);
         trim::TrimStateVector_T<double> unpack_linear_quadratic_regulator_setpoint(const guidance::LinearFullStateFeedbackSetpoint& linear_quadratic_regulator_setpoint);
     };
 }

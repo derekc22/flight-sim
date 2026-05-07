@@ -33,9 +33,9 @@ namespace control {
         PIDController vertical_policy;
 
         AxialPID(const AxialPIDParameters& params);
-        ControlOutput step(const AxialControllerInput& ctrl_law_input);
+        ControlOutput step(const AxialControllerInput& controller_input);
 
-        virtual PIDControllerInput make_pid_controller_input(const AxialControllerInput& ctrl_law_input, ControlAxis control_axis);
+        virtual PIDControllerInput make_pid_controller_input(const AxialControllerInput& controller_input, ControlAxis control_axis);
     };
 
 }

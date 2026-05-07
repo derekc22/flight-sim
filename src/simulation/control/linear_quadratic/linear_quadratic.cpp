@@ -7,14 +7,14 @@ namespace control {
 
     LinearQuadraticController::LinearQuadraticController(const LinearQuadraticControllerParameters& params) : params(params) {}
 
-    Eigen::VectorXd LinearQuadraticController::step(const LinearQuadraticControllerInput& ctrl_law_input) {
+    Eigen::VectorXd LinearQuadraticController::step(const LinearQuadraticControllerInput& controller_input) {
 
         if (!params.K.has_value()){
-            const CareSolution care_sol = control::solve_care(ctrl_law_input.A, ctrl_law_input.B, params.Q, params.R);
-            params.K = lqr_gain(ctrl_law_input.B, params.R, care_sol.P);
+            const CareSolution care_sol = control::solve_care(controller_input.A, controller_input.B, params.Q, params.R);
+            params.K = lqr_gain(controller_input.B, params.R, care_sol.P);
         }
 
-        trim::TrimStateVector_T<double> meas_deviation = ctrl_law_input.meas - ctrl_law_input.meas_des;
+        trim::TrimStateVector_T<double> meas_deviation = controller_input.meas - controller_input.meas_des;
 
         Eigen::VectorXd u_deviation;
         if (!params.integrator_bool){
