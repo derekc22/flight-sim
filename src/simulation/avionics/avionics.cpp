@@ -79,14 +79,14 @@ namespace avionics {
         
         MeasurementCache cache = avionics_properties.step(meas_gt);
 
-        dynamics::RigidBodyState zN_t = { 
+        dynamics::RigidBodyState yN_t = { 
             .p = cache.sensors.pI_BI_gnss,
             .v = cache.sensors.vB_BI_gnss,
             .q = cache.computers.qIB,
             .w = cache.sensors.wB_BI
         };
 
-        // aerodynamics::AerodynamicState ads_t_meas = aerodynamics::compute_aerodynamic_state(zN_t, wind);
+        // aerodynamics::AerodynamicState ads_t_meas = aerodynamics::compute_aerodynamic_state(yN_t, wind);
 
         // not needed 
         // atmospheric::StaticAtmosphericState static_atmo_meas = {
@@ -100,8 +100,8 @@ namespace avionics {
         //     .lat = 
         // }
         
-        // return { zN_t, ads_t_meas };
-        return zN_t;
+        // return { yN_t, ads_t_meas };
+        return yN_t;
     }
 
 }

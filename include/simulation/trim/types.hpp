@@ -18,6 +18,12 @@ namespace trim {
     using TrimActuatorInputsVector_T = Eigen::Matrix<T, constants::input_dim, 1>;
 
     template <typename T>
+    using FullSurfaceActuatorInputsVector_T = Eigen::Matrix<T, constants::full_surface_input_dim, 1>;
+
+    template <typename T>
+    using FullPropulsorActuatorInputsVector_T = Eigen::Matrix<T, constants::full_propulsor_input_dim, 1>;
+
+    template <typename T>
     using TrimStateVector_T = Eigen::Matrix<T, constants::state_dim, 1>;
 
     template <typename T>

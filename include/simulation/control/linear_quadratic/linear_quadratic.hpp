@@ -7,10 +7,10 @@
 namespace control {
 
     struct LinearQuadraticControllerInput {
-        trim::TrimStateVector_T<double> meas;
-        trim::TrimStateVector_T<double> meas_des;
-        Eigen::MatrixXd A;
-        Eigen::MatrixXd B;
+        trim::TrimStateVector_T<double> zN_t;
+        trim::TrimStateVector_T<double> zN_t_des;
+        linearization::TrimStateJacobian A;
+        linearization::TrimInputJacobian B;
     };
 
     struct LinearQuadraticControllerParameters {
@@ -24,6 +24,6 @@ namespace control {
         LinearQuadraticControllerParameters params;
 
         LinearQuadraticController(const LinearQuadraticControllerParameters& params);
-        Eigen::VectorXd step(const LinearQuadraticControllerInput& controller_input);
+        trim::TrimActuatorInputsVector_T<double> step(const LinearQuadraticControllerInput& controller_input);
     };
 }

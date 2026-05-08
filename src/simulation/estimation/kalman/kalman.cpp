@@ -4,25 +4,25 @@ namespace estimation {
 
     KalmanFilter::KalmanFilter(const KalmanFilterParameters& params) : params(params) {}
 
-    KalmanState KalmanFilter::predict(const KalmanState& prev, const Eigen::MatrixXd& A, const Eigen::MatrixXd& B, const Eigen::VectorXd& ut_1) {
-        Eigen::VectorXd xt_bar = A * prev.x + B * ut_1;
+    KalmanState KalmanFilter::predict(const KalmanState& prev, const Eigen::MatrixXd& A, const Eigen::MatrixXd& B, const trim::TrimActuatorInputsVector_T<double>& ut_1) {
+        trim::TrimStateVector_T<double> zN_t_bar = A * prev.z + B * ut_1;
 
         Eigen::MatrixXd Pt_bar = A * prev.P * A.transpose() + params.R0;
 
-        return { .x = xt_bar, .P = Pt_bar };
+        return { .z = zN_t_bar, .P = Pt_bar };
     }
 
-    KalmanState KalmanFilter::correct(const KalmanState& pred, const Eigen::VectorXd& zt) {
+    KalmanState KalmanFilter::correct(const KalmanState& pred, const trim::TrimStateVector_T<double>& yN_t) {
         Eigen::MatrixXd Kt = pred.P * params.C.transpose() * (params.C * pred.P * params.C.transpose() + params.Q0).inverse(); // Kalman gain
 
-        Eigen::VectorXd yt = zt - params.C * pred.x; // Innovation
+        trim::TrimStateVector_T<double> Lt = yN_t - params.C * pred.z; // Innovation
 
-        Eigen::VectorXd xt = pred.x + Kt * yt;
+        trim::TrimStateVector_T<double> zN_t = pred.z + Kt * Lt;
 
         Eigen::MatrixXd Inxn = Eigen::MatrixXd::Identity(pred.P.rows(), pred.P.cols());
 
         Eigen::MatrixXd Pt = (Inxn - Kt * params.C) * pred.P * (Inxn - Kt * params.C).transpose() + Kt * params.Q0 * Kt.transpose();
 
-        return { .x = xt, .P = Pt };
+        return { .z = zN_t, .P = Pt };
     }
 }

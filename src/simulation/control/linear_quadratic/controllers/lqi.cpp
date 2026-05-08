@@ -25,8 +25,8 @@ namespace control {
         linearization::TrimStateJacobian A_aug;
         linearization::TrimInputJacobian B_aug;
         return {
-            .meas = trim::unpack_rigid_body_state(controller_input.zN_t),
-            .meas_des = unpack_linear_quadratic_regulator_setpoint(controller_input.setpoint),
+            .zN_t = trim::unpack_rigid_body_state(controller_input.zN_t),
+            .zN_t_des = unpack_linear_quadratic_regulator_setpoint(controller_input.setpoint),
             .A = A_aug,
             .B = B_aug
         };

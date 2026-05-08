@@ -27,8 +27,8 @@ namespace control {
         return out;
     }
 
-    Eigen::VectorXd unpack_full_surface_actuator_inputs(const SurfaceActuatorInputs& u_surface) {
-        Eigen::VectorXd out(constants::full_surface_input_dim);
+    trim::FullSurfaceActuatorInputsVector_T<double> unpack_full_surface_actuator_inputs(const SurfaceActuatorInputs& u_surface) {
+        trim::FullSurfaceActuatorInputsVector_T<double> out;
         out << u_surface.elevator_cmd, 
                u_surface.aileron_cmd, 
                u_surface.rudder_cmd, 
@@ -37,16 +37,16 @@ namespace control {
         return out;
     }
 
-    Eigen::VectorXd unpack_full_propulsor_actuator_inputs(const PropulsorActuatorInputs& u_propulsor) {
-        Eigen::VectorXd out(constants::full_propulsor_input_dim);
+    trim::FullPropulsorActuatorInputsVector_T<double> unpack_full_propulsor_actuator_inputs(const PropulsorActuatorInputs& u_propulsor) {
+        trim::FullPropulsorActuatorInputsVector_T<double> out;
         out << u_propulsor.front_propulsor_cmd, 
                u_propulsor.left_propulsor_cmd, 
                u_propulsor.right_propulsor_cmd;
         return out;
     }
 
-    Eigen::VectorXd unpack_actuator_inputs(const SurfaceActuatorInputs& u_surface, const PropulsorActuatorInputs& u_propulsor) {
-        Eigen::VectorXd out(constants::input_dim);
+    trim::TrimActuatorInputsVector_T<double> unpack_actuator_inputs(const SurfaceActuatorInputs& u_surface, const PropulsorActuatorInputs& u_propulsor) {
+        trim::TrimActuatorInputsVector_T<double> out;
         out << u_surface.elevator_cmd, 
                u_surface.aileron_cmd, 
                u_surface.rudder_cmd, 

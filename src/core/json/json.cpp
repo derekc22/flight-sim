@@ -106,6 +106,7 @@ namespace json {
     void dump_configs(const std::string& dir) {
         const auto run_path = std::filesystem::path("config") / "run.json";
         const auto run_config = read_json_file(run_path);
+        write_json(run_config, dir, "run");
 
         for (const auto& [key, value] : run_config.items()) {
             if (!value.is_string()) { throw std::runtime_error("json::dump_configs: expected string path for key '" + key + "'"); }

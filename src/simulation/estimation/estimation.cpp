@@ -4,7 +4,7 @@
 namespace estimation {
 
     EstimationOutput EstimationProperties::step(const EstimationInput& estimation_input, bool trim_bool) {
-        EstimationOutput out{ .state_estimate = estimation_input.zN_t };
+        EstimationOutput out{ .zN_t = estimation_input.yN_t };
 
         if (kalman_filter_estimator) {
             if (kalman_filter_estimator_type == EstimatorType::LinearKalmanFilter && !trim_bool) {

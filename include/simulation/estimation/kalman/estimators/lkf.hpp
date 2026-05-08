@@ -16,8 +16,8 @@ namespace estimation {
         LinearKalmanFilter(const LinearKalmanFilterParameters& params);
         EstimationOutput step(const KalmanFilterInput& estimator_input);
 
-        Eigen::VectorXd make_measurement_deviation(const KalmanFilterInput& estimator_input);
-        Eigen::VectorXd make_input_deviation(const KalmanFilterInput& estimator_input);
-        dynamics::RigidBodyState pack_state_estimate(const KalmanFilterInput& estimator_input, const Eigen::VectorXd& x_est_deviation);
+        trim::TrimStateVector_T<double> make_measurement_deviation(const KalmanFilterInput& estimator_input);
+        trim::TrimActuatorInputsVector_T<double> make_input_deviation(const KalmanFilterInput& estimator_input);
+        dynamics::RigidBodyState pack_state_estimate(const KalmanFilterInput& estimator_input, const trim::TrimStateVector_T<double>& zN_t_deviation);
     };
 }

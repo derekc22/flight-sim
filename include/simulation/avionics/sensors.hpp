@@ -53,7 +53,7 @@ namespace avionics {
         std::normal_distribution<double> dist;
         double tau;
 
-        Sensor(double mean, double stddev, double bias, const Eigen::Vector3d& bias3, double tau);
+        Sensor(double mean, double stddev, double bias, const Eigen::Vector3d& bias3d, double tau);
 
         double _step(double meas, std::optional<double>& lag_state);
         Eigen::Vector3d _step(const Eigen::Vector3d& meas, std::optional<Eigen::Vector3d>& lag_state);

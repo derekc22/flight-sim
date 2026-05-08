@@ -10,7 +10,7 @@
 
 namespace avionics {
 
-    Sensor::Sensor(double mean, double stddev, double bias, const Eigen::Vector3d& bias3, double tau) : mean(mean), stddev(stddev), bias(bias), bias_3d(bias3), dist(mean, stddev), tau(tau) {}
+    Sensor::Sensor(double mean, double stddev, double bias, const Eigen::Vector3d& bias3d, double tau) : mean(mean), stddev(stddev), bias(bias), bias_3d(bias3d), dist(mean, stddev), tau(tau) {}
 
     double Sensor::_step(double meas, std::optional<double>& lag_state) {
         double prev_meas = lag_state ? lag_state.value() : meas;

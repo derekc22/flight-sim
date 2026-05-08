@@ -7,11 +7,11 @@
 namespace estimation {
 
     struct EstimationOutput {
-        dynamics::RigidBodyState state_estimate;
+        dynamics::RigidBodyState zN_t;  // state estimate
     };
 
     struct KalmanFilterInput {
-        dynamics::RigidBodyState zN_t;
+        dynamics::RigidBodyState yN_t;
         linearization::TrimLinearization lin_sol;
         trim::TrimSolution trim_sol;
         control::SurfaceActuatorInputs u_surface_actual_prev;

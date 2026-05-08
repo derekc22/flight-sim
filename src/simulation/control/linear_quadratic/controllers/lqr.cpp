@@ -29,8 +29,8 @@ namespace control {
         guidance::LinearFullStateFeedbackSetpoint setpoint = controller_input.setpoint;
 
         return {
-            .meas = trim::unpack_rigid_body_state(controller_input.zN_t),
-            .meas_des = unpack_linear_quadratic_regulator_setpoint(setpoint),
+            .zN_t = trim::unpack_rigid_body_state(controller_input.zN_t),
+            .zN_t_des = unpack_linear_quadratic_regulator_setpoint(setpoint),
             .A = controller_input.A,
             .B = controller_input.B
         };
@@ -40,12 +40,12 @@ namespace control {
         SurfaceActuatorInputs u_surface{};
         PropulsorActuatorInputs u_propulsor{};
 
-        Eigen::VectorXd u_deviation = policy.step(
+        trim::TrimActuatorInputsVector_T<double> u_deviation = policy.step(
             make_linear_quadratic_controller_input(controller_input)
         );
-        Eigen::VectorXd u_trim = trim::unpack_trim_actuator_inputs_T(controller_input.u_sol_trim);
+        trim::TrimActuatorInputsVector_T<double> u_trim = trim::unpack_trim_actuator_inputs_T(controller_input.u_sol_trim);
 
-        Eigen::VectorXd u_cmd = u_deviation + u_trim;
+        trim::TrimActuatorInputsVector_T<double> u_cmd = u_deviation + u_trim;
 
         u_surface.elevator_cmd = u_cmd[0];
         u_surface.aileron_cmd = u_cmd[1];

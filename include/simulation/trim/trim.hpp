@@ -67,8 +67,8 @@ namespace trim {
 
     std::pair<dynamics::RigidBodyState, aerodynamics::AerodynamicState> update_state_from_trim(const dynamics::RigidBodyState& xN_t, const TrimSolution& trim_sol);
 
-    /** @deprecated DO NOT REFERENCE */
-    // void update_actuators_from_trim(actuators::SurfaceActuators& surface_actuators,  actuators::PropulsorActuators& propulsor_actuators, const TrimSolution& trim_sol);
+    /** @deprecated */
+    // void update_actuators_from_trim(actuators::SurfaceActuators& surface_actuators, actuators::PropulsorActuators& propulsor_actuators, const TrimSolution& trim_sol);
 
     control::ControlOutput set_control_inputs_from_trim(const TrimSolution& trim_sol);
 

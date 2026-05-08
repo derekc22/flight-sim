@@ -15,7 +15,7 @@ namespace estimation {
     using KalmanFilterEstimator = std::function<EstimationOutput(const KalmanFilterInput&)>;
 
     struct EstimationInput {
-        dynamics::RigidBodyState zN_t;
+        dynamics::RigidBodyState yN_t;
         KalmanFilterInput estimator_input;
     };
 

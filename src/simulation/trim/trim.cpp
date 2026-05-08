@@ -400,7 +400,7 @@ namespace trim {
     }
 
     /** @deprecated */
-    // void update_actuators_from_trim(actuators::SurfaceActuators& surface_actuators,  actuators::PropulsorActuators& propulsor_actuators, const TrimSolution& trim_sol) {
+    // void update_actuators_from_trim(actuators::SurfaceActuators& surface_actuators, actuators::PropulsorActuators& propulsor_actuators, const TrimSolution& trim_sol) {
     //     surface_actuators.aileron.prev_cmd = trim_sol.input.aileron_cmd;
     //     surface_actuators.elevator.prev_cmd = trim_sol.input.elevator_cmd;
     //     surface_actuators.rudder.prev_cmd = trim_sol.input.rudder_cmd;

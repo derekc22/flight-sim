@@ -5,7 +5,7 @@
 namespace estimation {
 
     struct KalmanState {
-        Eigen::VectorXd x;  // state estimate
+        trim::TrimStateVector_T<double> z;  // state estimate
         Eigen::MatrixXd P;  // state estimate error covariance matrix
     };
 
@@ -20,7 +20,7 @@ namespace estimation {
         KalmanFilterParameters params;
 
         KalmanFilter(const KalmanFilterParameters& params);
-        KalmanState predict(const KalmanState& prev, const Eigen::MatrixXd& A, const Eigen::MatrixXd& B, const Eigen::VectorXd& ut_1);
-        KalmanState correct(const KalmanState& pred, const Eigen::VectorXd& zt);
+        KalmanState predict(const KalmanState& prev, const Eigen::MatrixXd& A, const Eigen::MatrixXd& B, const trim::TrimActuatorInputsVector_T<double>& ut_1);
+        KalmanState correct(const KalmanState& pred, const trim::TrimStateVector_T<double>& yN_t);
     };
 }
