@@ -1,15 +1,15 @@
 #pragma once
-#include "simulation/dynamics/dynamics.hpp"
-#include "simulation/actuators/actuators.hpp"
-#include "simulation/trim/trim.hpp"
-#include "simulation/linearization/linearization.hpp"
-#include "simulation/types/types.hpp"
+#include <optional>
+#include <Eigen/Dense>
+#include "simulation/actuators/shared.hpp"
+#include "simulation/dynamics/shared.hpp"
+#include "simulation/linearization/shared.hpp"
 
 namespace control {
 
     struct LinearQuadraticControllerInput {
-        types::StateVector_T<double> zN_t;
-        types::StateVector_T<double> zN_t_des;
+        dynamics::StateVector_T<double> zN_t;
+        dynamics::StateVector_T<double> zN_t_des;
         linearization::StateJacobian A;
         linearization::TrimInputJacobian B;
     };
@@ -25,6 +25,6 @@ namespace control {
         LinearQuadraticControllerParameters params;
 
         LinearQuadraticController(const LinearQuadraticControllerParameters& params);
-        types::ActuatorInputsVector_T<double> step(const LinearQuadraticControllerInput& controller_input);
+        actuators::ActuatorInputsVector_T<double> step(const LinearQuadraticControllerInput& controller_input);
     };
 }

@@ -1,4 +1,9 @@
 #pragma once
+#include "simulation/actuators/propulsor/shared.hpp"
+#include "simulation/atmospheric/shared.hpp"
+#include "simulation/constants/constants.hpp"
+#include "simulation/dynamics/shared.hpp"
+#include "simulation/util/util.hpp"
 
 namespace propulsion {
 
@@ -47,7 +52,7 @@ namespace propulsion {
     }
 
     template <typename T>
-    dynamics::Wrench_T<T> step_propulsive_forces_moments_T(const actuators::PropulsorActuators& propulsor_actuators, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& static_atmospheric_state, const types::PropulsorActuatorInputs_T<T>& u, const PropulsorOmegaDot_T<T>& omega_dot) {
+    dynamics::Wrench_T<T> step_propulsive_forces_moments_T(const actuators::PropulsorActuators& propulsor_actuators, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& static_atmospheric_state, const actuators::PropulsorActuatorInputs_T<T>& u, const PropulsorOmegaDot_T<T>& omega_dot) {
         dynamics::Wrench_T<T> total;
 
         const dynamics::Wrench_T<T> front = step_propulsor_forces_moments_T<T>(propulsor_actuators.front_propulsor, twist, static_atmospheric_state, u.front_propulsor_cmd, omega_dot.front_propulsor);

@@ -1,11 +1,9 @@
 #pragma once
-#include "simulation/actuators/surface.hpp"
-#include "simulation/control/control.hpp"
-#include "simulation/types/types.hpp"
+#include "simulation/actuators/shared.hpp"
 
 namespace operating {
 
     struct OperatingProperties {
-        types::FixedActuatorInputs_T<double> fixed_actuator_inputs{};
+        actuators::FixedActuatorInputs_T fixed_actuator_inputs{};
     };
 }

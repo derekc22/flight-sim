@@ -1,5 +1,9 @@
 
+#include <stdexcept>
+#include "simulation/actuators/surface/shared.hpp"
+#include "simulation/control/interface.hpp"
 #include "simulation/control/pid/controllers/damper.hpp"
+#include "simulation/dynamics/shared.hpp"
 
 
 namespace control {

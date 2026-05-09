@@ -1,5 +1,5 @@
 #pragma once
-#include "simulation/estimation/shared.hpp"
+#include "simulation/estimation/interface.hpp"
 
 namespace estimation {
 

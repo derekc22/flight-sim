@@ -2,6 +2,7 @@
 #include <format>
 #include <stdexcept>
 #include "simulation/atmospheric/atmospheric.hpp"
+#include "simulation/dynamics/shared.hpp"
 #include "simulation/frames/frames.hpp"
 #include "simulation/geography/geography.hpp"
 #include "simulation/constants/constants.hpp"

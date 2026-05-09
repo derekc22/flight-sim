@@ -4,11 +4,12 @@
 #include <sstream>
 #include <stdexcept>
 #include "simulation/analysis/analysis.hpp"
+#include "simulation/constants/constants.hpp"
 #include "simulation/linearization/linearization.hpp"
 
 namespace analysis {
 
-    static std::string format_complex(const std::complex<double>& z, int precision = 6) {
+    std::string format_complex(const std::complex<double>& z, int precision = 6) {
         std::ostringstream out;
         out << std::fixed << std::setprecision(precision) << z.real();
         if (z.imag() < 0.0) out << " - " << std::abs(z.imag()) << "i";

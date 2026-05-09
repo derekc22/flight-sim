@@ -1,5 +1,12 @@
 
+#include <stdexcept>
+#include "simulation/actuators/propulsor/shared.hpp"
+#include "simulation/actuators/surface/shared.hpp"
+#include "simulation/control/interface.hpp"
+#include "simulation/control/shared.hpp"
 #include "simulation/control/pid/controllers/axial.hpp"
+#include "simulation/dynamics/shared.hpp"
+#include "simulation/guidance/shared.hpp"
 
 
 namespace control {
@@ -71,8 +78,8 @@ namespace control {
     }
 
     ControlOutput AxialPID::step(const AxialControllerInput& controller_input){
-        SurfaceActuatorInputs_T<double> u_surface{};
-        PropulsorActuatorInputs_T<double> u_propulsor{};
+        actuators::SurfaceActuatorInputs_T<double> u_surface{};
+        actuators::PropulsorActuatorInputs_T<double> u_propulsor{};
 
         u_surface.aileron_cmd = lateral_policy.step(
             make_pid_controller_input(controller_input, ControlAxis::Lateral)

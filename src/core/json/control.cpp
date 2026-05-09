@@ -5,6 +5,13 @@
 #include "core/json/control.hpp"
 #include "core/json/json.hpp"
 #include "simulation/constants/constants.hpp"
+#include "simulation/control/control.hpp"
+#include "simulation/control/linear_quadratic/controllers/lqi.hpp"
+#include "simulation/control/linear_quadratic/controllers/lqr.hpp"
+#include "simulation/control/linear_quadratic/controllers/lqt.hpp"
+#include "simulation/control/pid/controllers/axial.hpp"
+#include "simulation/control/pid/controllers/damper.hpp"
+#include "simulation/control/pid/controllers/velocity.hpp"
 
 namespace json {
 

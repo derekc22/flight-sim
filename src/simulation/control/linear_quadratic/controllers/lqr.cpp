@@ -1,4 +1,12 @@
+#include "simulation/actuators/propulsor/shared.hpp"
+#include "simulation/actuators/surface/shared.hpp"
+#include "simulation/actuators/shared.hpp"
+#include "simulation/control/interface.hpp"
+#include "simulation/control/shared.hpp"
 #include "simulation/control/linear_quadratic/controllers/lqr.hpp"
+#include "simulation/dynamics/dynamics.hpp"
+#include "simulation/guidance/shared.hpp"
+#include "simulation/trim/trim.hpp"
 
 namespace control {
 
@@ -6,12 +14,12 @@ namespace control {
         params(params), policy(params)
     {};
 
-    types::StateVector_T<double> LinearQuadraticRegulator::unpack_linear_quadratic_regulator_setpoint(const guidance::LinearFullStateFeedbackSetpoint& setpoint){
+    dynamics::StateVector_T<double> LinearQuadraticRegulator::unpack_linear_quadratic_regulator_setpoint(const guidance::LinearFullStateFeedbackSetpoint& setpoint){
         dynamics::LinearVelocity vB_BI = setpoint.vB_BI;
         dynamics::AngularVelocity wB_BI = setpoint.wB_BI;
         dynamics::EulerAngles eulIB = setpoint.eulIB;
 
-        types::State_T<double> setpoint_packed { 
+        dynamics::State_T<double> setpoint_packed {
             .vx = vB_BI.data(0),
             .vy = vB_BI.data(1),
             .vz = vB_BI.data(2),
@@ -21,7 +29,7 @@ namespace control {
             .phi = eulIB.phi(),
             .theta = eulIB.theta(),
         };
-        return trim::unpack_state_T(setpoint_packed);
+        return dynamics::unpack_state_T(setpoint_packed);
     }
 
     LinearQuadraticControllerInput LinearQuadraticRegulator::make_linear_quadratic_controller_input(const LinearFullStateFeedbackControllerInput& controller_input){
@@ -37,15 +45,15 @@ namespace control {
     }
 
     ControlOutput LinearQuadraticRegulator::step(const LinearFullStateFeedbackControllerInput& controller_input){
-        SurfaceActuatorInputs_T<double> u_surface{};
-        PropulsorActuatorInputs_T<double> u_propulsor{};
+        actuators::SurfaceActuatorInputs_T<double> u_surface{};
+        actuators::PropulsorActuatorInputs_T<double> u_propulsor{};
 
-        types::ActuatorInputsVector_T<double> u_deviation = policy.step(
+        actuators::ActuatorInputsVector_T<double> u_deviation = policy.step(
             make_linear_quadratic_controller_input(controller_input)
         );
-        types::ActuatorInputsVector_T<double> u_trim = trim::unpack_actuator_inputs_T(controller_input.u_sol_trim);
+        actuators::ActuatorInputsVector_T<double> u_trim = actuators::unpack_actuator_inputs_T(controller_input.u_sol_trim);
 
-        types::ActuatorInputsVector_T<double> u_cmd = u_deviation + u_trim;
+        actuators::ActuatorInputsVector_T<double> u_cmd = u_deviation + u_trim;
 
         u_surface.elevator_cmd = u_cmd[0];
         u_surface.aileron_cmd = u_cmd[1];

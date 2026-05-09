@@ -26,7 +26,7 @@ if [ -f "$DATA_PATH/p_meas.csv" ]; then
 fi
 
 if [ -f "$DATA_PATH/p_est.csv" ]; then
-  python3 "$SCRIPT" -d "$DATA_DIR/p_est.csv" -r "$DATA_DIR/p_meas.csv" \
+  python3 "$SCRIPT" -d "$DATA_DIR/p_est.csv" -r "$DATA_DIR/p.csv" \
     -l "x(t) [m]" "y(t) [m]" "z(t) [m]" \
     -t "position estimate vs time"
 fi
@@ -48,7 +48,7 @@ if [ -f "$DATA_PATH/eul_meas.csv" ]; then
 fi
 
 if [ -f "$DATA_PATH/eul_est.csv" ]; then
-  python3 "$SCRIPT" -d "$DATA_DIR/eul_est.csv" -r "$DATA_DIR/eul_meas.csv" \
+  python3 "$SCRIPT" -d "$DATA_DIR/eul_est.csv" -r "$DATA_DIR/eul.csv" \
     -l "psi(t) [rad]" "theta(t) [rad]" "phi(t) [rad]" \
     -t "orientation estimate vs time"
 fi
@@ -70,7 +70,7 @@ if [ -f "$DATA_PATH/w_meas.csv" ]; then
 fi
 
 if [ -f "$DATA_PATH/w_est.csv" ]; then
-  python3 "$SCRIPT" -d "$DATA_DIR/w_est.csv" -r "$DATA_DIR/w_meas.csv" \
+  python3 "$SCRIPT" -d "$DATA_DIR/w_est.csv" -r "$DATA_DIR/w.csv" \
     -l "p(t) [rad/s]" "q(t) [rad/s]" "r(t) [rad/s]" \
     -t "angular velocity estimate vs time"
 fi
@@ -92,7 +92,7 @@ if [ -f "$DATA_PATH/v_meas.csv" ]; then
 fi
 
 if [ -f "$DATA_PATH/v_est.csv" ]; then
-  python3 "$SCRIPT" -d "$DATA_DIR/v_est.csv" -r "$DATA_DIR/v_meas.csv" \
+  python3 "$SCRIPT" -d "$DATA_DIR/v_est.csv" -r "$DATA_DIR/v.csv" \
     -l "vx(t) [m/s]" "vy(t) [m/s]" "vz(t) [m/s]" \
     -t "linear velocity estimate vs time"
 fi

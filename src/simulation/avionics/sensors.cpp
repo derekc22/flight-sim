@@ -1,12 +1,12 @@
 #include <random>
 // #include <utility> // For std::pair
-#include "simulation/aerodynamics/aerodynamics.hpp"
-#include "simulation/constants/constants.hpp"
+#include "simulation/aerodynamics/shared.hpp"
 #include "simulation/atmospheric/atmospheric.hpp"
-#include "simulation/dynamics/dynamics.hpp"
-#include "simulation/geography/geography.hpp"
-#include "simulation/util/util.hpp"
 #include "simulation/avionics/sensors.hpp"
+#include "simulation/constants/constants.hpp"
+#include "simulation/dynamics/shared.hpp"
+#include "simulation/geography/shared.hpp"
+#include "simulation/util/util.hpp"
 
 namespace avionics {
 

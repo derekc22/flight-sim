@@ -1,14 +1,10 @@
 #pragma once
+#include <cstddef>
 #include <Eigen/Dense>
-#include <vector>
-#include <stdexcept>
-#include <cmath>
 #include <string>
 #include <unordered_map>
-#include "simulation/dynamics/dynamics.hpp"
-#include "simulation/constants/constants.hpp"
-#include "simulation/util/util.hpp"
-
+#include <vector>
+#include "simulation/dynamics/shared.hpp"
 
 namespace structural {
 

@@ -1,6 +1,7 @@
 #include <Eigen/Dense>
 #include <format>
 #include <stdexcept>
+#include "simulation/constants/constants.hpp"
 #include "simulation/dynamics/dynamics.hpp"
 #include "simulation/frames/frames.hpp"
 #include "simulation/geography/geography.hpp"

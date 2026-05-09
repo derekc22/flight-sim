@@ -3,10 +3,7 @@
 #include <string>
 #include <vector>
 #include <Eigen/Dense>
-#include "simulation/actuators/actuator.hpp"
-#include "simulation/constants/constants.hpp"
-
-namespace control { struct PropulsorActuatorInputs_T; } // forward declare
+#include "simulation/actuators/actuator/actuator.hpp"
 
 namespace actuators {
 
@@ -38,6 +35,13 @@ namespace actuators {
         FrontPropulsor front_propulsor;
         LeftPropulsor left_propulsor;
         RightPropulsor right_propulsor;
+    };
+
+    template <typename T>
+    struct PropulsorActuatorInputs_T {
+        T front_propulsor_cmd = T(0);
+        T left_propulsor_cmd = T(0);
+        T right_propulsor_cmd = T(0);
     };
 
 }

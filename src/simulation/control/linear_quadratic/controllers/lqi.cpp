@@ -1,7 +1,10 @@
 #include <Eigen/Dense>
+#include "simulation/control/interface.hpp"
 #include "simulation/control/linear_quadratic/controllers/lqr.hpp"
 #include "simulation/control/linear_quadratic/controllers/lqi.hpp"
 #include "simulation/constants/constants.hpp"
+#include "simulation/linearization/shared.hpp"
+#include "simulation/trim/trim.hpp"
 
 namespace control {
 

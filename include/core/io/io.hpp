@@ -1,10 +1,12 @@
 #pragma once
+#include <optional>
 #include <string>
 #include <vector>
 #include <Eigen/Dense>
-#include "simulation/types/types.hpp"
-#include "simulation/dynamics/dynamics.hpp"
-#include "simulation/guidance/guidance.hpp"
+#include "simulation/actuators/propulsor/shared.hpp"
+#include "simulation/actuators/surface/shared.hpp"
+#include "simulation/dynamics/shared.hpp"
+#include "simulation/guidance/shared.hpp"
 
 namespace io {
 
@@ -26,8 +28,8 @@ namespace io {
         dynamics::RigidBodyState xN_t;
         dynamics::RigidBodyState yN_t;
         dynamics::RigidBodyState zN_t;
-        types::SurfaceActuatorInputs_T<double> u_surface_actual;
-        types::PropulsorActuatorInputs_T<double> u_propulsor_actual;
+        actuators::SurfaceActuatorInputs_T<double> u_surface_actual;
+        actuators::PropulsorActuatorInputs_T<double> u_propulsor_actual;
         dynamics::Wrench WB_net;
         dynamics::Wrench WB_aero;
         dynamics::Wrench WB_propulsive;

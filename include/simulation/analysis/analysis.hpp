@@ -2,7 +2,8 @@
 
 #include <Eigen/Dense>
 #include <complex>
-#include "simulation/trim/trim.hpp"
+#include <string>
+#include "simulation/constants/constants.hpp"
 #include "simulation/linearization/linearization.hpp"
 
 namespace analysis {

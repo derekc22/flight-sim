@@ -5,6 +5,8 @@
 #include "core/json/control.hpp"
 #include "core/json/json.hpp"
 #include "simulation/constants/constants.hpp"
+#include "simulation/control/control.hpp"
+#include "simulation/dynamics/shared.hpp"
 #include "simulation/guidance/guidance.hpp"
 #include "simulation/util/validate.hpp"
 

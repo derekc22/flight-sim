@@ -2,6 +2,7 @@
 #include <nlohmann/json.hpp>
 #include "core/json/avionics.hpp"
 #include "core/json/json.hpp"
+#include "simulation/avionics/avionics.hpp"
 #include "simulation/constants/constants.hpp"
 
 namespace json {

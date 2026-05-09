@@ -1,6 +1,7 @@
 #pragma once
 #include <Eigen/Dense>
 #include <functional>
+#include "simulation/control/interface.hpp"
 #include "simulation/control/shared.hpp"
 #include "simulation/control/pid/pid.hpp"
 #include "simulation/control/pid/controllers/damper.hpp"
@@ -9,7 +10,6 @@
 #include "simulation/control/linear_quadratic/controllers/lqr.hpp"
 #include "simulation/control/linear_quadratic/controllers/lqi.hpp"
 #include "simulation/control/linear_quadratic/controllers/lqt.hpp"
-#include "simulation/types/types.hpp"
 
 namespace control {
 

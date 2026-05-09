@@ -1,6 +1,10 @@
+#include "simulation/actuators/propulsor/shared.hpp"
+#include "simulation/atmospheric/shared.hpp"
+#include "simulation/constants/constants.hpp"
+#include "simulation/dynamics/shared.hpp"
 #include "simulation/propulsion/propulsion.hpp"
+#include "simulation/propulsion/shared.hpp"
 #include "simulation/util/util.hpp"
-#include "simulation/control/control.hpp"
 
 namespace propulsion {
 
@@ -13,7 +17,7 @@ namespace propulsion {
         return (omega - prev_omega) / constants::dt;
     }
 
-    PropulsiveWrench step_propulsive_forces_moments(actuators::PropulsorActuators& propulsor_actuators, const dynamics::RigidBodyState& rigid_body_state, const atmospheric::StaticAtmosphericState& static_atmospheric_state, const types::PropulsorActuatorInputs_T<double>& u) {
+    PropulsiveWrench step_propulsive_forces_moments(actuators::PropulsorActuators& propulsor_actuators, const dynamics::RigidBodyState& rigid_body_state, const atmospheric::StaticAtmosphericState& static_atmospheric_state, const actuators::PropulsorActuatorInputs_T<double>& u) {
         PropulsorOmegaDot_T<double> omega_dot{
             .front_propulsor = step_propeller_omega_dot(propulsor_actuators.front_propulsor, u.front_propulsor_cmd, static_atmospheric_state),
             .left_propulsor = step_propeller_omega_dot(propulsor_actuators.left_propulsor, u.left_propulsor_cmd, static_atmospheric_state),
@@ -29,7 +33,7 @@ namespace propulsion {
             propulsor_actuators,
             twist,
             static_atmospheric_state,
-            PropulsorActuatorInputs_T<double>{
+            actuators::PropulsorActuatorInputs_T<double>{
                 .front_propulsor_cmd = u.front_propulsor_cmd,
                 .left_propulsor_cmd = u.left_propulsor_cmd,
                 .right_propulsor_cmd = u.right_propulsor_cmd

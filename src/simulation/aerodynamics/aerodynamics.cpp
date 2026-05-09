@@ -7,14 +7,14 @@
 #include <cmath>
 #include <format>
 #include <stdexcept>
+#include "simulation/actuators/surface/shared.hpp"
 #include "simulation/aerodynamics/aerodynamics.hpp"
-#include "simulation/structural/structural.hpp"
-#include "simulation/frames/frames.hpp"
-#include <simulation/dynamics/dynamics.hpp>
-#include <simulation/atmospheric/atmospheric.hpp>
+#include "simulation/atmospheric/atmospheric.hpp"
 #include "simulation/constants/constants.hpp"
+#include "simulation/dynamics/dynamics.hpp"
+#include "simulation/frames/frames.hpp"
+#include "simulation/structural/structural.hpp"
 #include "simulation/util/util.hpp"
-#include "simulation/control/control.hpp"
 
 namespace aerodynamics {
 
@@ -51,7 +51,7 @@ namespace aerodynamics {
         const structural::StructuralProperties& structural_properties,
         const dynamics::RigidBodyState& rigid_body_state,
         const atmospheric::StaticAtmosphericState& static_atmospheric_state,
-        const types::SurfaceActuatorInputs_T<double>& u,
+        const actuators::SurfaceActuatorInputs_T<double>& u,
         const atmospheric::Wind& windB
     ) {
         const dynamics::Twist_T<double> twist{

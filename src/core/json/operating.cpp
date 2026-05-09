@@ -3,6 +3,9 @@
 #include <nlohmann/json.hpp>
 #include "core/json/operating.hpp"
 #include "core/json/json.hpp"
+#include "simulation/actuators/actuator/actuator.hpp"
+#include "simulation/actuators/actuators.hpp"
+#include "simulation/operating/operating.hpp"
 #include "simulation/util/util.hpp"
 
 namespace json {

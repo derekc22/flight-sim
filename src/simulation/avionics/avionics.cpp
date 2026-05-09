@@ -1,4 +1,8 @@
+#include "simulation/aerodynamics/shared.hpp"
+#include "simulation/atmospheric/atmospheric.hpp"
 #include "simulation/avionics/avionics.hpp"
+#include "simulation/dynamics/shared.hpp"
+#include "simulation/geography/geography.hpp"
 
 namespace avionics {
 

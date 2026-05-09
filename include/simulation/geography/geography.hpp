@@ -2,34 +2,12 @@
 #include <Eigen/Dense>
 #include <cmath>
 #include <vector>
-#include "simulation/dynamics/dynamics.hpp"
+#include "simulation/dynamics/shared.hpp"
+#include "simulation/geography/shared.hpp"
 
 namespace frames { struct Frame; } // forward declare
 
 namespace geography {
-
-    struct Latitude { 
-        double data; // [rad] e.g. lat_BE
-    };
-
-    struct Longitude { 
-        double data; // [rad] e.g. lon_BE
-    };
-
-    struct Altitude { 
-        double data; // [m] e.g. alt_BE
-    };
-
-    struct Heading { 
-        double data; // [rad] e.g. heading_BE
-    };
-
-    /** @brief Latitude, Longitude, and Altitude of a frame WRT the ECEF frame */
-    struct GeographicState {
-        Latitude lat;
-        Longitude lon;
-        Altitude alt;
-    };
 
     /** @warning The parent of F must the ECEFFrame */
     GeographicState compute_geographic_state(const frames::Frame& F);

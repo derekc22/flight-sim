@@ -1,14 +1,6 @@
 #pragma once
 
-namespace types {
-
-    template <typename T>
-    ActuatorInputsVector_T<T> unpack_actuator_inputs_T(const ActuatorInputs_T<T>& u) {
-        ActuatorInputsVector_T<T> out;
-        out << u.elevator_cmd, u.aileron_cmd, u.rudder_cmd,
-               u.front_propulsor_cmd, u.left_propulsor_cmd, u.right_propulsor_cmd;
-        return out;
-    }
+namespace dynamics {
 
     template <typename T>
     StateVector_T<T> unpack_state_T(const State_T<T>& x) {
@@ -27,9 +19,5 @@ namespace types {
                x_dot.phi_dot, x_dot.theta_dot;
         return out;
     }
-
-
-
-
 
 }

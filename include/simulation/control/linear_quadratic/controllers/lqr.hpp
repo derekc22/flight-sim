@@ -2,7 +2,7 @@
 #include <Eigen/Dense>
 #include "simulation/dynamics/dynamics.hpp"
 #include "simulation/linearization/linearization.hpp"
-#include "simulation/control/shared.hpp"
+#include "simulation/control/interface.hpp"
 #include "simulation/control/linear_quadratic/linear_quadratic.hpp"
 #include "simulation/guidance/guidance.hpp"
 
@@ -20,6 +20,6 @@ namespace control {
         ControlOutput step(const LinearFullStateFeedbackControllerInput& controller_input);
 
         virtual LinearQuadraticControllerInput make_linear_quadratic_controller_input(const LinearFullStateFeedbackControllerInput& controller_input);
-        types::StateVector_T<double> unpack_linear_quadratic_regulator_setpoint(const guidance::LinearFullStateFeedbackSetpoint& linear_quadratic_regulator_setpoint);
+        dynamics::StateVector_T<double> unpack_linear_quadratic_regulator_setpoint(const guidance::LinearFullStateFeedbackSetpoint& linear_quadratic_regulator_setpoint);
     };
 }

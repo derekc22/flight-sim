@@ -1,7 +1,9 @@
 #pragma once
-#include <iostream>
-#include "simulation/trim/trim.hpp"
-#include "simulation/linearization/types.hpp"
+#include <string>
+#include "simulation/linearization/shared.hpp"
+#include "simulation/trim/shared.hpp"
+
+namespace vehicles { struct Aircraft; } // forward declare
 
 namespace linearization {
     TrimLinearization linearize_trim_solution(vehicles::Aircraft& aircraft, const trim::TrimSolution& trim_sol);

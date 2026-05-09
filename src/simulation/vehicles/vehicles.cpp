@@ -6,7 +6,12 @@
 #include <stdexcept>
 #include <queue>
 #include <unordered_set>
+#include "simulation/actuators/actuators.hpp"
+#include "simulation/aerodynamics/aerodynamics.hpp"
+#include "simulation/atmospheric/atmospheric.hpp"
+#include "simulation/control/control.hpp"
 #include "simulation/dynamics/dynamics.hpp"
+#include "simulation/estimation/estimation.hpp"
 #include "simulation/frames/frames.hpp"
 #include "simulation/geography/geography.hpp"
 #include "simulation/vehicles/vehicles.hpp"
@@ -15,6 +20,7 @@
 #include "simulation/util/util.hpp"
 #include "simulation/operating/operating.hpp"
 #include "simulation/guidance/guidance.hpp"
+#include "simulation/structural/structural.hpp"
 
 
 

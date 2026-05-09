@@ -1,9 +1,9 @@
 #pragma once
 #include <Eigen/Dense>
 #include <optional>
-#include "simulation/dynamics/dynamics.hpp"
 #include "simulation/aerodynamics/aerodynamics.hpp"
 #include "simulation/atmospheric/atmospheric.hpp"
+#include "simulation/dynamics/shared.hpp"
 #include "simulation/geography/geography.hpp"
 #include "simulation/avionics/sensors.hpp"
 #include "simulation/avionics/computers.hpp"

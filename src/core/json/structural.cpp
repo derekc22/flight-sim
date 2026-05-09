@@ -4,6 +4,7 @@
 #include <nlohmann/json.hpp>
 #include "core/json/structural.hpp"
 #include "core/json/json.hpp"
+#include "simulation/structural/structural.hpp"
 
 namespace json {
 

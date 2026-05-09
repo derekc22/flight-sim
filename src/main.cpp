@@ -18,12 +18,18 @@
 #include "simulation/structural/structural.hpp"
 #include "simulation/aerodynamics/aerodynamics.hpp"
 #include "simulation/actuators/actuators.hpp"
+#include "simulation/actuators/propulsor/shared.hpp"
+#include "simulation/actuators/surface/shared.hpp"
+#include "simulation/control/control.hpp"
 #include "simulation/trim/trim.hpp"
 #include "simulation/analysis/analysis.hpp"
 #include "simulation/linearization/linearization.hpp"
 #include "simulation/propulsion/propulsion.hpp"
+#include "simulation/geography/geography.hpp"
 #include "simulation/guidance/guidance.hpp"
 #include "simulation/estimation/estimation.hpp"
+#include "simulation/avionics/avionics.hpp"
+#include "simulation/operating/operating.hpp"
 #include "core/io/io.hpp"
 #include "core/json/json.hpp"
 #include "core/connection/connection.hpp"
@@ -41,11 +47,13 @@ struct SimulationInput {
     bool data_bool;
     std::string out_dir;
     io::DataManager data_manager;
-}; 
+};
 
 struct SimulationOutput {
+    trim::TrimSolution trim_sol;
+    linearization::TrimLinearization lin_sol;
     analysis::TrimEigenAnalysis eig_sol;
-}; 
+};
 
 struct SimulationContext {
     dynamics::RigidBodyState xN_t;
@@ -66,7 +74,7 @@ vehicles::Aircraft load(bool trim_bool) {
     control::ControlProperties control_properties = json::parse_control_config();
 
     // create vehicle from config
-    vehicles::Aircraft aircraft { 
+    vehicles::Aircraft aircraft {
         structural_properties,
         json::parse_aerodynamics_config(),
         actuator_properties,
@@ -87,25 +95,24 @@ vehicles::Aircraft load(bool trim_bool) {
 void cleanup(SimulationInput& sim_in, SimulationOutput& sim_out) {
     std::string out_dir_path = "data/" + sim_in.out_dir + "/";
 
-        // save data
-        sim_in.data_manager.save(out_dir_path);
+    // save data
+    sim_in.data_manager.save(out_dir_path);
 
-        // log trim
-        if (sim_in.trim_bool){
-            io::write_txt(trim::print_trim_solution(sim_out.trim_sol), out_dir_path, "trim_sol");
-            
-            // log linearization and eigenanalysis
-            if (sim_out.trim_sol.converged) {
-                io::write_txt(linearization::print_linearization_solution(sim_out.lin_sol), out_dir_path, "lin_sol");
-                io::write_csv(Eigen::MatrixXd(sim_out.lin_sol.A), out_dir_path, "lin_sol_A");
-                io::write_csv(Eigen::MatrixXd(sim_out.lin_sol.B), out_dir_path, "lin_sol_B");
-                io::write_txt(analysis::print_eigen_analysis(sim_out.eig_sol), out_dir_path, "eig_sol");
-            }
+    // log trim
+    if (sim_in.trim_bool){
+        io::write_txt(trim::print_trim_solution(sim_out.trim_sol), out_dir_path, "trim_sol");
+
+        // log linearization and eigenanalysis
+        if (sim_out.trim_sol.converged) {
+            io::write_txt(linearization::print_linearization_solution(sim_out.lin_sol), out_dir_path, "lin_sol");
+            io::write_csv(Eigen::MatrixXd(sim_out.lin_sol.A), out_dir_path, "lin_sol_A");
+            io::write_csv(Eigen::MatrixXd(sim_out.lin_sol.B), out_dir_path, "lin_sol_B");
+            io::write_txt(analysis::print_eigen_analysis(sim_out.eig_sol), out_dir_path, "eig_sol");
         }
-
-        // dump configs
-        json::dump_configs(out_dir_path);
     }
+
+    // dump configs
+    json::dump_configs(out_dir_path);
 }
 
 
@@ -125,8 +132,8 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
     dynamics::Mass mass = structural_properties.Mass;
     dynamics::InertiaTensor J = structural_properties.J;
 
-    types::SurfaceActuatorInputs_T<double> u_surface_actual_prev{};
-    types::PropulsorActuatorInputs_T<double> u_propulsor_actual_prev{};
+    actuators::SurfaceActuatorInputs_T<double> u_surface_actual_prev{};
+    actuators::PropulsorActuatorInputs_T<double> u_propulsor_actual_prev{};
 
     // initialize trim and linearization solutions
     trim::TrimSolution trim_sol;
@@ -136,8 +143,6 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
     dynamics::Force FB_net{ constants::Zero3 };
     dynamics::Moment MB_net{ constants::Zero3 };
     dynamics::Wrench WB_net{ .F = FB_net, .M = MB_net };
-
-    io::Database DB(sim_in.data_bool, sim_in.control_bool, sim_in.sensor_bool, sim_in.estimation_bool);
 
     // initialize udp connections
     connection::UDPOut udp_out(5510);
@@ -202,7 +207,7 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
 
                 // perform eigenanalysis
                 const analysis::TrimEigenAnalysis eig_sol = analysis::trim_linearization_eigen_analysis(lin_sol);
-                
+
                 sim_out.lin_sol = lin_sol;
                 sim_out.eig_sol = eig_sol;
             }
@@ -211,13 +216,13 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
         // initialize measurements to ground truth
         dynamics::RigidBodyState yN_t = xN_t;
 
-        // use sensors 
+        // use sensors
         if (sim_in.sensor_bool){
             geography::GeographicState gps_t = geography::compute_geographic_state(aircraft.FRDFrameECEF);
 
             // obtain full state from sensors
             aerodynamics::AerodynamicState ads_t = aerodynamics::compute_aerodynamic_state(xN_t, wind);
-            
+
             // overwrite local measurement state with sensor measurements
             yN_t = avionics::get_state_from_avionics(xN_t, ads_t, static_atmospheric_state, gps_t, mass, wind, WB_net, aircraft.avionics_properties);
         }
@@ -265,10 +270,10 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
         u_cmd.surface_inputs.spoiler_cmd = operating_properties.fixed_actuator_inputs.spoiler;
 
         // apply surface actuator dynamics
-        types::SurfaceActuatorInputs_T<double> u_surface_actual = actuator_properties.step(u_cmd.surface_inputs);
+        actuators::SurfaceActuatorInputs_T<double> u_surface_actual = actuator_properties.step(u_cmd.surface_inputs);
 
         // apply propulsor dynamics
-        types::PropulsorActuatorInputs_T<double> u_propulsor_actual = actuator_properties.step(u_cmd.propulsor_inputs);
+        actuators::PropulsorActuatorInputs_T<double> u_propulsor_actual = actuator_properties.step(u_cmd.propulsor_inputs);
         u_surface_actual_prev = u_surface_actual;
         u_propulsor_actual_prev = u_propulsor_actual;
 
@@ -310,8 +315,8 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
             .xN_t=xN_t,
             .yN_t=yN_t,
             .zN_t=zN_t,
-            .u_surface=u_surface_actual,
-            .u_propulsor=u_propulsor_actual,
+            .u_surface_actual=u_surface_actual,
+            .u_propulsor_actual=u_propulsor_actual,
             .WB_net=WB_net,
             .WB_aero=WB_aero,
             .WB_propulsive=WB_propulsive,
@@ -319,11 +324,11 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
         };
 
         // step data manager
-        sim_in.DM.step(t, data_context);
+        sim_in.data_manager.step(t, data_context);
 
         // generate in_pkt from the simulation state
         messages::FlightGearMessageIn in_pkt = messages::process_in_pkt(
-            geography::compute_geographic_state(aircraft.FRDFrameECEF), 
+            geography::compute_geographic_state(aircraft.FRDFrameECEF),
             aircraft.FRDFrameNED.eulNB
         );
 
@@ -350,9 +355,9 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
 
 int main(int argc, char* argv[]) {
     if (argc != 9) { return 1; }
-    
+
     double time_sec;
-    try { time_sec = std::stod(argv[1]); } 
+    try { time_sec = std::stod(argv[1]); }
     catch (const std::exception&) {std::cerr << "invalid TIME_SEC: " << argv[1] << std::endl; return 1; }
     if (!std::isfinite(time_sec) || time_sec <= 0.0) { std::cerr << "TIME_SEC must be > 0" << std::endl; return 1; }
 
@@ -368,21 +373,21 @@ int main(int argc, char* argv[]) {
     vehicles::Aircraft aircraft = load(trim_bool);
 
     // compute number of simulation steps
-    const int tf = std::max(1, static_cast<int>(std::ceil(sim_in.time_sec / constants::dt)));
+    const int tf = std::max(1, static_cast<int>(std::ceil(time_sec / constants::dt)));
 
     // create data manager
     io::DataManager data_manager{tf, data_bool, control_bool, sensor_bool, estimation_bool};
 
     // create simulation input
     SimulationInput sim_in {
-        .aircraft=aircraft, 
+        .aircraft=aircraft,
         .tf=tf,
         .trim_bool=trim_bool,
         .sensor_bool=sensor_bool,
         .control_bool=control_bool,
         .estimation_bool=estimation_bool,
         .verbose_bool=verbose_bool,
-        .data_bool=data_bool, 
+        .data_bool=data_bool,
         .out_dir=out_dir,
         .data_manager=data_manager
     };
@@ -395,4 +400,3 @@ int main(int argc, char* argv[]) {
 
     return 0;
 }
-

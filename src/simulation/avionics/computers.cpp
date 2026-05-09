@@ -1,3 +1,4 @@
+#include <cmath>
 #include "simulation/constants/constants.hpp"
 #include "simulation/dynamics/dynamics.hpp"
 #include "simulation/geography/geography.hpp"

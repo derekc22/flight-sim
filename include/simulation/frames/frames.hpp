@@ -15,12 +15,12 @@
 
 namespace frames {
 
-    struct Frame;
-    struct NEDFrameECEF;
-    struct FRDFrameECEF;
-    struct FRDFrameNED;
-    struct STABFrameFRD;
-    struct WINDFrameSTAB;
+    struct Frame; // forward declare
+    struct NEDFrameECEF; // forward declare
+    struct FRDFrameECEF; // forward declare
+    struct FRDFrameNED; // forward declare
+    struct STABFrameFRD; // forward declare
+    struct WINDFrameSTAB; // forward declare
 
     struct SetOptions {
         std::optional<dynamics::HomogenousFrameTransformationMatrix> H;

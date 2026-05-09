@@ -1,8 +1,16 @@
 #pragma once
+#include "simulation/actuators/propulsor/shared.hpp"
+#include "simulation/actuators/surface/shared.hpp"
+#include "simulation/actuators/shared.hpp"
+#include "simulation/aerodynamics/aerodynamics.hpp"
+#include "simulation/constants/constants.hpp"
+#include "simulation/dynamics/dynamics.hpp"
+#include "simulation/propulsion/propulsion.hpp"
+#include "simulation/util/util.hpp"
 
 namespace trim {
     template <typename T>
-    dynamics::Twist_T<T> build_twist_from_trim_state_T(const State_T<T>& x) {
+    dynamics::Twist_T<T> build_twist_from_trim_state_T(const dynamics::State_T<T>& x) {
         dynamics::Twist_T<T> twist;
         twist.v << x.vx, x.vy, x.vz;
         twist.w << x.p, x.q, x.r;
@@ -10,7 +18,7 @@ namespace trim {
     }
 
     template <typename T>
-    aerodynamics::SurfaceActuatorInputs_T<T> build_surface_actuator_inputs_from_trim_T(const ActuatorInputs_T<T>& u, const FixedActuatorInputs_T& fixed_actuator_inputs) {
+    actuators::SurfaceActuatorInputs_T<T> build_surface_actuator_inputs_from_trim_T(const actuators::ActuatorInputs_T<T>& u, const actuators::FixedActuatorInputs_T& fixed_actuator_inputs) {
         return {
             .elevator_cmd = u.elevator_cmd,
             .aileron_cmd = u.aileron_cmd,
@@ -21,7 +29,7 @@ namespace trim {
     }
 
     template <typename T>
-    propulsion::PropulsorActuatorInputs_T<T> build_propulsor_actuator_inputs_from_trim_T(const ActuatorInputs_T<T>& u) {
+    actuators::PropulsorActuatorInputs_T<T> build_propulsor_actuator_inputs_from_trim_T(const actuators::ActuatorInputs_T<T>& u) {
         return {
             .front_propulsor_cmd = u.front_propulsor_cmd,
             .left_propulsor_cmd = u.left_propulsor_cmd,
@@ -30,27 +38,21 @@ namespace trim {
     }
 
     template <typename T>
-    T get_control_from_solver_space_T(const T& u_solver, const actuators::Actuator& actuator) {
-        const double mid = 0.5 * (actuator.limit_max + actuator.limit_min);
-        const double half_range = 0.5 * (actuator.limit_max - actuator.limit_min);
-
-        if (half_range <= 0.0) {
-            return T(mid);
-        }
-
-        return T(mid) + T(half_range) * u_solver / util::sqrt(T(1) + u_solver * u_solver);
+    T get_control_from_solver_space_T(const T& u_solver, double limit_min, double limit_max) {
+        const T mid = T(0.5 * (limit_max + limit_min));
+        const T half_range = T(0.5 * (limit_max - limit_min));
+        return mid + half_range * (u_solver / util::sqrt(T(1) + u_solver * u_solver));
     }
 
     template <typename T>
-    ActuatorInputs_T<T> pack_trim_actuator_inputs_T(const TrimVariablesVector_T<T>& z, const actuators::SurfaceActuators& surface_actuators, const actuators::PropulsorActuators& propulsor_actuators) {
+    actuators::ActuatorInputs_T<T> pack_trim_actuator_inputs_T(const TrimVariablesVector_T<T>& z, const actuators::ActuatorLimits_T<double>& actuator_limits) {
         return {
-            .elevator_cmd = get_control_from_solver_space_T<T>(z(8), surface_actuators.elevator),
-            .aileron_cmd = get_control_from_solver_space_T<T>(z(9), surface_actuators.aileron),
-            .rudder_cmd = get_control_from_solver_space_T<T>(z(10), surface_actuators.rudder),
-
-            .front_propulsor_cmd = get_control_from_solver_space_T<T>(z(11), propulsor_actuators.front_propulsor),
-            .left_propulsor_cmd = get_control_from_solver_space_T<T>(z(12), propulsor_actuators.left_propulsor),
-            .right_propulsor_cmd = get_control_from_solver_space_T<T>(z(13), propulsor_actuators.right_propulsor)
+            .elevator_cmd = get_control_from_solver_space_T<T>(z(constants::state_dim + 0), actuator_limits.limit_min.elevator_cmd, actuator_limits.limit_max.elevator_cmd),
+            .aileron_cmd = get_control_from_solver_space_T<T>(z(constants::state_dim + 1), actuator_limits.limit_min.aileron_cmd, actuator_limits.limit_max.aileron_cmd),
+            .rudder_cmd = get_control_from_solver_space_T<T>(z(constants::state_dim + 2), actuator_limits.limit_min.rudder_cmd, actuator_limits.limit_max.rudder_cmd),
+            .front_propulsor_cmd = get_control_from_solver_space_T<T>(z(constants::state_dim + 3), actuator_limits.limit_min.front_propulsor_cmd, actuator_limits.limit_max.front_propulsor_cmd),
+            .left_propulsor_cmd = get_control_from_solver_space_T<T>(z(constants::state_dim + 4), actuator_limits.limit_min.left_propulsor_cmd, actuator_limits.limit_max.left_propulsor_cmd),
+            .right_propulsor_cmd = get_control_from_solver_space_T<T>(z(constants::state_dim + 5), actuator_limits.limit_min.right_propulsor_cmd, actuator_limits.limit_max.right_propulsor_cmd),
         };
     }
 
@@ -65,9 +67,9 @@ namespace trim {
 
 
     template <typename T>
-    dynamics::Wrench_T<T> compute_trim_net_wrench_T(const State_T<T>& x, const dynamics::Twist_T<T>& twist, const ActuatorInputs_T<T>& u, const TrimModel& model, const TrimConditions& conditions) {
-        const aerodynamics::SurfaceActuatorInputs_T<T> surface_actuator_inputs = build_surface_actuator_inputs_from_trim_T(u, model.fixed_actuator_inputs);
-        const aerodynamics::dynamics::Wrench_T<T> aero_wrench = aerodynamics::step_aero_forces_moments_T<T>(
+    dynamics::Wrench_T<T> compute_trim_net_wrench_T(const dynamics::State_T<T>& x, const dynamics::Twist_T<T>& twist, const actuators::ActuatorInputs_T<T>& u, const TrimModel& model, const TrimConditions& conditions) {
+        const actuators::SurfaceActuatorInputs_T<T> surface_actuator_inputs = build_surface_actuator_inputs_from_trim_T(u, model.fixed_actuator_inputs);
+        const dynamics::Wrench_T<T> aero_wrench = aerodynamics::step_aero_forces_moments_T<T>(
             model.aerodynamic,
             model.structural,
             twist,
@@ -76,8 +78,8 @@ namespace trim {
             conditions.windB
         );
 
-        const propulsion::PropulsorActuatorInputs_T<T> propulsor_actuator_inputs = build_propulsor_actuator_inputs_from_trim_T(u);
-        const propulsion::dynamics::Wrench_T<T> prop_wrench = propulsion::step_propulsive_forces_moments_T<T>(
+        const actuators::PropulsorActuatorInputs_T<T> propulsor_actuator_inputs = build_propulsor_actuator_inputs_from_trim_T(u);
+        const dynamics::Wrench_T<T> prop_wrench = propulsion::step_propulsive_forces_moments_T<T>(
             model.propulsor_actuators,
             twist,
             conditions.static_atmospheric_state,
@@ -92,7 +94,7 @@ namespace trim {
     }
 
     template <typename T>
-    StateDot_T<T> compute_trim_state_dot_T(const State_T<T>& x, const ActuatorInputs_T<T>& u, const TrimModel& model, const TrimConditions& conditions) {
+    dynamics::StateDot_T<T> compute_trim_state_dot_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u, const TrimModel& model, const TrimConditions& conditions) {
         const dynamics::Twist_T<T> twist = build_twist_from_trim_state_T(x);
         const dynamics::Wrench_T<T> net_wrench = compute_trim_net_wrench_T<T>(x, twist, u, model, conditions);
         const constants::Vector3_T<T> v_dot = dynamics::_ddtB_vB_BI_T<T>(twist.v, twist.w, model.structural.Mass.data, net_wrench.F);
@@ -112,8 +114,8 @@ namespace trim {
     }
 
     template <typename T>
-    TrimResidual<T> compute_trim_residual(const State_T<T>& x, const ActuatorInputs_T<T>& u, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions) {
-        const StateDot_T<T> trim_state_dot = compute_trim_state_dot_T<T>(x, u, model, conditions);
+    TrimResidual<T> compute_trim_residual(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions) {
+        const dynamics::StateDot_T<T> trim_state_dot = compute_trim_state_dot_T<T>(x, u, model, conditions);
         const dynamics::Twist_T<T> twist = build_twist_from_trim_state_T(x);
         const aerodynamics::AerodynamicState_T<T> ads = aerodynamics::compute_aerodynamic_state_T<T>(twist, conditions.windB);
         const constants::Vector3_T<T> eul_dot = dynamics::_wB_BI_to_eul_dot_T<T>(twist.w, x.theta, x.phi);
@@ -137,7 +139,7 @@ namespace trim {
     }
 
     template <typename T>
-    TrimVariablesVector_T<T> unpack_trim_variables_T(const State_T<T>& x, const ActuatorInputs_T<T>& u) {
+    TrimVariablesVector_T<T> unpack_trim_variables_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u) {
         TrimVariablesVector_T<T> out;
         out << x.vx, x.vy, x.vz,
                x.p, x.q, x.r,
@@ -148,7 +150,7 @@ namespace trim {
     }
 
     template <typename T>
-    State_T<T> pack_trim_state_T(const TrimVariablesVector_T<T>& z) {
+    dynamics::State_T<T> pack_trim_state_T(const TrimVariablesVector_T<T>& z) {
         return {
             .vx = z(0),
             .vy = z(1),
@@ -162,7 +164,7 @@ namespace trim {
     }
 
     template <typename T>
-    ActuatorInputs_T<T> pack_trim_actuator_inputs_T(const TrimVariablesVector_T<T>& z) {
+    actuators::ActuatorInputs_T<T> pack_trim_actuator_inputs_T(const TrimVariablesVector_T<T>& z) {
         return {
             .elevator_cmd = z(8),
             .aileron_cmd = z(9),
@@ -196,11 +198,11 @@ namespace trim {
 
     template <typename T>
     TrimResidualVector_T<T> compute_trim_residual_vector_T(const TrimVariablesVector_T<T>& z, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions, bool use_physical_controls) {
-        const State_T<T> x = pack_trim_state_T<T>(z);
+        const dynamics::State_T<T> x = pack_trim_state_T<T>(z);
 
-        ActuatorInputs_T<T> u;
+        actuators::ActuatorInputs_T<T> u;
         if (use_physical_controls) u = pack_trim_actuator_inputs_T<T>(z);
-        else u = pack_trim_actuator_inputs_T<T>(z, model.surface_actuators, model.propulsor_actuators);
+        else u = pack_trim_actuator_inputs_T<T>(z, model.actuator_limits);
 
         const TrimResidual<T> residual = compute_trim_residual<T>(x, u, model, target, conditions);
         return unpack_trim_residual_T(residual);

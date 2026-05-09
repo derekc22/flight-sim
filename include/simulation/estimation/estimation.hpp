@@ -1,6 +1,7 @@
 #pragma once
 #include <functional>
-#include "simulation/estimation/shared.hpp"
+#include "simulation/dynamics/shared.hpp"
+#include "simulation/estimation/interface.hpp"
 #include "simulation/estimation/kalman/estimators/ekf.hpp"
 #include "simulation/estimation/kalman/estimators/lkf.hpp"
 

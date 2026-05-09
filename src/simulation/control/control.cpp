@@ -1,6 +1,5 @@
 #include <Eigen/Dense>
 #include "simulation/control/control.hpp"
-#include "simulation/types/types.hpp"
 
 namespace control {
 

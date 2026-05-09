@@ -7,7 +7,11 @@
 #include <nlohmann/json.hpp>
 #include "core/json/actuators.hpp"
 #include "core/json/json.hpp"
+#include "simulation/actuators/actuators.hpp"
+#include "simulation/actuators/propulsor/shared.hpp"
+#include "simulation/actuators/surface/shared.hpp"
 #include "simulation/constants/constants.hpp"
+#include "simulation/structural/structural.hpp"
 #include "simulation/util/util.hpp"
 
 namespace json {
