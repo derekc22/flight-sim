@@ -2,7 +2,6 @@
 #include "simulation/control/shared.hpp"
 #include "simulation/dynamics/dynamics.hpp"
 #include "simulation/linearization/types.hpp"
-#include "simulation/trim/types.hpp"
 
 namespace estimation {
 
@@ -14,8 +13,8 @@ namespace estimation {
         dynamics::RigidBodyState yN_t;
         linearization::TrimLinearization lin_sol;
         trim::TrimSolution trim_sol;
-        control::SurfaceActuatorInputs u_surface_actual_prev;
-        control::PropulsorActuatorInputs u_propulsor_actual_prev;
+        types::SurfaceActuatorInputs_T<double> u_surface_actual_prev;
+        types::PropulsorActuatorInputs_T<double> u_propulsor_actual_prev;
     };
 
     struct KalmanFilterEstimatorParameters {};

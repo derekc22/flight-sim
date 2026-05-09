@@ -2,9 +2,6 @@
 #include <optional>
 #include "simulation/actuators/actuator.hpp"
 
-/** @deprecated ?? */
-// namespace control { struct SurfaceActuatorInputs; } // forward declare
-
 namespace actuators {
 
     struct SurfaceActuator : Actuator { using Actuator::Actuator; };

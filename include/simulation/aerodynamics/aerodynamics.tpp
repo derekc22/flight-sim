@@ -26,7 +26,7 @@ namespace aerodynamics {
     }
 
     template <typename T>
-    SurfaceCoefficients_T<T> compute_surface_coefficients_T(const Surface& s, const SurfaceKinematics_T<T>& sk, const SurfaceActuatorInputs_T<T>& u) {
+    SurfaceCoefficients_T<T> compute_surface_coefficients_T(const Surface& s, const SurfaceKinematics_T<T>& sk, const types::SurfaceActuatorInputs_T<T>& u) {
         const double CLalpha = 2.0 * constants::pi * (s.AR / (2.0 + s.AR));
 
         SurfaceCoefficients_T<T> out;
@@ -54,8 +54,8 @@ namespace aerodynamics {
     }
 
     template <typename T>
-    AerodynamicWrench_T<T> compute_surface_loads_T(const Surface& s, const SurfaceKinematics_T<T>& sk, const SurfaceCoefficients_T<T>& sc) {
-        AerodynamicWrench_T<T> out;
+    dynamics::Wrench_T<T> compute_surface_loads_T(const Surface& s, const SurfaceKinematics_T<T>& sk, const SurfaceCoefficients_T<T>& sc) {
+        dynamics::Wrench_T<T> out;
         if (sk.V < T(constants::eps)) {
             return out;
         }
@@ -78,12 +78,12 @@ namespace aerodynamics {
     }
 
     template <typename T>
-    AerodynamicWrench_T<T> step_aero_forces_moments_T(const AerodynamicProperties& aerodynamic_properties, const structural::StructuralProperties& structural_properties, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& static_atmospheric_state, const SurfaceActuatorInputs_T<T>& u, const atmospheric::Wind& windB) {
-        AerodynamicWrench_T<T> total;
+    dynamics::Wrench_T<T> step_aero_forces_moments_T(const AerodynamicProperties& aerodynamic_properties, const structural::StructuralProperties& structural_properties, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& static_atmospheric_state, const types::SurfaceActuatorInputs_T<T>& u, const atmospheric::Wind& windB) {
+        dynamics::Wrench_T<T> total;
         for (const Surface& s : aerodynamic_properties.surfaces) {
             const SurfaceKinematics_T<T> sk = compute_surface_kinematics_T<T>(s, structural_properties, twist, static_atmospheric_state, windB);
             const SurfaceCoefficients_T<T> sc = compute_surface_coefficients_T<T>(s, sk, u);
-            const AerodynamicWrench_T<T> loads = compute_surface_loads_T<T>(s, sk, sc);
+            const dynamics::Wrench_T<T> loads = compute_surface_loads_T<T>(s, sk, sc);
             total.F += loads.F;
             total.M += loads.M;
         }

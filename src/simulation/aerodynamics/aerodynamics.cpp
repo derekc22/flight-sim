@@ -35,7 +35,7 @@ namespace aerodynamics {
         if (F.parent != nullptr && F.parent->name != "NEDFrameECEF") {
             throw std::invalid_argument(std::format("aerodynamics::aerodynamic_state: Invalid frame input, the parent of {} must be an inertial frame: ECEFFrame or NEDFrameECEF", F.name));
         }
-        return aerodynamics::compute_aerodynamic_state(dynamics::rigid_body_state(F), windB);
+        return aerodynamics::compute_aerodynamic_state(dynamics::compute_rigid_body_state(F), windB);
     }
 
     std::unordered_map<std::string, size_t> AerodynamicProperties::build_IDs() {
@@ -51,7 +51,7 @@ namespace aerodynamics {
         const structural::StructuralProperties& structural_properties,
         const dynamics::RigidBodyState& rigid_body_state,
         const atmospheric::StaticAtmosphericState& static_atmospheric_state,
-        const control::SurfaceActuatorInputs& u,
+        const types::SurfaceActuatorInputs_T<double>& u,
         const atmospheric::Wind& windB
     ) {
         const dynamics::Twist_T<double> twist{
@@ -59,18 +59,12 @@ namespace aerodynamics {
             .w = rigid_body_state.w.data,
         };
 
-        const AerodynamicWrench_T<double> loads = step_aero_forces_moments_T<double>(
+        const dynamics::Wrench_T<double> loads = step_aero_forces_moments_T<double>(
             aerodynamic_properties,
             structural_properties,
             twist,
             static_atmospheric_state,
-            SurfaceActuatorInputs_T<double>{
-                .elevator_cmd = u.elevator_cmd,
-                .aileron_cmd = u.aileron_cmd,
-                .rudder_cmd = u.rudder_cmd,
-                .flap_cmd = u.flap_cmd,
-                .spoiler_cmd = u.spoiler_cmd,
-            },
+            u,
             windB
         );
 

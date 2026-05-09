@@ -11,9 +11,9 @@
 #include "simulation/util/util.hpp"
 #include <simulation/dynamics/dynamics.hpp>
 #include <simulation/atmospheric/atmospheric.hpp>
+#include <simulation/types/types.hpp>
 
 namespace frames { struct Frame; } // forward declare
-namespace control { struct SurfaceActuatorInputs; } // forward declare
 
 namespace aerodynamics {
 
@@ -144,15 +144,6 @@ namespace aerodynamics {
     };
 
     template <typename T>
-    struct SurfaceActuatorInputs_T {
-        T elevator_cmd = T(0);
-        T aileron_cmd = T(0);
-        T rudder_cmd = T(0);
-        T flap_cmd = T(0);
-        T spoiler_cmd = T(0);
-    };
-
-    template <typename T>
     struct SurfaceKinematics_T {
         constants::Vector3_T<T> rB_ac =  constants::Zero3_T<T>;
         constants::Vector3_T<T> vB_rel = constants::Zero3_T<T>;
@@ -172,12 +163,6 @@ namespace aerodynamics {
     };
 
     template <typename T>
-    struct AerodynamicWrench_T {
-        constants::Vector3_T<T> F = constants::Zero3_T<T>;
-        constants::Vector3_T<T> M = constants::Zero3_T<T>;
-    };
-
-    template <typename T>
     struct AerodynamicState_T {
         T Vinf = T(0);
         T alpha = T(0);
@@ -188,13 +173,13 @@ namespace aerodynamics {
     SurfaceKinematics_T<T> compute_surface_kinematics_T(const Surface& s, const structural::StructuralProperties& structural_properties, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& static_atmospheric_state, const atmospheric::Wind& windB);
 
     template <typename T>
-    SurfaceCoefficients_T<T> compute_surface_coefficients_T(const Surface& s, const SurfaceKinematics_T<T>& sk, const SurfaceActuatorInputs_T<T>& u);
+    SurfaceCoefficients_T<T> compute_surface_coefficients_T(const Surface& s, const SurfaceKinematics_T<T>& sk, const types::SurfaceActuatorInputs_T<T>& u);
 
     template <typename T>
-    AerodynamicWrench_T<T> compute_surface_loads_T(const Surface& s, const SurfaceKinematics_T<T>& sk, const SurfaceCoefficients_T<T>& sc);
+    dynamics::Wrench_T<T> compute_surface_loads_T(const Surface& s, const SurfaceKinematics_T<T>& sk, const SurfaceCoefficients_T<T>& sc);
 
     template <typename T>
-    AerodynamicWrench_T<T> step_aero_forces_moments_T(const AerodynamicProperties& aerodynamic_properties, const structural::StructuralProperties& structural_properties, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& static_atmospheric_state, const SurfaceActuatorInputs_T<T>& u, const atmospheric::Wind& windB);
+    dynamics::Wrench_T<T> step_aero_forces_moments_T(const AerodynamicProperties& aerodynamic_properties, const structural::StructuralProperties& structural_properties, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& static_atmospheric_state, const types::SurfaceActuatorInputs_T<T>& u, const atmospheric::Wind& windB);
 
     template <typename T>
     AerodynamicState_T<T> compute_aerodynamic_state_T(const dynamics::Twist_T<T>& twist, const atmospheric::Wind& windB);
@@ -204,7 +189,7 @@ namespace aerodynamics {
         const structural::StructuralProperties& structural_properties,
         const dynamics::RigidBodyState& rigid_body_state,
         const atmospheric::StaticAtmosphericState& static_atmospheric_state,
-        const control::SurfaceActuatorInputs& u,
+        const types::SurfaceActuatorInputs_T<double>& u,
         const atmospheric::Wind& windB
     );
     

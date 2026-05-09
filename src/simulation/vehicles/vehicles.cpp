@@ -747,8 +747,8 @@ namespace vehicles {
 
 
     void Aircraft::print_state(int t, const atmospheric::Wind& wind) {
-        const dynamics::RigidBodyState rbs = dynamics::rigid_body_state(FRDFrameNED);
-        const geography::GeographicState gps = geography::geographic_state(FRDFrameECEF);
+        const dynamics::RigidBodyState rbs = dynamics::compute_rigid_body_state(FRDFrameNED);
+        const geography::GeographicState gps = geography::compute_geographic_state(FRDFrameECEF);
         const aerodynamics::AerodynamicState ads = aerodynamics::aerodynamic_state(FRDFrameNED, wind);
 
         const Eigen::Vector3d& p = rbs.p.data;

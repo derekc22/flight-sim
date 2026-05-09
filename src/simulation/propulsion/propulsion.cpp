@@ -13,7 +13,7 @@ namespace propulsion {
         return (omega - prev_omega) / constants::dt;
     }
 
-    PropulsiveWrench step_propulsive_forces_moments(actuators::PropulsorActuators& propulsor_actuators, const dynamics::RigidBodyState& rigid_body_state, const atmospheric::StaticAtmosphericState& static_atmospheric_state, const control::PropulsorActuatorInputs& u) {
+    PropulsiveWrench step_propulsive_forces_moments(actuators::PropulsorActuators& propulsor_actuators, const dynamics::RigidBodyState& rigid_body_state, const atmospheric::StaticAtmosphericState& static_atmospheric_state, const types::PropulsorActuatorInputs_T<double>& u) {
         PropulsorOmegaDot_T<double> omega_dot{
             .front_propulsor = step_propeller_omega_dot(propulsor_actuators.front_propulsor, u.front_propulsor_cmd, static_atmospheric_state),
             .left_propulsor = step_propeller_omega_dot(propulsor_actuators.left_propulsor, u.left_propulsor_cmd, static_atmospheric_state),
@@ -25,7 +25,7 @@ namespace propulsion {
             .w = rigid_body_state.w.data
         };
 
-        PropulsiveWrench_T<double> loads = step_propulsive_forces_moments_T<double>(
+        dynamics::Wrench_T<double> loads = step_propulsive_forces_moments_T<double>(
             propulsor_actuators,
             twist,
             static_atmospheric_state,

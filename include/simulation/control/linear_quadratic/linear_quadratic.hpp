@@ -3,13 +3,14 @@
 #include "simulation/actuators/actuators.hpp"
 #include "simulation/trim/trim.hpp"
 #include "simulation/linearization/linearization.hpp"
+#include "simulation/types/types.hpp"
 
 namespace control {
 
     struct LinearQuadraticControllerInput {
-        trim::TrimStateVector_T<double> zN_t;
-        trim::TrimStateVector_T<double> zN_t_des;
-        linearization::TrimStateJacobian A;
+        types::StateVector_T<double> zN_t;
+        types::StateVector_T<double> zN_t_des;
+        linearization::StateJacobian A;
         linearization::TrimInputJacobian B;
     };
 
@@ -24,6 +25,6 @@ namespace control {
         LinearQuadraticControllerParameters params;
 
         LinearQuadraticController(const LinearQuadraticControllerParameters& params);
-        trim::TrimActuatorInputsVector_T<double> step(const LinearQuadraticControllerInput& controller_input);
+        types::ActuatorInputsVector_T<double> step(const LinearQuadraticControllerInput& controller_input);
     };
 }

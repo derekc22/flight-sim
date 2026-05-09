@@ -22,7 +22,7 @@ namespace control {
 
     LinearQuadraticControllerInput LinearQuadraticIntegrator::make_linear_quadratic_controller_input(const LinearFullStateFeedbackControllerInput& controller_input){
         /** @todo: Add augmentation structure for LQI */
-        linearization::TrimStateJacobian A_aug;
+        linearization::StateJacobian A_aug;
         linearization::TrimInputJacobian B_aug;
         return {
             .zN_t = trim::unpack_rigid_body_state(controller_input.zN_t),

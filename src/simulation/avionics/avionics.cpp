@@ -41,16 +41,16 @@ namespace avionics {
     dynamics::RigidBodyState get_state_from_avionics(
         const dynamics::RigidBodyState& xN_t, 
         const aerodynamics::AerodynamicState& ads_t, 
-        const atmospheric::StaticAtmosphericState& static_atmo_t, 
-        const geography::GeographicState& geo_t,
+        const atmospheric::StaticAtmosphericState& static_atm_t, 
+        const geography::GeographicState& gps_t,
         const dynamics::Mass& mass,
         const atmospheric::Wind & wind,
         const dynamics::Wrench& WB_net,
         AvionicsProperties& avionics_properties
     ) {
 
-        atmospheric::MachNumber Mach = atmospheric::ms_to_mach(xN_t.v, static_atmo_t.T);
-        atmospheric::StagnationAtmosphericState stagnation_atmo_t = atmospheric::static_to_stagnation(static_atmo_t, Mach);
+        atmospheric::MachNumber Mach = atmospheric::ms_to_mach(xN_t.v, static_atm_t.T);
+        atmospheric::StagnationAtmosphericState stagnation_atmo_t = atmospheric::static_to_stagnation(static_atm_t, Mach);
         dynamics::LinearVelocity vI_BI{ xN_t.q.data.conjugate() * xN_t.v.data };
         double alt_dot = xN_t.p.data.normalized().dot(vI_BI.data);
 
@@ -62,19 +62,19 @@ namespace avionics {
             .accelB = dynamics::LinearAcceleration{ WB_net.F.data / mass.data - geography::gB(xN_t.p, xN_t.q).data },
             .wB_BI = xN_t.w,
             .P0 = stagnation_atmo_t.P0,
-            .P = static_atmo_t.P,
+            .P = static_atm_t.P,
             .T0 = stagnation_atmo_t.T0,
             .pI_BI = xN_t.p,
             .vB_BI = xN_t.v,
 
-            .T = static_atmo_t.T,
+            .T = static_atm_t.T,
             .Mach = Mach,
             .heading = geography::Heading{ eul.psi() },
             .qIB = xN_t.q,
             .Vinf = ads_t.Vinf,
-            .alt_BE = geo_t.alt,
+            .alt_BE = gps_t.alt,
             .alt_dot = dynamics::VerticalSpeed{ alt_dot },
-            .rho = static_atmo_t.rho,
+            .rho = static_atm_t.rho,
         };
         
         MeasurementCache cache = avionics_properties.step(meas_gt);
@@ -93,7 +93,7 @@ namespace avionics {
         //     .P=cache.sensors.P,
         //     .T=cache.computers.T,
         //     .rho=cache.computers.rho,
-        //     .mu=static_atmo_t.mu,
+        //     .mu=static_atm_t.mu,
         // };
 
         // geography::GeographicState geo_state_meas = {

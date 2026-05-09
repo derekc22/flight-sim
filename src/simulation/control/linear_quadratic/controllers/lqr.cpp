@@ -6,12 +6,12 @@ namespace control {
         params(params), policy(params)
     {};
 
-    trim::TrimStateVector_T<double> LinearQuadraticRegulator::unpack_linear_quadratic_regulator_setpoint(const guidance::LinearFullStateFeedbackSetpoint& setpoint){
+    types::StateVector_T<double> LinearQuadraticRegulator::unpack_linear_quadratic_regulator_setpoint(const guidance::LinearFullStateFeedbackSetpoint& setpoint){
         dynamics::LinearVelocity vB_BI = setpoint.vB_BI;
         dynamics::AngularVelocity wB_BI = setpoint.wB_BI;
         dynamics::EulerAngles eulIB = setpoint.eulIB;
 
-        trim::TrimState<double> setpoint_packed { 
+        types::State_T<double> setpoint_packed { 
             .vx = vB_BI.data(0),
             .vy = vB_BI.data(1),
             .vz = vB_BI.data(2),
@@ -21,7 +21,7 @@ namespace control {
             .phi = eulIB.phi(),
             .theta = eulIB.theta(),
         };
-        return trim::unpack_trim_state_T(setpoint_packed);
+        return trim::unpack_state_T(setpoint_packed);
     }
 
     LinearQuadraticControllerInput LinearQuadraticRegulator::make_linear_quadratic_controller_input(const LinearFullStateFeedbackControllerInput& controller_input){
@@ -37,15 +37,15 @@ namespace control {
     }
 
     ControlOutput LinearQuadraticRegulator::step(const LinearFullStateFeedbackControllerInput& controller_input){
-        SurfaceActuatorInputs u_surface{};
-        PropulsorActuatorInputs u_propulsor{};
+        SurfaceActuatorInputs_T<double> u_surface{};
+        PropulsorActuatorInputs_T<double> u_propulsor{};
 
-        trim::TrimActuatorInputsVector_T<double> u_deviation = policy.step(
+        types::ActuatorInputsVector_T<double> u_deviation = policy.step(
             make_linear_quadratic_controller_input(controller_input)
         );
-        trim::TrimActuatorInputsVector_T<double> u_trim = trim::unpack_trim_actuator_inputs_T(controller_input.u_sol_trim);
+        types::ActuatorInputsVector_T<double> u_trim = trim::unpack_actuator_inputs_T(controller_input.u_sol_trim);
 
-        trim::TrimActuatorInputsVector_T<double> u_cmd = u_deviation + u_trim;
+        types::ActuatorInputsVector_T<double> u_cmd = u_deviation + u_trim;
 
         u_surface.elevator_cmd = u_cmd[0];
         u_surface.aileron_cmd = u_cmd[1];

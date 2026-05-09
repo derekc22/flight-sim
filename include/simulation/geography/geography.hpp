@@ -32,7 +32,7 @@ namespace geography {
     };
 
     /** @warning The parent of F must the ECEFFrame */
-    GeographicState geographic_state(const frames::Frame& F);
+    GeographicState compute_geographic_state(const frames::Frame& F);
 
     dynamics::OrientationMatrix CEN_from_lat_lon(const geography::Latitude& lat, const geography::Longitude& lon);
 

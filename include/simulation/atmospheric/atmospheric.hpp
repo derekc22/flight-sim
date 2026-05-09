@@ -53,7 +53,7 @@ namespace atmospheric {
     };
 
     /** @warning The parent of F must the ECEFFrame */
-    StaticAtmosphericState static_atmospheric_state(const frames::Frame& F);
+    StaticAtmosphericState compute_static_atmospheric_state(const frames::Frame& F);
 
     StaticAtmosphericState std_atmosphere(const geography::Altitude& altitude);
 

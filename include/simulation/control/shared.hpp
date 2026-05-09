@@ -3,28 +3,14 @@
 #include "simulation/actuators/surface.hpp"
 #include "simulation/actuators/propulsor.hpp"
 #include "simulation/guidance/guidance.hpp"
-#include "simulation/trim/types.hpp"
 #include "simulation/linearization/types.hpp"
+#include "simulation/types/types.hpp"
 
 namespace control {
 
-    struct SurfaceActuatorInputs {
-        double elevator_cmd = 0.0;  // [rad]
-        double aileron_cmd = 0.0;   // [rad]
-        double rudder_cmd = 0.0;    // [rad]
-        double flap_cmd = 0.0;      // [rad]
-        double spoiler_cmd = 0.0;   // [rad]
-    };
-
-    struct PropulsorActuatorInputs {
-        double front_propulsor_cmd = 0.0;  // [N]
-        double left_propulsor_cmd = 0.0;   // [N]
-        double right_propulsor_cmd = 0.0;  // [N]
-    };
-
     struct ControlOutput {
-        SurfaceActuatorInputs surface_inputs;
-        PropulsorActuatorInputs propulsor_inputs;
+        types::SurfaceActuatorInputs_T<double> surface_inputs;
+        types::PropulsorActuatorInputs_T<double> propulsor_inputs;
     };
 
     struct AxialControllerInput {
@@ -43,8 +29,8 @@ namespace control {
 
     struct LinearFullStateFeedbackControllerInput {
         dynamics::RigidBodyState zN_t;
-        trim::TrimActuatorInputs<double> u_sol_trim;
-        linearization::TrimStateJacobian A;
+        types::ActuatorInputs_T<double> u_sol_trim;
+        linearization::StateJacobian A;
         linearization::TrimInputJacobian B;
         guidance::LinearFullStateFeedbackSetpoint setpoint;
     };

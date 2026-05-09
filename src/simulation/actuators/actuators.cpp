@@ -2,7 +2,7 @@
 
 namespace actuators {
 
-    control::SurfaceActuatorInputs ActuatorProperties::step(const control::SurfaceActuatorInputs& u_cmd){
+    types::SurfaceActuatorInputs_T<double> ActuatorProperties::step(const types::SurfaceActuatorInputs_T<double>& u_cmd){
         return {
             .elevator_cmd = surface_actuators.elevator._step(u_cmd.elevator_cmd, surface_actuators.elevator.prev_cmd),
             .aileron_cmd = surface_actuators.aileron._step(u_cmd.aileron_cmd, surface_actuators.aileron.prev_cmd),
@@ -13,7 +13,7 @@ namespace actuators {
     }
 
 
-    control::PropulsorActuatorInputs ActuatorProperties::step(const control::PropulsorActuatorInputs& u_cmd){
+    types::PropulsorActuatorInputs_T<double> ActuatorProperties::step(const types::PropulsorActuatorInputs_T<double>& u_cmd){
         return {
             .front_propulsor_cmd = propulsor_actuators.front_propulsor._step(u_cmd.front_propulsor_cmd, propulsor_actuators.front_propulsor.prev_cmd),
             .left_propulsor_cmd = propulsor_actuators.left_propulsor._step(u_cmd.left_propulsor_cmd, propulsor_actuators.left_propulsor.prev_cmd),

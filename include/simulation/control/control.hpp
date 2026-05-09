@@ -9,6 +9,7 @@
 #include "simulation/control/linear_quadratic/controllers/lqr.hpp"
 #include "simulation/control/linear_quadratic/controllers/lqi.hpp"
 #include "simulation/control/linear_quadratic/controllers/lqt.hpp"
+#include "simulation/types/types.hpp"
 
 namespace control {
 
@@ -19,7 +20,7 @@ namespace control {
         DamperPID,
         // Velocity
         VelocityPID,
-        // Linear Full State Feedback
+        // Linear Full State_T Feedback
         LinearQuadraticRegulator,
         LinearQuadraticTracker,
         LinearQuadraticIntegrator,
@@ -58,7 +59,4 @@ namespace control {
         ControlOutput step(const ControllerInput& controller_input, bool trim_bool);
     };
 
-    trim::FullSurfaceActuatorInputsVector_T<double> unpack_full_surface_actuator_inputs(const SurfaceActuatorInputs& u_surface);
-    trim::FullPropulsorActuatorInputsVector_T<double> unpack_full_propulsor_actuator_inputs(const PropulsorActuatorInputs& u_propulsor);
-    trim::TrimActuatorInputsVector_T<double> unpack_actuator_inputs(const SurfaceActuatorInputs& u_surface, const PropulsorActuatorInputs& u_propulsor);
 }

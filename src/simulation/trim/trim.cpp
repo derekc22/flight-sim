@@ -25,7 +25,7 @@ namespace trim {
         return ratio / std::sqrt(std::max(1.0 - ratio * ratio, constants::eps));
     }
 
-    static TrimVariablesVector_T<double> unpack_trim_solver_variables(const TrimState<double>& x, const TrimActuatorInputs<double>& u, const actuators::SurfaceActuators& surface_actuators, const actuators::PropulsorActuators& propulsor_actuators) {
+    static TrimVariablesVector_T<double> unpack_trim_solver_variables(const State_T<double>& x, const ActuatorInputs_T<double>& u, const actuators::SurfaceActuators& surface_actuators, const actuators::PropulsorActuators& propulsor_actuators) {
         TrimVariablesVector_T<double> z = unpack_trim_variables_T<double>(x, u);
         z(8) = send_control_to_solver_space(u.elevator_cmd, surface_actuators.elevator);
         z(9) = send_control_to_solver_space(u.aileron_cmd, surface_actuators.aileron);
@@ -73,9 +73,9 @@ namespace trim {
         if (options.min_step_scale <= 0.0 || options.min_step_scale > 1.0) throw std::invalid_argument("trim::_validate_trim_solve_options: min_step_scale must be in (0, 1]");
     }
 
-    static dynamics::Wrench compute_trim_wrench(const TrimState<double>& x, const TrimActuatorInputs<double>& u, const TrimModel& model, const TrimConditions& conditions) {
+    static dynamics::Wrench compute_trim_wrench(const State_T<double>& x, const ActuatorInputs_T<double>& u, const TrimModel& model, const TrimConditions& conditions) {
         const dynamics::Twist_T<double> twist = build_twist_from_trim_state_T<double>(x);
-        const TrimNetWrench_T<double> net_wrench = compute_trim_net_wrench_T<double>(x, twist, u, model, conditions);
+        const dynamics::Wrench_T<double> net_wrench = compute_trim_net_wrench_T<double>(x, twist, u, model, conditions);
 
         return {
             .F = dynamics::Force{ net_wrench.F },
@@ -221,9 +221,9 @@ namespace trim {
             .aerodynamic = aircraft.aerodynamic_properties,
             .surface_actuators = aircraft.actuator_properties.surface_actuators,
             .propulsor_actuators = propulsor_actuators,
-            .fixed_surface_actuator_inputs = TrimFixedActuatorInputs{
-                .flap = aircraft.operating_properties.fixed_surface_actuator_inputs.flap,
-                .spoiler = aircraft.operating_properties.fixed_surface_actuator_inputs.spoiler,
+            .fixed_actuator_inputs = FixedActuatorInputs_T{
+                .flap = aircraft.operating_properties.fixed_actuator_inputs.flap,
+                .spoiler = aircraft.operating_properties.fixed_actuator_inputs.spoiler,
             },
         };
 
@@ -237,10 +237,10 @@ namespace trim {
                 .psi_dot = aircraft.FRDFrameNED.eulNB_dot.psi_dot()
             },
             .conditions = TrimConditions{
-                .static_atmospheric_state = atmospheric::static_atmospheric_state(aircraft.FRDFrameECEF),
+                .static_atmospheric_state = atmospheric::compute_static_atmospheric_state(aircraft.FRDFrameECEF),
                 .windB = wind,
             },
-            .state_guess = TrimState<double>{
+            .state_guess = State_T<double>{
                 .vx = aircraft.FRDFrameNED.vB_BN.data.x(),
                 .vy = aircraft.FRDFrameNED.vB_BN.data.y(),
                 .vz = aircraft.FRDFrameNED.vB_BN.data.z(),
@@ -250,7 +250,7 @@ namespace trim {
                 .phi = aircraft.FRDFrameNED.eulNB.phi(),
                 .theta = aircraft.FRDFrameNED.eulNB.theta(),
             },
-            .input_guess = TrimActuatorInputs<double>{
+            .input_guess = ActuatorInputs_T<double>{
                 .elevator_cmd = 0,
                 .aileron_cmd = 0,
                 .rudder_cmd = 0,
@@ -385,12 +385,12 @@ namespace trim {
     }
 
     control::ControlOutput set_control_inputs_from_trim(const TrimSolution& trim_sol){
-        control::SurfaceActuatorInputs surface_actuator_cmd_trim{
+        types::SurfaceActuatorInputs_T<double> surface_actuator_cmd_trim{
             .aileron_cmd = trim_sol.input.aileron_cmd,
             .elevator_cmd = trim_sol.input.elevator_cmd,
             .rudder_cmd = trim_sol.input.rudder_cmd,
         };
-        control::PropulsorActuatorInputs propulsor_actuator_cmd_trim{
+        types::PropulsorActuatorInputs_T<double> propulsor_actuator_cmd_trim{
             .front_propulsor_cmd = trim_sol.input.front_propulsor_cmd,
             .left_propulsor_cmd = trim_sol.input.left_propulsor_cmd,
             .right_propulsor_cmd = trim_sol.input.right_propulsor_cmd,
@@ -410,13 +410,13 @@ namespace trim {
     //     propulsor_actuators.right_propulsor.prev_cmd = trim_sol.input.right_propulsor_cmd;
     // }
 
-    TrimStateVector_T<double> unpack_rigid_body_state(const dynamics::RigidBodyState& xN_t){
+    StateVector_T<double> unpack_rigid_body_state(const dynamics::RigidBodyState& xN_t){
         dynamics::LinearVelocity vB_BI = xN_t.v;
         dynamics::AngularVelocity wB_BI = xN_t.w;
         dynamics::EulerAngles eulIB;
         eulIB.set(xN_t.q);
 
-        TrimState<double> xN_t_packed { 
+        State_T<double> xN_t_packed { 
             .vx = vB_BI.data(0),
             .vy = vB_BI.data(1),
             .vz = vB_BI.data(2),
@@ -426,7 +426,7 @@ namespace trim {
             .phi = eulIB.phi(),
             .theta = eulIB.theta(),
         };
-        return unpack_trim_state_T(xN_t_packed);
+        return unpack_state_T(xN_t_packed);
     }
 
 }

@@ -58,8 +58,8 @@ namespace control {
     }
 
     ControlOutput VelocityPID::step(const VelocityControllerInput& controller_input) {
-        SurfaceActuatorInputs u_surface{};
-        PropulsorActuatorInputs u_propulsor{};
+        SurfaceActuatorInputs_T<double> u_surface{};
+        PropulsorActuatorInputs_T<double> u_propulsor{};
 
         double T_tot = policy.step(
             make_pid_controller_input(controller_input)

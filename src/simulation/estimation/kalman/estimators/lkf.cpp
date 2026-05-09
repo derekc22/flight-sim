@@ -5,17 +5,17 @@ namespace estimation {
 
     LinearKalmanFilter::LinearKalmanFilter(const LinearKalmanFilterParameters& params) : params(params), policy(params) {}
 
-    trim::TrimStateVector_T<double> LinearKalmanFilter::make_measurement_deviation(const KalmanFilterInput& estimator_input) {
-        return trim::unpack_rigid_body_state(estimator_input.yN_t) - trim::unpack_trim_state_T(estimator_input.trim_sol.state);
+    types::StateVector_T<double> LinearKalmanFilter::make_measurement_deviation(const KalmanFilterInput& estimator_input) {
+        return trim::unpack_rigid_body_state(estimator_input.yN_t) - trim::unpack_state_T(estimator_input.trim_sol.state);
     }
 
-    trim::TrimActuatorInputsVector_T<double> LinearKalmanFilter::make_input_deviation(const KalmanFilterInput& estimator_input) {
-        return control::unpack_actuator_inputs(estimator_input.u_surface_actual_prev, estimator_input.u_propulsor_actual_prev) - trim::unpack_trim_actuator_inputs_T(estimator_input.trim_sol.input);
+    types::ActuatorInputsVector_T<double> LinearKalmanFilter::make_input_deviation(const KalmanFilterInput& estimator_input) {
+        return control::unpack_actuator_inputs(estimator_input.u_surface_actual_prev, estimator_input.u_propulsor_actual_prev) - trim::unpack_actuator_inputs_T(estimator_input.trim_sol.input);
     }
 
-    dynamics::RigidBodyState LinearKalmanFilter::pack_state_estimate(const KalmanFilterInput& estimator_input, const trim::TrimStateVector_T<double>& zN_t_deviation) {
-        trim::TrimStateVector_T<double> zN_trim = trim::unpack_trim_state_T(estimator_input.trim_sol.state);
-        trim::TrimStateVector_T<double> zN_t = zN_t_deviation + zN_trim;
+    dynamics::RigidBodyState LinearKalmanFilter::pack_state_estimate(const KalmanFilterInput& estimator_input, const types::StateVector_T<double>& zN_t_deviation) {
+        types::StateVector_T<double> zN_trim = trim::unpack_state_T(estimator_input.trim_sol.state);
+        types::StateVector_T<double> zN_t = zN_t_deviation + zN_trim;
 
         dynamics::RigidBodyState zN_t_packed = estimator_input.yN_t;
         dynamics::EulerAngles eul_meas;
@@ -31,8 +31,8 @@ namespace estimation {
     }
 
     EstimationOutput LinearKalmanFilter::step(const KalmanFilterInput& estimator_input) {
-        trim::TrimStateVector_T<double> yt_deviation = make_measurement_deviation(estimator_input);
-        trim::TrimActuatorInputsVector_T<double> ut_1_deviation = make_input_deviation(estimator_input);
+        types::StateVector_T<double> yt_deviation = make_measurement_deviation(estimator_input);
+        types::ActuatorInputsVector_T<double> ut_1_deviation = make_input_deviation(estimator_input);
 
         if (!initialized) {
             state = KalmanState{ .z = yt_deviation, .P = params.P0 };

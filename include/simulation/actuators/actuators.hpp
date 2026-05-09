@@ -2,15 +2,16 @@
 #include "simulation/actuators/surface.hpp"
 #include "simulation/actuators/propulsor.hpp"
 #include "simulation/control/shared.hpp"
+#include "simulation/types/types.hpp"
 
 namespace actuators {
 
     struct ActuatorProperties {
         SurfaceActuators surface_actuators;
-        control::SurfaceActuatorInputs step(const control::SurfaceActuatorInputs& u_cmd);
+        types::SurfaceActuatorInputs_T<double> step(const types::SurfaceActuatorInputs_T<double>& u_cmd);
 
         PropulsorActuators propulsor_actuators;
-        control::PropulsorActuatorInputs step(const control::PropulsorActuatorInputs& u_cmd);
+        types::PropulsorActuatorInputs_T<double> step(const types::PropulsorActuatorInputs_T<double>& u_cmd);
     };
 
 }

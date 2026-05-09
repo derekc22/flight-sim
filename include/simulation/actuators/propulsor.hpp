@@ -6,7 +6,7 @@
 #include "simulation/actuators/actuator.hpp"
 #include "simulation/constants/constants.hpp"
 
-namespace control { struct PropulsorActuatorInputs; } // forward declare
+namespace control { struct PropulsorActuatorInputs_T; } // forward declare
 
 namespace actuators {
 

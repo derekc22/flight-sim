@@ -9,11 +9,11 @@
 
 namespace atmospheric {
 
-    StaticAtmosphericState static_atmospheric_state(const frames::Frame& F) {
+    StaticAtmosphericState compute_static_atmospheric_state(const frames::Frame& F) {
         if (F.parent != nullptr) {
             throw std::invalid_argument(std::format("atmospheric::static_atmospheric_state: Invalid frame input, the parent of {} must be ECEFFrame", F.name));
         }
-        return atmospheric::std_atmosphere(geography::geographic_state(F).alt);
+        return atmospheric::std_atmosphere(geography::compute_geographic_state(F).alt);
     }
 
     StaticAtmosphericState std_atmosphere(const geography::Altitude& altitude){

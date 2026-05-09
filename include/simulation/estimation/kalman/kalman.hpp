@@ -1,11 +1,12 @@
 #pragma once
 #include <Eigen/Dense>
 #include "simulation/estimation/shared.hpp"
+#include "simulation/types/types.hpp"
 
 namespace estimation {
 
     struct KalmanState {
-        trim::TrimStateVector_T<double> z;  // state estimate
+        types::StateVector_T<double> z;  // state estimate
         Eigen::MatrixXd P;  // state estimate error covariance matrix
     };
 
@@ -20,7 +21,7 @@ namespace estimation {
         KalmanFilterParameters params;
 
         KalmanFilter(const KalmanFilterParameters& params);
-        KalmanState predict(const KalmanState& prev, const Eigen::MatrixXd& A, const Eigen::MatrixXd& B, const trim::TrimActuatorInputsVector_T<double>& ut_1);
-        KalmanState correct(const KalmanState& pred, const trim::TrimStateVector_T<double>& yN_t);
+        KalmanState predict(const KalmanState& prev, const Eigen::MatrixXd& A, const Eigen::MatrixXd& B, const types::ActuatorInputsVector_T<double>& ut_1);
+        KalmanState correct(const KalmanState& pred, const types::StateVector_T<double>& yN_t);
     };
 }

@@ -71,8 +71,8 @@ namespace control {
     }
 
     ControlOutput AxialPID::step(const AxialControllerInput& controller_input){
-        SurfaceActuatorInputs u_surface{};
-        PropulsorActuatorInputs u_propulsor{};
+        SurfaceActuatorInputs_T<double> u_surface{};
+        PropulsorActuatorInputs_T<double> u_propulsor{};
 
         u_surface.aileron_cmd = lateral_policy.step(
             make_pid_controller_input(controller_input, ControlAxis::Lateral)

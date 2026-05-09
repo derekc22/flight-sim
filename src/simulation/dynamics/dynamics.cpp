@@ -22,7 +22,7 @@ namespace dynamics {
         return _wB_BI_to_eul_dot_mat_T(theta, phi);
     }
 
-    RigidBodyState rigid_body_state(const frames::Frame& F) {
+    RigidBodyState compute_rigid_body_state(const frames::Frame& F) {
         if (F.parent != nullptr && F.parent->name != "NEDFrameECEF") {
             throw std::invalid_argument(std::format("dynamics::rigid_body_state: Invalid frame input, the parent of {} must be an inertial frame: ECEFFrame or NEDFrameECEF", F.name));
         }
@@ -158,13 +158,16 @@ namespace dynamics {
 
 
 
-    RigidBodyState step_rigid_body(const RigidBodyState& xB_BI_t, const Mass& mass, const InertiaTensor& J, const Force& FB_net_t, const Moment& MB_net_t){
+    RigidBodyState step_rigid_body(const RigidBodyState& xB_BI_t, const Mass& mass, const InertiaTensor& J, const Wrench& WB_net_t){
 
         // ddtB_vB_BI_t is the body derivative of velocity expressed in the body frame, 
         // ddtI_vB_BI_t is the inertial derivative of velocity expressed in the body frame, 
         // and aI_BI_t = CBI_t * aB_BI_t.data gives the inertial derivative of velocity expressed in the inertial frame for the inertial-position kinematics update
         // This assumes CBI maps body components to inertial components 
         // and that _ddtB_vB_BI returns the body derivative of velocity expressed in the body frame
+
+        const dynamics::Force FB_net_t = WB_net_t.F;
+        const dynamics::Moment MB_net_t = WB_net_t.M;
 
         const Eigen::Matrix3d CIB_t = transforms::quat_to_rot(xB_BI_t.q.data);
         const Eigen::Matrix3d CBI_t = CIB_t.transpose();

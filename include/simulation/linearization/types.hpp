@@ -4,16 +4,16 @@
 
 namespace linearization {
 
-    using TrimStateJacobian = Eigen::Matrix<double, constants::state_dim, constants::state_dim>;
+    using StateJacobian = Eigen::Matrix<double, constants::state_dim, constants::state_dim>;
     using TrimInputJacobian = Eigen::Matrix<double, constants::state_dim, constants::input_dim>;
 
     struct TrimLinearization {
-        TrimStateJacobian A = TrimStateJacobian::Zero();
+        StateJacobian A = StateJacobian::Zero();
         TrimInputJacobian B = TrimInputJacobian::Zero();
     };
 
     struct DiscretizedTrimLinearization {
-        TrimStateJacobian A = TrimStateJacobian::Zero();
+        StateJacobian A = StateJacobian::Zero();
         TrimInputJacobian B = TrimInputJacobian::Zero();
     };
 }

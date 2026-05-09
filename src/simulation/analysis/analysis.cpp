@@ -17,7 +17,7 @@ namespace analysis {
     }
 
     TrimEigenAnalysis trim_linearization_eigen_analysis(const linearization::TrimLinearization& lin_sol) {
-        Eigen::EigenSolver<linearization::TrimStateJacobian> solver(lin_sol.A);
+        Eigen::EigenSolver<linearization::StateJacobian> solver(lin_sol.A);
         if (solver.info() != Eigen::Success) {
             throw std::runtime_error("analysis::trim_linearization_eigen_analysis: eigenvalue computation failed");
         }

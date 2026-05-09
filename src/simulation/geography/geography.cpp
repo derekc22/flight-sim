@@ -8,7 +8,7 @@
 
 namespace geography {
 
-    GeographicState geographic_state(const frames::Frame& F) {
+    GeographicState compute_geographic_state(const frames::Frame& F) {
         if (F.parent != nullptr) {
             throw std::invalid_argument(std::format("geography::geographic_state: Invalid frame input, the parent of {} must be ECEFFrame", F.name));
         }

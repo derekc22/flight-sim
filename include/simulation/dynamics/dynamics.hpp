@@ -163,7 +163,7 @@ namespace dynamics {
     };
 
     /** @warning The parent of F must be an inertial frame: ECEFFrame or NEDFrameECEF */
-    RigidBodyState rigid_body_state(const frames::Frame& F);
+    RigidBodyState compute_rigid_body_state(const frames::Frame& F);
 
     struct Wrench {
         Force F;          
@@ -179,6 +179,12 @@ namespace dynamics {
     struct Twist_T {
         constants::Vector3_T<T> v = constants::Zero3_T<T>;
         constants::Vector3_T<T> w = constants::Zero3_T<T>;
+    };
+
+    template <typename T>
+    struct Wrench_T {
+        constants::Vector3_T<T> F = constants::Zero3_T<T>;
+        constants::Vector3_T<T> M = constants::Zero3_T<T>;
     };
 
     template <typename T>
@@ -242,7 +248,7 @@ namespace dynamics {
 
     LinearVelocity _trans_dyn_vel(const LinearVelocity& vB_t, const AngularVelocity& wB_BI_t, const Mass& mass, const Force& FB_net_t);
     AngularVelocity _rot_dyn(const AngularVelocity& wB_BI_t, const InertiaTensor& J, const Moment& MB_net_t);
-    RigidBodyState step_rigid_body(const RigidBodyState& xB_BI_t, const Mass& mass, const InertiaTensor& J, const Force& FB_net_t, const Moment& MB_net_t);
+    RigidBodyState step_rigid_body(const RigidBodyState& xB_BI_t, const Mass& mass, const InertiaTensor& J, const Wrench& WB_net_t);
 
     AngularVelocity _CIB_dot_to_wB_BI(const OrientationMatrixRate& CIB_dot, const OrientationMatrix& CIB);
     OrientationQuaternionRate _CIB_dot_to_qIB_dot(const OrientationMatrixRate& CIB_dot, const OrientationMatrix& CIB, const OrientationQuaternion& qIB);
