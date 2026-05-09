@@ -275,21 +275,10 @@ namespace transforms {
     }
 
     // Recall from above that the premise of an "intrinsic" vector rotation (as opposed to an intrinsic frame rotations/coordinate transformations) is rejected
-    // Thus, the "intr" branch of `eul_to_R` exists only for parallelity with `eul_to_C`
-    // As such, it should not be called externally to avoid confusion
-    // In its place is the more semantically appropriate/correct definition of `eul_to_R`, below
-    /** @warning *DO NOT CALL PUBLICLY* @warning */
-    Eigen::Matrix3d eul_to_R(double a, double b, double c, const std::string& order, const std::string& type){
-        if (type == "extr") return _eul_to_R_extr(a, b, c, order);
-        if (type == "intr") return _eul_to_R_intr(a, b, c, order);
-        throw std::invalid_argument("Unsupported type: " + type);
-    }
-
-    // This version explicity removes the 'type' argument and appropriately ONLY calls `_eul_to_R_extr` internally
-    // THIS is the version that can and should be called publicly to generate an active rotation matrix from euler angles
-    // Once again, this new defintion is created to avoid the confusion introduced by the definition of `eul_to_R` above, which implies that active rotation matrices, R, can apply intrinsic rotations
-    // Once again, this is not true. Active rotation matrices CANNOT apply intrinsic rotations
-    // And `eul_to_R` from above is implemented with the 'type' argument SOLELY to maintain congruence/parallelity with `eul_to_C`
+    // Thus, the "intr" branch of `eul_to_R` does not exist
+    // That is, this function DOES NOT have a 'type' argument and appropriately ONLY calls `_eul_to_R_extr` internally
+    // Once again, the 'types' argument is omitted in eul_to_R because including it would imply that active rotation matrices, R, can apply intrinsic rotations
+    // Once again, this is not true. Active rotation matrices CANNOT apply intrinsic rotations - they can ONLY apply extrinsic rotations, hence why `eul_to_R` automtically calls _eul_to_R_extr and does not support the option to build an `intrinsic` R (which, again, DOES NOT EXIST)
     Eigen::Matrix3d eul_to_R(double a, double b, double c, const std::string& order){
         return _eul_to_R_extr(a, b, c, order);
     }

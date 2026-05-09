@@ -84,7 +84,6 @@ namespace transforms {
     Eigen::Matrix3d _eul_to_C_intr(double a, double b, double c, const std::string& order);
 
     Eigen::Matrix3d eul_to_C(double a, double b, double c, const std::string& order, const std::string& type);
-    Eigen::Matrix3d eul_to_R(double a, double b, double c, const std::string& order, const std::string& type); /** @warning *DO NOT CALL PUBLICLY* @warning */
     Eigen::Matrix3d eul_to_R(double a, double b, double c, const std::string& order);
     Eigen::Quaterniond rot_to_quat(const Eigen::Matrix3d& rot);
 
