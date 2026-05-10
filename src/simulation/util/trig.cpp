@@ -40,6 +40,10 @@ namespace util {
         return std::asin(x);
     }
 
+    double acos(double x) {
+        return std::acos(x);
+    }
+
     double atan2(double y, double x) {
         return std::atan2(y, x);
     }

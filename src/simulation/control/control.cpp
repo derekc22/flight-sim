@@ -13,14 +13,14 @@ namespace control {
             if (velocity_controller) {
                 out.propulsor_inputs = velocity_controller(controller_input.velocity_controller_input).propulsor_inputs;
             }
+            if (nonlinear_controller) {
+                out = nonlinear_controller(controller_input.nonlinear_controller_input);
+            }
         }
 
         if (trim_bool) {
             if (linear_full_state_feedback_controller) {
                 out = linear_full_state_feedback_controller(controller_input.linear_full_state_feedback_controller_input);
-            }
-            if (nonlinear_controller) {
-                out = nonlinear_controller(controller_input.nonlinear_controller_input);
             }
         }
 

@@ -1,5 +1,4 @@
 #include <Eigen/Dense>
-#include <cmath>
 #include <stdexcept>
 #include <algorithm>
 #include <vector>
@@ -14,25 +13,25 @@ namespace transforms {
 
     Eigen::Matrix3d Rx(double phi) {
         Eigen::Matrix3d Rx;
-        Rx <<   1,              0,               0,
-                0,  std::cos(phi),  -std::sin(phi),
-                0,  std::sin(phi),   std::cos(phi);
+        Rx <<   1,               0,                0,
+                0,  util::cos(phi),  -util::sin(phi),
+                0,  util::sin(phi),   util::cos(phi);
         return Rx;
     };
 
     Eigen::Matrix3d Ry(double theta) {
         Eigen::Matrix3d Ry;
-        Ry <<   std::cos(theta),  0,  std::sin(theta),
-                              0,  1,                0,
-               -std::sin(theta),  0,  std::cos(theta);
+        Ry <<   util::cos(theta),  0,  util::sin(theta),
+                               0,  1,                 0,
+               -util::sin(theta),  0,  util::cos(theta);
         return Ry;
     };
 
     Eigen::Matrix3d Rz(double psi) {
         Eigen::Matrix3d Rz;
-        Rz <<   std::cos(psi),  -std::sin(psi),  0,
-                std::sin(psi),   std::cos(psi),  0,
-                            0,               0,  1;
+        Rz <<   util::cos(psi),  -util::sin(psi),  0,
+                util::sin(psi),   util::cos(psi),  0,
+                             0,               0,   1;
         return Rz;
     };
 
@@ -79,135 +78,135 @@ namespace transforms {
 
         // Tait-Bryan, middle angle in [-pi/2, pi/2]
         if (order == "ZYX") {
-            b = std::asin(util::clamp_to_1(R(0,2)));
-            const double cb = std::cos(b);
+            b = util::asin(util::clamp_to_1(R(0,2)));
+            double cb = util::cos(b);
             if (std::abs(cb) > constants::eps) {
-                a = std::atan2(-R(0,1), R(0,0));
-                c = std::atan2(-R(1,2), R(2,2));
+                a = util::atan2(-R(0,1), R(0,0));
+                c = util::atan2(-R(1,2), R(2,2));
             } else {
-                a = std::atan2(R(1,0), R(1,1));
+                a = util::atan2(R(1,0), R(1,1));
                 c = 0.0;
             }
 
         } else if (order == "ZXY") {
-            b = std::asin(util::clamp_to_1(-R(1,2)));
-            const double cb = std::cos(b);
+            b = util::asin(util::clamp_to_1(-R(1,2)));
+            double cb = util::cos(b);
             if (std::abs(cb) > constants::eps) {
-                a = std::atan2(R(1,0), R(1,1));
-                c = std::atan2(R(0,2), R(2,2));
+                a = util::atan2(R(1,0), R(1,1));
+                c = util::atan2(R(0,2), R(2,2));
             } else {
-                a = std::atan2(-R(0,1), R(0,0));
+                a = util::atan2(-R(0,1), R(0,0));
                 c = 0.0;
             }
 
         } else if (order == "YZX") {
-            b = std::asin(util::clamp_to_1(-R(0,1)));
-            const double cb = std::cos(b);
+            b = util::asin(util::clamp_to_1(-R(0,1)));
+            double cb = util::cos(b);
             if (std::abs(cb) > constants::eps) {
-                a = std::atan2(R(0,2), R(0,0));
-                c = std::atan2(R(2,1), R(1,1));
+                a = util::atan2(R(0,2), R(0,0));
+                c = util::atan2(R(2,1), R(1,1));
             } else {
-                a = std::atan2(-R(2,0), R(2,2));
+                a = util::atan2(-R(2,0), R(2,2));
                 c = 0.0;
             }
 
         } else if (order == "YXZ") {
-            b = std::asin(util::clamp_to_1(R(2,1)));
-            const double cb = std::cos(b);
+            b = util::asin(util::clamp_to_1(R(2,1)));
+            double cb = util::cos(b);
             if (std::abs(cb) > constants::eps) {
-                a = std::atan2(-R(2,0), R(2,2));
-                c = std::atan2(-R(0,1), R(1,1));
+                a = util::atan2(-R(2,0), R(2,2));
+                c = util::atan2(-R(0,1), R(1,1));
             } else {
-                a = std::atan2(R(0,2), R(0,0));
+                a = util::atan2(R(0,2), R(0,0));
                 c = 0.0;
             }
 
         } else if (order == "XZY") {
-            b = std::asin(util::clamp_to_1(R(1,0)));
-            const double cb = std::cos(b);
+            b = util::asin(util::clamp_to_1(R(1,0)));
+            double cb = util::cos(b);
             if (std::abs(cb) > constants::eps) {
-                a = std::atan2(-R(1,2), R(1,1));
-                c = std::atan2(-R(2,0), R(0,0));
+                a = util::atan2(-R(1,2), R(1,1));
+                c = util::atan2(-R(2,0), R(0,0));
             } else {
-                a = std::atan2(R(2,1), R(2,2));
+                a = util::atan2(R(2,1), R(2,2));
                 c = 0.0;
             }
 
         } else if (order == "XYZ") {
-            b = std::asin(util::clamp_to_1(-R(2,0)));
-            const double cb = std::cos(b);
+            b = util::asin(util::clamp_to_1(-R(2,0)));
+            double cb = util::cos(b);
             if (std::abs(cb) > constants::eps) {
-                a = std::atan2(R(2,1), R(2,2));
-                c = std::atan2(R(1,0), R(0,0));
+                a = util::atan2(R(2,1), R(2,2));
+                c = util::atan2(R(1,0), R(0,0));
             } else {
-                a = std::atan2(-R(1,2), R(1,1));
+                a = util::atan2(-R(1,2), R(1,1));
                 c = 0.0;
             }
 
         // Proper Euler (repeated axis), middle angle in [-pi, 0]
         } else if (order == "ZXZ") {
-            b = -std::acos(util::clamp_to_1(R(2,2)));
-            const double sb = std::sin(b);
+            b = -util::acos(util::clamp_to_1(R(2,2)));
+            double sb = util::sin(b);
             if (std::abs(sb) > constants::eps) {
-                a = std::atan2(-R(2,0), -R(2,1));
-                c = std::atan2(-R(0,2),  R(1,2));
+                a = util::atan2(-R(2,0), -R(2,1));
+                c = util::atan2(-R(0,2),  R(1,2));
             } else {
-                a = std::atan2(-R(0,1), R(0,0));
+                a = util::atan2(-R(0,1), R(0,0));
                 c = 0.0;
             }
 
         } else if (order == "ZYZ") {
-            b = -std::acos(util::clamp_to_1(R(2,2)));
-            const double sb = std::sin(b);
+            b = -util::acos(util::clamp_to_1(R(2,2)));
+            double sb = util::sin(b);
             if (std::abs(sb) > constants::eps) {
-                a = std::atan2(-R(2,1),  R(2,0));
-                c = std::atan2(-R(1,2), -R(0,2));
+                a = util::atan2(-R(2,1),  R(2,0));
+                c = util::atan2(-R(1,2), -R(0,2));
             } else {
-                a = std::atan2(-R(0,1), R(0,0));
+                a = util::atan2(-R(0,1), R(0,0));
                 c = 0.0;
             }
 
         } else if (order == "XYX") {
-            b = -std::acos(util::clamp_to_1(R(0,0)));
-            const double sb = std::sin(b);
+            b = -util::acos(util::clamp_to_1(R(0,0)));
+            double sb = util::sin(b);
             if (std::abs(sb) > constants::eps) {
-                a = std::atan2(-R(0,1), -R(0,2));
-                c = std::atan2(-R(1,0),  R(2,0));
+                a = util::atan2(-R(0,1), -R(0,2));
+                c = util::atan2(-R(1,0),  R(2,0));
             } else {
-                a = std::atan2(-R(1,2), R(1,1));
+                a = util::atan2(-R(1,2), R(1,1));
                 c = 0.0;
             }
 
         } else if (order == "XZX") {
-            b = -std::acos(util::clamp_to_1(R(0,0)));
-            const double sb = std::sin(b);
+            b = -util::acos(util::clamp_to_1(R(0,0)));
+            double sb = util::sin(b);
             if (std::abs(sb) > constants::eps) {
-                a = std::atan2(-R(0,2),  R(0,1));
-                c = std::atan2(-R(2,0), -R(1,0));
+                a = util::atan2(-R(0,2),  R(0,1));
+                c = util::atan2(-R(2,0), -R(1,0));
             } else {
-                a = std::atan2(-R(1,2), R(1,1));
+                a = util::atan2(-R(1,2), R(1,1));
                 c = 0.0;
             }
 
         } else if (order == "YXY") {
-            b = -std::acos(util::clamp_to_1(R(1,1)));
-            const double sb = std::sin(b);
+            b = -util::acos(util::clamp_to_1(R(1,1)));
+            double sb = util::sin(b);
             if (std::abs(sb) > constants::eps) {
-                a = std::atan2(-R(1,0),  R(1,2));
-                c = std::atan2(-R(0,1), -R(2,1));
+                a = util::atan2(-R(1,0),  R(1,2));
+                c = util::atan2(-R(0,1), -R(2,1));
             } else {
-                a = std::atan2(-R(2,0), R(0,0));
+                a = util::atan2(-R(2,0), R(0,0));
                 c = 0.0;
             }
 
         } else if (order == "YZY") {
-            b = -std::acos(util::clamp_to_1(R(1,1)));
-            const double sb = std::sin(b);
+            b = -util::acos(util::clamp_to_1(R(1,1)));
+            double sb = util::sin(b);
             if (std::abs(sb) > constants::eps) {
-                a = std::atan2(-R(1,2), -R(1,0));
-                c = std::atan2(-R(2,1),  R(0,1));
+                a = util::atan2(-R(1,2), -R(1,0));
+                c = util::atan2(-R(2,1),  R(0,1));
             } else {
-                a = std::atan2(-R(2,0), R(0,0));
+                a = util::atan2(-R(2,0), R(0,0));
                 c = 0.0;
             }
 

@@ -31,16 +31,16 @@ namespace avionics {
         return { dynamics::_quat_kin(prev_qIB, wB_BI) };
     }
 
-    PositionMeasurement InertialNavigationSystem::_calculate(const PositionMeasurement& prev_pI_BI, const LinearVelocityMeasurement& prev_vB_BI, const LinearAccelerationMeasurement& accelB, const OrientationMeasurement& prev_qIB) {
+    PositionMeasurement InertialNavigationSystem::_calculate(const PositionMeasurement& prev_pI_BI, const TranslationalVelocityMeasurement& prev_vB_BI, const TranslationalAccelerationMeasurement& accelB, const OrientationMeasurement& prev_qIB) {
         dynamics::Gravity prev_gB = geography::gB(prev_pI_BI, prev_qIB);
-        dynamics::LinearVelocity pI_BI_dot{ prev_qIB.data.conjugate() * prev_vB_BI.data };
-        dynamics::LinearAcceleration vI_BI_dot{ prev_qIB.data.conjugate() * (accelB.data + prev_gB.data) };
+        dynamics::TranslationalVelocity pI_BI_dot{ prev_qIB.data.conjugate() * prev_vB_BI.data };
+        dynamics::TranslationalAcceleration vI_BI_dot{ prev_qIB.data.conjugate() * (accelB.data + prev_gB.data) };
         return { dynamics::_trans_kin(prev_pI_BI, pI_BI_dot, vI_BI_dot).data };
     }
 
-    LinearVelocityMeasurement InertialNavigationSystem::_calculate(const LinearVelocityMeasurement& prev_vB_BI, const LinearAccelerationMeasurement& accelB, const PositionMeasurement& prev_pI_BI, const OrientationMeasurement& prev_qIB, const AngularVelocityMeasurement& wB_BI) {
+    TranslationalVelocityMeasurement InertialNavigationSystem::_calculate(const TranslationalVelocityMeasurement& prev_vB_BI, const TranslationalAccelerationMeasurement& accelB, const PositionMeasurement& prev_pI_BI, const OrientationMeasurement& prev_qIB, const AngularVelocityMeasurement& wB_BI) {
         dynamics::Gravity prev_gB = geography::gB(prev_pI_BI, prev_qIB);
-        dynamics::LinearAcceleration vB_BI_dot{ accelB.data + prev_gB.data - wB_BI.data.cross(prev_vB_BI.data) };
+        dynamics::TranslationalAcceleration vB_BI_dot{ accelB.data + prev_gB.data - wB_BI.data.cross(prev_vB_BI.data) };
         return { dynamics::_trans_kin_vel(prev_vB_BI, vB_BI_dot).data };
     }
 

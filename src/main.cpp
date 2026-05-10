@@ -383,7 +383,7 @@ int main(int argc, char* argv[]) {
     vehicles::Aircraft aircraft = load(trim_bool);
 
     // compute number of simulation steps
-    const int tf = std::max(1, static_cast<int>(std::ceil(time_sec / constants::dt)));
+    int tf = std::max(1, static_cast<int>(std::ceil(time_sec / constants::dt)));
 
     // create data manager
     io::DataManager data_manager{tf, data_bool, control_bool, sensor_bool, estimation_bool, wind_bool};

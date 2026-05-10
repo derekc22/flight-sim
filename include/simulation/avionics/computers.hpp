@@ -27,7 +27,7 @@ namespace avionics {
 
     struct ComputerMeasurements {
         PositionMeasurement pI_BI_ins;
-        LinearVelocityMeasurement vB_BI_ins;
+        TranslationalVelocityMeasurement vB_BI_ins;
         StaticAirTemperatureMeasurement T;
         MachNumberMeasurement Mach;
         OrientationMeasurement qIB;
@@ -49,7 +49,7 @@ namespace avionics {
     };
 
     struct InertialNavigationSystem {
-        PositionMeasurement _calculate(const PositionMeasurement& prev_pI_BI, const LinearVelocityMeasurement& prev_vB_BI, const LinearAccelerationMeasurement& accelB, const OrientationMeasurement& prev_qIB);
-        LinearVelocityMeasurement _calculate(const LinearVelocityMeasurement& prev_vB_BI, const LinearAccelerationMeasurement& accelB, const PositionMeasurement& prev_pI_BI, const OrientationMeasurement& prev_qIB, const AngularVelocityMeasurement& wB_BI);
+        PositionMeasurement _calculate(const PositionMeasurement& prev_pI_BI, const TranslationalVelocityMeasurement& prev_vB_BI, const TranslationalAccelerationMeasurement& accelB, const OrientationMeasurement& prev_qIB);
+        TranslationalVelocityMeasurement _calculate(const TranslationalVelocityMeasurement& prev_vB_BI, const TranslationalAccelerationMeasurement& accelB, const PositionMeasurement& prev_pI_BI, const OrientationMeasurement& prev_qIB, const AngularVelocityMeasurement& wB_BI);
     };
 }

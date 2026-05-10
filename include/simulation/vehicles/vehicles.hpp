@@ -27,7 +27,7 @@ namespace vehicles {
             Linear velocity: None
             Gravity: Uniquely determined by initial Position and initial Orientation
         */
-        // std::optional<dynamics::homogeneousFrameTransformationMatrix> HEN;
+        // std::optional<dynamics::HomogeneousFrameTransformationMatrix> HEN;
         // std::optional<dynamics::OrientationMatrix> CEN;
         // std::optional<dynamics::Position> pE_NE;
         // std::optional<dynamics::OrientationQuaternion> qEN;
@@ -37,7 +37,7 @@ namespace vehicles {
         // std::optional<dynamics::AngularVelocity> wN_NE;
         // std::optional<dynamics::EulerAngleRates> eulEN_dot;
         // std::optional<dynamics::AngularVelocityQuaternion> wq_NE;
-        // std::optional<dynamics::LinearVelocity> vN_NE;
+        // std::optional<dynamics::TranslationalVelocity> vN_NE;
         // std::optional<dynamics::Gravity> gN;
         std::optional<geography::Latitude> lat_NE;
         std::optional<geography::Longitude> lon_NE;
@@ -55,7 +55,7 @@ namespace vehicles {
             Linear velocity: Determined by input OR (equal to FRDFrameNED Linear velocity)
             Gravity: Uniquely determined by Position and Orientation
         */
-        std::optional<dynamics::homogeneousFrameTransformationMatrix> HEB; 
+        std::optional<dynamics::HomogeneousFrameTransformationMatrix> HEB; 
         std::optional<dynamics::OrientationMatrix> CEB;
         std::optional<dynamics::Position> pE_BE;
         std::optional<dynamics::OrientationQuaternion> qEB;
@@ -65,7 +65,7 @@ namespace vehicles {
         std::optional<dynamics::AngularVelocity> wB_BE;
         std::optional<dynamics::EulerAngleRates> eulEB_dot;
         std::optional<dynamics::AngularVelocityQuaternion> wq_BE;
-        std::optional<dynamics::LinearVelocity> vB_BE;
+        std::optional<dynamics::TranslationalVelocity> vB_BE;
         // std::optional<dynamics::Gravity> gB;
         std::optional<geography::Latitude> lat_BE;
         std::optional<geography::Longitude> lon_BE;
@@ -84,7 +84,7 @@ namespace vehicles {
             Linear velocity: Determined by input OR (equal to FRDFrameECEF Linear velocity)
             Gravity: Equal to FRDFrameECEF Gravity
         */
-        std::optional<dynamics::homogeneousFrameTransformationMatrix> HNB; 
+        std::optional<dynamics::HomogeneousFrameTransformationMatrix> HNB; 
         std::optional<dynamics::OrientationMatrix> CNB;
         std::optional<dynamics::Position> pN_BN;
         std::optional<dynamics::OrientationQuaternion> qNB;
@@ -94,7 +94,7 @@ namespace vehicles {
         std::optional<dynamics::AngularVelocity> wB_BN;
         std::optional<dynamics::EulerAngleRates> eulNB_dot;
         std::optional<dynamics::AngularVelocityQuaternion> wq_BN;
-        std::optional<dynamics::LinearVelocity> vB_BN;
+        std::optional<dynamics::TranslationalVelocity> vB_BN;
         // std::optional<dynamics::Gravity> gB;
         std::optional<dynamics::RigidBodyState> rbs_BN; // container
     };
@@ -110,7 +110,7 @@ namespace vehicles {
             Gravity: Uniquely determined by Orientation AND FRDFrameNED Gravity 
             AngleOfAttack: Determined by input
         */
-        // std::optional<dynamics::homogeneousFrameTransformationMatrix> HBS; 
+        // std::optional<dynamics::HomogeneousFrameTransformationMatrix> HBS; 
         // std::optional<dynamics::OrientationMatrix> CBS;
         // std::optional<dynamics::Position> pB_SB;
         // std::optional<dynamics::OrientationQuaternion> qBS;
@@ -120,7 +120,7 @@ namespace vehicles {
         // std::optional<dynamics::AngularVelocity> wS_SB;
         // std::optional<dynamics::EulerAngleRates> eulBS_dot;
         // std::optional<dynamics::AngularVelocityQuaternion> wq_SB;
-        // std::optional<dynamics::LinearVelocity> vS_SB;
+        // std::optional<dynamics::TranslationalVelocity> vS_SB;
         // std::optional<dynamics::Gravity> gS;
         std::optional<aerodynamics::AngleOfAttack> alpha;
         std::optional<aerodynamics::AerodynamicState> ads; // container
@@ -137,7 +137,7 @@ namespace vehicles {
             Gravity: Uniquely determined by Orientation AND STABFrameFRD Gravity 
             SideslipAngle: Determined by input
         */
-        // std::optional<dynamics::homogeneousFrameTransformationMatrix> HSW; 
+        // std::optional<dynamics::HomogeneousFrameTransformationMatrix> HSW; 
         // std::optional<dynamics::OrientationMatrix> CSW;
         // std::optional<dynamics::Position> pS_WS;
         // std::optional<dynamics::OrientationQuaternion> qSW;
@@ -147,7 +147,7 @@ namespace vehicles {
         // std::optional<dynamics::AngularVelocity> wW_WS;
         // std::optional<dynamics::EulerAngleRates> eulSW_dot;
         // std::optional<dynamics::AngularVelocityQuaternion> wq_WS;
-        // std::optional<dynamics::LinearVelocity> vW_WS;
+        // std::optional<dynamics::TranslationalVelocity> vW_WS;
         // std::optional<dynamics::Gravity> gW;
         std::optional<aerodynamics::SideslipAngle> beta;
         std::optional<aerodynamics::AerodynamicState> ads; // container
@@ -166,7 +166,7 @@ namespace vehicles {
 
     struct _StepOptions {
         // Standard
-        std::optional<dynamics::homogeneousFrameTransformationMatrix> H;
+        std::optional<dynamics::HomogeneousFrameTransformationMatrix> H;
         std::optional<dynamics::OrientationMatrix> C;
         std::optional<dynamics::Position> p;
         std::optional<dynamics::OrientationQuaternion> q;
@@ -176,7 +176,7 @@ namespace vehicles {
         std::optional<dynamics::AngularVelocity> w;
         std::optional<dynamics::EulerAngleRates> eul_dot;
         std::optional<dynamics::AngularVelocityQuaternion> wq;
-        std::optional<dynamics::LinearVelocity> v;
+        std::optional<dynamics::TranslationalVelocity> v;
         std::optional<dynamics::Gravity> g;
 
         // Geometric

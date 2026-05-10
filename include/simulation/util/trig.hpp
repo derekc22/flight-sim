@@ -13,6 +13,7 @@ namespace util {
     double cos(double x);
     double tan(double x);
     double asin(double x);
+    double acos(double x);
     double atan2(double y, double x);
 
 }

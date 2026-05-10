@@ -16,7 +16,7 @@
 namespace frames {
 
     struct SetOptions {
-        std::optional<dynamics::homogeneousFrameTransformationMatrix> H;
+        std::optional<dynamics::HomogeneousFrameTransformationMatrix> H;
         std::optional<dynamics::OrientationMatrix> C;
         std::optional<dynamics::Position> p;
         std::optional<dynamics::OrientationQuaternion> q;
@@ -26,13 +26,13 @@ namespace frames {
         std::optional<dynamics::AngularVelocity> w;
         std::optional<dynamics::EulerAngleRates> eul_dot;
         std::optional<dynamics::AngularVelocityQuaternion> wq;
-        std::optional<dynamics::LinearVelocity> v;
+        std::optional<dynamics::TranslationalVelocity> v;
         std::optional<dynamics::Gravity> g;
         // void clear() noexcept;
     };
 
     struct MutableFrameView {
-        dynamics::homogeneousFrameTransformationMatrix* H;
+        dynamics::HomogeneousFrameTransformationMatrix* H;
         dynamics::OrientationQuaternion* q;
         dynamics::EulerAngles* eul;
         dynamics::OrientationMatrixRate* C_dot;
@@ -40,12 +40,12 @@ namespace frames {
         dynamics::AngularVelocity* w;
         dynamics::EulerAngleRates* eul_dot;
         dynamics::AngularVelocityQuaternion* wq;
-        dynamics::LinearVelocity* v;
+        dynamics::TranslationalVelocity* v;
         dynamics::Gravity* g;
     };
 
     struct FrameView {
-        const dynamics::homogeneousFrameTransformationMatrix* H;
+        const dynamics::HomogeneousFrameTransformationMatrix* H;
         const dynamics::OrientationQuaternion* q;
         const dynamics::EulerAngles* eul;
         const dynamics::OrientationMatrixRate* C_dot;
@@ -53,7 +53,7 @@ namespace frames {
         const dynamics::AngularVelocity* w;
         const dynamics::EulerAngleRates* eul_dot;
         const dynamics::AngularVelocityQuaternion* wq;
-        const dynamics::LinearVelocity* v;
+        const dynamics::TranslationalVelocity* v;
         const dynamics::Gravity* g;
     };
 
@@ -63,7 +63,7 @@ namespace frames {
 
         Frame(std::string n, Frame* p);
 
-        void _set(const dynamics::homogeneousFrameTransformationMatrix& H);
+        void _set(const dynamics::HomogeneousFrameTransformationMatrix& H);
         void _set(const dynamics::OrientationMatrix& C);
         void _set(const dynamics::Position& p);
         void _set(const dynamics::OrientationQuaternion& q);
@@ -73,7 +73,7 @@ namespace frames {
         void _set(const dynamics::AngularVelocity& w);
         void _set(const dynamics::EulerAngleRates& eul_dot);
         void _set(const dynamics::AngularVelocityQuaternion& wq);
-        void _set(const dynamics::LinearVelocity& v);
+        void _set(const dynamics::TranslationalVelocity& v);
         void _set(const dynamics::Gravity& g);
 
         virtual MutableFrameView view() = 0;
@@ -97,7 +97,7 @@ namespace frames {
     // {ECEF} -> {NED}
     struct NEDFrameECEF : Frame {
         NEDFrameECEF();
-        dynamics::homogeneousFrameTransformationMatrix HEN; 
+        dynamics::HomogeneousFrameTransformationMatrix HEN; 
         dynamics::OrientationQuaternion qEN;
         dynamics::EulerAngles eulEN;
         dynamics::OrientationMatrixRate CEN_dot;
@@ -105,7 +105,7 @@ namespace frames {
         dynamics::AngularVelocity wN_NE;
         dynamics::EulerAngleRates eulEN_dot;
         dynamics::AngularVelocityQuaternion wq_NE;
-        dynamics::LinearVelocity vN_NE;
+        dynamics::TranslationalVelocity vN_NE;
         dynamics::Gravity gN;
 
         MutableFrameView view() override;
@@ -115,7 +115,7 @@ namespace frames {
     // {ECEF} -> {BODY}
     struct FRDFrameECEF : Frame {
         FRDFrameECEF();
-        dynamics::homogeneousFrameTransformationMatrix HEB; 
+        dynamics::HomogeneousFrameTransformationMatrix HEB; 
         dynamics::OrientationQuaternion qEB;
         dynamics::EulerAngles eulEB;
         dynamics::OrientationMatrixRate CEB_dot;
@@ -123,7 +123,7 @@ namespace frames {
         dynamics::AngularVelocity wB_BE;
         dynamics::EulerAngleRates eulEB_dot;
         dynamics::AngularVelocityQuaternion wq_BE;
-        dynamics::LinearVelocity vB_BE;
+        dynamics::TranslationalVelocity vB_BE;
         dynamics::Gravity gB;
 
         MutableFrameView view() override;  
@@ -133,7 +133,7 @@ namespace frames {
     // {NED} -> {BODY}
     struct FRDFrameNED : Frame { 
         FRDFrameNED(NEDFrameECEF* pNEDFrameECEF);
-        dynamics::homogeneousFrameTransformationMatrix HNB; 
+        dynamics::HomogeneousFrameTransformationMatrix HNB; 
         dynamics::OrientationQuaternion qNB;
         dynamics::EulerAngles eulNB;
         dynamics::OrientationMatrixRate CNB_dot;
@@ -141,7 +141,7 @@ namespace frames {
         dynamics::AngularVelocity wB_BN;
         dynamics::EulerAngleRates eulNB_dot;
         dynamics::AngularVelocityQuaternion wq_BN;
-        dynamics::LinearVelocity vB_BN;
+        dynamics::TranslationalVelocity vB_BN;
         dynamics::Gravity gB;
 
         MutableFrameView view() override; 
@@ -151,7 +151,7 @@ namespace frames {
     // {BODY} -> {STAB}
     struct STABFrameFRD : Frame {
         STABFrameFRD(FRDFrameNED* pFRDFrameNED);
-        dynamics::homogeneousFrameTransformationMatrix HBS; 
+        dynamics::HomogeneousFrameTransformationMatrix HBS; 
         dynamics::OrientationQuaternion qBS;
         dynamics::EulerAngles eulBS;
         dynamics::OrientationMatrixRate CBS_dot;
@@ -159,7 +159,7 @@ namespace frames {
         dynamics::AngularVelocity wS_SB;
         dynamics::EulerAngleRates eulBS_dot;
         dynamics::AngularVelocityQuaternion wq_SB;
-        dynamics::LinearVelocity vS_SB;
+        dynamics::TranslationalVelocity vS_SB;
         dynamics::Gravity gS;
 
         MutableFrameView view() override; 
@@ -169,7 +169,7 @@ namespace frames {
     // {STAB} -> {WIND}
     struct WINDFrameSTAB : Frame {
         WINDFrameSTAB(STABFrameFRD* pSTABFrameFRD);
-        dynamics::homogeneousFrameTransformationMatrix HSW; 
+        dynamics::HomogeneousFrameTransformationMatrix HSW; 
         dynamics::OrientationQuaternion qSW;
         dynamics::EulerAngles eulSW;
         dynamics::OrientationMatrixRate CSW_dot;
@@ -177,7 +177,7 @@ namespace frames {
         dynamics::AngularVelocity wW_WS;
         dynamics::EulerAngleRates eulSW_dot;
         dynamics::AngularVelocityQuaternion wq_WS;
-        dynamics::LinearVelocity vW_WS;
+        dynamics::TranslationalVelocity vW_WS;
         dynamics::Gravity gW;
 
         MutableFrameView view() override; 

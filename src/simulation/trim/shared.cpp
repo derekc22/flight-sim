@@ -4,7 +4,7 @@
 namespace trim {
 
     dynamics::StateVector_T<double> unpack_rigid_body_state(const dynamics::RigidBodyState& xN_t){
-        dynamics::LinearVelocity vB_BI = xN_t.v;
+        dynamics::TranslationalVelocity vB_BI = xN_t.v;
         dynamics::AngularVelocity wB_BI = xN_t.w;
         dynamics::EulerAngles eulIB;
         eulIB.set(xN_t.q);

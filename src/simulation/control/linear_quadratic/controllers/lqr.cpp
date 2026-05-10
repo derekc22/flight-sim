@@ -15,7 +15,7 @@ namespace control {
     {};
 
     dynamics::StateVector_T<double> LinearQuadraticRegulator::unpack_linear_quadratic_regulator_setpoint(const guidance::LinearFullStateFeedbackSetpoint& setpoint){
-        dynamics::LinearVelocity vB_BI = setpoint.vB_BI;
+        dynamics::TranslationalVelocity vB_BI = setpoint.vB_BI;
         dynamics::AngularVelocity wB_BI = setpoint.wB_BI;
         dynamics::EulerAngles eulIB = setpoint.eulIB;
 

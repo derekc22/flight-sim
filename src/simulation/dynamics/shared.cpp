@@ -22,13 +22,13 @@ namespace dynamics {
         };
     }
 
-    Position _trans_kin(const Position& xt, const LinearVelocity& xt_dot, const LinearAcceleration& xt_ddot){
+    Position _trans_kin(const Position& xt, const TranslationalVelocity& xt_dot, const TranslationalAcceleration& xt_ddot){
         const Eigen::Vector3d xt1 = xt.data + xt_dot.data * constants::dt + 0.5 * xt_ddot.data * (constants::dt * constants::dt);
 
         return { xt1 };
     }
 
-    LinearVelocity _trans_kin_vel(const LinearVelocity& xt_dot, const LinearAcceleration& xt_ddot){
+    TranslationalVelocity _trans_kin_vel(const TranslationalVelocity& xt_dot, const TranslationalAcceleration& xt_ddot){
         const Eigen::Vector3d xt_dot1 = xt_dot.data + xt_ddot.data * constants::dt;
 
         return { xt_dot1 };
@@ -41,8 +41,8 @@ namespace dynamics {
         if (Omega < constants::eps) dq = constants::qI;
         else {
             const Eigen::Vector3d w_hat = wB_BI_t.data/Omega;
-            dq.w() = std::cos(Omega * constants::dt / 2);
-            dq.vec() = -w_hat * std::sin(Omega * constants::dt / 2);
+            dq.w() = util::cos(Omega * constants::dt / 2);
+            dq.vec() = -w_hat * util::sin(Omega * constants::dt / 2);
         }
 
         const Eigen::Quaterniond qIB_t1 = dq * qIB_t.data;
@@ -52,13 +52,13 @@ namespace dynamics {
     void OrientationMatrix::set(const OrientationQuaternion& q) { data = transforms::quat_to_rot(q.data); }
     void OrientationMatrix::set(const EulerAngles& eul) { data = transforms::eul_to_C(eul.psi(), eul.theta(), eul.phi(), "ZYX", "intr"); }
 
-    OrientationMatrix homogeneousFrameTransformationMatrix::C() const { return OrientationMatrix{ transforms::C_from_H(data) }; }
-    Position homogeneousFrameTransformationMatrix::p() const { return Position{ transforms::p_from_H(data) }; }
-    void homogeneousFrameTransformationMatrix::set(const OrientationMatrix& C, const Position& p) { data = transforms::make_HC(C.data, p.data, "translate"); }
-    void homogeneousFrameTransformationMatrix::set(const OrientationMatrix& C) { data = transforms::make_HC(C.data, p().data, "translate"); }
-    void homogeneousFrameTransformationMatrix::set(const Position& p) { data = transforms::make_HC(C().data, p.data, "translate"); }
-    void homogeneousFrameTransformationMatrix::set(const OrientationQuaternion& q) { data = transforms::make_HC(transforms::quat_to_rot(q.data), p().data, "translate"); }
-    void homogeneousFrameTransformationMatrix::set(const EulerAngles& eul) { data = transforms::make_HC(transforms::eul_to_C(eul.psi(), eul.theta(), eul.phi(), "ZYX", "intr"), p().data, "translate"); }
+    OrientationMatrix HomogeneousFrameTransformationMatrix::C() const { return OrientationMatrix{ transforms::C_from_H(data) }; }
+    Position HomogeneousFrameTransformationMatrix::p() const { return Position{ transforms::p_from_H(data) }; }
+    void HomogeneousFrameTransformationMatrix::set(const OrientationMatrix& C, const Position& p) { data = transforms::make_HC(C.data, p.data, "translate"); }
+    void HomogeneousFrameTransformationMatrix::set(const OrientationMatrix& C) { data = transforms::make_HC(C.data, p().data, "translate"); }
+    void HomogeneousFrameTransformationMatrix::set(const Position& p) { data = transforms::make_HC(C().data, p.data, "translate"); }
+    void HomogeneousFrameTransformationMatrix::set(const OrientationQuaternion& q) { data = transforms::make_HC(transforms::quat_to_rot(q.data), p().data, "translate"); }
+    void HomogeneousFrameTransformationMatrix::set(const EulerAngles& eul) { data = transforms::make_HC(transforms::eul_to_C(eul.psi(), eul.theta(), eul.phi(), "ZYX", "intr"), p().data, "translate"); }
 
     void OrientationQuaternion::set(const OrientationMatrix& C) { data = transforms::normalize_and_canonicalize(transforms::rot_to_quat(C.data)); }
     void OrientationQuaternion::set(const EulerAngles& eul) { data = transforms::normalize_and_canonicalize(transforms::eul_to_quatC(eul.psi(), eul.theta(), eul.phi(), "ZYX", "intr")); }

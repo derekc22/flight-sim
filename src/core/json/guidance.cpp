@@ -183,7 +183,7 @@ namespace json {
 
         for (int i = 0; i < traj_components.n_rows; ++i) {
             dynamics::RigidBodyState rbs_temp;
-            rbs_temp.v = dynamics::LinearVelocity{ traj_components.v_mat.row(i).transpose() };
+            rbs_temp.v = dynamics::TranslationalVelocity{ traj_components.v_mat.row(i).transpose() };
             rbs_temp.w = dynamics::AngularVelocity{ traj_components.w_mat.row(i).transpose() };
 
             dynamics::OrientationQuaternion qIB;

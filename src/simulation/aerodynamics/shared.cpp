@@ -9,6 +9,7 @@
 #include "simulation/dynamics/shared.hpp"
 #include "simulation/frames/frames.hpp"
 #include "simulation/structural/structural.hpp"
+#include "simulation/util/util.hpp"
 
 namespace aerodynamics {
 
@@ -40,19 +41,19 @@ namespace aerodynamics {
 
     dynamics::OrientationMatrix CBS(const aerodynamics::AngleOfAttack& alpha) {
         Eigen::Matrix3d CBS;
-        const double a = alpha.data;
-        CBS     <<   std::cos(a),   0,   std::sin(a),
-                               0,   1,             0,
-                    -std::sin(a),   0,    std::cos(a);
+        double a = alpha.data;
+        CBS     <<   util::cos(a),   0,   util::sin(a),
+                                0,   1,              0,
+                    -util::sin(a),   0,   util::cos(a);
         return { CBS };
     };
 
     dynamics::OrientationMatrix CSW(const aerodynamics::SideslipAngle& beta) {
         Eigen::Matrix3d CSW;
-        const double b = beta.data;
-        CSW     <<   std::cos(b),   std::sin(b),   0,
-                    -std::sin(b),   std::cos(b),   0,
-                               0,             0,   1;
+        double b = beta.data;
+        CSW     <<   util::cos(b),   util::sin(b),   0,
+                    -util::sin(b),   util::cos(b),   0,
+                                0,              0,   1;
         return { CSW };
     };
 

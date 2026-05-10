@@ -57,7 +57,7 @@ namespace atmospheric {
     StaticAtmosphericState compute_static_atmospheric_state(const frames::Frame& F);
 
     StaticAirTemperature T_from_T0(const StagnationAirTemperature& T0, const MachNumber& M);
-    MachNumber ms_to_mach(const dynamics::LinearVelocity& v, const StaticAirTemperature& T);
+    MachNumber mps_to_mach(const dynamics::TranslationalVelocity& v, const StaticAirTemperature& T);
     StagnationAtmosphericState static_to_stagnation(const StaticAtmosphericState& static_atm_state, const MachNumber& M);
     MachNumber compute_mach(const StagnationAirPressure& P0, const StaticAirPressure& P);
 

@@ -72,7 +72,7 @@ namespace structural {
         j(2, 0) = j(0, 2);
         j(2, 1) = j(1, 2);
 
-        const double detj = j.determinant();
+        double detj = j.determinant();
         if (std::abs(detj) < constants::eps) { throw std::runtime_error("structural::StructuralProperties::compute_j: Inertia tensor is singular"); }
 
         return j;

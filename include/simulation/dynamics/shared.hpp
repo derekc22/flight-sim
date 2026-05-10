@@ -17,7 +17,7 @@ namespace dynamics {
         void set(const EulerAngles& eul);
     };
 
-    struct homogeneousFrameTransformationMatrix {
+    struct HomogeneousFrameTransformationMatrix {
         Eigen::Matrix4d data;
         OrientationMatrix C() const;
         Position p() const;
@@ -76,11 +76,11 @@ namespace dynamics {
         void set(const AngularVelocity& w);
     };
 
-    struct LinearVelocity {
+    struct TranslationalVelocity {
         Eigen::Vector3d data;
     };
 
-    struct LinearAcceleration {
+    struct TranslationalAcceleration {
         Eigen::Vector3d data;
     };
 
@@ -122,7 +122,7 @@ namespace dynamics {
 
     struct RigidBodyState {
         Position p;
-        LinearVelocity v;
+        TranslationalVelocity v;
         OrientationQuaternion q;
         AngularVelocity w;
     };
@@ -133,7 +133,7 @@ namespace dynamics {
     };
 
     struct Twist {
-        LinearVelocity v;
+        TranslationalVelocity v;
         AngularVelocity w;
     };
 
@@ -201,8 +201,8 @@ namespace dynamics {
     template <typename T>
     constants::Vector3_T<T> _wB_BI_to_eul_dot_T(const constants::Vector3_T<T>& wB_BI, const T& theta, const T& phi);
 
-    Position _trans_kin(const Position& xt, const LinearVelocity& xt_dot, const LinearAcceleration& xt_ddot);
-    LinearVelocity _trans_kin_vel(const LinearVelocity& xt_dot, const LinearAcceleration& xt_ddot);
+    Position _trans_kin(const Position& xt, const TranslationalVelocity& xt_dot, const TranslationalAcceleration& xt_ddot);
+    TranslationalVelocity _trans_kin_vel(const TranslationalVelocity& xt_dot, const TranslationalAcceleration& xt_ddot);
     OrientationQuaternion _quat_kin(const OrientationQuaternion& qIB_t, const AngularVelocity& wB_BI_t);
     AngularVelocity _CIB_dot_to_wB_BI(const OrientationMatrixRate& CIB_dot, const OrientationMatrix& CIB);
     AngularVelocity _qIB_dot_to_wB_BI(const OrientationQuaternionRate& qIB_dot, const OrientationQuaternion& qIB);

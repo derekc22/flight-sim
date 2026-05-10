@@ -277,7 +277,7 @@ namespace vehicles {
 
         // Defaults
         NEDFrameECEFSetOpts.C_dot = dynamics::OrientationMatrixRate{ constants::Zero3x3 };
-        NEDFrameECEFSetOpts.v = dynamics::LinearVelocity{ constants::Zero3 };
+        NEDFrameECEFSetOpts.v = dynamics::TranslationalVelocity{ constants::Zero3 };
         // NEDFrameECEFSetOpts.g = geography::gN();
 
         F.set(NEDFrameECEFSetOpts); 
@@ -546,7 +546,7 @@ namespace vehicles {
         // Defaults
         STABFrameFRDSetOpts.p = dynamics::Position{ constants::Zero3 };
         STABFrameFRDSetOpts.C_dot = dynamics::OrientationMatrixRate{ constants::Zero3x3 };
-        STABFrameFRDSetOpts.v = dynamics::LinearVelocity{ constants::Zero3 };
+        STABFrameFRDSetOpts.v = dynamics::TranslationalVelocity{ constants::Zero3 };
 
         F.set(STABFrameFRDSetOpts); 
     }
@@ -599,7 +599,7 @@ namespace vehicles {
         // Defaults
         WINDFrameSTABSetOpts.p = dynamics::Position{ constants::Zero3 };
         WINDFrameSTABSetOpts.C_dot = dynamics::OrientationMatrixRate{ constants::Zero3x3 };
-        WINDFrameSTABSetOpts.v = dynamics::LinearVelocity{ constants::Zero3 };
+        WINDFrameSTABSetOpts.v = dynamics::TranslationalVelocity{ constants::Zero3 };
 
         F.set(WINDFrameSTABSetOpts); 
     }
@@ -694,9 +694,9 @@ namespace vehicles {
 
         // Set default values
         frames::SetOptions initStepOptions = {
-            .H = dynamics::homogeneousFrameTransformationMatrix{ constants::HI },
+            .H = dynamics::HomogeneousFrameTransformationMatrix{ constants::HI },
             .w = dynamics::AngularVelocity{ constants::Zero3 },
-            .v = dynamics::LinearVelocity{ constants::Zero3 },
+            .v = dynamics::TranslationalVelocity{ constants::Zero3 },
             .g = dynamics::Gravity{ constants::Zero3 }
         };
 

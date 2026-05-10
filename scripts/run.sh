@@ -2,7 +2,22 @@
 set -e
 
 usage() {
-	echo "USAGE: $0 -a <AIRCRAFT> -t <TIME_SEC> [-r <TRIM_BOOL>] [-s <SENSOR_BOOL>] [-c <CONTROL_BOOL>] [-e <ESTIMATION_BOOL>] [-e <WIND_BOOL>] [-v <VERBOSE_BOOL>] [-d <DATA_BOOL>] [-o <OUT_DIR>] [-p <PLOT_BOOL>] [-z <TEST_BOOL>] [-q <QUICK_BOOL>]" >&2
+	cat >&2 <<EOF
+USAGE: $0
+  -a <AIRCRAFT>
+  -t <TIME_SEC>
+  [-r TRIM_BOOL]
+  [-s SENSOR_BOOL]
+  [-c CONTROL_BOOL]
+  [-e ESTIMATION_BOOL]
+  [-w WIND_BOOL]
+  [-v VERBOSE_BOOL]
+  [-d DATA_BOOL]
+  [-p PLOT_BOOL]
+  -o <OUT_DIR>
+  [-z TEST_BOOL]
+  [-q QUICK_BOOL]
+EOF
 	exit 1
 }
 

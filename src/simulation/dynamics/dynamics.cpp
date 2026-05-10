@@ -50,7 +50,7 @@ namespace dynamics {
         else {
             const Eigen::Vector3d w_hat = wB_BI_t.data/Omega;
             Eigen::Matrix3d w_hat_skew = util::hat(w_hat);
-            exp_term = constants::I3 - std::sin(Omega * constants::dt) * w_hat_skew + (1 - std::cos(Omega * constants::dt)) * w_hat_skew * w_hat_skew;
+            exp_term = constants::I3 - util::sin(Omega * constants::dt) * w_hat_skew + (1 - util::cos(Omega * constants::dt)) * w_hat_skew * w_hat_skew;
         }
 
         const Eigen::Matrix3d CIB_t1 = exp_term * CIB_t.data;
@@ -78,12 +78,12 @@ namespace dynamics {
     //
     // Inputs at t0: FB_net(t0), wB_BI(t0), vB(t0)
     // Output: vB(t0 + dt)
-    LinearAcceleration _ddtB_vB_BI(const LinearVelocity& vB_BI, const AngularVelocity& wB_BI, const Mass& mass, const Force& FB_net){
+    TranslationalAcceleration _ddtB_vB_BI(const TranslationalVelocity& vB_BI, const AngularVelocity& wB_BI, const Mass& mass, const Force& FB_net){
         return { _ddtB_vB_BI_T<double>(vB_BI.data, wB_BI.data, mass.data, FB_net.data) };
     }
 
-    LinearVelocity _trans_dyn_vel(const LinearVelocity& vB_BI_t, const AngularVelocity& wB_BI_t, const Mass& mass, const Force& FB_net_t){
-        const LinearAcceleration vB_BI_dot_t = _ddtB_vB_BI(vB_BI_t, wB_BI_t, mass, FB_net_t);
+    TranslationalVelocity _trans_dyn_vel(const TranslationalVelocity& vB_BI_t, const AngularVelocity& wB_BI_t, const Mass& mass, const Force& FB_net_t){
+        const TranslationalAcceleration vB_BI_dot_t = _ddtB_vB_BI(vB_BI_t, wB_BI_t, mass, FB_net_t);
 
         const Eigen::Vector3d vB_BI_t1 = vB_BI_t.data + vB_BI_dot_t.data * constants::dt;
         return { vB_BI_t1 };
@@ -129,10 +129,10 @@ namespace dynamics {
         const Eigen::Matrix3d CBI_t = CIB_t.transpose();
 
         // Translational dynamics in body coordinates
-        const LinearVelocity vB_BI_t1 = _trans_dyn_vel(xB_BI_t.v, xB_BI_t.w, mass, FB_net_t); 
+        const TranslationalVelocity vB_BI_t1 = _trans_dyn_vel(xB_BI_t.v, xB_BI_t.w, mass, FB_net_t); 
         const Eigen::Vector3d ddtB_vB_BI_t = _ddtB_vB_BI(xB_BI_t.v, xB_BI_t.w, mass, FB_net_t).data;           // produces a body derivative
         const Eigen::Vector3d ddtI_vB_BI_t = _ddtB_to_ddtI(ddtB_vB_BI_t, xB_BI_t.v.data, xB_BI_t.w.data);      // produces an inertial derivative
-        const LinearAcceleration aB_BI_t{ ddtI_vB_BI_t }; // since pI_BI_t1 and vI_BI_t are inertial, aB_BI_t needs to be an inertial derivative
+        const TranslationalAcceleration aB_BI_t{ ddtI_vB_BI_t }; // since pI_BI_t1 and vI_BI_t are inertial, aB_BI_t needs to be an inertial derivative
 
         // Rotational dynamics in body coordinates
         const AngularVelocity wB_BI_t1 = _rot_dyn(xB_BI_t.w, J, MB_net_t);
@@ -145,7 +145,7 @@ namespace dynamics {
         const Eigen::Vector3d aI_BI_t = CBI_t * aB_BI_t.data;
 
         // Translational kinematics in inertial coordinates
-        const Position pI_BI_t1 = _trans_kin(xB_BI_t.p, LinearVelocity { vI_BI_t }, LinearAcceleration { aI_BI_t });
+        const Position pI_BI_t1 = _trans_kin(xB_BI_t.p, TranslationalVelocity { vI_BI_t }, TranslationalAcceleration { aI_BI_t });
 
         return { pI_BI_t1, vB_BI_t1, qIB_t1, wB_BI_t1 };
     }

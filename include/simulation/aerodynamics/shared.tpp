@@ -46,17 +46,15 @@ namespace aerodynamics {
         const T flap_cmd_abs = util::smooth_abs(u.flap_cmd);
         const T spoiler_cmd_abs = util::smooth_abs(u.spoiler_cmd);
 
-        T dCD_extra = T(0);
-
         out.CL += T(s.dyn.CL_phat) * sk.p_hat + T(s.dyn.CL_qhat) * sk.q_hat + T(s.dyn.CL_rhat) * sk.r_hat;
         out.CM += T(s.dyn.CM_phat) * sk.p_hat + T(s.dyn.CM_qhat) * sk.q_hat + T(s.dyn.CM_rhat) * sk.r_hat;
-        dCD_extra += T(s.dyn.CD_phat) * sk.p_hat + T(s.dyn.CD_qhat) * sk.q_hat + T(s.dyn.CD_rhat) * sk.r_hat;
+        out.CD += T(s.dyn.CD_phat) * sk.p_hat + T(s.dyn.CD_qhat) * sk.q_hat + T(s.dyn.CD_rhat) * sk.r_hat;
 
         out.CL += T(s.ctrl.dCL_de) * u.elevator_cmd + T(s.ctrl.dCL_da) * u.aileron_cmd + T(s.ctrl.dCL_dr) * u.rudder_cmd + T(s.ctrl.dCL_df) * u.flap_cmd + T(s.ctrl.dCL_ds) * u.spoiler_cmd;
         out.CM += T(s.ctrl.dCM_de) * u.elevator_cmd + T(s.ctrl.dCM_da) * u.aileron_cmd + T(s.ctrl.dCM_dr) * u.rudder_cmd + T(s.ctrl.dCM_df) * u.flap_cmd + T(s.ctrl.dCM_ds) * u.spoiler_cmd;
-        dCD_extra += T(s.ctrl.dCD_de) * elevator_cmd_abs + T(s.ctrl.dCD_da) * aileron_cmd_abs + T(s.ctrl.dCD_dr) * rudder_cmd_abs + T(s.ctrl.dCD_df) * flap_cmd_abs + T(s.ctrl.dCD_ds) * spoiler_cmd_abs;
+        out.CD += T(s.ctrl.dCD_de) * elevator_cmd_abs + T(s.ctrl.dCD_da) * aileron_cmd_abs + T(s.ctrl.dCD_dr) * rudder_cmd_abs + T(s.ctrl.dCD_df) * flap_cmd_abs + T(s.ctrl.dCD_ds) * spoiler_cmd_abs;
 
-        out.CD = T(s.CD0) + T(s.CDa) * (sk.alpha - T(s.a0)) * (sk.alpha - T(s.a0)) + (out.CL * out.CL) / T(constants::pi * s.e * s.AR) + dCD_extra;
+        out.CD += T(s.CD0) + T(s.CDa) * (sk.alpha - T(s.a0)) * (sk.alpha - T(s.a0)) + (out.CL * out.CL) / T(constants::pi * s.e * s.AR);
         return out;
     }
 

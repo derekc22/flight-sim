@@ -12,7 +12,7 @@ namespace avionics {
     // directly measured
     struct AngleOfAttackMeasurement : aerodynamics::AngleOfAttack {};
 
-    struct LinearAccelerationMeasurement : dynamics::LinearAcceleration {};
+    struct TranslationalAccelerationMeasurement : dynamics::TranslationalAcceleration {};
 
     struct AngularVelocityMeasurement : dynamics::AngularVelocity {};
 
@@ -24,20 +24,20 @@ namespace avionics {
 
     struct PositionMeasurement : dynamics::Position {};
 
-    struct LinearVelocityMeasurement : dynamics::LinearVelocity {};
+    struct TranslationalVelocityMeasurement : dynamics::TranslationalVelocity {};
 
     struct HeadingMeasurement : geography::Heading {};
 
 
     struct SensorMeasurements {
         AngleOfAttackMeasurement alpha;
-        LinearAccelerationMeasurement accel;
+        TranslationalAccelerationMeasurement accel;
         AngularVelocityMeasurement wB_BI;
         StagnationAirPressureMeasurement P0;
         StaticAirPressureMeasurement P;
         StagnationAirTemperatureMeasurement T0;
         PositionMeasurement pI_BI_gnss;
-        LinearVelocityMeasurement vB_BI_gnss;
+        TranslationalVelocityMeasurement vB_BI_gnss;
         HeadingMeasurement heading_BE;
     };
 
@@ -67,7 +67,7 @@ namespace avionics {
 
     struct Accelerometer : Sensor {
         std::optional<Eigen::Vector3d> prev_accel_lag;
-        LinearAccelerationMeasurement _measure(const dynamics::LinearAcceleration& accelB);
+        TranslationalAccelerationMeasurement _measure(const dynamics::TranslationalAcceleration& accelB);
         // Note: accelB = FB_net/m - gB, not vB_BI_dot
         // That is, an accelerometer measures all accelerations excluding gravity 
     };
@@ -96,7 +96,7 @@ namespace avionics {
         std::optional<Eigen::Vector3d> prev_pI_BI_lag;
         std::optional<Eigen::Vector3d> prev_vB_BI_lag;
         PositionMeasurement _measure(const dynamics::Position& pI_BI);
-        LinearVelocityMeasurement _measure(const dynamics::LinearVelocity& vB_BI);
+        TranslationalVelocityMeasurement _measure(const dynamics::TranslationalVelocity& vB_BI);
     };
 
     struct Magnetometer : Sensor {

@@ -12,3 +12,4 @@ CMakeCache.txt
 **.pdf
 __pycache__
 CLAUDE.md
+.cache/

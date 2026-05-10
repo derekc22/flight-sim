@@ -65,7 +65,7 @@ namespace avionics {
         return { _step(alpha.data, prev_alpha_lag) };
     }
 
-    LinearAccelerationMeasurement Accelerometer::_measure(const dynamics::LinearAcceleration& accelB) {
+    TranslationalAccelerationMeasurement Accelerometer::_measure(const dynamics::TranslationalAcceleration& accelB) {
         return { _step(accelB.data, prev_accel_lag) };
     }
 
@@ -89,7 +89,7 @@ namespace avionics {
         return { _step(pI_BI.data, prev_pI_BI_lag) };
     }
 
-    LinearVelocityMeasurement GNSSReceiver::_measure(const dynamics::LinearVelocity& vB_BI) {
+    TranslationalVelocityMeasurement GNSSReceiver::_measure(const dynamics::TranslationalVelocity& vB_BI) {
         return { _step(vB_BI.data, prev_vB_BI_lag) };
     }
     

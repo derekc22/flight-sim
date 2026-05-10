@@ -384,7 +384,7 @@ namespace trim {
 
             dynamics::RigidBodyState xN_t_trim = {
                 .p = xN_t.p,
-                .v = dynamics::LinearVelocity{ Eigen::Vector3d(trim_sol.state.vx, trim_sol.state.vy, trim_sol.state.vz) },
+                .v = dynamics::TranslationalVelocity{ Eigen::Vector3d(trim_sol.state.vx, trim_sol.state.vy, trim_sol.state.vz) },
                 .q = qNB_trim,
                 .w = dynamics::AngularVelocity{ Eigen::Vector3d(trim_sol.state.p, trim_sol.state.q, trim_sol.state.r) },
             };

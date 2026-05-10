@@ -24,7 +24,7 @@ namespace avionics {
     
         ComputerMeasurements computer_meas {
             .pI_BI_ins = hist.computers ? computers.INS._calculate(hist.computers->pI_BI_ins, hist.computers->vB_BI_ins, sensor_meas.accel, hist.computers->qIB) : PositionMeasurement{ meas_gt.pI_BI.data },
-            .vB_BI_ins = hist.computers ? computers.INS._calculate(hist.computers->vB_BI_ins, sensor_meas.accel, hist.computers->pI_BI_ins, hist.computers->qIB, sensor_meas.wB_BI) : LinearVelocityMeasurement{ meas_gt.vB_BI.data },
+            .vB_BI_ins = hist.computers ? computers.INS._calculate(hist.computers->vB_BI_ins, sensor_meas.accel, hist.computers->pI_BI_ins, hist.computers->qIB, sensor_meas.wB_BI) : TranslationalVelocityMeasurement{ meas_gt.vB_BI.data },
             .T = curr_T_meas,
             .Mach = curr_Mach_meas,
             .Vinf = computers.ADC._calculate(curr_Mach_meas, curr_T_meas),
@@ -53,9 +53,9 @@ namespace avionics {
         AvionicsProperties& avionics_properties
     ) {
 
-        atmospheric::MachNumber Mach = atmospheric::ms_to_mach(xN_t.v, static_atm_t.T);
+        atmospheric::MachNumber Mach = atmospheric::mps_to_mach(xN_t.v, static_atm_t.T);
         atmospheric::StagnationAtmosphericState stagnation_atmo_t = atmospheric::static_to_stagnation(static_atm_t, Mach);
-        dynamics::LinearVelocity vI_BI{ xN_t.q.data.conjugate() * xN_t.v.data };
+        dynamics::TranslationalVelocity vI_BI{ xN_t.q.data.conjugate() * xN_t.v.data };
         double alt_dot = xN_t.p.data.normalized().dot(vI_BI.data);
 
         dynamics::EulerAngles eul;
@@ -63,7 +63,7 @@ namespace avionics {
 
         avionics::MeasurementGroundTruth meas_gt = {
             .alpha = ads_t.alpha,
-            .accelB = dynamics::LinearAcceleration{ WB_net.F.data / mass.data - geography::gB(xN_t.p, xN_t.q).data },
+            .accelB = dynamics::TranslationalAcceleration{ WB_net.F.data / mass.data - geography::gB(xN_t.p, xN_t.q).data },
             .wB_BI = xN_t.w,
             .P0 = stagnation_atmo_t.P0,
             .P = static_atm_t.P,

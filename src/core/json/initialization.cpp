@@ -13,7 +13,7 @@
 namespace json {
 
     struct ParsedStepOptions {
-        std::optional<dynamics::homogeneousFrameTransformationMatrix> H;
+        std::optional<dynamics::HomogeneousFrameTransformationMatrix> H;
         std::optional<dynamics::OrientationMatrix> C;
         std::optional<dynamics::Position> p;
         std::optional<dynamics::OrientationQuaternion> q;
@@ -23,7 +23,7 @@ namespace json {
         std::optional<dynamics::AngularVelocity> w;
         std::optional<dynamics::EulerAngleRates> eul_dot;
         std::optional<dynamics::AngularVelocityQuaternion> wq;
-        std::optional<dynamics::LinearVelocity> v;
+        std::optional<dynamics::TranslationalVelocity> v;
         std::optional<geography::Latitude> lat;
         std::optional<geography::Longitude> lon;
         std::optional<geography::Altitude> alt;
@@ -34,7 +34,7 @@ namespace json {
     ParsedStepOptions parse_step_options(const nlohmann::json& frame_json) {
         ParsedStepOptions fields;
 
-        if (frame_json.contains("H")) { fields.H = dynamics::homogeneousFrameTransformationMatrix{ parse_Matrix4d(frame_json.at("H")) }; }
+        if (frame_json.contains("H")) { fields.H = dynamics::HomogeneousFrameTransformationMatrix{ parse_Matrix4d(frame_json.at("H")) }; }
         if (frame_json.contains("C")) { fields.C = dynamics::OrientationMatrix{ parse_Matrix3d(frame_json.at("C")) }; }
         if (frame_json.contains("p")) { fields.p = dynamics::Position{ parse_Vector3d(frame_json.at("p")) }; }
         if (frame_json.contains("q")) { fields.q = dynamics::OrientationQuaternion{ parse_Quaterniond(frame_json.at("q")) }; }
@@ -44,7 +44,7 @@ namespace json {
         if (frame_json.contains("w")) { fields.w = dynamics::AngularVelocity{ parse_Vector3d(frame_json.at("w")) }; }
         if (frame_json.contains("eul_dot")) { fields.eul_dot = dynamics::EulerAngleRates{ parse_Vector3d(frame_json.at("eul_dot")) }; }
         if (frame_json.contains("wq")) { fields.wq = dynamics::AngularVelocityQuaternion{ parse_Quaterniond(frame_json.at("wq")) }; }
-        if (frame_json.contains("v")) { fields.v = dynamics::LinearVelocity{ parse_Vector3d(frame_json.at("v")) }; }
+        if (frame_json.contains("v")) { fields.v = dynamics::TranslationalVelocity{ parse_Vector3d(frame_json.at("v")) }; }
         if (frame_json.contains("lat")) { fields.lat = geography::Latitude{ util::deg_to_rad(frame_json.at("lat").get<double>()) }; }
         if (frame_json.contains("lon")) { fields.lon = geography::Longitude{ util::deg_to_rad(frame_json.at("lon").get<double>()) }; }
         if (frame_json.contains("alt")) { fields.alt = geography::Altitude{ frame_json.at("alt").get<double>() }; }

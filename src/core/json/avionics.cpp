@@ -13,8 +13,8 @@ namespace json {
         if (!sensor_json.contains("bias")) { throw std::runtime_error("json::validate_sensor_json: sensor bias not present"); }
         if (!sensor_json.contains("tau")) { throw std::runtime_error("json::validate_sensor_json: sensor tau not present"); }
 
-        const double stddev = sensor_json.at("stddev").get<double>();
-        const double tau = sensor_json.at("tau").get<double>();
+        double stddev = sensor_json.at("stddev").get<double>();
+        double tau = sensor_json.at("tau").get<double>();
 
         if (stddev < 0.0) { throw std::runtime_error("json::validate_sensor_json: sensor noise stddev must be non-negative"); }
         if (tau < 0.0) { throw std::runtime_error("json::validate_sensor_json: sensor tau must be non-negative"); }
@@ -25,9 +25,9 @@ namespace json {
         const auto& sensor_json = config.at(key);
         validate_sensor_json(sensor_json);
 
-        const bool has_vector_bias = sensor_json.at("bias").is_array();
-        const double bias = has_vector_bias ? 0.0 : sensor_json.at("bias").get<double>();
-        const Eigen::Vector3d bias_3d = has_vector_bias ? parse_Vector3d(sensor_json.at("bias")) : constants::Zero3;
+        bool has_vector_bias = sensor_json.at("bias").is_array();
+        double bias = has_vector_bias ? 0.0 : sensor_json.at("bias").get<double>();
+        Eigen::Vector3d bias_3d = has_vector_bias ? parse_Vector3d(sensor_json.at("bias")) : constants::Zero3;
 
         SensorType sensor{ avionics::Sensor(
             sensor_json.at("mean").get<double>(),

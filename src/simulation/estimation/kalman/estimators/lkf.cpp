@@ -27,7 +27,7 @@ namespace estimation {
         dynamics::OrientationQuaternion q_est;
         q_est.set(eul_est);
 
-        zN_t_packed.v = dynamics::LinearVelocity{ zN_t.segment<3>(0) };
+        zN_t_packed.v = dynamics::TranslationalVelocity{ zN_t.segment<3>(0) };
         zN_t_packed.w = dynamics::AngularVelocity{ zN_t.segment<3>(3) };
         zN_t_packed.q = q_est;
         return zN_t_packed;

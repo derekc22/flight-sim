@@ -52,7 +52,7 @@ namespace frames {
 
 
 
-    void Frame::_set(const dynamics::homogeneousFrameTransformationMatrix& H){
+    void Frame::_set(const dynamics::HomogeneousFrameTransformationMatrix& H){
         _set(H.C());
         _set(H.p());
     }
@@ -123,7 +123,7 @@ namespace frames {
         mfv.eul_dot->set(w, *mfv.eul);
         *mfv.wq = wq;
     }
-    void Frame::_set(const dynamics::LinearVelocity& v){
+    void Frame::_set(const dynamics::TranslationalVelocity& v){
         MutableFrameView mfv = view();
         *mfv.v = v;
     }

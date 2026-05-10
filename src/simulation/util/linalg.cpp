@@ -17,7 +17,7 @@ namespace util {
     }
 
     Eigen::Vector3d norm(const Eigen::Vector3d& v) {
-        const double n = v.norm();
+        double n = v.norm();
         if (n < constants::eps) return constants::Zero3;
         return v / n;
     }

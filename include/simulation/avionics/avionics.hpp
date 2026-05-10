@@ -12,13 +12,13 @@ namespace avionics {
 
     struct MeasurementGroundTruth {
         const aerodynamics::AngleOfAttack& alpha;
-        const dynamics::LinearAcceleration& accelB;
+        const dynamics::TranslationalAcceleration& accelB;
         const dynamics::AngularVelocity& wB_BI;
         const atmospheric::StagnationAirPressure& P0;
         const atmospheric::StaticAirPressure& P;
         const atmospheric::StagnationAirTemperature& T0;
         const dynamics::Position& pI_BI;
-        const dynamics::LinearVelocity& vB_BI;
+        const dynamics::TranslationalVelocity& vB_BI;
 
         const atmospheric::StaticAirTemperature& T;
         const atmospheric::MachNumber& Mach;

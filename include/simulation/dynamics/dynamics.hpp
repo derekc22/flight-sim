@@ -33,7 +33,7 @@ namespace dynamics {
     /**
     * @brief Returns the body derivative of body-expressed linear velocity
     */
-    LinearAcceleration _ddtB_vB_BI(const LinearVelocity& vB, const AngularVelocity& wB_BI, const Mass& mass, const Force& FB_net);
+    TranslationalAcceleration _ddtB_vB_BI(const TranslationalVelocity& vB, const AngularVelocity& wB_BI, const Mass& mass, const Force& FB_net);
     
     /**
     * @brief Returns the body derivative of body-expressed angular velocity
@@ -47,7 +47,7 @@ namespace dynamics {
     Eigen::Vector3d _ddtB_to_ddtI(const Eigen::Vector3d& ddtB_v, const Eigen::Vector3d& v, const Eigen::Vector3d& w);
 
 
-    LinearVelocity _trans_dyn_vel(const LinearVelocity& vB_t, const AngularVelocity& wB_BI_t, const Mass& mass, const Force& FB_net_t);
+    TranslationalVelocity _trans_dyn_vel(const TranslationalVelocity& vB_t, const AngularVelocity& wB_BI_t, const Mass& mass, const Force& FB_net_t);
     AngularVelocity _rot_dyn(const AngularVelocity& wB_BI_t, const InertiaTensor& J, const Moment& MB_net_t);
     RigidBodyState step_rigid_body(const RigidBodyState& xB_BI_t, const Mass& mass, const InertiaTensor& J, const Wrench& WB_net_t);
 

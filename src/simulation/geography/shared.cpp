@@ -7,6 +7,7 @@
 #include "simulation/geography/geography.hpp"
 #include "simulation/geography/shared.hpp"
 #include "simulation/transforms/transforms.hpp"
+#include "simulation/util/util.hpp"
 
 namespace geography {
 
@@ -22,9 +23,9 @@ namespace geography {
         Eigen::Matrix3d CEN;
         double lat = latitude.data;
         double lon = longitude.data;
-        CEN     <<   -std::sin(lat) * std::cos(lon),  -std::sin(lat) * std::sin(lon),   std::cos(lat),
-                                     -std::sin(lon),                   std::cos(lon),               0,
-                     -std::cos(lat) * std::cos(lon),  -std::cos(lat) * std::sin(lon),  -std::sin(lat);
+        CEN     <<   -util::sin(lat) * util::cos(lon),  -util::sin(lat) * util::sin(lon),   util::cos(lat),
+                                      -util::sin(lon),                    util::cos(lon),                0,
+                     -util::cos(lat) * util::cos(lon),  -util::cos(lat) * util::sin(lon),  -util::sin(lat);
         return { CEN };
     };
 
@@ -35,14 +36,9 @@ namespace geography {
 
         double r = constants::r_earth + alt;
 
-        double cos_lat = std::cos(lat);
-        double sin_lat = std::sin(lat);
-        double cos_lon = std::cos(lon);
-        double sin_lon = std::sin(lon);
-
-        double x = r * cos_lat * cos_lon;
-        double y = r * cos_lat * sin_lon;
-        double z = r * sin_lat;
+        double x = r * util::cos(lat) * util::cos(lon);
+        double y = r * util::cos(lat) * util::sin(lon);
+        double z = r * util::sin(lat);
         Eigen::Vector3d p(x, y, z);
 
         return { p };
@@ -52,7 +48,7 @@ namespace geography {
         return { Eigen::Vector3d(0, 0, constants::g_earth) }; 
     };
 
-    dynamics::Gravity gB(const dynamics::Position& pE, const dynamics::homogeneousFrameTransformationMatrix& HEB) { 
+    dynamics::Gravity gB(const dynamics::Position& pE, const dynamics::HomogeneousFrameTransformationMatrix& HEB) { 
         return { HEB.C().data * geography::gE(HEB.p()).data }; 
     };
     dynamics::Gravity gB(const dynamics::Position& pE, const dynamics::OrientationMatrix& CEB) { 
@@ -65,7 +61,7 @@ namespace geography {
         return { transforms::eul_to_C(eulEB.psi(), eulEB.theta(), eulEB.phi(), "ZYX", "intr") * geography::gE(pE).data }; 
     };
 
-    dynamics::Gravity gB(const dynamics::homogeneousFrameTransformationMatrix& HNB) { 
+    dynamics::Gravity gB(const dynamics::HomogeneousFrameTransformationMatrix& HNB) { 
         return { HNB.C().data * geography::gN().data }; 
     };
     dynamics::Gravity gB(const dynamics::OrientationMatrix& CNB) {

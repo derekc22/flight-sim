@@ -52,7 +52,7 @@ C++ flight simulator with FlightGear integration
   - `guidance_config`: Guidance properties
   - `operating_config`: Operating properties
   
-- To run the simulation: `scripts/run.sh -a <AIRCRAFT> -t <TIME_SEC> [-r <TRIM>] [-s <SENSOR>] [-c <CONTROL>] [-e <ESTIMATION>] [-w <WIND>] [-v <VERBOSE>] [-d <DATA>] [-o <OUT_DIR>] [-p <PLOT>]`
+- To run the simulation: `scripts/run.sh -a <AIRCRAFT> -t <TIME_SEC> [-r TRIM] [-s SENSOR] [-c CONTROL] [-e ESTIMATION] [-w WIND] [-v VERBOSE] [-d DATA] [-p PLOT] -o <OUT_DIR>`
   - `-a AIRCRAFT`: Aircraft to simulate (e.g. ASW28, c172p)
   - `-t TIME_SEC`: Simulation time in seconds
   - `-r TRIM`: Enable trim, linearization, and eigenanalysis
@@ -66,7 +66,7 @@ C++ flight simulator with FlightGear integration
   - `-o OUT_DIR`: Output directory
   
 ## Example
-Run a 60-second simulation of the C172 with control and avionics. Outputs are saved to `data/c172_test` and `plots/c172_test`
+Run a 60-second simulation of the C172 with control and avionics. Data and plots are saved to `data/c172_test` and `plots/c172_test`, respectively
 ```bash
 scripts/run.sh -a c172p -t 60 -c -s -d -p -o c172_test
 ```

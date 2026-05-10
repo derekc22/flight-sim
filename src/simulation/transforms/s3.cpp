@@ -1,11 +1,11 @@
 #include <Eigen/Dense>
-#include <cmath>
 #include <stdexcept>
 #include <algorithm>
 #include <vector>
 #include "simulation/constants/constants.hpp"
 #include "simulation/transforms/so3.hpp"
 #include "simulation/transforms/s3.hpp"
+#include "simulation/util/util.hpp"
 
 namespace transforms {
 
@@ -26,17 +26,17 @@ namespace transforms {
 
     Eigen::Quaterniond qx(double phi) {
         double h = 0.5 * phi;
-        return Eigen::Quaterniond(std::cos(h), std::sin(h), 0.0, 0.0); // (w,x,y,z)
+        return Eigen::Quaterniond(util::cos(h), util::sin(h), 0.0, 0.0); // (w,x,y,z)
     }
 
     Eigen::Quaterniond qy(double theta) {
         double h = 0.5 * theta;
-        return Eigen::Quaterniond(std::cos(h), 0.0, std::sin(h), 0.0);
+        return Eigen::Quaterniond(util::cos(h), 0.0, util::sin(h), 0.0);
     }
 
     Eigen::Quaterniond qz(double psi) {
         double h = 0.5 * psi;
-        return Eigen::Quaterniond(std::cos(h), 0.0, 0.0, std::sin(h));
+        return Eigen::Quaterniond(util::cos(h), 0.0, 0.0, util::sin(h));
     }
 
     Eigen::Quaterniond normalize_and_canonicalize(Eigen::Quaterniond q) {
