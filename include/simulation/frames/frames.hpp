@@ -5,22 +5,15 @@
 #include <variant>
 #include <optional>
 #include <unordered_set>
-#include "simulation/dynamics/dynamics.hpp"
+#include <string>
+#include "simulation/dynamics/shared.hpp"
 #include "simulation/constants/constants.hpp"
 #include "simulation/util/util.hpp"
 #include "simulation/transforms/transforms.hpp"
-#include "simulation/aerodynamics/aerodynamics.hpp"
 #include <algorithm>
 
 
 namespace frames {
-
-    struct Frame; // forward declare
-    struct NEDFrameECEF; // forward declare
-    struct FRDFrameECEF; // forward declare
-    struct FRDFrameNED; // forward declare
-    struct STABFrameFRD; // forward declare
-    struct WINDFrameSTAB; // forward declare
 
     struct SetOptions {
         std::optional<dynamics::homogeneousFrameTransformationMatrix> H;

@@ -1,7 +1,7 @@
 #include <random>
 // #include <utility> // For std::pair
 #include "simulation/aerodynamics/shared.hpp"
-#include "simulation/atmospheric/atmospheric.hpp"
+#include "simulation/atmospheric/shared.hpp"
 #include "simulation/avionics/sensors.hpp"
 #include "simulation/constants/constants.hpp"
 #include "simulation/dynamics/shared.hpp"

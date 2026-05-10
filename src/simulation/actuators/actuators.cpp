@@ -5,27 +5,6 @@
 
 namespace actuators {
 
-    ActuatorLimits_T<double> pack_actuator_limits(const SurfaceActuators& surface_actuators, const PropulsorActuators& propulsor_actuators) {
-        return {
-            .limit_min = {
-                .elevator_cmd = surface_actuators.elevator.limit_min,
-                .aileron_cmd = surface_actuators.aileron.limit_min,
-                .rudder_cmd = surface_actuators.rudder.limit_min,
-                .front_propulsor_cmd = propulsor_actuators.front_propulsor.limit_min,
-                .left_propulsor_cmd = propulsor_actuators.left_propulsor.limit_min,
-                .right_propulsor_cmd = propulsor_actuators.right_propulsor.limit_min,
-            },
-            .limit_max = {
-                .elevator_cmd = surface_actuators.elevator.limit_max,
-                .aileron_cmd = surface_actuators.aileron.limit_max,
-                .rudder_cmd = surface_actuators.rudder.limit_max,
-                .front_propulsor_cmd = propulsor_actuators.front_propulsor.limit_max,
-                .left_propulsor_cmd = propulsor_actuators.left_propulsor.limit_max,
-                .right_propulsor_cmd = propulsor_actuators.right_propulsor.limit_max,
-            }
-        };
-    }
-
     SurfaceActuatorInputs_T<double> ActuatorProperties::step(const SurfaceActuatorInputs_T<double>& u_cmd) {
         return {
             .elevator_cmd = surface_actuators.elevator._step(u_cmd.elevator_cmd, surface_actuators.elevator.prev_cmd),

@@ -1,15 +1,12 @@
 #include <Eigen/Eigenvalues>
-#include <unsupported/Eigen/MatrixFunctions>
 #include <array>
 #include <iomanip>
 #include <sstream>
 #include <stdexcept>
-#include "simulation/actuators/actuators.hpp"
 #include "simulation/actuators/shared.hpp"
 #include "simulation/constants/constants.hpp"
 #include "simulation/dynamics/shared.hpp"
 #include "simulation/linearization/linearization.hpp"
-#include "simulation/trim/trim.hpp"
 #include "simulation/trim/shared.hpp"
 #include "simulation/util/cppad.hpp"
 #include "simulation/vehicles/vehicles.hpp"
@@ -53,23 +50,6 @@ namespace linearization {
         out << "A:\n" << lin_sol.A << "\n";
         out << "B:\n" << lin_sol.B << "\n";
         return out.str();
-    }
-
-    DiscretizedTrimLinearization discretize(const linearization::TrimLinearization& lin_sol){
-        int nx = lin_sol.A.rows();
-        int nu = lin_sol.B.cols();
-
-        Eigen::MatrixXd M = Eigen::MatrixXd::Zero(nx + nu, nx + nu);
-
-        M.block(0, 0, nx, nx) = lin_sol.A;  // continuous, Ac
-        M.block(0, nx, nx, nu) = lin_sol.B; // continuous, Bc
-
-        Eigen::MatrixXd Md = (M * constants::dt).exp();
-
-        Eigen::MatrixXd Ak = Md.block(0, 0, nx, nx);
-        Eigen::MatrixXd Bk = Md.block(0, nx, nx, nu);
-
-        return { .A = Ak, .B = Bk };
     }
 
 }

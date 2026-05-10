@@ -16,4 +16,6 @@ namespace linearization {
         StateJacobian A = StateJacobian::Zero();
         TrimInputJacobian B = TrimInputJacobian::Zero();
     };
+
+    DiscretizedTrimLinearization discretize(const linearization::TrimLinearization& lin_sol);
 }

@@ -1,7 +1,7 @@
 #include <cmath>
 #include "simulation/constants/constants.hpp"
-#include "simulation/dynamics/dynamics.hpp"
-#include "simulation/geography/geography.hpp"
+#include "simulation/dynamics/shared.hpp"
+#include "simulation/geography/shared.hpp"
 #include "simulation/avionics/computers.hpp"
 
 namespace avionics {

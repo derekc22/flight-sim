@@ -2,11 +2,10 @@
 #include <Eigen/Dense>
 #include "simulation/constants/constants.hpp"
 
-namespace dynamics {
+namespace frames { struct Frame; } // forward declare
+namespace dynamics { struct OrientationQuaternion; struct EulerAngles; struct OrientationQuaternionRate; } // forward declare
 
-    struct OrientationQuaternion; // forward declare
-    struct EulerAngles; // forward declare
-    struct OrientationQuaternionRate; // forward declare
+namespace dynamics {
 
     struct Position {
         Eigen::Vector3d data;
@@ -189,6 +188,26 @@ namespace dynamics {
 
     template <typename T>
     StateDotVector_T<T> unpack_state_dot_T(const StateDot_T<T>& x_dot);
+
+    /** @warning The parent of F must be an inertial frame: ECEFFrame or NEDFrameECEF */
+    RigidBodyState compute_rigid_body_state(const frames::Frame& F);
+
+    template <typename T>
+    constants::Vector3_T<T> _ddtB_vB_BI_T(const constants::Vector3_T<T>& vB, const constants::Vector3_T<T>& wB_BI, double mass, const constants::Vector3_T<T>& FB_net);
+
+    template <typename T>
+    constants::Vector3_T<T> _ddtB_wB_BI_T(const constants::Vector3_T<T>& wB_BI, const Eigen::Matrix3d& J, const constants::Vector3_T<T>& MB_net);
+
+    template <typename T>
+    constants::Vector3_T<T> _wB_BI_to_eul_dot_T(const constants::Vector3_T<T>& wB_BI, const T& theta, const T& phi);
+
+    Position _trans_kin(const Position& xt, const LinearVelocity& xt_dot, const LinearAcceleration& xt_ddot);
+    LinearVelocity _trans_kin_vel(const LinearVelocity& xt_dot, const LinearAcceleration& xt_ddot);
+    OrientationQuaternion _quat_kin(const OrientationQuaternion& qIB_t, const AngularVelocity& wB_BI_t);
+    AngularVelocity _CIB_dot_to_wB_BI(const OrientationMatrixRate& CIB_dot, const OrientationMatrix& CIB);
+    AngularVelocity _qIB_dot_to_wB_BI(const OrientationQuaternionRate& qIB_dot, const OrientationQuaternion& qIB);
+    AngularVelocity _eul_dot_to_wB_BI(const EulerAngleRates& eul_dot, const EulerAngles& eul);
+    EulerAngleRates _wB_BI_to_eul_dot(const AngularVelocity& wB_BI, const EulerAngles& eul);
 
 }
 

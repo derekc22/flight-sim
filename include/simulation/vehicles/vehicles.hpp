@@ -2,14 +2,14 @@
 #include <Eigen/Dense>
 #include "simulation/frames/frames.hpp"
 #include "simulation/structural/structural.hpp"
-#include "simulation/dynamics/dynamics.hpp"
+#include "simulation/dynamics/shared.hpp"
 #include "simulation/aerodynamics/aerodynamics.hpp"
 #include "simulation/control/control.hpp"
 #include "simulation/estimation/estimation.hpp"
 #include "simulation/actuators/actuators.hpp"
 #include "simulation/operating/operating.hpp"
-#include "simulation/geography/geography.hpp"
-#include "simulation/atmospheric/atmospheric.hpp"
+#include "simulation/geography/shared.hpp"
+#include "simulation/atmospheric/shared.hpp"
 #include "simulation/avionics/avionics.hpp"
 #include "simulation/guidance/guidance.hpp"
 
@@ -235,7 +235,7 @@ namespace vehicles {
         void _step_dependent(frames::Frame& F);
         void _step_gravity();
         void _init_frames();
-        void print_state(int t, const atmospheric::Wind& wind);
+        void print_state(int t, const atmospheric::Wind& windB);
     };
 
 

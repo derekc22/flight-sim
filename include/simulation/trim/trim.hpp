@@ -3,19 +3,16 @@
 #include <utility> // For std::pair
 #include <Eigen/Dense>
 #include "simulation/trim/shared.hpp"
-#include "simulation/aerodynamics/aerodynamics.hpp"
-#include "simulation/atmospheric/atmospheric.hpp"
-#include "simulation/actuators/actuators.hpp"
+#include "simulation/aerodynamics/shared.hpp"
+#include "simulation/atmospheric/shared.hpp"
 #include "simulation/actuators/propulsor/shared.hpp"
 #include "simulation/actuators/surface/shared.hpp"
 #include "simulation/actuators/shared.hpp"
 #include "simulation/control/shared.hpp"
-#include "simulation/dynamics/dynamics.hpp"
 #include "simulation/dynamics/shared.hpp"
 #include "simulation/constants/constants.hpp"
 #include "simulation/util/util.hpp"
 #include "simulation/structural/structural.hpp"
-#include "simulation/propulsion/propulsion.hpp"
 
 namespace vehicles { struct Aircraft; } // forward declare
 
@@ -61,19 +58,7 @@ namespace trim {
     };
 
     template <typename T>
-    dynamics::StateDot_T<T> compute_trim_state_dot_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u, const TrimModel& model, const TrimConditions& conditions);
-
-    template <typename T>
     TrimResidual<T> compute_trim_residual(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions);
-
-    template <typename T>
-    TrimVariablesVector_T<T> unpack_trim_variables_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u);
-
-    template <typename T>
-    dynamics::State_T<T> pack_trim_state_T(const TrimVariablesVector_T<T>& z);
-
-    template <typename T>
-    actuators::ActuatorInputs_T<T> pack_trim_actuator_inputs_T(const TrimVariablesVector_T<T>& z);
 
     template <typename T>
     TrimResidualVector_T<T> unpack_trim_residual_T(const TrimResidual<T>& residual);
@@ -98,7 +83,6 @@ namespace trim {
 
     control::ControlOutput set_control_inputs_from_trim(const TrimSolution& trim_sol);
 
-    dynamics::StateVector_T<double> unpack_rigid_body_state(const dynamics::RigidBodyState& xN_t);
 }
 
 #include "simulation/trim/trim.tpp"

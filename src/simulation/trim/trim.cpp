@@ -5,17 +5,13 @@
 #include <string>
 #include <utility> // For std::pair
 #include <stdexcept>
-#include "simulation/actuators/actuators.hpp"
 #include "simulation/actuators/propulsor/shared.hpp"
 #include "simulation/actuators/surface/shared.hpp"
 #include "simulation/actuators/shared.hpp"
 #include "simulation/aerodynamics/aerodynamics.hpp"
-#include "simulation/atmospheric/atmospheric.hpp"
+#include "simulation/atmospheric/shared.hpp"
 #include "simulation/constants/constants.hpp"
-#include "simulation/control/control.hpp"
-#include "simulation/dynamics/dynamics.hpp"
 #include "simulation/dynamics/shared.hpp"
-#include "simulation/propulsion/propulsion.hpp"
 #include "simulation/trim/trim.hpp"
 #include "simulation/trim/shared.hpp"
 #include "simulation/util/cppad.hpp"
@@ -423,24 +419,5 @@ namespace trim {
     //     propulsor_actuators.left_propulsor.prev_cmd = trim_sol.input.left_propulsor_cmd;
     //     propulsor_actuators.right_propulsor.prev_cmd = trim_sol.input.right_propulsor_cmd;
     // }
-
-    dynamics::StateVector_T<double> unpack_rigid_body_state(const dynamics::RigidBodyState& xN_t){
-        dynamics::LinearVelocity vB_BI = xN_t.v;
-        dynamics::AngularVelocity wB_BI = xN_t.w;
-        dynamics::EulerAngles eulIB;
-        eulIB.set(xN_t.q);
-
-        dynamics::State_T<double> xN_t_packed {
-            .vx = vB_BI.data(0),
-            .vy = vB_BI.data(1),
-            .vz = vB_BI.data(2),
-            .p = wB_BI.p(),
-            .q = wB_BI.q(),
-            .r = wB_BI.r(),
-            .phi = eulIB.phi(),
-            .theta = eulIB.theta(),
-        };
-        return dynamics::unpack_state_T(xN_t_packed);
-    }
 
 }

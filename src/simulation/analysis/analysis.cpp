@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include "simulation/analysis/analysis.hpp"
 #include "simulation/constants/constants.hpp"
-#include "simulation/linearization/linearization.hpp"
+#include "simulation/linearization/shared.hpp"
 
 namespace analysis {
 

@@ -1,4 +1,5 @@
 #pragma once
+#include "simulation/aerodynamics/aerodynamics.hpp"
 #include "simulation/actuators/surface/shared.hpp"
 #include "simulation/atmospheric/shared.hpp"
 #include "simulation/constants/constants.hpp"

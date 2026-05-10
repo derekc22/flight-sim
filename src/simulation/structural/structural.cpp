@@ -5,7 +5,7 @@
 #include <string>
 #include <unordered_map>
 #include "simulation/structural/structural.hpp"
-#include "simulation/dynamics/dynamics.hpp"
+#include "simulation/dynamics/shared.hpp"
 #include "simulation/constants/constants.hpp"
 #include "simulation/util/util.hpp"
 

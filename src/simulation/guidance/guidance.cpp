@@ -1,10 +1,8 @@
 #include <stdexcept>
 #include "simulation/constants/constants.hpp"
-#include "simulation/control/shared.hpp"
-#include "simulation/trim/trim.hpp"
-#include "simulation/dynamics/dynamics.hpp"
 #include "simulation/dynamics/shared.hpp"
 #include "simulation/guidance/guidance.hpp"
+#include "simulation/trim/shared.hpp"
 
 namespace guidance {
 

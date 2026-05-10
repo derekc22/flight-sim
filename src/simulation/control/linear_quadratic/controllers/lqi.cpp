@@ -4,7 +4,7 @@
 #include "simulation/control/linear_quadratic/controllers/lqi.hpp"
 #include "simulation/constants/constants.hpp"
 #include "simulation/linearization/shared.hpp"
-#include "simulation/trim/trim.hpp"
+#include "simulation/trim/shared.hpp"
 
 namespace control {
 

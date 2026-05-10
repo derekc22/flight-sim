@@ -1,8 +1,6 @@
 #pragma once
 #include "simulation/control/linear_quadratic/controllers/lqr.hpp"
 
-namespace control { struct ControlOutput; } // forward declare
-
 namespace control {
 
     struct LinearQuadraticIntegratorParameters : LinearQuadraticRegulatorParameters {

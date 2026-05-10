@@ -13,6 +13,4 @@ namespace actuators {
         PropulsorActuatorInputs_T<double> step(const PropulsorActuatorInputs_T<double>& u_cmd);
     };
 
-    ActuatorLimits_T<double> pack_actuator_limits(const SurfaceActuators& surface_actuators, const PropulsorActuators& propulsor_actuators);
-
 }

@@ -3,7 +3,7 @@
 
 #include "simulation/control/pid/controllers/axial.hpp"
 
-namespace control { struct PIDControllerInput; struct ControlOutput; } // forward declare
+namespace control { struct PIDControllerInput; } // forward declare
 
 namespace control {
 

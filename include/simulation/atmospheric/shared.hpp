@@ -1,5 +1,9 @@
 #pragma once
 #include <Eigen/Dense>
+#include "simulation/dynamics/shared.hpp"
+#include "simulation/geography/shared.hpp"
+
+namespace frames { struct Frame; } // forward declare
 
 namespace atmospheric {
 
@@ -48,5 +52,13 @@ namespace atmospheric {
         AirDensity rho;
         DynamicViscosity mu;
     };
+
+    /** @warning The parent of F must the ECEFFrame */
+    StaticAtmosphericState compute_static_atmospheric_state(const frames::Frame& F);
+
+    StaticAirTemperature T_from_T0(const StagnationAirTemperature& T0, const MachNumber& M);
+    MachNumber ms_to_mach(const dynamics::LinearVelocity& v, const StaticAirTemperature& T);
+    StagnationAtmosphericState static_to_stagnation(const StaticAtmosphericState& static_atm_state, const MachNumber& M);
+    MachNumber compute_mach(const StagnationAirPressure& P0, const StaticAirPressure& P);
 
 }

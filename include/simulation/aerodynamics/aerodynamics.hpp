@@ -11,10 +11,8 @@
 #include "simulation/constants/constants.hpp"
 #include "simulation/structural/structural.hpp"
 #include "simulation/util/util.hpp"
-#include "simulation/dynamics/dynamics.hpp"
-#include "simulation/atmospheric/atmospheric.hpp"
-
-namespace frames { struct Frame; } // forward declare
+#include "simulation/dynamics/shared.hpp"
+#include "simulation/atmospheric/shared.hpp"
 
 namespace aerodynamics {
 
@@ -91,8 +89,6 @@ namespace aerodynamics {
         MomentCoefficient CM;
     };
 
-    struct AerodynamicWrench : dynamics::Wrench {};
-
     struct AerodynamicProperties {
         std::vector<Surface> surfaces;
         std::unordered_map<std::string, size_t> surfaceIDs;
@@ -121,39 +117,6 @@ namespace aerodynamics {
         T CM = T(0);
     };
 
-    /** @warning The parent of F must be an inertial frame: ECEFFrame or NEDFrameECEF */
-    AerodynamicState aerodynamic_state(const frames::Frame& F, const atmospheric::Wind& windB);
-
-    template <typename T>
-    SurfaceKinematics_T<T> compute_surface_kinematics_T(const Surface& s, const structural::StructuralProperties& structural_properties, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& static_atm_state, const atmospheric::Wind& windB);
-
-    template <typename T>
-    SurfaceCoefficients_T<T> compute_surface_coefficients_T(const Surface& s, const SurfaceKinematics_T<T>& sk, const actuators::SurfaceActuatorInputs_T<T>& u);
-
-    template <typename T>
-    dynamics::Wrench_T<T> compute_surface_loads_T(const Surface& s, const SurfaceKinematics_T<T>& sk, const SurfaceCoefficients_T<T>& sc);
-
-    template <typename T>
-    dynamics::Wrench_T<T> step_aero_forces_moments_T(const AerodynamicProperties& aerodynamic_properties, const structural::StructuralProperties& structural_properties, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& static_atm_state, const actuators::SurfaceActuatorInputs_T<T>& u, const atmospheric::Wind& windB);
-
-    template <typename T>
-    AerodynamicState_T<T> compute_aerodynamic_state_T(const dynamics::Twist_T<T>& twist, const atmospheric::Wind& windB);
-
-    AerodynamicWrench step_aero_forces_moments(
-        const AerodynamicProperties& aerodynamic_properties,
-        const structural::StructuralProperties& structural_properties,
-        const dynamics::RigidBodyState& rigid_body_state,
-        const atmospheric::StaticAtmosphericState& static_atm_state,
-        const actuators::SurfaceActuatorInputs_T<double>& u,
-        const atmospheric::Wind& windB
-    );
-    
-
-    AerodynamicState compute_aerodynamic_state(const dynamics::RigidBodyState& rigid_body_state, const atmospheric::Wind& windB);
-
-
-    dynamics::OrientationMatrix CBS(const aerodynamics::AngleOfAttack& alpha);
-    dynamics::OrientationMatrix CSW(const aerodynamics::SideslipAngle& beta);
 }
 
-#include "simulation/aerodynamics/aerodynamics.tpp"
+#include "simulation/aerodynamics/shared.tpp"

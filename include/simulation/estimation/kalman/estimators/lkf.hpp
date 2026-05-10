@@ -2,7 +2,7 @@
 #include "simulation/actuators/shared.hpp"
 #include "simulation/dynamics/shared.hpp"
 #include "simulation/estimation/kalman/kalman.hpp"
-#include "simulation/linearization/linearization.hpp"
+#include "simulation/linearization/shared.hpp"
 
 namespace estimation {
 

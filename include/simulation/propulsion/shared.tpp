@@ -1,8 +1,6 @@
 #pragma once
-#include "simulation/actuators/propulsor/shared.hpp"
-#include "simulation/atmospheric/shared.hpp"
 #include "simulation/constants/constants.hpp"
-#include "simulation/dynamics/shared.hpp"
+#include "simulation/propulsion/shared.hpp"
 #include "simulation/util/util.hpp"
 
 namespace propulsion {
@@ -43,9 +41,9 @@ namespace propulsion {
             const T q_prop = compute_propeller_torque_T<T>(propulsor, omega, rho);
             const constants::Vector3_T<T> H_prop = n_prop * (T(propellers.spin_inertia * propellers.spin_sign) * omega);
 
-            out.M += -wB_BI.cross(H_prop);  // Gyroscopic moment
-            out.M += -n_prop * (T(propellers.spin_inertia * propellers.spin_sign) * omega_dot); // Spin-up / angular-acceleration reaction moment
-            out.M += -n_prop * (T(propellers.spin_sign) * q_prop);  // Aerodynamic reaction torque
+            out.M += -wB_BI.cross(H_prop);
+            out.M += -n_prop * (T(propellers.spin_inertia * propellers.spin_sign) * omega_dot);
+            out.M += -n_prop * (T(propellers.spin_sign) * q_prop);
         }
 
         return out;

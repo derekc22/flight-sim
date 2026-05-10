@@ -7,8 +7,10 @@
 #include "simulation/atmospheric/shared.hpp"
 #include "simulation/constants/constants.hpp"
 #include "simulation/dynamics/shared.hpp"
-#include "simulation/aerodynamics/aerodynamics.hpp"
+#include "simulation/propulsion/shared.hpp"
 #include "simulation/structural/structural.hpp"
+
+namespace aerodynamics { struct AerodynamicProperties; } // forward declare
 
 namespace trim {
 
@@ -63,4 +65,20 @@ namespace trim {
         actuators::FixedActuatorInputs_T fixed_actuator_inputs{};
     };
 
+    template <typename T>
+    dynamics::StateDot_T<T> compute_trim_state_dot_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u, const TrimModel& model, const TrimConditions& conditions);
+
+    template <typename T>
+    TrimVariablesVector_T<T> unpack_trim_variables_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u);
+
+    template <typename T>
+    dynamics::State_T<T> pack_trim_state_T(const TrimVariablesVector_T<T>& z);
+
+    template <typename T>
+    actuators::ActuatorInputs_T<T> pack_trim_actuator_inputs_T(const TrimVariablesVector_T<T>& z);
+
+    dynamics::StateVector_T<double> unpack_rigid_body_state(const dynamics::RigidBodyState& xN_t);
+
 }
+
+#include "simulation/trim/shared.tpp"

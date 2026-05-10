@@ -1,6 +1,6 @@
 #include <Eigen/Dense>
 #include "core/messages/messages.hpp"
-#include "simulation/dynamics/dynamics.hpp"
+#include "simulation/dynamics/shared.hpp"
 #include "simulation/geography/shared.hpp"
 #include "simulation/util/util.hpp"
 

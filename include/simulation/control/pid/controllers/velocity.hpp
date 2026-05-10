@@ -1,12 +1,9 @@
 #pragma once
 #include <tuple>
-#include "simulation/dynamics/dynamics.hpp"
-#include "simulation/actuators/actuators.hpp"
 #include "simulation/actuators/propulsor/shared.hpp"
 #include "simulation/control/interface.hpp"
 #include "simulation/control/shared.hpp"
 #include "simulation/control/pid/pid.hpp"
-#include "simulation/guidance/guidance.hpp"
 
 namespace control { struct ControlOutput; struct VelocityControllerInput; } // forward declare
 

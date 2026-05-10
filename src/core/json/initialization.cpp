@@ -6,7 +6,7 @@
 #include "simulation/aerodynamics/shared.hpp"
 #include "simulation/constants/constants.hpp"
 #include "simulation/dynamics/shared.hpp"
-#include "simulation/geography/geography.hpp"
+#include "simulation/geography/shared.hpp"
 #include "simulation/util/util.hpp"
 #include "simulation/vehicles/vehicles.hpp"
 

@@ -1,8 +1,8 @@
 #include "simulation/actuators/shared.hpp"
 #include "simulation/dynamics/shared.hpp"
 #include "simulation/estimation/kalman/estimators/lkf.hpp"
-#include "simulation/linearization/linearization.hpp"
-#include "simulation/trim/trim.hpp"
+#include "simulation/linearization/shared.hpp"
+#include "simulation/trim/shared.hpp"
 
 namespace estimation {
 

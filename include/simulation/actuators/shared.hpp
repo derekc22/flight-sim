@@ -46,6 +46,7 @@ namespace actuators {
     ActuatorLimitsVector_T<T> unpack_actuator_limits_T(const ActuatorLimits_T<T>& limits);
 
     ActuatorInputsVector_T<double> unpack_actuator_inputs(const SurfaceActuatorInputs_T<double>& u_surface, const PropulsorActuatorInputs_T<double>& u_propulsor);
+    ActuatorLimits_T<double> pack_actuator_limits(const SurfaceActuators& surface_actuators, const PropulsorActuators& propulsor_actuators);
 
 }
 

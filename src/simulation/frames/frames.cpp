@@ -6,9 +6,7 @@
 #include "simulation/transforms/transforms.hpp"
 #include "simulation/constants/constants.hpp"
 #include "simulation/util/util.hpp"
-#include "simulation/dynamics/dynamics.hpp"
-#include "simulation/geography/geography.hpp"
-#include "simulation/aerodynamics/aerodynamics.hpp"
+#include "simulation/dynamics/shared.hpp"
 
 namespace frames {
 

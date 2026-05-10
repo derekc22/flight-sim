@@ -1,10 +1,10 @@
 #pragma once
 #include <Eigen/Dense>
-#include "simulation/dynamics/dynamics.hpp"
-#include "simulation/linearization/linearization.hpp"
+#include "simulation/dynamics/shared.hpp"
+#include "simulation/linearization/shared.hpp"
 #include "simulation/control/interface.hpp"
 #include "simulation/control/linear_quadratic/linear_quadratic.hpp"
-#include "simulation/guidance/guidance.hpp"
+#include "simulation/guidance/shared.hpp"
 
 namespace control { struct ControlOutput; struct LinearFullStateFeedbackControllerInput; } // forward declare
 

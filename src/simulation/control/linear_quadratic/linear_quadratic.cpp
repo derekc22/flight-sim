@@ -1,10 +1,8 @@
 #include <algorithm>
 #include "simulation/actuators/shared.hpp"
-#include "simulation/control/control.hpp"
 #include "simulation/control/linear_quadratic/care.hpp"
 #include "simulation/control/linear_quadratic/linear_quadratic.hpp"
 #include "simulation/dynamics/shared.hpp"
-#include "simulation/trim/trim.hpp"
 
 namespace control {
 

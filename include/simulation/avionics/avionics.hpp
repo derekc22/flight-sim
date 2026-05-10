@@ -1,10 +1,10 @@
 #pragma once
 #include <Eigen/Dense>
 #include <optional>
-#include "simulation/aerodynamics/aerodynamics.hpp"
-#include "simulation/atmospheric/atmospheric.hpp"
+#include "simulation/aerodynamics/shared.hpp"
+#include "simulation/atmospheric/shared.hpp"
 #include "simulation/dynamics/shared.hpp"
-#include "simulation/geography/geography.hpp"
+#include "simulation/geography/shared.hpp"
 #include "simulation/avionics/sensors.hpp"
 #include "simulation/avionics/computers.hpp"
 

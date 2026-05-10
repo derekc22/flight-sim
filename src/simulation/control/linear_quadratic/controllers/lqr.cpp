@@ -4,9 +4,9 @@
 #include "simulation/control/interface.hpp"
 #include "simulation/control/shared.hpp"
 #include "simulation/control/linear_quadratic/controllers/lqr.hpp"
-#include "simulation/dynamics/dynamics.hpp"
+#include "simulation/dynamics/shared.hpp"
 #include "simulation/guidance/shared.hpp"
-#include "simulation/trim/trim.hpp"
+#include "simulation/trim/shared.hpp"
 
 namespace control {
 
