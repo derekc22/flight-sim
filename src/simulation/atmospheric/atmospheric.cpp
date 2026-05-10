@@ -12,7 +12,7 @@ namespace atmospheric {
 
     StaticAtmosphericState compute_static_atmospheric_state(const frames::Frame& F) {
         if (F.parent != nullptr) {
-            throw std::invalid_argument(std::format("atmospheric::static_atmospheric_state: Invalid frame input, the parent of {} must be ECEFFrame", F.name));
+            throw std::invalid_argument(std::format("atmospheric::static_atm_state: Invalid frame input, the parent of {} must be ECEFFrame", F.name));
         }
         return atmospheric::std_atmosphere(geography::compute_geographic_state(F).alt);
     }
@@ -74,12 +74,12 @@ namespace atmospheric {
         return { M };
     }
 
-    StagnationAtmosphericState static_to_stagnation(const StaticAtmosphericState& static_atmospheric_state, const MachNumber& M) {
-        AirDensity rho = static_atmospheric_state.rho;
-        DynamicViscosity mu = static_atmospheric_state.mu;
+    StagnationAtmosphericState static_to_stagnation(const StaticAtmosphericState& static_atm_state, const MachNumber& M) {
+        AirDensity rho = static_atm_state.rho;
+        DynamicViscosity mu = static_atm_state.mu;
 
-        StagnationAirTemperature T0 = T0_from_T(static_atmospheric_state.T, M);
-        StagnationAirPressure P0 = P0_from_P(static_atmospheric_state.P, M);
+        StagnationAirTemperature T0 = T0_from_T(static_atm_state.T, M);
+        StagnationAirPressure P0 = P0_from_P(static_atm_state.P, M);
 
         return { T0, P0, rho, mu };
     };
@@ -100,5 +100,16 @@ namespace atmospheric {
         return { M };
     }
 
+
+    Wind build_wind(double heading_deg, double spd_kts){
+        double psi_wind = util::deg_to_rad(heading_deg);
+        double V_wind = util::kts_to_mps(spd_kts);
+
+        double wind_N = -V_wind * util::cos(psi_wind);
+        double wind_E = -V_wind * util::sin(psi_wind);
+        double wind_D = 0.0;
+
+        return { Eigen::Vector3d(wind_N, wind_E, wind_D) };
+    }
 
 }

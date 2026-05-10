@@ -2,7 +2,7 @@
 
 namespace util {
 
-    double kts_to_ms(double kts) {
+    double kts_to_mps(double kts) {
         return kts / 1.94384;
     }
 

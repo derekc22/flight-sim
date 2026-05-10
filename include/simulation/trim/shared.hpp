@@ -18,7 +18,7 @@ namespace trim {
     using TrimVariablesVector_T = Eigen::Matrix<T, trim_variable_dim, 1>;
 
     struct TrimConditions {
-        atmospheric::StaticAtmosphericState static_atmospheric_state;
+        atmospheric::StaticAtmosphericState static_atm_state;
         atmospheric::Wind windB{ constants::Zero3 };
     };
 

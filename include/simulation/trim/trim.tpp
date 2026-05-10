@@ -73,7 +73,7 @@ namespace trim {
             model.aerodynamic,
             model.structural,
             twist,
-            conditions.static_atmospheric_state,
+            conditions.static_atm_state,
             surface_actuator_inputs,
             conditions.windB
         );
@@ -82,7 +82,7 @@ namespace trim {
         const dynamics::Wrench_T<T> prop_wrench = propulsion::step_propulsive_forces_moments_T<T>(
             model.propulsor_actuators,
             twist,
-            conditions.static_atmospheric_state,
+            conditions.static_atm_state,
             propulsor_actuator_inputs,
             propulsion::PropulsorOmegaDot_T<T>{}
         );

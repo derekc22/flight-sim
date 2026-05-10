@@ -18,7 +18,7 @@ namespace dynamics {
         void set(const EulerAngles& eul);
     };
 
-    struct HomogenousFrameTransformationMatrix {
+    struct homogeneousFrameTransformationMatrix {
         Eigen::Matrix4d data;
         OrientationMatrix C() const;
         Position p() const;

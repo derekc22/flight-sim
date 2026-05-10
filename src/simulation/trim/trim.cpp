@@ -251,7 +251,7 @@ namespace trim {
                 .psi_dot = aircraft.FRDFrameNED.eulNB_dot.psi_dot()
             },
             .conditions = TrimConditions{
-                .static_atmospheric_state = atmospheric::compute_static_atmospheric_state(aircraft.FRDFrameECEF),
+                .static_atm_state = atmospheric::compute_static_atmospheric_state(aircraft.FRDFrameECEF),
                 .windB = wind,
             },
             .state_guess = dynamics::State_T<double>{

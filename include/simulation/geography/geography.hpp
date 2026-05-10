@@ -25,12 +25,12 @@ namespace geography {
 
     dynamics::Gravity gN();
 
-    dynamics::Gravity gB(const dynamics::Position& pE, const dynamics::HomogenousFrameTransformationMatrix& HEB); // pE is unused but left for congruence
+    dynamics::Gravity gB(const dynamics::Position& pE, const dynamics::homogeneousFrameTransformationMatrix& HEB); // pE is unused but left for congruence
     dynamics::Gravity gB(const dynamics::Position& pE, const dynamics::OrientationMatrix& CEB);
     dynamics::Gravity gB(const dynamics::Position& pE, const dynamics::OrientationQuaternion& qEB);
     dynamics::Gravity gB(const dynamics::Position& pE, const dynamics::EulerAngles& eulEB);
     
-    dynamics::Gravity gB(const dynamics::HomogenousFrameTransformationMatrix& HNB);
+    dynamics::Gravity gB(const dynamics::homogeneousFrameTransformationMatrix& HNB);
     dynamics::Gravity gB(const dynamics::OrientationMatrix& CNB);
     dynamics::Gravity gB(const dynamics::OrientationQuaternion& qNB);
     dynamics::Gravity gB(const dynamics::EulerAngles& eulNB);

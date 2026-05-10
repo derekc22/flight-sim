@@ -13,7 +13,7 @@
 namespace json {
 
     struct ParsedStepOptions {
-        std::optional<dynamics::HomogenousFrameTransformationMatrix> H;
+        std::optional<dynamics::homogeneousFrameTransformationMatrix> H;
         std::optional<dynamics::OrientationMatrix> C;
         std::optional<dynamics::Position> p;
         std::optional<dynamics::OrientationQuaternion> q;
@@ -34,7 +34,7 @@ namespace json {
     ParsedStepOptions parse_step_options(const nlohmann::json& frame_json) {
         ParsedStepOptions fields;
 
-        if (frame_json.contains("H")) { fields.H = dynamics::HomogenousFrameTransformationMatrix{ parse_Matrix4d(frame_json.at("H")) }; }
+        if (frame_json.contains("H")) { fields.H = dynamics::homogeneousFrameTransformationMatrix{ parse_Matrix4d(frame_json.at("H")) }; }
         if (frame_json.contains("C")) { fields.C = dynamics::OrientationMatrix{ parse_Matrix3d(frame_json.at("C")) }; }
         if (frame_json.contains("p")) { fields.p = dynamics::Position{ parse_Vector3d(frame_json.at("p")) }; }
         if (frame_json.contains("q")) { fields.q = dynamics::OrientationQuaternion{ parse_Quaterniond(frame_json.at("q")) }; }

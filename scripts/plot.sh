@@ -129,3 +129,7 @@ python3 "$SCRIPT" -d "$DATA_DIR/F_prop.csv" \
 python3 "$SCRIPT" -d "$DATA_DIR/M_prop.csv" \
   -l "Mx_prop(t) [Nm]" "My_prop(t) [Nm]" "Mz_prop(t) [Nm]" \
   -t "propulsive moment vs time"
+
+python3 "$SCRIPT" -d "$DATA_DIR/windB.csv" \
+  -l "windB_x(t) [m/s]" "windB_y(t) [m/s]" "windB_z(t) [m/s]" \
+  -t "wind vs time"

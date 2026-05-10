@@ -27,7 +27,7 @@ namespace vehicles {
             Linear velocity: None
             Gravity: Uniquely determined by initial Position and initial Orientation
         */
-        // std::optional<dynamics::HomogenousFrameTransformationMatrix> HEN;
+        // std::optional<dynamics::homogeneousFrameTransformationMatrix> HEN;
         // std::optional<dynamics::OrientationMatrix> CEN;
         // std::optional<dynamics::Position> pE_NE;
         // std::optional<dynamics::OrientationQuaternion> qEN;
@@ -55,7 +55,7 @@ namespace vehicles {
             Linear velocity: Determined by input OR (equal to FRDFrameNED Linear velocity)
             Gravity: Uniquely determined by Position and Orientation
         */
-        std::optional<dynamics::HomogenousFrameTransformationMatrix> HEB; 
+        std::optional<dynamics::homogeneousFrameTransformationMatrix> HEB; 
         std::optional<dynamics::OrientationMatrix> CEB;
         std::optional<dynamics::Position> pE_BE;
         std::optional<dynamics::OrientationQuaternion> qEB;
@@ -84,7 +84,7 @@ namespace vehicles {
             Linear velocity: Determined by input OR (equal to FRDFrameECEF Linear velocity)
             Gravity: Equal to FRDFrameECEF Gravity
         */
-        std::optional<dynamics::HomogenousFrameTransformationMatrix> HNB; 
+        std::optional<dynamics::homogeneousFrameTransformationMatrix> HNB; 
         std::optional<dynamics::OrientationMatrix> CNB;
         std::optional<dynamics::Position> pN_BN;
         std::optional<dynamics::OrientationQuaternion> qNB;
@@ -110,7 +110,7 @@ namespace vehicles {
             Gravity: Uniquely determined by Orientation AND FRDFrameNED Gravity 
             AngleOfAttack: Determined by input
         */
-        // std::optional<dynamics::HomogenousFrameTransformationMatrix> HBS; 
+        // std::optional<dynamics::homogeneousFrameTransformationMatrix> HBS; 
         // std::optional<dynamics::OrientationMatrix> CBS;
         // std::optional<dynamics::Position> pB_SB;
         // std::optional<dynamics::OrientationQuaternion> qBS;
@@ -137,7 +137,7 @@ namespace vehicles {
             Gravity: Uniquely determined by Orientation AND STABFrameFRD Gravity 
             SideslipAngle: Determined by input
         */
-        // std::optional<dynamics::HomogenousFrameTransformationMatrix> HSW; 
+        // std::optional<dynamics::homogeneousFrameTransformationMatrix> HSW; 
         // std::optional<dynamics::OrientationMatrix> CSW;
         // std::optional<dynamics::Position> pS_WS;
         // std::optional<dynamics::OrientationQuaternion> qSW;
@@ -166,7 +166,7 @@ namespace vehicles {
 
     struct _StepOptions {
         // Standard
-        std::optional<dynamics::HomogenousFrameTransformationMatrix> H;
+        std::optional<dynamics::homogeneousFrameTransformationMatrix> H;
         std::optional<dynamics::OrientationMatrix> C;
         std::optional<dynamics::Position> p;
         std::optional<dynamics::OrientationQuaternion> q;

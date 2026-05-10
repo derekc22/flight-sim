@@ -43,6 +43,7 @@ struct SimulationInput {
     bool sensor_bool;
     bool control_bool;
     bool estimation_bool;
+    bool wind_bool;
     bool verbose_bool;
     bool data_bool;
     std::string out_dir;
@@ -60,9 +61,9 @@ struct SimulationContext {
     dynamics::RigidBodyState yN_t;
     dynamics::RigidBodyState zN_t;
     dynamics::Wrench WB_net;
-    atmospheric::StaticAtmosphericState static_atmospheric_state;
+    atmospheric::StaticAtmosphericState static_atm_state;
     geography::GeographicState geographic_state;
-    atmospheric::Wind wind;
+    atmospheric::Wind windB;
     trim::TrimSolution trim_sol;
     linearization::TrimLinearization lin_sol;
 };
@@ -99,15 +100,17 @@ void cleanup(SimulationInput& sim_in, SimulationOutput& sim_out) {
     sim_in.data_manager.save(out_dir_path);
 
     // log trim
-    if (sim_in.trim_bool){
-        io::write_txt(trim::print_trim_solution(sim_out.trim_sol), out_dir_path, "trim_sol");
+    if (sim_in.data_bool) {
+        if (sim_in.trim_bool) {
+            io::write_txt(trim::print_trim_solution(sim_out.trim_sol), out_dir_path, "trim_sol");
 
-        // log linearization and eigenanalysis
-        if (sim_out.trim_sol.converged) {
-            io::write_txt(linearization::print_linearization_solution(sim_out.lin_sol), out_dir_path, "lin_sol");
-            io::write_csv(Eigen::MatrixXd(sim_out.lin_sol.A), out_dir_path, "lin_sol_A");
-            io::write_csv(Eigen::MatrixXd(sim_out.lin_sol.B), out_dir_path, "lin_sol_B");
-            io::write_txt(analysis::print_eigen_analysis(sim_out.eig_sol), out_dir_path, "eig_sol");
+            // log linearization and eigenanalysis
+            if (sim_out.trim_sol.converged) {
+                io::write_txt(linearization::print_linearization_solution(sim_out.lin_sol), out_dir_path, "lin_sol");
+                io::write_csv(Eigen::MatrixXd(sim_out.lin_sol.A), out_dir_path, "lin_sol_A");
+                io::write_csv(Eigen::MatrixXd(sim_out.lin_sol.B), out_dir_path, "lin_sol_B");
+                io::write_txt(analysis::print_eigen_analysis(sim_out.eig_sol), out_dir_path, "eig_sol");
+            }
         }
     }
 
@@ -144,6 +147,9 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
     dynamics::Moment MB_net{ constants::Zero3 };
     dynamics::Wrench WB_net{ .F = FB_net, .M = MB_net };
 
+    // initialize windB
+    atmospheric::Wind windB{ constants::Zero3 };
+
     // initialize udp connections
     connection::UDPOut udp_out(5510);
     connection::UDPIn udp_in("127.0.0.1", 5511);
@@ -158,17 +164,19 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
         dynamics::RigidBodyState xN_t = dynamics::compute_rigid_body_state(aircraft.FRDFrameNED);
 
         // compute static atmospheric state at current altitude
-        atmospheric::StaticAtmosphericState static_atmospheric_state = atmospheric::compute_static_atmospheric_state(aircraft.FRDFrameECEF);
+        atmospheric::StaticAtmosphericState static_atm_state = atmospheric::compute_static_atmospheric_state(aircraft.FRDFrameECEF);
 
-        // fetch wind
-        if (auto out_pkt = udp_out.try_receive()) {
-            // use out_pkt->wind_heading, out_pkt->wind_speed
+        // fetch windB
+        if (sim_in.wind_bool) {
+            if (auto out_pkt = udp_out.try_receive()) { 
+                atmospheric::Wind wind = atmospheric::build_wind(out_pkt->wind_heading, out_pkt->wind_speed);
+                windB.data = frames::transform_vec(wind.data, aircraft.NEDFrameECEF, aircraft.FRDFrameNED);
+            }
         }
-        atmospheric::Wind wind{ constants::Zero3 }; // no wind for now
 
         // trim and linearization
         if (sim_in.trim_bool && !trim_sol.attempted) {
-            trim_sol = trim::inspect_trim(aircraft, wind);
+            trim_sol = trim::inspect_trim(aircraft, windB);
             sim_out.trim_sol = trim_sol;
 
             if (trim_sol.converged){
@@ -221,10 +229,10 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
             geography::GeographicState gps_t = geography::compute_geographic_state(aircraft.FRDFrameECEF);
 
             // obtain full state from sensors
-            aerodynamics::AerodynamicState ads_t = aerodynamics::compute_aerodynamic_state(xN_t, wind);
+            aerodynamics::AerodynamicState ads_t = aerodynamics::compute_aerodynamic_state(xN_t, windB);
 
             // overwrite local measurement state with sensor measurements
-            yN_t = avionics::get_state_from_avionics(xN_t, ads_t, static_atmospheric_state, gps_t, mass, wind, WB_net, aircraft.avionics_properties);
+            yN_t = avionics::get_state_from_avionics(xN_t, ads_t, static_atm_state, gps_t, mass, windB, WB_net, aircraft.avionics_properties);
         }
 
         // initialize estimated state to measurements
@@ -278,12 +286,12 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
         u_propulsor_actual_prev = u_propulsor_actual;
 
         // compute aerodynamics forces and moments
-        aerodynamics::AerodynamicWrench WB_aero = aerodynamics::step_aero_forces_moments(aerodynamic_properties, structural_properties, xN_t, static_atmospheric_state, u_surface_actual, wind);
+        aerodynamics::AerodynamicWrench WB_aero = aerodynamics::step_aero_forces_moments(aerodynamic_properties, structural_properties, xN_t, static_atm_state, u_surface_actual, windB);
         dynamics::Force FB_aero = WB_aero.F;
         dynamics::Moment MB_aero = WB_aero.M;
 
         // compute propulsive forces and momments
-        propulsion::PropulsiveWrench WB_propulsive = propulsion::step_propulsive_forces_moments(actuator_properties.propulsor_actuators, xN_t, static_atmospheric_state, u_propulsor_actual);
+        propulsion::PropulsiveWrench WB_propulsive = propulsion::step_propulsive_forces_moments(actuator_properties.propulsor_actuators, xN_t, static_atm_state, u_propulsor_actual);
         dynamics::Force FB_propulsive = WB_propulsive.F;
         dynamics::Moment MB_propulsive = WB_propulsive.M;
 
@@ -303,7 +311,7 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
 
         // set step options
         StepOpts.FRDFrameNEDStepOpts = vehicles::FRDFrameNEDStepOptions{ .rbs_BN = xN_t };
-        aerodynamics::AerodynamicState ads_t = aerodynamics::compute_aerodynamic_state(xN_t, wind);
+        aerodynamics::AerodynamicState ads_t = aerodynamics::compute_aerodynamic_state(xN_t, windB);
         StepOpts.STABFrameFRDStepOpts = vehicles::STABFrameFRDStepOptions{ .ads = ads_t };
         StepOpts.WINDFrameSTABStepOpts = vehicles::WINDFrameSTABStepOptions{ .ads = ads_t };
 
@@ -321,6 +329,7 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
             .WB_aero=WB_aero,
             .WB_propulsive=WB_propulsive,
             .setpoint=setpoint,
+            .windB=windB
         };
 
         // step data manager
@@ -336,7 +345,7 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
         udp_in.send(in_pkt);
 
         // print state
-        if (sim_in.verbose_bool) { aircraft.print_state(t, wind); }
+        if (sim_in.verbose_bool) { aircraft.print_state(t, windB); }
 
         // step timer by dt
         next += std::chrono::duration_cast<clock::duration>(std::chrono::duration<double>(constants::dt));
@@ -354,7 +363,7 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
 
 
 int main(int argc, char* argv[]) {
-    if (argc != 9) { return 1; }
+    if (argc != 10) { return 1; }
 
     double time_sec;
     try { time_sec = std::stod(argv[1]); }
@@ -365,9 +374,10 @@ int main(int argc, char* argv[]) {
     bool sensor_bool = std::stoi(argv[3]) == 1;
     bool control_bool = std::stoi(argv[4]) == 1;
     bool estimation_bool = std::stoi(argv[5]) == 1;
-    bool verbose_bool = std::stoi(argv[6]) == 1;
-    bool data_bool = std::stoi(argv[7]) == 1;
-    std::string out_dir = argv[8];
+    bool wind_bool = std::stoi(argv[6]) == 1;
+    bool verbose_bool = std::stoi(argv[7]) == 1;
+    bool data_bool = std::stoi(argv[8]) == 1;
+    std::string out_dir = argv[9];
 
     // load vehicle
     vehicles::Aircraft aircraft = load(trim_bool);
@@ -376,7 +386,7 @@ int main(int argc, char* argv[]) {
     const int tf = std::max(1, static_cast<int>(std::ceil(time_sec / constants::dt)));
 
     // create data manager
-    io::DataManager data_manager{tf, data_bool, control_bool, sensor_bool, estimation_bool};
+    io::DataManager data_manager{tf, data_bool, control_bool, sensor_bool, estimation_bool, wind_bool};
 
     // create simulation input
     SimulationInput sim_in {
@@ -386,6 +396,7 @@ int main(int argc, char* argv[]) {
         .sensor_bool=sensor_bool,
         .control_bool=control_bool,
         .estimation_bool=estimation_bool,
+        .wind_bool=wind_bool,
         .verbose_bool=verbose_bool,
         .data_bool=data_bool,
         .out_dir=out_dir,

@@ -74,7 +74,7 @@ namespace geography {
         return { Eigen::Vector3d(0, 0, constants::g_earth) }; 
     };
 
-    dynamics::Gravity gB(const dynamics::Position& pE, const dynamics::HomogenousFrameTransformationMatrix& HEB) { 
+    dynamics::Gravity gB(const dynamics::Position& pE, const dynamics::homogeneousFrameTransformationMatrix& HEB) { 
         return { HEB.C().data * geography::gE(HEB.p()).data }; 
     };
     dynamics::Gravity gB(const dynamics::Position& pE, const dynamics::OrientationMatrix& CEB) { 
@@ -87,7 +87,7 @@ namespace geography {
         return { transforms::eul_to_C(eulEB.psi(), eulEB.theta(), eulEB.phi(), "ZYX", "intr") * geography::gE(pE).data }; 
     };
 
-    dynamics::Gravity gB(const dynamics::HomogenousFrameTransformationMatrix& HNB) { 
+    dynamics::Gravity gB(const dynamics::homogeneousFrameTransformationMatrix& HNB) { 
         return { HNB.C().data * geography::gN().data }; 
     };
     dynamics::Gravity gB(const dynamics::OrientationMatrix& CNB) {

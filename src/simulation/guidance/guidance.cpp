@@ -41,7 +41,7 @@ namespace guidance {
             break;
 
             case TrajectoryType::Interpolated: {
-                if (tf <= 1) { throw std::runtime_error("GuidanceProperties::step: T <= 1 for interpolated trajectory"); }
+                if (tf <= 1) { throw std::runtime_error("GuidanceProperties::step: tf <= 1 for interpolated trajectory"); }
                 GuidanceStateVector setpoint_t = ((trajectory.data.row(1) - trajectory.data.row(0)) * (static_cast<double>(t) / (tf - 1)) + trajectory.data.row(0)).transpose();
                 return pack_guidance_setpoint(setpoint_t);
             }

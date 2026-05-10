@@ -50,7 +50,7 @@ namespace aerodynamics {
         const AerodynamicProperties& aerodynamic_properties,
         const structural::StructuralProperties& structural_properties,
         const dynamics::RigidBodyState& rigid_body_state,
-        const atmospheric::StaticAtmosphericState& static_atmospheric_state,
+        const atmospheric::StaticAtmosphericState& static_atm_state,
         const actuators::SurfaceActuatorInputs_T<double>& u,
         const atmospheric::Wind& windB
     ) {
@@ -63,7 +63,7 @@ namespace aerodynamics {
             aerodynamic_properties,
             structural_properties,
             twist,
-            static_atmospheric_state,
+            static_atm_state,
             u,
             windB
         );

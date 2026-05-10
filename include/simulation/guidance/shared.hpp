@@ -4,9 +4,9 @@
 namespace guidance {
 
     struct GuidanceSetpoint {
-        dynamics::LinearVelocity vB_BI;
-        dynamics::AngularVelocity wB_BI;
-        dynamics::EulerAngles eulIB;
+        const dynamics::LinearVelocity vB_BI;
+        const dynamics::AngularVelocity wB_BI;
+        const dynamics::EulerAngles eulIB;
     };
 
     struct AxialSetpoint : GuidanceSetpoint {};

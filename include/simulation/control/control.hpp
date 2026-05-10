@@ -39,10 +39,10 @@ namespace control {
     using NonlinearController = std::function<ControlOutput(const NonlinearControllerInput&)>;
 
     struct ControllerInput {
-        AxialControllerInput axial_controller_input;
-        VelocityControllerInput velocity_controller_input;
-        LinearFullStateFeedbackControllerInput linear_full_state_feedback_controller_input;
-        NonlinearControllerInput nonlinear_controller_input;
+        const AxialControllerInput& axial_controller_input;
+        const VelocityControllerInput& velocity_controller_input;
+        const LinearFullStateFeedbackControllerInput& linear_full_state_feedback_controller_input;
+        const NonlinearControllerInput& nonlinear_controller_input;
     };
 
     struct ControlProperties {

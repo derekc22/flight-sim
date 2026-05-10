@@ -22,10 +22,12 @@ namespace atmospheric {
 
     MachNumber ms_to_mach(const dynamics::LinearVelocity& v, const StaticAirTemperature& T);
 
-    StagnationAtmosphericState static_to_stagnation(const StaticAtmosphericState& static_atmospheric_state, const MachNumber& M);
+    StagnationAtmosphericState static_to_stagnation(const StaticAtmosphericState& static_atm_state, const MachNumber& M);
 
     StaticAtmosphericState stagnation_to_static(const StagnationAtmosphericState& stagnation_atmospheric_state, const MachNumber& M);
 
     MachNumber compute_mach(const StagnationAirPressure& P0, const StaticAirPressure& P);
+
+    Wind build_wind(double heading_deg, double spd_kts);
 
 }

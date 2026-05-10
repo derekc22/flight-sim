@@ -18,7 +18,7 @@ namespace constants {
 
     // Special Matrices
     inline const Eigen::Matrix3d I3 = Eigen::Matrix3d::Identity();
-    inline const Eigen::Matrix4d HI = Eigen::Matrix4d::Identity(); // Identity homogenous transformation matrix
+    inline const Eigen::Matrix4d HI = Eigen::Matrix4d::Identity(); // Identity homogeneous transformation matrix
     inline const Eigen::Matrix3d Zero3x3 = Eigen::Matrix3d::Zero();
 
     // Special Vectors

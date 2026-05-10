@@ -23,7 +23,7 @@ namespace frames {
     struct WINDFrameSTAB; // forward declare
 
     struct SetOptions {
-        std::optional<dynamics::HomogenousFrameTransformationMatrix> H;
+        std::optional<dynamics::homogeneousFrameTransformationMatrix> H;
         std::optional<dynamics::OrientationMatrix> C;
         std::optional<dynamics::Position> p;
         std::optional<dynamics::OrientationQuaternion> q;
@@ -39,7 +39,7 @@ namespace frames {
     };
 
     struct MutableFrameView {
-        dynamics::HomogenousFrameTransformationMatrix* H;
+        dynamics::homogeneousFrameTransformationMatrix* H;
         dynamics::OrientationQuaternion* q;
         dynamics::EulerAngles* eul;
         dynamics::OrientationMatrixRate* C_dot;
@@ -52,7 +52,7 @@ namespace frames {
     };
 
     struct FrameView {
-        const dynamics::HomogenousFrameTransformationMatrix* H;
+        const dynamics::homogeneousFrameTransformationMatrix* H;
         const dynamics::OrientationQuaternion* q;
         const dynamics::EulerAngles* eul;
         const dynamics::OrientationMatrixRate* C_dot;
@@ -70,7 +70,7 @@ namespace frames {
 
         Frame(std::string n, Frame* p);
 
-        void _set(const dynamics::HomogenousFrameTransformationMatrix& H);
+        void _set(const dynamics::homogeneousFrameTransformationMatrix& H);
         void _set(const dynamics::OrientationMatrix& C);
         void _set(const dynamics::Position& p);
         void _set(const dynamics::OrientationQuaternion& q);
@@ -104,7 +104,7 @@ namespace frames {
     // {ECEF} -> {NED}
     struct NEDFrameECEF : Frame {
         NEDFrameECEF();
-        dynamics::HomogenousFrameTransformationMatrix HEN; 
+        dynamics::homogeneousFrameTransformationMatrix HEN; 
         dynamics::OrientationQuaternion qEN;
         dynamics::EulerAngles eulEN;
         dynamics::OrientationMatrixRate CEN_dot;
@@ -122,7 +122,7 @@ namespace frames {
     // {ECEF} -> {BODY}
     struct FRDFrameECEF : Frame {
         FRDFrameECEF();
-        dynamics::HomogenousFrameTransformationMatrix HEB; 
+        dynamics::homogeneousFrameTransformationMatrix HEB; 
         dynamics::OrientationQuaternion qEB;
         dynamics::EulerAngles eulEB;
         dynamics::OrientationMatrixRate CEB_dot;
@@ -140,7 +140,7 @@ namespace frames {
     // {NED} -> {BODY}
     struct FRDFrameNED : Frame { 
         FRDFrameNED(NEDFrameECEF* pNEDFrameECEF);
-        dynamics::HomogenousFrameTransformationMatrix HNB; 
+        dynamics::homogeneousFrameTransformationMatrix HNB; 
         dynamics::OrientationQuaternion qNB;
         dynamics::EulerAngles eulNB;
         dynamics::OrientationMatrixRate CNB_dot;
@@ -158,7 +158,7 @@ namespace frames {
     // {BODY} -> {STAB}
     struct STABFrameFRD : Frame {
         STABFrameFRD(FRDFrameNED* pFRDFrameNED);
-        dynamics::HomogenousFrameTransformationMatrix HBS; 
+        dynamics::homogeneousFrameTransformationMatrix HBS; 
         dynamics::OrientationQuaternion qBS;
         dynamics::EulerAngles eulBS;
         dynamics::OrientationMatrixRate CBS_dot;
@@ -176,7 +176,7 @@ namespace frames {
     // {STAB} -> {WIND}
     struct WINDFrameSTAB : Frame {
         WINDFrameSTAB(STABFrameFRD* pSTABFrameFRD);
-        dynamics::HomogenousFrameTransformationMatrix HSW; 
+        dynamics::homogeneousFrameTransformationMatrix HSW; 
         dynamics::OrientationQuaternion qSW;
         dynamics::EulerAngles eulSW;
         dynamics::OrientationMatrixRate CSW_dot;
@@ -196,15 +196,15 @@ namespace frames {
     /** @brief Obtains the rotation matrix from the root (ECEFFrame) to the frame F */
     Eigen::Matrix3d CRF(const Frame& F);
 
-    /** @brief Rotates vector vA from frame {A} to frame {B}, producing vB */
-    Eigen::Vector3d rotate_vec(const Eigen::Vector3d& vA, const Frame& A, const Frame& B);
+    /** @brief Performs a coordinate transformation on a vector vA from frame {A} to frame {B}, producing vB */
+    Eigen::Vector3d transform_vec(const Eigen::Vector3d& vA, const Frame& A, const Frame& B);
 
-    Eigen::Vector3d rotate_vec(const Eigen::Vector3d& vA, const Frame& A, const ECEFFrame&);
+    Eigen::Vector3d transform_vec(const Eigen::Vector3d& vA, const Frame& A, const ECEFFrame&);
 
-    Eigen::Vector3d rotate_vec(const Eigen::Vector3d& vA, const ECEFFrame&, const Frame& B);
+    Eigen::Vector3d transform_vec(const Eigen::Vector3d& vA, const ECEFFrame&, const Frame& B);
 
-    /** @brief Transforms point/position vector pA from frame {A} to frame {B}, producing pB
-    If you have a point pA in one frame, transform_point(pA, A, B) re-expresses that same point in frame B */
+    /** @brief Performs a homogeneous transformation (translation + coordinate transformation) on a point/position vector pA from frame {A} to frame {B}, producing pB
+    If you have point expressed in frame A and described by pA, transform_point(pA, A, B) re-expresses that same point in frame B */
     Eigen::Vector3d transform_point(const Eigen::Vector3d& pA, const Frame& A, const Frame& B);
 
     Eigen::Vector3d transform_point(const Eigen::Vector3d& pA, const Frame& A, const ECEFFrame&);

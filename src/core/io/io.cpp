@@ -71,8 +71,8 @@ namespace io {
     }
 
 
-    DataManager::DataManager(int tf, bool data_bool, bool control_bool, bool sensor_bool, bool estimation_bool)
-        : data_bool(data_bool), control_bool(control_bool), sensor_bool(sensor_bool),  estimation_bool(estimation_bool)
+    DataManager::DataManager(int tf, bool data_bool, bool control_bool, bool sensor_bool, bool estimation_bool, bool wind_bool)
+        : data_bool(data_bool), control_bool(control_bool), sensor_bool(sensor_bool), estimation_bool(estimation_bool), wind_bool(wind_bool)
     {
         if (data_bool) {
             p_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
@@ -106,6 +106,10 @@ namespace io {
                 eul_est_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
                 w_est_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
                 v_est_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
+            }
+
+            if (wind_bool) {
+                windB_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
             }
         }
     }
@@ -151,6 +155,10 @@ namespace io {
                 w_est_DT->insert(t, context.zN_t.w.data);
                 v_est_DT->insert(t, context.zN_t.v.data);
             }
+
+            if (wind_bool) {
+                windB_DT->insert(t, context.windB.data);
+            }
         }
     }
 
@@ -189,6 +197,10 @@ namespace io {
                 write_csv(eul_est_DT->data, out_dir_path, "eul_est");
                 write_csv(w_est_DT->data, out_dir_path, "w_est");
                 write_csv(v_est_DT->data, out_dir_path, "v_est");
+            }
+
+            if (wind_bool) {
+                write_csv(windB_DT->data, out_dir_path, "windB");
             }
         }
     }

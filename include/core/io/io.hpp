@@ -7,6 +7,7 @@
 #include "simulation/actuators/surface/shared.hpp"
 #include "simulation/dynamics/shared.hpp"
 #include "simulation/guidance/shared.hpp"
+#include "simulation/atmospheric/shared.hpp"
 
 namespace io {
 
@@ -25,15 +26,16 @@ namespace io {
     };
 
     struct DataContext {
-        dynamics::RigidBodyState xN_t;
-        dynamics::RigidBodyState yN_t;
-        dynamics::RigidBodyState zN_t;
-        actuators::SurfaceActuatorInputs_T<double> u_surface_actual;
-        actuators::PropulsorActuatorInputs_T<double> u_propulsor_actual;
-        dynamics::Wrench WB_net;
-        dynamics::Wrench WB_aero;
-        dynamics::Wrench WB_propulsive;
-        guidance::GuidanceSetpoint setpoint;
+        const dynamics::RigidBodyState& xN_t;
+        const dynamics::RigidBodyState& yN_t;
+        const dynamics::RigidBodyState& zN_t;
+        const actuators::SurfaceActuatorInputs_T<double>& u_surface_actual;
+        const actuators::PropulsorActuatorInputs_T<double>& u_propulsor_actual;
+        const dynamics::Wrench& WB_net;
+        const dynamics::Wrench& WB_aero;
+        const dynamics::Wrench& WB_propulsive;
+        const guidance::GuidanceSetpoint& setpoint;
+        const atmospheric::Wind& windB;
     };
 
     struct DataManager {
@@ -41,6 +43,7 @@ namespace io {
         bool control_bool;
         bool sensor_bool;
         bool estimation_bool;
+        bool wind_bool;
 
         std::optional<DataTable> p_DT;
         std::optional<DataTable> p_meas_DT;
@@ -65,10 +68,11 @@ namespace io {
         std::optional<DataTable> M_aero_DT;
         std::optional<DataTable> F_prop_DT;
         std::optional<DataTable> M_prop_DT;
+        std::optional<DataTable> windB_DT;
 
         void step(int t, const DataContext& context);
         void save(const std::string& out_dir_path);
-        DataManager(int tf, bool data_bool, bool control_bool, bool sensor_bool, bool estimation_bool);
+        DataManager(int tf, bool data_bool, bool control_bool, bool sensor_bool, bool estimation_bool, bool wind_bool);
 
     };
 

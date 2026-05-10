@@ -700,7 +700,7 @@ namespace vehicles {
 
         // Set default values
         frames::SetOptions initStepOptions = {
-            .H = dynamics::HomogenousFrameTransformationMatrix{ constants::HI },
+            .H = dynamics::homogeneousFrameTransformationMatrix{ constants::HI },
             .w = dynamics::AngularVelocity{ constants::Zero3 },
             .v = dynamics::LinearVelocity{ constants::Zero3 },
             .g = dynamics::Gravity{ constants::Zero3 }

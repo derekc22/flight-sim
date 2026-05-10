@@ -11,23 +11,23 @@
 namespace avionics {
 
     struct MeasurementGroundTruth {
-        aerodynamics::AngleOfAttack alpha;
-        dynamics::LinearAcceleration accelB;
-        dynamics::AngularVelocity wB_BI;
-        atmospheric::StagnationAirPressure P0;
-        atmospheric::StaticAirPressure P;
-        atmospheric::StagnationAirTemperature T0;
-        dynamics::Position pI_BI;
-        dynamics::LinearVelocity vB_BI;
+        const aerodynamics::AngleOfAttack& alpha;
+        const dynamics::LinearAcceleration& accelB;
+        const dynamics::AngularVelocity& wB_BI;
+        const atmospheric::StagnationAirPressure& P0;
+        const atmospheric::StaticAirPressure& P;
+        const atmospheric::StagnationAirTemperature& T0;
+        const dynamics::Position& pI_BI;
+        const dynamics::LinearVelocity& vB_BI;
 
-        atmospheric::StaticAirTemperature T;
-        atmospheric::MachNumber Mach;
-        geography::Heading heading;
-        dynamics::OrientationQuaternion qIB;
-        aerodynamics::FreeStreamVelocity Vinf;
-        geography::Altitude alt_BE;
-        dynamics::VerticalSpeed alt_dot;
-        atmospheric::AirDensity rho;
+        const atmospheric::StaticAirTemperature& T;
+        const atmospheric::MachNumber& Mach;
+        const geography::Heading& heading;
+        const dynamics::OrientationQuaternion& qIB;
+        const aerodynamics::FreeStreamVelocity& Vinf;
+        const geography::Altitude& alt_BE;
+        const dynamics::VerticalSpeed& alt_dot;
+        const atmospheric::AirDensity& rho;
     };
 
     struct MeasurementCache {

@@ -54,7 +54,7 @@ namespace frames {
 
 
 
-    void Frame::_set(const dynamics::HomogenousFrameTransformationMatrix& H){
+    void Frame::_set(const dynamics::homogeneousFrameTransformationMatrix& H){
         _set(H.C());
         _set(H.p());
     }
@@ -200,20 +200,20 @@ namespace frames {
         return C ;
     }
 
-    Eigen::Vector3d rotate_vec(const Eigen::Vector3d& vA, const Frame& A, const Frame& B) {
+    Eigen::Vector3d transform_vec(const Eigen::Vector3d& vA, const Frame& A, const Frame& B) {
         Eigen::Matrix3d CRA = CRF(A);
         Eigen::Matrix3d CRB = CRF(B);
         Eigen::Vector3d vB = CRB * CRA.transpose() * vA;
         return vB;
     }
 
-    Eigen::Vector3d rotate_vec(const Eigen::Vector3d& vA, const Frame& A, const ECEFFrame&) {
+    Eigen::Vector3d transform_vec(const Eigen::Vector3d& vA, const Frame& A, const ECEFFrame&) {
         Eigen::Matrix3d CRA = CRF(A);
         Eigen::Vector3d vB = CRA.transpose() * vA;
         return vB;
     }
 
-    Eigen::Vector3d rotate_vec(const Eigen::Vector3d& vA, const ECEFFrame&, const Frame& B) {
+    Eigen::Vector3d transform_vec(const Eigen::Vector3d& vA, const ECEFFrame&, const Frame& B) {
         Eigen::Matrix3d CRB = CRF(B);
         Eigen::Vector3d vB = CRB * vA;
         return vB;
