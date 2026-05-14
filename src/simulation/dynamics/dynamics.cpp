@@ -1,47 +1,39 @@
 #include <Eigen/Dense>
-#include <cmath>
-#include <stdexcept>
-#include <algorithm>
-#include <iostream>
-#include <format>
-#include <vector>
-#include <tuple>
-#include "simulation/transforms/transforms.hpp"
+#include "simulation/transforms/public.hpp"
 #include "simulation/dynamics/dynamics.hpp"
-#include "simulation/frames/frames.hpp"
-#include "simulation/constants/constants.hpp"
-#include "simulation/util/util.hpp"
+#include "simulation/constants/public.hpp"
+#include "simulation/util/public.hpp"
 
 namespace dynamics {
 
-    Eigen::Matrix3d _eul_dot_to_wB_BI_mat(double theta, double phi){
-        return _eul_dot_to_wB_BI_mat_T(theta, phi);
+    Eigen::Matrix3d eul_dot_to_wB_BI_mat(double theta, double phi){
+        return eul_dot_to_wB_BI_mat_T<double>(theta, phi);
     }
 
-    Eigen::Matrix3d _wB_BI_to_eul_dot_mat(double theta, double phi) {
-        return _wB_BI_to_eul_dot_mat_T(theta, phi);
+    Eigen::Matrix3d wB_BI_to_eul_dot_mat(double theta, double phi) {
+        return wB_BI_to_eul_dot_mat_T<double>(theta, phi);
     }
 
-    EulerAngles _eul_kin(const EulerAngles& eul_t, const EulerAngleRates& eul_dot_t){
+    EulerAngles eul_kin(const EulerAngles& eul_t, const EulerAngleRates& eul_dot_t){
         const Eigen::Vector3d eul_t1 = eul_t.data + eul_dot_t.data * constants::dt;
 
         return { eul_t1 };
     }
 
-    OrientationMatrixRate _ddt_CIB(const OrientationMatrix& CIB, const AngularVelocity& wB_BI){
+    OrientationMatrixRate ddt_CIB(const OrientationMatrix& CIB, const AngularVelocity& wB_BI){
         const Eigen::Matrix3d CIB_dot = -util::hat(wB_BI.data) * CIB.data;
 
         return { CIB_dot };
     }
 
-    OrientationMatrixRate _ddt_CBI(const OrientationMatrix& CBI, const AngularVelocity& wB_BI){
+    OrientationMatrixRate ddt_CBI(const OrientationMatrix& CBI, const AngularVelocity& wB_BI){
         const Eigen::Matrix3d CBI_dot = CBI.data * util::hat(wB_BI.data);
 
         return { CBI_dot };
     }
 
 
-    OrientationMatrix _rot_kin(const OrientationMatrix& CIB_t, const AngularVelocity& wB_BI_t){
+    OrientationMatrix rot_kin(const OrientationMatrix& CIB_t, const AngularVelocity& wB_BI_t){
         // strap_down/poisson
         const double Omega = wB_BI_t.data.norm();
         Eigen::Matrix3d exp_term;
@@ -57,7 +49,7 @@ namespace dynamics {
         return { CIB_t1 };
     }
 
-    OrientationQuaternionRate _quat_kin_vel(const OrientationQuaternion& qIB, const AngularVelocity& wB_BI) {
+    OrientationQuaternionRate quat_kin_vel(const OrientationQuaternion& qIB, const AngularVelocity& wB_BI) {
         Eigen::Quaterniond wq_BI;
         wq_BI.w() = 0.0;
         wq_BI.vec() = - wB_BI.data;                  // minus for qIB convention
@@ -66,8 +58,8 @@ namespace dynamics {
         return { qIB_dot };  // do NOT canonicalize qIB_dot
     }
 
-    OrientationQuaternionRate _quat_kin_vel(const OrientationQuaternion& qIB, const AngularVelocityQuaternion& wq_BI){
-        OrientationQuaternionRate qIB_dot = _quat_kin_vel(qIB, wq_BI.w());
+    OrientationQuaternionRate quat_kin_vel(const OrientationQuaternion& qIB, const AngularVelocityQuaternion& wq_BI){
+        OrientationQuaternionRate qIB_dot = quat_kin_vel(qIB, wq_BI.w());
         return qIB_dot;
     }
 
@@ -78,19 +70,19 @@ namespace dynamics {
     //
     // Inputs at t0: FB_net(t0), wB_BI(t0), vB(t0)
     // Output: vB(t0 + dt)
-    TranslationalAcceleration _ddtB_vB_BI(const TranslationalVelocity& vB_BI, const AngularVelocity& wB_BI, const Mass& mass, const Force& FB_net){
-        return { _ddtB_vB_BI_T<double>(vB_BI.data, wB_BI.data, mass.data, FB_net.data) };
+    TranslationalAcceleration ddtB_vB_BI(const TranslationalVelocity& vB_BI, const AngularVelocity& wB_BI, const Mass& mass, const Force& FB_net){
+        return { ddtB_vB_BI_T<double>(vB_BI.data, wB_BI.data, mass.data, FB_net.data) };
     }
 
-    TranslationalVelocity _trans_dyn_vel(const TranslationalVelocity& vB_BI_t, const AngularVelocity& wB_BI_t, const Mass& mass, const Force& FB_net_t){
-        const TranslationalAcceleration vB_BI_dot_t = _ddtB_vB_BI(vB_BI_t, wB_BI_t, mass, FB_net_t);
+    TranslationalVelocity trans_dyn_vel(const TranslationalVelocity& vB_BI_t, const AngularVelocity& wB_BI_t, const Mass& mass, const Force& FB_net_t){
+        const TranslationalAcceleration vB_BI_dot_t = ddtB_vB_BI(vB_BI_t, wB_BI_t, mass, FB_net_t);
 
         const Eigen::Vector3d vB_BI_t1 = vB_BI_t.data + vB_BI_dot_t.data * constants::dt;
         return { vB_BI_t1 };
     }
 
-    Eigen::Vector3d _ddtB_to_ddtI(const Eigen::Vector3d& ddtB_v, const Eigen::Vector3d& v, const Eigen::Vector3d& w){
-        return _ddtB_to_ddtI_T<double>(ddtB_v, v, w);
+    Eigen::Vector3d ddtB_to_ddtI(const Eigen::Vector3d& ddtB_v, const Eigen::Vector3d& v, const Eigen::Vector3d& w){
+        return ddtB_to_ddtI_T<double>(ddtB_v, v, w);
     }
 
 
@@ -101,72 +93,33 @@ namespace dynamics {
     //
     // Inputs at t0: M(t0), J, w(t0)
     // Output: w(t0 + dt)
-    Eigen::Vector3d _ddtB_wB_BI(const AngularVelocity& wB_BI, const InertiaTensor& J, const Moment& MB_net){
-        return _ddtB_wB_BI_T<double>(wB_BI.data, J.data, MB_net.data);
+    Eigen::Vector3d ddtB_wB_BI(const AngularVelocity& wB_BI, const InertiaTensor& J, const Moment& MB_net){
+        return ddtB_wB_BI_T<double>(wB_BI.data, J.data, MB_net.data);
     }
 
-    AngularVelocity _rot_dyn(const AngularVelocity& wB_BI_t, const InertiaTensor& J, const Moment& MB_net_t){
-        const Eigen::Vector3d wB_BI_dot_t = _ddtB_wB_BI(wB_BI_t, J, MB_net_t);
+    AngularVelocity rot_dyn(const AngularVelocity& wB_BI_t, const InertiaTensor& J, const Moment& MB_net_t){
+        const Eigen::Vector3d wB_BI_dot_t = ddtB_wB_BI(wB_BI_t, J, MB_net_t);
 
         const Eigen::Vector3d wB_BI_t1 = wB_BI_t.data + wB_BI_dot_t * constants::dt;
         return { wB_BI_t1 };
     }
 
-
-
-    RigidBodyState step_rigid_body(const RigidBodyState& xB_BI_t, const Mass& mass, const InertiaTensor& J, const Wrench& WB_net_t){
-
-        // ddtB_vB_BI_t is the body derivative of velocity expressed in the body frame, 
-        // ddtI_vB_BI_t is the inertial derivative of velocity expressed in the body frame, 
-        // and aI_BI_t = CBI_t * aB_BI_t.data gives the inertial derivative of velocity expressed in the inertial frame for the inertial-position kinematics update
-        // This assumes CBI maps body components to inertial components 
-        // and that _ddtB_vB_BI returns the body derivative of velocity expressed in the body frame
-
-        const dynamics::Force FB_net_t = WB_net_t.F;
-        const dynamics::Moment MB_net_t = WB_net_t.M;
-
-        const Eigen::Matrix3d CIB_t = transforms::quat_to_rot(xB_BI_t.q.data);
-        const Eigen::Matrix3d CBI_t = CIB_t.transpose();
-
-        // Translational dynamics in body coordinates
-        const TranslationalVelocity vB_BI_t1 = _trans_dyn_vel(xB_BI_t.v, xB_BI_t.w, mass, FB_net_t); 
-        const Eigen::Vector3d ddtB_vB_BI_t = _ddtB_vB_BI(xB_BI_t.v, xB_BI_t.w, mass, FB_net_t).data;           // produces a body derivative
-        const Eigen::Vector3d ddtI_vB_BI_t = _ddtB_to_ddtI(ddtB_vB_BI_t, xB_BI_t.v.data, xB_BI_t.w.data);      // produces an inertial derivative
-        const TranslationalAcceleration aB_BI_t{ ddtI_vB_BI_t }; // since pI_BI_t1 and vI_BI_t are inertial, aB_BI_t needs to be an inertial derivative
-
-        // Rotational dynamics in body coordinates
-        const AngularVelocity wB_BI_t1 = _rot_dyn(xB_BI_t.w, J, MB_net_t);
-
-        // Quaternion rotational kinematics
-        const OrientationQuaternion qIB_t1 = _quat_kin(xB_BI_t.q, xB_BI_t.w);
-
-        // Convert body velocity/acceleleration to inertial for translational kinematics update on pI_BI
-        const Eigen::Vector3d vI_BI_t = CBI_t * xB_BI_t.v.data;
-        const Eigen::Vector3d aI_BI_t = CBI_t * aB_BI_t.data;
-
-        // Translational kinematics in inertial coordinates
-        const Position pI_BI_t1 = _trans_kin(xB_BI_t.p, TranslationalVelocity { vI_BI_t }, TranslationalAcceleration { aI_BI_t });
-
-        return { pI_BI_t1, vB_BI_t1, qIB_t1, wB_BI_t1 };
-    }
-
-
-    OrientationQuaternionRate _CIB_dot_to_qIB_dot(const OrientationMatrixRate& CIB_dot, const OrientationMatrix& CIB, const OrientationQuaternion& qIB){
-        AngularVelocity wB_BI = _CIB_dot_to_wB_BI(CIB_dot, CIB) ;
-        OrientationQuaternionRate qIB_dot = _quat_kin_vel(qIB, wB_BI);
+    OrientationQuaternionRate CIB_dot_to_qIB_dot(const OrientationMatrixRate& CIB_dot, const OrientationMatrix& CIB, const OrientationQuaternion& qIB){
+        AngularVelocity wB_BI = CIB_dot_to_wB_BI(CIB_dot, CIB) ;
+        OrientationQuaternionRate qIB_dot = quat_kin_vel(qIB, wB_BI);
 
         return qIB_dot;
     }
 
-    OrientationQuaternionRate _wB_BI_to_qIB_dot(const AngularVelocity& wB_BI, const OrientationQuaternion& qIB){
+    OrientationQuaternionRate wB_BI_to_qIB_dot(const AngularVelocity& wB_BI, const OrientationQuaternion& qIB){
         Eigen::Quaterniond wq(0.0, wB_BI.data.x(), wB_BI.data.y(), wB_BI.data.z());
         Eigen::Quaterniond qdot = wq * qIB.data;
         qdot.coeffs() *= -0.5; // minus for qIB convention
         return { qdot };
     }
 
-    OrientationMatrixRate _qIB_dot_to_CIB_dot(const OrientationQuaternionRate& qIB_dot, const OrientationQuaternion& qIB, const OrientationMatrix& CIB){
-        AngularVelocity wB_BI = _qIB_dot_to_wB_BI(qIB_dot, qIB);
+    OrientationMatrixRate qIB_dot_to_CIB_dot(const OrientationQuaternionRate& qIB_dot, const OrientationQuaternion& qIB, const OrientationMatrix& CIB){
+        AngularVelocity wB_BI = qIB_dot_to_wB_BI(qIB_dot, qIB);
         Eigen::Matrix3d CIB_dot = - util::hat(wB_BI.data) * CIB.data; // minus for qIB convention
 
         return { CIB_dot };

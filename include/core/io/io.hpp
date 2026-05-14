@@ -3,11 +3,11 @@
 #include <string>
 #include <vector>
 #include <Eigen/Dense>
-#include "simulation/actuators/propulsor/shared.hpp"
-#include "simulation/actuators/surface/shared.hpp"
-#include "simulation/dynamics/shared.hpp"
-#include "simulation/guidance/shared.hpp"
-#include "simulation/atmospheric/shared.hpp"
+#include "simulation/actuators/propulsor/public.hpp"
+#include "simulation/actuators/surface/public.hpp"
+#include "simulation/dynamics/public.hpp"
+#include "simulation/guidance/public.hpp"
+#include "simulation/atmospheric/public.hpp"
 
 namespace io {
 

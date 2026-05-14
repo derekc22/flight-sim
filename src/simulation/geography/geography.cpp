@@ -1,5 +1,5 @@
 #include <Eigen/Dense>
-#include "simulation/constants/constants.hpp"
+#include "simulation/constants/public.hpp"
 #include "simulation/geography/geography.hpp"
 
 namespace geography {

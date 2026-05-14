@@ -23,7 +23,7 @@ find_library(QUADMATH_LIB NAMES quadmath HINTS /opt/homebrew/opt/gcc/lib/gcc/cur
 
 # Collect all source files
 file(GLOB_RECURSE SOURCES "src/*.cpp")
-list(FILTER SOURCES EXCLUDE REGEX "src/simulation/control/care\\.cpp$")
+list(FILTER SOURCES EXCLUDE REGEX "src/simulation/control/linear_quadratic/linear_quadratic\\.cpp$")
 
 set(SLICOT_CARE_WRAPPER_OBJ ${CMAKE_CURRENT_BINARY_DIR}/slicot_care_wrapper.o)
 add_custom_command(
@@ -36,7 +36,7 @@ set_source_files_properties(${SLICOT_CARE_WRAPPER_OBJ} PROPERTIES EXTERNAL_OBJEC
 
 # Standalone CARE library
 add_library(control_care STATIC
-    src/simulation/control/linear_quadratic/care.cpp
+    src/simulation/control/linear_quadratic/linear_quadratic.cpp
     ${SLICOT_CARE_WRAPPER_OBJ}
 )
 target_include_directories(control_care PUBLIC ${CMAKE_SOURCE_DIR}/include)

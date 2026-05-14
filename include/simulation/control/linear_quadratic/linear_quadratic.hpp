@@ -1,30 +1,16 @@
 #pragma once
-#include <optional>
 #include <Eigen/Dense>
-#include "simulation/actuators/shared.hpp"
-#include "simulation/dynamics/shared.hpp"
-#include "simulation/linearization/shared.hpp"
 
 namespace control {
 
-    struct LinearQuadraticControllerInput {
-        dynamics::StateVector_T<double> zN_t;
-        dynamics::StateVector_T<double> zN_t_des;
-        linearization::StateJacobian A;
-        linearization::TrimInputJacobian B;
+    struct CareSolution {
+        Eigen::MatrixXd P;
+        Eigen::MatrixXd residual;
+        double rcond = 0.0;
     };
 
-    struct LinearQuadraticControllerParameters {
-        Eigen::MatrixXd Q;
-        Eigen::MatrixXd R;
-        std::optional<Eigen::MatrixXd> K;
-        bool integrator_bool = false;
-    };
+    CareSolution solve_care_sb02md(const Eigen::Ref<const Eigen::MatrixXd>& A, const Eigen::Ref<const Eigen::MatrixXd>& G, const Eigen::Ref<const Eigen::MatrixXd>& Q);
+    CareSolution solve_care(const Eigen::Ref<const Eigen::MatrixXd>& A, const Eigen::Ref<const Eigen::MatrixXd>& B, const Eigen::Ref<const Eigen::MatrixXd>& Q, const Eigen::Ref<const Eigen::MatrixXd>& R);
+    Eigen::MatrixXd lqr_gain(const Eigen::Ref<const Eigen::MatrixXd>& B, const Eigen::Ref<const Eigen::MatrixXd>& R, const Eigen::Ref<const Eigen::MatrixXd>& P);
 
-    struct LinearQuadraticController {
-        LinearQuadraticControllerParameters params;
-
-        LinearQuadraticController(const LinearQuadraticControllerParameters& params);
-        actuators::ActuatorInputsVector_T<double> step(const LinearQuadraticControllerInput& controller_input);
-    };
 }

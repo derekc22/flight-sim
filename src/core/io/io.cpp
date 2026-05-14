@@ -6,10 +6,10 @@
 #include <stdexcept>
 #include <Eigen/Dense>
 #include "core/io/io.hpp"
-#include "simulation/actuators/propulsor/propulsor.hpp"
-#include "simulation/actuators/surface/surface.hpp"
-#include "simulation/constants/constants.hpp"
-#include "simulation/dynamics/shared.hpp"
+#include "simulation/actuators/propulsor/public.hpp"
+#include "simulation/actuators/surface/public.hpp"
+#include "simulation/constants/public.hpp"
+#include "simulation/dynamics/public.hpp"
 
 namespace io {
 

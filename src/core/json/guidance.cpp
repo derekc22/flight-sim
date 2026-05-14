@@ -4,11 +4,11 @@
 #include <nlohmann/json.hpp>
 #include "core/json/control.hpp"
 #include "core/json/json.hpp"
-#include "simulation/constants/constants.hpp"
-#include "simulation/control/control.hpp"
-#include "simulation/dynamics/shared.hpp"
-#include "simulation/guidance/guidance.hpp"
-#include "simulation/util/validate.hpp"
+#include "simulation/constants/public.hpp"
+#include "simulation/control/public.hpp"
+#include "simulation/dynamics/public.hpp"
+#include "simulation/guidance/public.hpp"
+#include "simulation/util/validate/public.hpp"
 
 namespace json {
 
@@ -38,9 +38,9 @@ namespace json {
         }
 
         if (control_type == control::ControlType::AxialPID) {
-            traj_components.w_mat = parse_MatrixXd(guidance_json.at("w"));
-            traj_components.eul_mat = parse_MatrixXd(guidance_json.at("eul"));
-            traj_components.n_rows = traj_components.w_mat.rows();
+            traj_components.w_traj = parse_MatrixXd(guidance_json.at("w"));
+            traj_components.eul_traj = parse_MatrixXd(guidance_json.at("eul"));
+            traj_components.n_rows = traj_components.w_traj.rows();
         }
         return traj_components;
     }
@@ -61,8 +61,8 @@ namespace json {
         validate_velocity_control_setpoint(guidance_json, control_type);
 
         if (control_type == control::ControlType::VelocityPID) {
-            traj_components.v_mat = parse_MatrixXd(guidance_json.at("v"));
-            traj_components.n_rows = traj_components.v_mat.rows();
+            traj_components.v_traj = parse_MatrixXd(guidance_json.at("v"));
+            traj_components.n_rows = traj_components.v_traj.rows();
         }
         return traj_components;
     }
@@ -91,10 +91,10 @@ namespace json {
             control_type == control::ControlType::LinearQuadraticTracker ||
             control_type == control::ControlType::LinearQuadraticIntegrator
         ) {
-            traj_components.v_mat = parse_MatrixXd(guidance_json.at("v"));
-            traj_components.w_mat = parse_MatrixXd(guidance_json.at("w"));
-            traj_components.eul_mat = parse_MatrixXd(guidance_json.at("eul"));
-            traj_components.n_rows = traj_components.v_mat.rows();
+            traj_components.v_traj = parse_MatrixXd(guidance_json.at("v"));
+            traj_components.w_traj = parse_MatrixXd(guidance_json.at("w"));
+            traj_components.eul_traj = parse_MatrixXd(guidance_json.at("eul"));
+            traj_components.n_rows = traj_components.v_traj.rows();
         }
         return traj_components;
     }
@@ -123,10 +123,10 @@ namespace json {
             control_type == control::ControlType::NonlinearDynamicInversion ||
             control_type == control::ControlType::IncrementalNonlinearDynamicInversion
         ) {
-            traj_components.v_mat = parse_MatrixXd(guidance_json.at("v"));
-            traj_components.w_mat = parse_MatrixXd(guidance_json.at("w"));
-            traj_components.eul_mat = parse_MatrixXd(guidance_json.at("eul"));
-            traj_components.n_rows = traj_components.v_mat.rows();
+            traj_components.v_traj = parse_MatrixXd(guidance_json.at("v"));
+            traj_components.w_traj = parse_MatrixXd(guidance_json.at("w"));
+            traj_components.eul_traj = parse_MatrixXd(guidance_json.at("eul"));
+            traj_components.n_rows = traj_components.v_traj.rows();
         }
         return traj_components;
     }
@@ -160,9 +160,9 @@ namespace json {
 
     void fill_missing_trajectory_components(guidance::TrajectoryComponents& traj_components) {
         if (traj_components.n_rows <= 0) { throw std::runtime_error("json::fill_missing_trajectory_components: trajectory must have at least one row"); }
-        if (traj_components.v_mat.size() == 0) { traj_components.v_mat = Eigen::MatrixXd::Zero(traj_components.n_rows, 3); }
-        if (traj_components.w_mat.size() == 0) { traj_components.w_mat = Eigen::MatrixXd::Zero(traj_components.n_rows, 3); }
-        if (traj_components.eul_mat.size() == 0) { traj_components.eul_mat = Eigen::MatrixXd::Zero(traj_components.n_rows, 3); }
+        if (traj_components.v_traj.size() == 0) { traj_components.v_traj = Eigen::MatrixXd::Zero(traj_components.n_rows, 3); }
+        if (traj_components.w_traj.size() == 0) { traj_components.w_traj = Eigen::MatrixXd::Zero(traj_components.n_rows, 3); }
+        if (traj_components.eul_traj.size() == 0) { traj_components.eul_traj = Eigen::MatrixXd::Zero(traj_components.n_rows, 3); }
     }
 
     void validate_trajectory_components(guidance::TrajectoryComponents& traj_components) {
@@ -171,9 +171,9 @@ namespace json {
         if (n_rows <= 0) { throw std::runtime_error("json::validate_trajectory_components: trajectory must have at least one row"); }
 
         std::string context = "guidance::validate_trajectory_components";
-        util::validate_shape(traj_components.v_mat, n_rows, n_cols, context, "v_mat");
-        util::validate_shape(traj_components.w_mat, n_rows, n_cols, context, "w_mat");
-        util::validate_shape(traj_components.eul_mat, n_rows, n_cols, context, "eul_mat");
+        util::validate_shape(traj_components.v_traj, n_rows, n_cols, context, "v_traj");
+        util::validate_shape(traj_components.w_traj, n_rows, n_cols, context, "w_traj");
+        util::validate_shape(traj_components.eul_traj, n_rows, n_cols, context, "eul_traj");
 
         traj_components.n_rows = n_rows;
     }
@@ -183,11 +183,11 @@ namespace json {
 
         for (int i = 0; i < traj_components.n_rows; ++i) {
             dynamics::RigidBodyState rbs_temp;
-            rbs_temp.v = dynamics::TranslationalVelocity{ traj_components.v_mat.row(i).transpose() };
-            rbs_temp.w = dynamics::AngularVelocity{ traj_components.w_mat.row(i).transpose() };
+            rbs_temp.v = dynamics::TranslationalVelocity{ traj_components.v_traj.row(i).transpose() };
+            rbs_temp.w = dynamics::AngularVelocity{ traj_components.w_traj.row(i).transpose() };
 
             dynamics::OrientationQuaternion qIB;
-            qIB.set(dynamics::EulerAngles{ traj_components.eul_mat.row(i).transpose() });
+            qIB.set(dynamics::EulerAngles{ traj_components.eul_traj.row(i).transpose() });
             rbs_temp.q = qIB;
 
             guidance::GuidanceStateVector traj_row_merged = guidance::unpack_rigid_body_state(rbs_temp);

@@ -2,8 +2,8 @@
 #include <nlohmann/json.hpp>
 #include "core/json/avionics.hpp"
 #include "core/json/json.hpp"
-#include "simulation/avionics/avionics.hpp"
-#include "simulation/constants/constants.hpp"
+#include "simulation/avionics/public.hpp"
+#include "simulation/constants/public.hpp"
 
 namespace json {
 

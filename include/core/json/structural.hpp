@@ -1,5 +1,5 @@
 #pragma once
-#include "simulation/structural/structural.hpp"
+#include "simulation/structural/public.hpp"
 
 namespace json {
 

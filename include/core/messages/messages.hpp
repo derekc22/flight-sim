@@ -1,7 +1,7 @@
 #pragma once
 #include <Eigen/Dense>
-#include "simulation/geography/shared.hpp"
-#include "simulation/dynamics/shared.hpp"
+#include "simulation/geography/public.hpp"
+#include "simulation/dynamics/public.hpp"
 
 namespace messages {
 

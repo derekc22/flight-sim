@@ -2,8 +2,8 @@
 #include <Eigen/Dense>
 #include <cmath>
 #include <vector>
-#include "simulation/dynamics/shared.hpp"
-#include "simulation/geography/shared.hpp"
+#include "simulation/dynamics/public.hpp"
+#include "simulation/geography/public.hpp"
 
 namespace geography {
 

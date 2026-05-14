@@ -1,17 +1,9 @@
 #pragma once
 #include <Eigen/Dense>
-#include <cmath>
-#include <stdexcept>
-#include <algorithm>
-#include <vector>
-#include <string>
-#include <tuple> // For std::tuple
-#include <array>
-#include <functional>
-#include "simulation/constants/constants.hpp"
-#include "simulation/dynamics/shared.hpp"
-#include "simulation/util/util.hpp"
-#include "simulation/transforms/transforms.hpp"
+#include "simulation/dynamics/public.hpp"
+#include "simulation/transforms/public.hpp"
+#include "simulation/constants/public.hpp"
+#include "simulation/util/public.hpp"
 
 namespace dynamics {
 
@@ -23,38 +15,37 @@ namespace dynamics {
         This may change in the future, but, for now, always assume inertial <=> ECEF and NEVER pass arguments corresponding to other frames to the below dynamics functions
     */
 
-    EulerAngles _eul_kin(const EulerAngles& eul_t, const EulerAngleRates& eul_dot_t);
+    EulerAngles eul_kin(const EulerAngles& eul_t, const EulerAngleRates& eul_dot_t);
 
-    OrientationMatrixRate _ddt_CIB(const OrientationMatrix& CIB, const AngularVelocity& wB_BI);
-    OrientationMatrixRate _ddt_CBI(const OrientationMatrix& CBI, const AngularVelocity& wB_BI);
-    OrientationMatrix _rot_kin(const OrientationMatrix& CIB_t, const AngularVelocity& wB_BI_t);
-    OrientationQuaternionRate _quat_kin_vel(const OrientationQuaternion& qIB_t, const AngularVelocity& wB_BI_t);
+    OrientationMatrixRate ddt_CIB(const OrientationMatrix& CIB, const AngularVelocity& wB_BI);
+    OrientationMatrixRate ddt_CBI(const OrientationMatrix& CBI, const AngularVelocity& wB_BI);
+    OrientationMatrix rot_kin(const OrientationMatrix& CIB_t, const AngularVelocity& wB_BI_t);
+    OrientationQuaternionRate quat_kin_vel(const OrientationQuaternion& qIB_t, const AngularVelocity& wB_BI_t);
 
     /**
     * @brief Returns the body derivative of body-expressed linear velocity
     */
-    TranslationalAcceleration _ddtB_vB_BI(const TranslationalVelocity& vB, const AngularVelocity& wB_BI, const Mass& mass, const Force& FB_net);
+    TranslationalAcceleration ddtB_vB_BI(const TranslationalVelocity& vB, const AngularVelocity& wB_BI, const Mass& mass, const Force& FB_net);
     
     /**
     * @brief Returns the body derivative of body-expressed angular velocity
     */
-    Eigen::Vector3d _ddtB_wB_BI(const AngularVelocity& wB_BI, const InertiaTensor& J, const Moment& MB_net);
+    Eigen::Vector3d ddtB_wB_BI(const AngularVelocity& wB_BI, const InertiaTensor& J, const Moment& MB_net);
 
 
     /**
     * @brief Converts a body derivative to an inertial derivative
     */
-    Eigen::Vector3d _ddtB_to_ddtI(const Eigen::Vector3d& ddtB_v, const Eigen::Vector3d& v, const Eigen::Vector3d& w);
+    Eigen::Vector3d ddtB_to_ddtI(const Eigen::Vector3d& ddtB_v, const Eigen::Vector3d& v, const Eigen::Vector3d& w);
 
 
-    TranslationalVelocity _trans_dyn_vel(const TranslationalVelocity& vB_t, const AngularVelocity& wB_BI_t, const Mass& mass, const Force& FB_net_t);
-    AngularVelocity _rot_dyn(const AngularVelocity& wB_BI_t, const InertiaTensor& J, const Moment& MB_net_t);
-    RigidBodyState step_rigid_body(const RigidBodyState& xB_BI_t, const Mass& mass, const InertiaTensor& J, const Wrench& WB_net_t);
+    TranslationalVelocity trans_dyn_vel(const TranslationalVelocity& vB_t, const AngularVelocity& wB_BI_t, const Mass& mass, const Force& FB_net_t);
+    AngularVelocity rot_dyn(const AngularVelocity& wB_BI_t, const InertiaTensor& J, const Moment& MB_net_t);
 
-    OrientationQuaternionRate _CIB_dot_to_qIB_dot(const OrientationMatrixRate& CIB_dot, const OrientationMatrix& CIB, const OrientationQuaternion& qIB);
-    OrientationMatrixRate _qIB_dot_to_CIB_dot(const OrientationQuaternionRate& qIB_dot, const OrientationQuaternion& qIB, const OrientationMatrix& CIB);
+    OrientationQuaternionRate CIB_dot_to_qIB_dot(const OrientationMatrixRate& CIB_dot, const OrientationMatrix& CIB, const OrientationQuaternion& qIB);
+    OrientationMatrixRate qIB_dot_to_CIB_dot(const OrientationQuaternionRate& qIB_dot, const OrientationQuaternion& qIB, const OrientationMatrix& CIB);
 
-    Eigen::Matrix3d _eul_dot_to_wB_BI_mat(double theta, double phi);
+    Eigen::Matrix3d eul_dot_to_wB_BI_mat(double theta, double phi);
 
-    Eigen::Matrix3d _wB_BI_to_eul_dot_mat(double theta, double phi);
+    Eigen::Matrix3d wB_BI_to_eul_dot_mat(double theta, double phi);
 }

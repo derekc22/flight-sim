@@ -3,12 +3,12 @@
 #include <nlohmann/json.hpp>
 #include "core/json/initialization.hpp"
 #include "core/json/json.hpp"
-#include "simulation/aerodynamics/shared.hpp"
-#include "simulation/constants/constants.hpp"
-#include "simulation/dynamics/shared.hpp"
-#include "simulation/geography/shared.hpp"
-#include "simulation/util/util.hpp"
-#include "simulation/vehicles/vehicles.hpp"
+#include "simulation/aerodynamics/public.hpp"
+#include "simulation/constants/public.hpp"
+#include "simulation/dynamics/public.hpp"
+#include "simulation/geography/public.hpp"
+#include "simulation/util/public.hpp"
+#include "simulation/vehicles/public.hpp"
 
 namespace json {
 

@@ -4,14 +4,14 @@
 #include <nlohmann/json.hpp>
 #include "core/json/control.hpp"
 #include "core/json/json.hpp"
-#include "simulation/constants/constants.hpp"
-#include "simulation/control/control.hpp"
-#include "simulation/control/linear_quadratic/controllers/lqi.hpp"
-#include "simulation/control/linear_quadratic/controllers/lqr.hpp"
-#include "simulation/control/linear_quadratic/controllers/lqt.hpp"
-#include "simulation/control/pid/controllers/axial.hpp"
-#include "simulation/control/pid/controllers/damper.hpp"
-#include "simulation/control/pid/controllers/velocity.hpp"
+#include "simulation/constants/public.hpp"
+#include "simulation/control/public.hpp"
+#include "simulation/control/linear_quadratic/controllers/lqi/public.hpp"
+#include "simulation/control/linear_quadratic/controllers/lqr/public.hpp"
+#include "simulation/control/linear_quadratic/controllers/lqt/public.hpp"
+#include "simulation/control/pid/controllers/axial/public.hpp"
+#include "simulation/control/pid/controllers/damper/public.hpp"
+#include "simulation/control/pid/controllers/velocity/public.hpp"
 
 namespace json {
 

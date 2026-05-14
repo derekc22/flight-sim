@@ -4,11 +4,11 @@
 #include <nlohmann/json.hpp>
 #include "core/json/estimation.hpp"
 #include "core/json/json.hpp"
-#include "simulation/constants/constants.hpp"
-#include "simulation/estimation/estimation.hpp"
-#include "simulation/estimation/kalman/estimators/ekf.hpp"
-#include "simulation/estimation/kalman/estimators/lkf.hpp"
-#include "simulation/util/validate.hpp"
+#include "simulation/constants/public.hpp"
+#include "simulation/estimation/public.hpp"
+#include "simulation/estimation/kalman/estimators/ekf/public.hpp"
+#include "simulation/estimation/kalman/estimators/lkf/public.hpp"
+#include "simulation/util/validate/public.hpp"
 
 namespace json {
 

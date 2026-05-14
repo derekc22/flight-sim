@@ -1,20 +1,18 @@
 #pragma once
 #include <cstddef>
+#include <string>
 #include <utility> // For std::pair
 #include <Eigen/Dense>
-#include "simulation/trim/shared.hpp"
-#include "simulation/aerodynamics/shared.hpp"
-#include "simulation/atmospheric/shared.hpp"
-#include "simulation/actuators/propulsor/shared.hpp"
-#include "simulation/actuators/surface/shared.hpp"
-#include "simulation/actuators/shared.hpp"
-#include "simulation/control/shared.hpp"
-#include "simulation/dynamics/shared.hpp"
-#include "simulation/constants/constants.hpp"
-#include "simulation/util/util.hpp"
-#include "simulation/structural/structural.hpp"
-
-namespace vehicles { struct Aircraft; } // forward declare
+#include "simulation/trim/public.hpp"
+#include "simulation/aerodynamics/public.hpp"
+#include "simulation/atmospheric/public.hpp"
+#include "simulation/actuators/propulsor/public.hpp"
+#include "simulation/actuators/surface/public.hpp"
+#include "simulation/actuators/public.hpp"
+#include "simulation/dynamics/public.hpp"
+#include "simulation/constants/public.hpp"
+#include "simulation/util/public.hpp"
+#include "simulation/structural/public.hpp"
 
 namespace trim {
 
@@ -72,16 +70,8 @@ namespace trim {
 
     TrimSolution solve_trim(const TrimProblem<double>& problem, const TrimModel& model, TrimSolveOptions options = {});
 
-    TrimSolution inspect_trim(vehicles::Aircraft& aircraft, const atmospheric::Wind& wind);
-
-    std::string print_trim_solution(const TrimSolution& trim_sol);
-
-    std::pair<dynamics::RigidBodyState, aerodynamics::AerodynamicState> update_state_from_trim(const dynamics::RigidBodyState& xN_t, const TrimSolution& trim_sol);
-
     /** @deprecated */
     // void update_actuators_from_trim(actuators::SurfaceActuators& surface_actuators, actuators::PropulsorActuators& propulsor_actuators, const TrimSolution& trim_sol);
-
-    control::ControlOutput set_control_inputs_from_trim(const TrimSolution& trim_sol);
 
 }
 

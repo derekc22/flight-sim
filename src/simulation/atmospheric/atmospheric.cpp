@@ -1,7 +1,7 @@
 #include <array>
 #include "simulation/atmospheric/atmospheric.hpp"
-#include "simulation/constants/constants.hpp"
-#include "simulation/util/util.hpp"
+#include "simulation/constants/public.hpp"
+#include "simulation/util/public.hpp"
 
 namespace atmospheric {
 
@@ -36,15 +36,28 @@ namespace atmospheric {
         return StaticAtmosphericState{ T, P, rho, mu };
     }
 
-    Wind build_wind(double heading_deg, double spd_kts){
-        double psi_wind = util::deg_to_rad(heading_deg);
-        double V_wind = util::kts_to_mps(spd_kts);
+    StagnationAirTemperature T0_from_T(const StaticAirTemperature& T, const MachNumber& M) {
+        double T0 = T.data * ( 1 + ((constants::gamma_air - 1) / 2) * M.data * M.data );
+        return { T0 };
+    };
 
-        double wind_N = -V_wind * util::cos(psi_wind);
-        double wind_E = -V_wind * util::sin(psi_wind);
-        double wind_D = 0.0;
+    StagnationAirPressure P0_from_P(const StaticAirPressure& P, const MachNumber& M) {
+        double P0 = P.data * std::pow( 1 + ((constants::gamma_air - 1) / 2) * M.data * M.data, constants::gamma_air/(constants::gamma_air - 1) );
+        return { P0 };
+    };
 
-        return { Eigen::Vector3d(wind_N, wind_E, wind_D) };
-    }
+    StaticAirPressure P_from_P0(const StagnationAirPressure& P0, const MachNumber& M) {
+        double P = P0.data / std::pow( 1 + ((constants::gamma_air - 1) / 2) * M.data * M.data, constants::gamma_air / (constants::gamma_air - 1) );
+        return { P };
+    };
 
+    StaticAtmosphericState stagnation_to_static(const StagnationAtmosphericState& stagnation_atmospheric_state, const MachNumber& M) {
+        AirDensity rho = stagnation_atmospheric_state.rho;
+        DynamicViscosity mu = stagnation_atmospheric_state.mu;
+
+        StaticAirTemperature T = T_from_T0(stagnation_atmospheric_state.T0, M);
+        StaticAirPressure P = P_from_P0(stagnation_atmospheric_state.P0, M);
+
+        return { T, P, rho, mu };
+    };
 }

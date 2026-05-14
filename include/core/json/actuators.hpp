@@ -1,6 +1,6 @@
 #pragma once
-#include "simulation/actuators/actuators.hpp"
-#include "simulation/structural/structural.hpp"
+#include "simulation/actuators/public.hpp"
+#include "simulation/structural/public.hpp"
 
 namespace json {
 
