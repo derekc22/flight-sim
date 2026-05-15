@@ -1,0 +1,53 @@
+#pragma once
+#include <cstddef>
+#include <Eigen/Dense>
+#include "simulation/constants/public.hpp"
+#include "simulation/dynamics/public.hpp"
+
+namespace guidance {
+
+    struct GuidanceSetpoint {
+        const dynamics::TranslationalVelocity vB_BI;
+        const dynamics::AngularVelocity wB_BI;
+        const dynamics::EulerAngles eulIB;
+    };
+
+    struct AxialSetpoint : GuidanceSetpoint {};
+
+    struct VelocitySetpoint : GuidanceSetpoint {};
+
+    struct LinearFullStateFeedbackSetpoint : GuidanceSetpoint {};
+
+    struct NonlinearSetpoint : GuidanceSetpoint {};
+
+    enum class TrajectoryType {
+        Stationary,
+        Prespecified,
+        Interpolated
+    };
+
+    inline constexpr std::size_t guidance_state_dim = constants::state_dim + 1;
+
+    using GuidanceStateVector = Eigen::Matrix<double, guidance_state_dim, 1>;
+
+    struct TrajectoryComponents {
+        Eigen::MatrixXd v_traj;
+        Eigen::MatrixXd w_traj;
+        Eigen::MatrixXd eul_traj;
+        int n_rows = 0;
+    };
+
+    struct Trajectory {
+        Eigen::MatrixXd data;
+    };
+
+    struct GuidanceProperties {
+        TrajectoryType trajectory_type;
+        Trajectory trajectory;
+        GuidanceSetpoint step(int t, int tf);
+    };
+
+    GuidanceStateVector unpack_rigid_body_state(const dynamics::RigidBodyState& xN_t);
+    GuidanceSetpoint pack_guidance_setpoint(const GuidanceStateVector& guidance_vec);
+
+}

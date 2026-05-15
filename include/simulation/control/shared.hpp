@@ -1,60 +1,47 @@
 #pragma once
-#include "simulation/dynamics/dynamics.hpp"
-#include "simulation/actuators/surface.hpp"
-#include "simulation/actuators/propulsor.hpp"
-#include "simulation/guidance/guidance.hpp"
-#include "simulation/trim/types.hpp"
-#include "simulation/linearization/types.hpp"
+#include "simulation/actuators/propulsor/public.hpp"
+#include "simulation/actuators/surface/public.hpp"
+#include "simulation/actuators/public.hpp"
+#include "simulation/dynamics/public.hpp"
+#include "simulation/guidance/public.hpp"
+#include "simulation/linearization/public.hpp"
 
 namespace control {
 
-    struct SurfaceActuatorInputs {
-        double elevator_cmd = 0.0;  // [rad]
-        double aileron_cmd = 0.0;   // [rad]
-        double rudder_cmd = 0.0;    // [rad]
-        double flap_cmd = 0.0;      // [rad]
-        double spoiler_cmd = 0.0;   // [rad]
-    };
-
-    struct PropulsorActuatorInputs {
-        double front_propulsor_cmd = 0.0;  // [N]
-        double left_propulsor_cmd = 0.0;   // [N]
-        double right_propulsor_cmd = 0.0;  // [N]
-    };
-
     struct ControlOutput {
-        SurfaceActuatorInputs surface_inputs;
-        PropulsorActuatorInputs propulsor_inputs;
+        actuators::SurfaceActuatorInputs_T<double> surface_inputs;
+        actuators::PropulsorActuatorInputs_T<double> propulsor_inputs;
     };
 
     struct AxialControllerInput {
-        dynamics::RigidBodyState zN_t;
-        actuators::SurfaceActuators surface_actuators;
-        guidance::AxialSetpoint setpoint;
+        const dynamics::RigidBodyState& zN_t;
+        const actuators::SurfaceActuators& surface_actuators;
+        const guidance::AxialSetpoint& setpoint;
     };
     struct AxialControllerParameters {};
 
     struct VelocityControllerInput {
-        dynamics::RigidBodyState zN_t;
-        actuators::PropulsorActuators propulsor_actuators;
-        guidance::VelocitySetpoint setpoint;
+        const dynamics::RigidBodyState& zN_t;
+        const actuators::PropulsorActuators& propulsor_actuators;
+        const guidance::VelocitySetpoint& setpoint;
     };
     struct VelocityControllerParameters {};
 
     struct LinearFullStateFeedbackControllerInput {
-        dynamics::RigidBodyState zN_t;
-        trim::TrimActuatorInputs<double> u_sol_trim;
-        linearization::TrimStateJacobian A;
-        linearization::TrimInputJacobian B;
-        guidance::LinearFullStateFeedbackSetpoint setpoint;
+        const dynamics::RigidBodyState& zN_t;
+        const actuators::ActuatorInputs_T<double>& u_sol_trim;
+        const linearization::StateJacobian& A;
+        const linearization::TrimInputJacobian& B;
+        const guidance::LinearFullStateFeedbackSetpoint& setpoint;
     };
     struct LinearFullStateFeedbackControllerParameters {};
 
     struct NonlinearControllerInput {
-        dynamics::RigidBodyState zN_t;
-        actuators::SurfaceActuators surface_actuators;
-        actuators::PropulsorActuators propulsor_actuators;
-        guidance::NonlinearSetpoint setpoint;
+        const dynamics::RigidBodyState& zN_t;
+        const actuators::SurfaceActuators& surface_actuators;
+        const actuators::PropulsorActuators& propulsor_actuators;
+        const guidance::NonlinearSetpoint& setpoint;
     };
     struct NonlinearControllerParameters {};
+
 }

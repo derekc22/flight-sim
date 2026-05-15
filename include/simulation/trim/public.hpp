@@ -1,0 +1,97 @@
+#pragma once
+#include <cstddef>
+#include <Eigen/Dense>
+#include <string>
+#include <utility>
+#include "simulation/actuators/propulsor/public.hpp"
+#include "simulation/actuators/surface/public.hpp"
+#include "simulation/actuators/public.hpp"
+#include "simulation/atmospheric/public.hpp"
+#include "simulation/constants/public.hpp"
+#include "simulation/dynamics/public.hpp"
+#include "simulation/propulsion/public.hpp"
+#include "simulation/aerodynamics/public.hpp"
+#include "simulation/structural/public.hpp"
+
+namespace control { struct ControlOutput; }
+namespace vehicles { struct Aircraft; }
+
+namespace trim {
+
+    inline constexpr std::size_t trim_variable_dim = constants::state_dim + constants::input_dim;
+
+    template <typename T>
+    using TrimVariablesVector_T = Eigen::Matrix<T, trim_variable_dim, 1>;
+
+    struct TrimConditions {
+        atmospheric::StaticAtmosphericState static_atm_state;
+        atmospheric::Wind windB{ constants::Zero3 };
+    };
+
+    template <typename T>
+    struct TrimResidual {
+        T vx_dot = T(0);
+        T vy_dot = T(0);
+        T vz_dot = T(0);
+        T p_dot = T(0);
+        T q_dot = T(0);
+        T r_dot = T(0);
+        T phi_dot = T(0);
+        T theta_dot = T(0);
+        T beta_err = T(0);
+        T phi_err = T(0);
+        T theta_err = T(0);
+        T vx_err = T(0);
+        T vz_err = T(0);
+        T psi_dot_err = T(0);
+    };
+
+    struct TrimModel {
+        const structural::StructuralProperties& structural;
+        const aerodynamics::AerodynamicProperties& aerodynamic;
+        const actuators::PropulsorActuators& propulsor_actuators;
+        actuators::ActuatorLimits_T<double> actuator_limits;
+        actuators::FixedActuatorInputs_T fixed_actuator_inputs{};
+    };
+
+    struct TrimSolution {
+        dynamics::State_T<double> state;
+        actuators::ActuatorInputs_T<double> input;
+        TrimConditions conditions;
+        dynamics::Wrench wrench{};
+        TrimResidual<double> residual;
+        TrimResidual<double> weighted_residual;
+        TrimVariablesVector_T<double> variables = TrimVariablesVector_T<double>::Zero();
+        bool attempted = false;
+        bool converged = false;
+        std::size_t iterations = 0;
+        double weighted_residual_norm_2 = 0.0;
+        double weighted_residual_norm_inf = 0.0;
+    };
+
+    template <typename T>
+    dynamics::StateDot_T<T> compute_trim_state_dot_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u, const TrimModel& model, const TrimConditions& conditions);
+
+    template <typename T>
+    TrimVariablesVector_T<T> unpack_trim_variables_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u);
+
+    template <typename T>
+    dynamics::State_T<T> pack_trim_state_T(const TrimVariablesVector_T<T>& z);
+
+    template <typename T>
+    actuators::ActuatorInputs_T<T> pack_trim_actuator_inputs_T(const TrimVariablesVector_T<T>& z);
+
+    template <typename T>
+    actuators::ActuatorInputs_T<T> pack_trim_actuator_inputs_T(const TrimVariablesVector_T<T>& z, const actuators::ActuatorLimits_T<double>& actuator_limits);
+
+    TrimSolution inspect_trim(vehicles::Aircraft& aircraft, const atmospheric::Wind& wind);
+
+    std::string print_trim_solution(const TrimSolution& trim_sol);
+
+    std::pair<dynamics::RigidBodyState, aerodynamics::AerodynamicState> update_state_from_trim(const dynamics::RigidBodyState& xN_t, const TrimSolution& trim_sol);
+
+    control::ControlOutput set_control_inputs_from_trim(const TrimSolution& trim_sol);
+
+}
+
+#include "simulation/trim/public.tpp"

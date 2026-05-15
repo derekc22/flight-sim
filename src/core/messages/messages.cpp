@@ -1,9 +1,8 @@
 #include <Eigen/Dense>
 #include "core/messages/messages.hpp"
-#include "simulation/constants/constants.hpp"
-#include "simulation/util/util.hpp"
-#include "simulation/geography/geography.hpp"
-#include "simulation/dynamics/dynamics.hpp"
+#include "simulation/dynamics/public.hpp"
+#include "simulation/geography/public.hpp"
+#include "simulation/util/public.hpp"
 
 namespace messages {
 

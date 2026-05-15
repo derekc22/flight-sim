@@ -1,5 +1,5 @@
 #pragma once
-#include "simulation/aerodynamics/aerodynamics.hpp"
+#include "simulation/aerodynamics/public.hpp"
 
 namespace json {
 

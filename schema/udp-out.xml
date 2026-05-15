@@ -9,11 +9,13 @@
             <chunk>
                <name>/environment/wind-from-heading-deg</name>
                <type>float</type>
+               <format>%.6f</format>
                <node>/environment/wind-from-heading-deg</node>
             </chunk>
 			<chunk>
                <name>/environment/wind-speed-kt</name>
                <type>float</type>
+               <format>%.6f</format>
                <node>/environment/wind-speed-kt</node>
             </chunk>
         </output>

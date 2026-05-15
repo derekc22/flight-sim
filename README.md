@@ -45,27 +45,28 @@ C++ flight simulator with FlightGear integration
   - `initialization_config`: Initial conditions
   - `structural_config`: Structural properties
   - `aerodynamics_config`: Aerodynamic properties
-  - `control_config`: Control properties
-  - `guidance_config`: Guidance properties
-  - `estimation_config`: Estimation properties
   - `avionics_config`: Avionics properties
   - `actuator_config`: Actuator properties
+  - `control_config`: Control properties
+  - `estimation_config`: Estimation properties
+  - `guidance_config`: Guidance properties
   - `operating_config`: Operating properties
   
-- To run the simulation: `scripts/run.sh -a <AIRCRAFT> -t <TIME_SEC> [-r <TRIM>] [-s <SENSOR>] [-c <CONTROL>] [-e <ESTIMATION>] [-v <VERBOSE>] [-d <DATA>] [-o <OUT_DIR>] [-p <PLOT>]`
+- To run the simulation: `scripts/run.sh -a <AIRCRAFT> -t <TIME_SEC> [-r TRIM] [-s SENSOR] [-c CONTROL] [-e ESTIMATION] [-w WIND] [-v VERBOSE] [-d DATA] [-p PLOT] -o <OUT_DIR>`
   - `-a AIRCRAFT`: Aircraft to simulate (e.g. ASW28, c172p)
   - `-t TIME_SEC`: Simulation time in seconds
   - `-r TRIM`: Enable trim, linearization, and eigenanalysis
+  - `-s SENSOR`: Enable sensors and avionics
   - `-c CONTROL`: Enable control system
   - `-e ESTIMATION`: Enable state estimation
-  - `-s SENSOR`: Enable sensors and avionics
+  - `-w WIND`: Enable wind
   - `-v VERBOSE`: Enable verbose output
   - `-d DATA`: Enable data logging
   - `-p PLOT`: Enable plotting
   - `-o OUT_DIR`: Output directory
   
 ## Example
-Run a 60-second simulation of the C172 with control and avionics. Outputs are saved to `data/c172_test` and `plots/c172_test`
+Run a 60-second simulation of the C172 with control and avionics. Data and plots are saved to `data/c172_test` and `plots/c172_test`, respectively
 ```bash
 scripts/run.sh -a c172p -t 60 -c -s -d -p -o c172_test
 ```

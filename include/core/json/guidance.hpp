@@ -1,6 +1,6 @@
 #pragma once
-#include "simulation/control/control.hpp"
-#include "simulation/guidance/guidance.hpp"
+#include "simulation/control/public.hpp"
+#include "simulation/guidance/public.hpp"
 
 namespace json {
 

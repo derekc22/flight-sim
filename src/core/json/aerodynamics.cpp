@@ -4,6 +4,7 @@
 #include <nlohmann/json.hpp>
 #include "core/json/aerodynamics.hpp"
 #include "core/json/json.hpp"
+#include "simulation/aerodynamics/public.hpp"
 
 namespace json {
 

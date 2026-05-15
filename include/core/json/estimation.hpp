@@ -1,6 +1,6 @@
 #pragma once
 #include <nlohmann/json.hpp>
-#include "simulation/estimation/estimation.hpp"
+#include "simulation/estimation/public.hpp"
 
 namespace json {
 

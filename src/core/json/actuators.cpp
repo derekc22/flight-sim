@@ -7,8 +7,12 @@
 #include <nlohmann/json.hpp>
 #include "core/json/actuators.hpp"
 #include "core/json/json.hpp"
-#include "simulation/constants/constants.hpp"
-#include "simulation/util/util.hpp"
+#include "simulation/actuators/public.hpp"
+#include "simulation/actuators/propulsor/public.hpp"
+#include "simulation/actuators/surface/public.hpp"
+#include "simulation/constants/public.hpp"
+#include "simulation/structural/public.hpp"
+#include "simulation/util/public.hpp"
 
 namespace json {
 
@@ -17,9 +21,9 @@ namespace json {
         if (!actuator_json.contains("limit_min")) { throw std::runtime_error("json::validate_actuator_json: actuator minimum limit not present"); }
         if (!actuator_json.contains("tau")) { throw std::runtime_error("json::validate_actuator_json: actuator tau not present"); }
 
-        const double limit_max = actuator_json.at("limit_max").get<double>();
-        const double limit_min = actuator_json.at("limit_min").get<double>();
-        const double tau = actuator_json.at("tau").get<double>();
+        double limit_max = actuator_json.at("limit_max").get<double>();
+        double limit_min = actuator_json.at("limit_min").get<double>();
+        double tau = actuator_json.at("tau").get<double>();
 
         if (limit_max < limit_min) { throw std::runtime_error("json::validate_actuator_json: actuator maximum limit must be greater than or equal to minimum limit"); }
         if (tau < 0.0) { throw std::runtime_error("json::validate_actuator_json: actuator tau must be non-negative"); }
@@ -31,7 +35,7 @@ namespace json {
         if (!propulsor_actuator_json.contains("toe_angle")) { throw std::runtime_error("json::validate_propulsor_actuator_json: propulsor toe_angle not present"); }
         if (!propulsor_actuator_json.contains("pB_prop_cg")) { throw std::runtime_error("json::validate_propulsor_actuator_json: propulsor pB_prop_cg not present"); }
         
-        const double limit_min = propulsor_actuator_json.at("limit_min").get<double>();
+        double limit_min = propulsor_actuator_json.at("limit_min").get<double>();
         if (limit_min < 0.0) { throw std::runtime_error("json::validate_propulsor_actuator_json: propulsor limit_min must be non-negative"); }
 
         Eigen::Vector3d prop_pos = parse_Vector3d(propulsor_actuator_json.at("pB_prop_cg"));
@@ -54,9 +58,9 @@ namespace json {
         if (!propellers_json.contains("thrust_coeff")) { throw std::runtime_error("json::validate_propellers_json: propellers thrust_coeff not present"); }
         if (!propellers_json.contains("torque_coeff")) { throw std::runtime_error("json::validate_propellers_json: propellers torque_coeff not present"); }
 
-        const double spin_sign = propellers_json.at("spin_sign").get<double>();
-        const double thrust_coeff = propellers_json.at("thrust_coeff").get<double>();
-        const double torque_coeff = propellers_json.at("torque_coeff").get<double>();
+        double spin_sign = propellers_json.at("spin_sign").get<double>();
+        double thrust_coeff = propellers_json.at("thrust_coeff").get<double>();
+        double torque_coeff = propellers_json.at("torque_coeff").get<double>();
 
         if (std::abs(std::abs(spin_sign) - 1.0) > constants::eps) { throw std::runtime_error("json::validate_propellers_json: propellers spin_sign must be +1 or -1"); }
         if (thrust_coeff <= 0.0) { throw std::runtime_error("json::validate_propellers_json: propellers thrust_coeff must be positive"); }
