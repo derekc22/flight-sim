@@ -1,12 +1,14 @@
 #include <Eigen/Dense>
+#include <cmath>
 #include <stdexcept>
 #include <algorithm>
+#include <string>
 #include <vector>
 #include "simulation/constants/public.hpp"
 #include "simulation/util/public.hpp"
 #include "simulation/transforms/s3/public.hpp"
 #include "simulation/transforms/so3/public.hpp"
-#include "simulation/transforms/so3/so3.hpp"
+#include "simulation/transforms/so3/private.hpp"
 
 namespace transforms {
 

@@ -4,7 +4,7 @@
 #include <vector>
 #include "simulation/constants/public.hpp"
 #include "simulation/transforms/se3/public.hpp"
-#include "simulation/transforms/se3/se3.hpp"
+#include "simulation/transforms/se3/private.hpp"
 
 namespace transforms {
 

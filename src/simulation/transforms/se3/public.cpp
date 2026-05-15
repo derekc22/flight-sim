@@ -1,10 +1,11 @@
 #include <Eigen/Dense>
 #include <stdexcept>
 #include <algorithm>
+#include <string>
 #include <vector>
 #include "simulation/constants/public.hpp"
 #include "simulation/transforms/se3/public.hpp"
-#include "simulation/transforms/se3/se3.hpp"
+#include "simulation/transforms/se3/private.hpp"
 
 namespace transforms {
 
@@ -60,4 +61,3 @@ namespace transforms {
     };    
 
 }
-

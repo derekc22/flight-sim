@@ -1,5 +1,6 @@
 #include <unsupported/Eigen/MatrixFunctions>
 #include <sstream>
+#include <string>
 #include "simulation/actuators/public.hpp"
 #include "simulation/constants/public.hpp"
 #include "simulation/dynamics/public.hpp"

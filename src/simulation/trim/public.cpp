@@ -10,7 +10,7 @@
 #include "simulation/control/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/trim/public.hpp"
-#include "simulation/trim/trim.hpp"
+#include "simulation/trim/private.hpp"
 #include "simulation/util/public.hpp"
 #include "simulation/vehicles/public.hpp"
 

@@ -1,7 +1,7 @@
 #include <Eigen/Dense>
 #include <format>
 #include <stdexcept>
-#include "simulation/dynamics/dynamics.hpp"
+#include "simulation/dynamics/private.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/frames/public.hpp"
 #include "simulation/transforms/public.hpp"

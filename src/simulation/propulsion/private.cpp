@@ -1,4 +1,4 @@
-#include "simulation/propulsion/propulsion.hpp"
+#include "simulation/propulsion/private.hpp"
 #include "simulation/constants/public.hpp"
 
 namespace propulsion {

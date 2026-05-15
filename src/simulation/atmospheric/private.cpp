@@ -1,5 +1,6 @@
 #include <array>
-#include "simulation/atmospheric/atmospheric.hpp"
+#include <cmath>
+#include "simulation/atmospheric/private.hpp"
 #include "simulation/constants/public.hpp"
 #include "simulation/util/public.hpp"
 

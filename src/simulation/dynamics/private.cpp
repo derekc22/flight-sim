@@ -1,6 +1,6 @@
 #include <Eigen/Dense>
 #include "simulation/transforms/public.hpp"
-#include "simulation/dynamics/dynamics.hpp"
+#include "simulation/dynamics/private.hpp"
 #include "simulation/constants/public.hpp"
 #include "simulation/util/public.hpp"
 

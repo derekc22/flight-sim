@@ -1,5 +1,5 @@
+#include <optional>
 #include <random>
-// #include <utility> // For std::pair
 #include "simulation/aerodynamics/public.hpp"
 #include "simulation/atmospheric/public.hpp"
 #include "simulation/avionics/sensors/public.hpp"

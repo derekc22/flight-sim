@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <cmath>
+#include <cstddef>
 #include <utility> // For std::pair
 #include <stdexcept>
 #include "simulation/actuators/propulsor/public.hpp"
@@ -9,7 +10,7 @@
 #include "simulation/atmospheric/public.hpp"
 #include "simulation/constants/public.hpp"
 #include "simulation/dynamics/public.hpp"
-#include "simulation/trim/trim.hpp"
+#include "simulation/trim/private.hpp"
 #include "simulation/util/cppad/public.hpp"
 #include "simulation/util/public.hpp"
 
@@ -24,7 +25,7 @@ namespace trim {
         }
 
         double ratio = util::clamp_inside_1((u - mid) / half_range);
-        return ratio / std::sqrt(std::max(1.0 - ratio * ratio, constants::eps));
+        return ratio / util::sqrt(std::max(1.0 - ratio * ratio, constants::eps));
     }
 
     TrimVariablesVector_T<double> unpack_trim_solver_variables(const dynamics::State_T<double>& x, const actuators::ActuatorInputs_T<double>& u, const actuators::ActuatorLimits_T<double>& actuator_limits) {

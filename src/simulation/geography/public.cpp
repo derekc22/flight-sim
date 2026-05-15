@@ -4,7 +4,7 @@
 #include <Eigen/Dense>
 #include "simulation/constants/public.hpp"
 #include "simulation/frames/public.hpp"
-#include "simulation/geography/geography.hpp"
+#include "simulation/geography/private.hpp"
 #include "simulation/geography/public.hpp"
 #include "simulation/transforms/public.hpp"
 #include "simulation/util/public.hpp"

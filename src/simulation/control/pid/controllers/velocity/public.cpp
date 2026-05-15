@@ -1,4 +1,5 @@
 
+#include <tuple>
 #include "simulation/actuators/propulsor/public.hpp"
 #include "simulation/actuators/surface/public.hpp"
 #include "simulation/control/public.hpp"

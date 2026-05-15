@@ -1,6 +1,6 @@
 #include <algorithm>
 #include "simulation/actuators/public.hpp"
-#include "simulation/control/linear_quadratic/linear_quadratic.hpp"
+#include "simulation/control/linear_quadratic/private.hpp"
 #include "simulation/control/linear_quadratic/public.hpp"
 #include "simulation/dynamics/public.hpp"
 

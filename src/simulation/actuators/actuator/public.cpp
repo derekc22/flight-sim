@@ -1,3 +1,4 @@
+#include <optional>
 #include "simulation/actuators/actuator/public.hpp"
 #include "simulation/util/public.hpp"
 

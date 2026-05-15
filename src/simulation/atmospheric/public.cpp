@@ -1,7 +1,7 @@
 #include <cmath>
 #include <format>
 #include <stdexcept>
-#include "simulation/atmospheric/atmospheric.hpp"
+#include "simulation/atmospheric/private.hpp"
 #include "simulation/atmospheric/public.hpp"
 #include "simulation/constants/public.hpp"
 #include "simulation/frames/public.hpp"
@@ -23,7 +23,7 @@ namespace atmospheric {
     };
 
     MachNumber mps_to_mach(const dynamics::TranslationalVelocity& v, const StaticAirTemperature& T){
-        double a = std::sqrt(constants::gamma_air * constants::R_air * T.data);
+        double a = util::sqrt(constants::gamma_air * constants::R_air * T.data);
         double M = util::vector_norm(v.data)/a;
         return { M };
     }
@@ -39,7 +39,7 @@ namespace atmospheric {
     };
 
     MachNumber compute_mach(const StagnationAirPressure& P0, const StaticAirPressure& P){
-        double M = std::sqrt( (2.0 / (constants::gamma_air - 1.0)) * (std::pow( P0.data / P.data, (constants::gamma_air - 1.0) / constants::gamma_air ) - 1.0) ); 
+        double M = util::sqrt( (2.0 / (constants::gamma_air - 1.0)) * (std::pow( P0.data / P.data, (constants::gamma_air - 1.0) / constants::gamma_air ) - 1.0) ); 
         return { M };
     }
 

@@ -1,7 +1,10 @@
 #include <cmath>
 #include <format>
 #include <stdexcept>
+#include <string>
+#include <unordered_map>
 #include <utility>
+#include <vector>
 #include <Eigen/Dense>
 #include "simulation/actuators/surface/public.hpp"
 #include "simulation/aerodynamics/public.hpp"

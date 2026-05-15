@@ -1,7 +1,9 @@
+#include <complex>
 #include <cmath>
 #include <iomanip>
 #include <sstream>
-#include "simulation/analysis/analysis.hpp"
+#include <string>
+#include "simulation/analysis/private.hpp"
 
 namespace analysis {
 

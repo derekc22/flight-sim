@@ -3,7 +3,8 @@
 #include <iomanip>
 #include <sstream>
 #include <stdexcept>
-#include "simulation/analysis/analysis.hpp"
+#include <string>
+#include "simulation/analysis/private.hpp"
 #include "simulation/analysis/public.hpp"
 #include "simulation/constants/public.hpp"
 #include "simulation/linearization/public.hpp"

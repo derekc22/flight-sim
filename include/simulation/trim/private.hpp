@@ -64,6 +64,20 @@ namespace trim {
     template <typename T>
     TrimResidualVector_T<T> compute_trim_residual_vector_T(const TrimVariablesVector_T<T>& z, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions, bool use_physical_controls);
 
+    double send_control_to_solver_space(double u, double limit_min, double limit_max);
+
+    TrimVariablesVector_T<double> unpack_trim_solver_variables(const dynamics::State_T<double>& x, const actuators::ActuatorInputs_T<double>& u, const actuators::ActuatorLimits_T<double>& actuator_limits);
+
+    TrimResidualVector_T<double> trim_residual_weights(const TrimSolveOptions& options);
+
+    double _residual_norm_inf(const TrimResidualVector_T<double>& residual);
+
+    void _validate_trim_solve_options(const TrimSolveOptions& options);
+
+    dynamics::Wrench compute_trim_wrench(const dynamics::State_T<double>& x, const actuators::ActuatorInputs_T<double>& u, const TrimModel& model, const TrimConditions& conditions);
+
+    TrimSolution build_trim_solution(const TrimVariablesVector_T<double>& z, const TrimResidualVector_T<double>& residual, const TrimResidualVector_T<double>& weighted_residual, const TrimModel& model, const TrimConditions& conditions, bool converged, std::size_t iterations);
+
     TrimResidualVector_T<double> compute_trim_residual_vector(const TrimVariablesVector_T<double>& z, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions, bool use_physical_controls);
 
     TrimResidualJacobian compute_trim_residual_jac(const TrimVariablesVector_T<double>& z, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions, bool use_physical_controls);
@@ -75,4 +89,4 @@ namespace trim {
 
 }
 
-#include "simulation/trim/trim.tpp"
+#include "simulation/trim/private.tpp"

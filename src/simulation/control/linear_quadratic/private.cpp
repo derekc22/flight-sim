@@ -1,21 +1,22 @@
 #include <stdexcept>
-#include "simulation/control/linear_quadratic/linear_quadratic.hpp"
+#include <string>
+#include "simulation/control/linear_quadratic/private.hpp"
 #include "simulation/control/linear_quadratic/slicot_care_wrapper.h"
 #include "simulation/util/validate/public.hpp"
 
 namespace control {
 
-    static Eigen::MatrixXd symmetrize(const Eigen::Ref<const Eigen::MatrixXd>& M) {
+    Eigen::MatrixXd symmetrize(const Eigen::Ref<const Eigen::MatrixXd>& M) {
         return 0.5 * (M + M.transpose());
     }
 
-    static Eigen::LDLT<Eigen::MatrixXd> factorize_symmetric(const Eigen::Ref<const Eigen::MatrixXd>& M, const char* name) {
+    Eigen::LDLT<Eigen::MatrixXd> factorize_symmetric(const Eigen::Ref<const Eigen::MatrixXd>& M, const char* name) {
         Eigen::LDLT<Eigen::MatrixXd> ldlt(symmetrize(M));
         if (ldlt.info() != Eigen::Success) { throw std::runtime_error(std::string("control::") + name + " factorization failed"); }
         return ldlt;
     }
 
-    static Eigen::MatrixXd care_residual(const Eigen::Ref<const Eigen::MatrixXd>& A, const Eigen::Ref<const Eigen::MatrixXd>& G, const Eigen::Ref<const Eigen::MatrixXd>& Q, const Eigen::Ref<const Eigen::MatrixXd>& P) {
+    Eigen::MatrixXd care_residual(const Eigen::Ref<const Eigen::MatrixXd>& A, const Eigen::Ref<const Eigen::MatrixXd>& G, const Eigen::Ref<const Eigen::MatrixXd>& Q, const Eigen::Ref<const Eigen::MatrixXd>& P) {
         return A.transpose() * P + P * A - P * G * P + Q;
     }
 

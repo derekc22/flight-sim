@@ -1,10 +1,11 @@
 #include <Eigen/Dense>
 #include <stdexcept>
 #include <algorithm>
+#include <string>
 #include <vector>
 #include "simulation/constants/public.hpp"
 #include "simulation/transforms/s3/public.hpp"
-#include "simulation/transforms/s3/s3.hpp"
+#include "simulation/transforms/s3/private.hpp"
 #include "simulation/transforms/so3/public.hpp"
 #include "simulation/util/public.hpp"
 

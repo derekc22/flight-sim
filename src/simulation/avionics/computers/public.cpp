@@ -3,11 +3,12 @@
 #include "simulation/dynamics/public.hpp"
 #include "simulation/geography/public.hpp"
 #include "simulation/avionics/computers/public.hpp"
+#include "simulation/util/public.hpp"
 
 namespace avionics {
 
     FreeStreamVelocityMeasurement AirDataComputer::calculate(const MachNumberMeasurement& Mach, const StaticAirTemperatureMeasurement& T) {
-        double Vinf = Mach.data * std::sqrt(constants::gamma_air * constants::R_air * T.data);
+        double Vinf = Mach.data * util::sqrt(constants::gamma_air * constants::R_air * T.data);
         return { Vinf };
     }
 

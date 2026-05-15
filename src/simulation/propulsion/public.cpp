@@ -2,7 +2,7 @@
 #include "simulation/atmospheric/public.hpp"
 #include "simulation/constants/public.hpp"
 #include "simulation/dynamics/public.hpp"
-#include "simulation/propulsion/propulsion.hpp"
+#include "simulation/propulsion/private.hpp"
 #include "simulation/propulsion/public.hpp"
 
 namespace propulsion {

@@ -8,7 +8,7 @@ namespace estimation {
 
     LinearKalmanFilter::LinearKalmanFilter(const LinearKalmanFilterParameters& params) : params(params), policy(params) {}
 
-    dynamics::StateVector_T<double> LinearKalmanFilter::makemeasurement_deviation(const KalmanFilterInput& estimator_input) {
+    dynamics::StateVector_T<double> LinearKalmanFilter::make_measurement_deviation(const KalmanFilterInput& estimator_input) {
         return dynamics::unpack_rigid_body_state(estimator_input.yN_t) - dynamics::unpack_state_T(estimator_input.trim_sol.state);
     }
 
@@ -34,7 +34,7 @@ namespace estimation {
     }
 
     EstimationOutput LinearKalmanFilter::step(const KalmanFilterInput& estimator_input) {
-        dynamics::StateVector_T<double> yt_deviation = makemeasurement_deviation(estimator_input);
+        dynamics::StateVector_T<double> yt_deviation = make_measurement_deviation(estimator_input);
         actuators::ActuatorInputsVector_T<double> ut_1_deviation = make_input_deviation(estimator_input);
 
         if (!initialized) {

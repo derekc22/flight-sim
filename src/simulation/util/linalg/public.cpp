@@ -1,6 +1,7 @@
 #include <cmath>
 #include "simulation/constants/public.hpp"
 #include "simulation/util/linalg/public.hpp"
+#include "simulation/util/public.hpp"
 
 namespace util {
 
@@ -23,7 +24,7 @@ namespace util {
     }
 
     double vector_norm(const Eigen::Vector3d& v) {
-        return std::sqrt(v.dot(v));
+        return sqrt(v.dot(v));
     }
 
 }

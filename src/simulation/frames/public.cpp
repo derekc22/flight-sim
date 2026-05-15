@@ -1,3 +1,4 @@
+#include <string>
 #include "simulation/frames/public.hpp"
 
 #include "simulation/transforms/public.hpp"
