@@ -1,5 +1,5 @@
 #include <Eigen/Dense>
-#include "simulation/control/public.hpp"
+// #include "simulation/control/public.hpp"
 #include "simulation/control/linear_quadratic/controllers/lqr/public.hpp"
 #include "simulation/control/linear_quadratic/controllers/lqi/public.hpp"
 #include "simulation/constants/public.hpp"

@@ -6,6 +6,7 @@
 #include <utility>
 #include <vector>
 #include <Eigen/Dense>
+#include <cstddef>
 #include "simulation/actuators/surface/public.hpp"
 #include "simulation/aerodynamics/public.hpp"
 #include "simulation/atmospheric/public.hpp"

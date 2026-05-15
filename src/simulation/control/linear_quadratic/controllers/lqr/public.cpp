@@ -1,7 +1,7 @@
 #include "simulation/actuators/propulsor/public.hpp"
 #include "simulation/actuators/surface/public.hpp"
 #include "simulation/actuators/public.hpp"
-#include "simulation/control/public.hpp"
+// #include "simulation/control/public.hpp"
 #include "simulation/control/linear_quadratic/controllers/lqr/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/guidance/public.hpp"

@@ -7,7 +7,7 @@
 #include "simulation/actuators/public.hpp"
 #include "simulation/aerodynamics/public.hpp"
 #include "simulation/atmospheric/public.hpp"
-#include "simulation/control/public.hpp"
+// #include "simulation/control/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/trim/public.hpp"
 #include "simulation/trim/private.hpp"

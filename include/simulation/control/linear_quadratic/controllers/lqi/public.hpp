@@ -1,4 +1,5 @@
 #pragma once
+#include <Eigen/Dense>
 #include "simulation/control/linear_quadratic/controllers/lqr/public.hpp"
 
 namespace control {

@@ -4,6 +4,7 @@
 #include <cmath>
 #include <string>
 #include <unordered_map>
+#include <cstddef>
 #include "simulation/structural/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/constants/public.hpp"
