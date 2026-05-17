@@ -1,4 +1,5 @@
 #include <Eigen/Dense>
+#include <cmath>
 #include <stdexcept>
 #include <algorithm>
 #include <string>
@@ -10,7 +11,164 @@
 
 namespace transforms {
 
+    Eigen::Vector3d R_to_eul_extr(const Eigen::Matrix3d& R, const std::string& order) {
+        double a = 0.0, b = 0.0, c = 0.0;
 
+        // Tait-Bryan, middle angle in [-pi/2, pi/2]
+        if (order == "ZYX") {
+            b = util::asin(util::clamp_to_1(R(0,2)));
+            double cb = util::cos(b);
+            if (std::abs(cb) > constants::eps) {
+                a = util::atan2(-R(0,1), R(0,0));
+                c = util::atan2(-R(1,2), R(2,2));
+            } else {
+                a = util::atan2(R(1,0), R(1,1));
+                c = 0.0;
+            }
+
+        } else if (order == "ZXY") {
+            b = util::asin(util::clamp_to_1(-R(1,2)));
+            double cb = util::cos(b);
+            if (std::abs(cb) > constants::eps) {
+                a = util::atan2(R(1,0), R(1,1));
+                c = util::atan2(R(0,2), R(2,2));
+            } else {
+                a = util::atan2(-R(0,1), R(0,0));
+                c = 0.0;
+            }
+
+        } else if (order == "YZX") {
+            b = util::asin(util::clamp_to_1(-R(0,1)));
+            double cb = util::cos(b);
+            if (std::abs(cb) > constants::eps) {
+                a = util::atan2(R(0,2), R(0,0));
+                c = util::atan2(R(2,1), R(1,1));
+            } else {
+                a = util::atan2(-R(2,0), R(2,2));
+                c = 0.0;
+            }
+
+        } else if (order == "YXZ") {
+            b = util::asin(util::clamp_to_1(R(2,1)));
+            double cb = util::cos(b);
+            if (std::abs(cb) > constants::eps) {
+                a = util::atan2(-R(2,0), R(2,2));
+                c = util::atan2(-R(0,1), R(1,1));
+            } else {
+                a = util::atan2(R(0,2), R(0,0));
+                c = 0.0;
+            }
+
+        } else if (order == "XZY") {
+            b = util::asin(util::clamp_to_1(R(1,0)));
+            double cb = util::cos(b);
+            if (std::abs(cb) > constants::eps) {
+                a = util::atan2(-R(1,2), R(1,1));
+                c = util::atan2(-R(2,0), R(0,0));
+            } else {
+                a = util::atan2(R(2,1), R(2,2));
+                c = 0.0;
+            }
+
+        } else if (order == "XYZ") {
+            b = util::asin(util::clamp_to_1(-R(2,0)));
+            double cb = util::cos(b);
+            if (std::abs(cb) > constants::eps) {
+                a = util::atan2(R(2,1), R(2,2));
+                c = util::atan2(R(1,0), R(0,0));
+            } else {
+                a = util::atan2(-R(1,2), R(1,1));
+                c = 0.0;
+            }
+
+        // Proper Euler (repeated axis), middle angle in [-pi, 0]
+        } else if (order == "ZXZ") {
+            b = -util::acos(util::clamp_to_1(R(2,2)));
+            double sb = util::sin(b);
+            if (std::abs(sb) > constants::eps) {
+                a = util::atan2(-R(2,0), -R(2,1));
+                c = util::atan2(-R(0,2),  R(1,2));
+            } else {
+                a = util::atan2(-R(0,1), R(0,0));
+                c = 0.0;
+            }
+
+        } else if (order == "ZYZ") {
+            b = -util::acos(util::clamp_to_1(R(2,2)));
+            double sb = util::sin(b);
+            if (std::abs(sb) > constants::eps) {
+                a = util::atan2(-R(2,1),  R(2,0));
+                c = util::atan2(-R(1,2), -R(0,2));
+            } else {
+                a = util::atan2(-R(0,1), R(0,0));
+                c = 0.0;
+            }
+
+        } else if (order == "XYX") {
+            b = -util::acos(util::clamp_to_1(R(0,0)));
+            double sb = util::sin(b);
+            if (std::abs(sb) > constants::eps) {
+                a = util::atan2(-R(0,1), -R(0,2));
+                c = util::atan2(-R(1,0),  R(2,0));
+            } else {
+                a = util::atan2(-R(1,2), R(1,1));
+                c = 0.0;
+            }
+
+        } else if (order == "XZX") {
+            b = -util::acos(util::clamp_to_1(R(0,0)));
+            double sb = util::sin(b);
+            if (std::abs(sb) > constants::eps) {
+                a = util::atan2(-R(0,2),  R(0,1));
+                c = util::atan2(-R(2,0), -R(1,0));
+            } else {
+                a = util::atan2(-R(1,2), R(1,1));
+                c = 0.0;
+            }
+
+        } else if (order == "YXY") {
+            b = -util::acos(util::clamp_to_1(R(1,1)));
+            double sb = util::sin(b);
+            if (std::abs(sb) > constants::eps) {
+                a = util::atan2(-R(1,0),  R(1,2));
+                c = util::atan2(-R(0,1), -R(2,1));
+            } else {
+                a = util::atan2(-R(2,0), R(0,0));
+                c = 0.0;
+            }
+
+        } else if (order == "YZY") {
+            b = -util::acos(util::clamp_to_1(R(1,1)));
+            double sb = util::sin(b);
+            if (std::abs(sb) > constants::eps) {
+                a = util::atan2(-R(1,2), -R(1,0));
+                c = util::atan2(-R(2,1),  R(0,1));
+            } else {
+                a = util::atan2(-R(2,0), R(0,0));
+                c = 0.0;
+            }
+
+        } else {
+            throw std::invalid_argument("Unsupported Euler order: " + order);
+        }
+
+        return Eigen::Vector3d(util::wrap_to_pi(a),util::wrap_to_pi(b),util::wrap_to_pi(c));
+    }
+
+    Eigen::Vector3d R_to_eul_intr(const Eigen::Matrix3d& R, const std::string& order) {
+        // R_intr(a, b, c) = R_extr(-a, -b, -c).T
+        return -1 * R_to_eul_extr(R.transpose(), order);
+    }
+
+    Eigen::Vector3d C_to_eul_extr(const Eigen::Matrix3d& C, const std::string& order) {
+        // C_extr(a, b, c) = R_extr(a, b, c).T = R_intr(-a, -b, -c)
+        return R_to_eul_extr(C.transpose(), order);
+    }
+
+    Eigen::Vector3d C_to_eul_intr(const Eigen::Matrix3d& C, const std::string& order) {
+        // C_intr(a, b, c) = R_intr(a, b, c).T = R_extr(-a, -b, -c)
+        return R_to_eul_intr(C.transpose(), order);
+    }
 
     Eigen::Matrix3d Rx(double phi) {
         Eigen::Matrix3d Rx;

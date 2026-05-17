@@ -1,5 +1,5 @@
 #pragma once
-#include "simulation/control/shared.hpp"
+#include "simulation/control/shared/public.hpp"
 #include "simulation/control/pid/public.hpp"
 
 namespace control {

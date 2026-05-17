@@ -1,7 +1,15 @@
 #pragma once
 #include <Eigen/Dense>
 #include <functional>
-#include "simulation/control/shared.hpp"
+#include "simulation/control/shared/public.hpp"
+#include "simulation/control/pid/public.hpp"
+#include "simulation/control/pid/controllers/axial/public.hpp"
+#include "simulation/control/pid/controllers/damper/public.hpp"
+#include "simulation/control/pid/controllers/velocity/public.hpp"
+#include "simulation/control/linear_quadratic/public.hpp"
+#include "simulation/control/linear_quadratic/controllers/lqr/public.hpp"
+#include "simulation/control/linear_quadratic/controllers/lqi/public.hpp"
+#include "simulation/control/linear_quadratic/controllers/lqt/public.hpp"
 
 namespace control {
 
@@ -52,12 +60,3 @@ namespace control {
     };
 
 }
-
-#include "simulation/control/pid/public.hpp"
-#include "simulation/control/pid/controllers/axial/public.hpp"
-#include "simulation/control/pid/controllers/damper/public.hpp"
-#include "simulation/control/pid/controllers/velocity/public.hpp"
-#include "simulation/control/linear_quadratic/public.hpp"
-#include "simulation/control/linear_quadratic/controllers/lqr/public.hpp"
-#include "simulation/control/linear_quadratic/controllers/lqi/public.hpp"
-#include "simulation/control/linear_quadratic/controllers/lqt/public.hpp"

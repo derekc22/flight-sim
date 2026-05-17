@@ -70,6 +70,24 @@ namespace trim {
     };
 
     template <typename T>
+    T get_control_from_solver_space_T(const T& u_solver, double limit_min, double limit_max);
+
+    template <typename T>
+    dynamics::Twist_T<T> build_twist_from_trim_state_T(const dynamics::State_T<T>& x);
+
+    template <typename T>
+    actuators::SurfaceActuatorInputs_T<T> build_surface_actuator_inputs_from_trim_T(const actuators::ActuatorInputs_T<T>& u, const actuators::FixedActuatorInputs_T& fixed_actuator_inputs);
+
+    template <typename T>
+    actuators::PropulsorActuatorInputs_T<T> build_propulsor_actuator_inputs_from_trim_T(const actuators::ActuatorInputs_T<T>& u);
+
+    template <typename T>
+    constants::Vector3_T<T> gB_T(const T& phi, const T& theta);
+
+    template <typename T>
+    dynamics::Wrench_T<T> compute_trim_net_wrench_T(const dynamics::State_T<T>& x, const dynamics::Twist_T<T>& twist, const actuators::ActuatorInputs_T<T>& u, const TrimModel& model, const TrimConditions& conditions);
+
+    template <typename T>
     dynamics::StateDot_T<T> compute_trim_state_dot_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u, const TrimModel& model, const TrimConditions& conditions);
 
     template <typename T>

@@ -306,7 +306,7 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
         // compute rigid-body dynamics
         xN_t = dynamics::step_rigid_body(xN_t, mass, J, WB_net);
 
-        // define StepOptions
+        // declare StepOptions
         vehicles::StepOptions StepOpts;
 
         // set step options

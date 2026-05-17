@@ -6,7 +6,7 @@
 #include "simulation/constants/public.hpp"
 #include "simulation/transforms/s3/public.hpp"
 #include "simulation/transforms/s3/private.hpp"
-#include "simulation/transforms/so3/public.hpp"
+#include "simulation/transforms/so3/private.hpp"
 #include "simulation/util/public.hpp"
 
 namespace transforms {
