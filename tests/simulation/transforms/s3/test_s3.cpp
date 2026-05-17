@@ -34,7 +34,7 @@ namespace {
     };
 }
 
-TEST(S3Transforms, EulerToQuatToEulerToQuatRoundTripExtrinsic) {
+TEST(transforms_s3, EulerToQuatToEulerToQuatRoundTripExtrinsic) {
     constexpr double a = 0.31;
     constexpr double b = 0.47;
     constexpr double c = -0.63;
@@ -54,7 +54,7 @@ TEST(S3Transforms, EulerToQuatToEulerToQuatRoundTripExtrinsic) {
     }
 }
 
-TEST(S3Transforms, EulerToQuatToEulerToQuatRoundTripIntrinsic) {
+TEST(transforms_s3, EulerToQuatToEulerToQuatRoundTripIntrinsic) {
     constexpr double a = 0.31;
     constexpr double b = 0.47;
     constexpr double c = -0.63;
@@ -74,7 +74,7 @@ TEST(S3Transforms, EulerToQuatToEulerToQuatRoundTripIntrinsic) {
     }
 }
 
-TEST(S3Transforms, NormalizeAndCanonicalizeReturnsUnitQuaternionWithPositiveW) {
+TEST(transforms_s3, NormalizeAndCanonicalizeReturnsUnitQuaternionWithPositiveW) {
     Eigen::Quaterniond q(-2.0, 0.5, -1.0, 0.25);
 
     const auto out = transforms::normalize_and_canonicalize(q);
@@ -83,7 +83,7 @@ TEST(S3Transforms, NormalizeAndCanonicalizeReturnsUnitQuaternionWithPositiveW) {
     EXPECT_GE(out.w(), 0.0);
 }
 
-TEST(S3Transforms, QuatCIsConjugateOfQuatR) {
+TEST(transforms_s3, QuatCIsConjugateOfQuatR) {
     constexpr double a = 0.2;
     constexpr double b = -0.4;
     constexpr double c = 0.7;
@@ -97,7 +97,7 @@ TEST(S3Transforms, QuatCIsConjugateOfQuatR) {
     expect_quat_near(qC_intr, transforms::normalize_and_canonicalize(qR_intr.conjugate()));
 }
 
-TEST(S3Transforms, QuatToRotNormalizesInput) {
+TEST(transforms_s3, QuatToRotNormalizesInput) {
     auto qR_extr = transforms::eul_to_quatR(0.3, -0.2, 0.5, "ZYX", "extr");
     qR_extr.coeffs() *= 3.0;
     expect_valid_rotation_matrix(transforms::quat_to_rot(qR_extr));
@@ -115,7 +115,7 @@ TEST(S3Transforms, QuatToRotNormalizesInput) {
     expect_valid_rotation_matrix(transforms::quat_to_rot(qC_intr));
 }
 
-TEST(S3Transforms, IntrinsicAndExtrinsicWrappersDispatch) {
+TEST(transforms_s3, IntrinsicAndExtrinsicWrappersDispatch) {
     constexpr double a = 0.1;
     constexpr double b = 0.2;
     constexpr double c = -0.3;
@@ -126,13 +126,13 @@ TEST(S3Transforms, IntrinsicAndExtrinsicWrappersDispatch) {
     expect_quat_near(transforms::eul_to_quatC(a, b, c, "XYZ", "intr"), transforms::eul_to_quatC_intr(a, b, c, "XYZ"));
 }
 
-TEST(S3Transforms, RejectsInvalidTypeArgument) {
+TEST(transforms_s3, RejectsInvalidTypeArgument) {
     EXPECT_THROW(transforms::eul_to_quatR(0.0, 0.0, 0.0, "ZYX", "bad"), std::invalid_argument);
     EXPECT_THROW(transforms::eul_to_quatC(0.0, 0.0, 0.0, "ZYX", "bad"), std::invalid_argument);
     EXPECT_THROW(transforms::quatC_to_eul(Eigen::Quaterniond::Identity(), "ZYX", "bad"), std::invalid_argument);
 }
 
-TEST(S3Transforms, RejectsInvalidEulerOrderArgument) {
+TEST(transforms_s3, RejectsInvalidEulerOrderArgument) {
     EXPECT_THROW(transforms::eul_to_quatR(0.0, 0.0, 0.0, "BAD", "extr"), std::invalid_argument);
     EXPECT_THROW(transforms::eul_to_quatR(0.0, 0.0, 0.0, "BAD", "intr"), std::invalid_argument);
     EXPECT_THROW(transforms::eul_to_quatC(0.0, 0.0, 0.0, "BAD", "extr"), std::invalid_argument);

@@ -23,7 +23,7 @@ static const std::vector<std::string> euler_orders = {
     "ZXZ", "ZYZ", "XYX", "XZX", "YXY", "YZY"
 };
 
-TEST(SO3Transforms, EulerToRotToEulerToRotRoundTripExtrinsic) {
+TEST(transforms_so3, EulerToRotToEulerToRotRoundTripExtrinsic) {
     constexpr double a = 0.31;
     constexpr double b = 0.47;
     constexpr double c = -0.63;
@@ -43,7 +43,7 @@ TEST(SO3Transforms, EulerToRotToEulerToRotRoundTripExtrinsic) {
     }
 }
 
-TEST(SO3Transforms, EulerToRotToEulerToRotRoundTripIntrinsic) {
+TEST(transforms_so3, EulerToRotToEulerToRotRoundTripIntrinsic) {
     constexpr double a = 0.31;
     constexpr double b = 0.47;
     constexpr double c = -0.63;
@@ -63,7 +63,7 @@ TEST(SO3Transforms, EulerToRotToEulerToRotRoundTripIntrinsic) {
     }
 }
 
-TEST(SO3Transforms, CIsTransposeOfR) {
+TEST(transforms_so3, CIsTransposeOfR) {
     constexpr double a = 0.2;
     constexpr double b = -0.4;
     constexpr double c = 0.7;
@@ -77,7 +77,7 @@ TEST(SO3Transforms, CIsTransposeOfR) {
     expect_matrix_near(C_intr, R_intr.transpose());
 }
 
-TEST(SO3Transforms, RotToQuatToRotRoundTrip) {
+TEST(transforms_so3, RotToQuatToRotRoundTrip) {
     const auto R = transforms::eul_to_R(0.3, -0.2, 0.5, "ZYX");
     const auto q = transforms::rot_to_quat(R);
 
@@ -85,13 +85,13 @@ TEST(SO3Transforms, RotToQuatToRotRoundTrip) {
     expect_matrix_near(transforms::quat_to_rot(q), R);
 }
 
-TEST(SO3Transforms, EulerToRAndEulerToCReturnOrthonormalMatricesWithUnitDeterminant) {
+TEST(transforms_so3, EulerToRAndEulerToCReturnOrthonormalMatricesWithUnitDeterminant) {
     expect_orthonormal_with_unit_determinant(transforms::eul_to_R(0.3, -0.2, 0.5, "ZYX"));
     expect_orthonormal_with_unit_determinant(transforms::eul_to_C(0.3, -0.2, 0.5, "ZYX", "extr"));
     expect_orthonormal_with_unit_determinant(transforms::eul_to_C(0.3, -0.2, 0.5, "ZYX", "intr"));
 }
 
-TEST(SO3Transforms, IntrinsicAndExtrinsicWrappersDispatch) {
+TEST(transforms_so3, IntrinsicAndExtrinsicWrappersDispatch) {
     constexpr double a = 0.1;
     constexpr double b = 0.2;
     constexpr double c = -0.3;
@@ -101,12 +101,12 @@ TEST(SO3Transforms, IntrinsicAndExtrinsicWrappersDispatch) {
     expect_matrix_near(transforms::eul_to_C(a, b, c, "XYZ", "intr"), transforms::eul_to_C_intr(a, b, c, "XYZ"));
 }
 
-TEST(SO3Transforms, RejectsInvalidTypeArgument) {
+TEST(transforms_so3, RejectsInvalidTypeArgument) {
     EXPECT_THROW(transforms::eul_to_C(0.0, 0.0, 0.0, "ZYX", "bad"), std::invalid_argument);
     EXPECT_THROW(transforms::C_to_eul(Eigen::Matrix3d::Identity(), "ZYX", "bad"), std::invalid_argument);
 }
 
-TEST(SO3Transforms, RejectsInvalidEulerOrderArgument) {
+TEST(transforms_so3, RejectsInvalidEulerOrderArgument) {
     EXPECT_THROW(transforms::eul_to_R(0.0, 0.0, 0.0, "BAD"), std::invalid_argument);
     EXPECT_THROW(transforms::eul_to_R_intr(0.0, 0.0, 0.0, "BAD"), std::invalid_argument);
     EXPECT_THROW(transforms::eul_to_C(0.0, 0.0, 0.0, "BAD", "extr"), std::invalid_argument);

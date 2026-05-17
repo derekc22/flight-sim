@@ -26,7 +26,7 @@ static void expect_valid_homogeneous_matrix(const Eigen::Matrix4d& H) {
     EXPECT_NEAR((H.block<3,3>(0,0).determinant()), 1.0, constants::eps_strict);
 }
 
-TEST(SE3Transforms, MakeHRBuildsRotateAndTranslateFirstTransforms) {
+TEST(transforms_se3, MakeHRBuildsRotateAndTranslateFirstTransforms) {
     const auto R = transforms::eul_to_R(0.2, -0.3, 0.4, "ZYX");
     const Eigen::Vector3d d(1.0, -2.0, 0.5);
     const Eigen::Vector3d v(0.25, 0.5, -0.75);
@@ -44,7 +44,7 @@ TEST(SE3Transforms, MakeHRBuildsRotateAndTranslateFirstTransforms) {
     expect_valid_homogeneous_matrix(H_translate);
 }
 
-TEST(SE3Transforms, MakeHCBuildsRotateAndTranslateFirstTransforms) {
+TEST(transforms_se3, MakeHCBuildsRotateAndTranslateFirstTransforms) {
     const auto R = transforms::eul_to_R(0.2, -0.3, 0.4, "ZYX");
     const auto C = R.transpose();
     const Eigen::Vector3d d(1.0, -2.0, 0.5);
@@ -64,7 +64,7 @@ TEST(SE3Transforms, MakeHCBuildsRotateAndTranslateFirstTransforms) {
     expect_valid_homogeneous_matrix(H_translate);
 }
 
-TEST(SE3Transforms, MakeHinvInvertsHomogeneousTransform) {
+TEST(transforms_se3, MakeHinvInvertsHomogeneousTransform) {
     const auto R = transforms::eul_to_R(0.2, -0.3, 0.4, "ZYX");
     const Eigen::Vector3d d(1.0, -2.0, 0.5);
     const Eigen::Vector3d v(0.25, 0.5, -0.75);
@@ -77,7 +77,7 @@ TEST(SE3Transforms, MakeHinvInvertsHomogeneousTransform) {
     expect_vector_near(transforms::apply_H(H_inv, transforms::apply_H(H, v)), v);
 }
 
-TEST(SE3Transforms, ChainHomPostAndPreComposeInExpectedOrder) {
+TEST(transforms_se3, ChainHomPostAndPreComposeInExpectedOrder) {
     const auto R1 = transforms::eul_to_R(0.2, -0.3, 0.4, "ZYX");
     const auto R2 = transforms::eul_to_R(-0.1, 0.5, 0.2, "XYZ");
     const Eigen::Vector3d d1(1.0, -2.0, 0.5);
@@ -90,7 +90,7 @@ TEST(SE3Transforms, ChainHomPostAndPreComposeInExpectedOrder) {
     expect_matrix4_near(transforms::chain_hom_pre(transforms_list), H2 * H1);
 }
 
-TEST(SE3Transforms, MakeHWrappersDispatchToRotateAndTranslateFirst) {
+TEST(transforms_se3, MakeHWrappersDispatchToRotateAndTranslateFirst) {
     const auto R = transforms::eul_to_R(0.2, -0.3, 0.4, "ZYX");
     const auto C = R.transpose();
     const Eigen::Vector3d d(1.0, -2.0, 0.5);
@@ -101,7 +101,7 @@ TEST(SE3Transforms, MakeHWrappersDispatchToRotateAndTranslateFirst) {
     expect_matrix4_near(transforms::make_HC(C, d, "translate"), transforms::make_HC_translate_first(C, d));
 }
 
-TEST(SE3Transforms, RejectsInvalidFirstArgument) {
+TEST(transforms_se3, RejectsInvalidFirstArgument) {
     const auto R = transforms::eul_to_R(0.2, -0.3, 0.4, "ZYX");
     const auto C = R.transpose();
     const Eigen::Vector3d d(1.0, -2.0, 0.5);

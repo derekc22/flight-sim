@@ -2,6 +2,7 @@
 set -e
 
 usage() {
+	exit_code="$1"
 	cat >&2 <<EOF
 USAGE: $0
   -a <AIRCRAFT>
@@ -18,7 +19,7 @@ USAGE: $0
   [-z TEST_BOOL]
   [-q QUICK_BOOL]
 EOF
-	exit 1
+	exit "$exit_code"
 }
 
 while getopts "a:t:o:rscewvdpzqh" opt; do
@@ -36,8 +37,8 @@ while getopts "a:t:o:rscewvdpzqh" opt; do
 		p) PLOT_BOOL=1 ;;
 		z) TEST_BOOL=1 ;;
 		q) QUICK_BOOL=1 ;;
-		h) usage ;;
-		?) usage ;;
+			h) usage 0 ;;
+			?) usage 1 ;;
 	esac
 done
 
@@ -55,7 +56,7 @@ done
 : "${OUT_DIR:=$(date +"%Y%b%d_%H-%M-%S")}"
 
 # required args check
-[[ -z "$AIRCRAFT" || -z "$TIME_SEC" ]] && usage
+[[ -z "$AIRCRAFT" || -z "$TIME_SEC" ]] && usage 1
 
 # validate arg combinations
 if [[ "$DATA_BOOL" -eq 0 && "$PLOT_BOOL" -eq 1 ]]; then

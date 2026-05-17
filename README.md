@@ -66,15 +66,22 @@ C++ flight simulator with FlightGear integration
   - `-o OUT_DIR`: Output directory
   
 ## Example
-Run a 60-second simulation of the C172 with control and avionics. Data and plots are saved to `data/c172_test` and `plots/c172_test`, respectively
+Run a 60-second simulation of the C172 with control and avionics. Data and plots are saved to `data/c172_test` and `plots/c172_test`, respectively:
 ```bash
 scripts/run.sh -a c172p -t 60 -c -s -d -p -o c172_test
 ```
 
-## Testing
-Unit tests are implemented with Google Test and are run using:
+## Tests
+Unit tests are implemented with Google Test:
 ```bash
+# Run all tests
 scripts/test.sh
+
+# Run a specific test suite
+scripts/test.sh -t <TEST_SUITE>
+
+# See available test suites
+scripts/test.sh -h
 ```
 
 ## References:
