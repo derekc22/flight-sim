@@ -47,7 +47,6 @@ namespace guidance {
         GuidanceSetpoint step(int t, int tf);
     };
 
-    GuidanceStateVector unpack_rigid_body_state(const dynamics::RigidBodyState& xN_t);
-    GuidanceSetpoint pack_guidance_setpoint(const GuidanceStateVector& guidance_vec);
+    GuidanceStateVector unpack_rigid_body_state_guidance(const dynamics::RigidBodyState& xN_t);
 
 }

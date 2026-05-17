@@ -4,14 +4,32 @@ Rules for active `include/simulation` and `src/simulation` code.
 
 ## Core Rule
 
-Publicly used symbols belong in `public.*`.
+Public symbols belong in `public.*`.
 
-Module-private symbols belong in `private.*`.
+Private symbols belong in `private.*`.
 
-A symbol is public if code outside its owning module or submodule includes it,
-calls it, constructs it, stores it, names it, or needs it to compile a public
-interface. A symbol is private only if it is used entirely inside its owning
-module or submodule.
+The owner of a symbol is the module or submodule directory where the symbol is
+declared. For example, a symbol declared in
+`include/simulation/transforms/so3/public.hpp` is owned by `transforms/so3`.
+
+Sibling submodules are submodule directories with the same immediate parent.
+For example, `transforms/so3`, `transforms/s3`, and `transforms/se3` are sibling
+submodules under `transforms`.
+
+A symbol is public when any of these files includes it, calls it, constructs it,
+stores it, names it, or needs it to compile a declaration:
+
+- A file in a different module.
+- A file in `src/main.cpp`, `src/core`, JSON, messages, IO, or tests.
+- A public header or public `.tpp` in any sibling submodule.
+
+A symbol is private when all uses stay in one of these places:
+
+- The owner.
+- A sibling submodule under the same immediate parent, limited to that sibling's
+  `.cpp`, `private.hpp`, or `private.tpp` files.
+- The body of a non-template function or member function defined in the owner's
+  `.cpp` files.
 
 ## File Roles
 
@@ -36,23 +54,48 @@ src/simulation/<module>/private.cpp
 Create only files that own real declarations or definitions. Omit `public.cpp`
 when there are no public non-template definitions. Omit `private.hpp` when
 there are no private declarations. Omit `.tpp` files when there are no templates.
-If a module has no public symbols and no meaningful private implementation, it
-should have no files.
+If a module has no public declarations, no private declarations, and no source
+definitions, it should have no files.
 
 Do not keep unnecessary empty files. Empty namespace blocks, include-only
-wrappers, and blank source/template files are invalid unless they have a concrete
-current purpose.
+wrappers, and blank source/template files are invalid unless an active source or
+header includes them.
 
 ## Symbol Placement
 
-Put a symbol in `public.*` when another module, `src/main.cpp`, `core`, JSON,
-messages, IO, tests, or any non-owning area uses it. Also put it in `public.*`
-when it appears in a public signature/data layout, external code must name it,
-or it is a public member function of a publicly exposed type.
+Put a symbol in `public.*` when a file outside the owner uses it, except for
+uses from sibling `.cpp`, `private.hpp`, or `private.tpp` files under the same
+immediate parent. `src/main.cpp`, `src/core`, JSON, messages, IO, and tests
+always count as outside the owner.
 
-Put a symbol in `private.*` only when the owning module/submodule is the only
-user, no outside public header needs it, no external code names it, and it does
-not appear in a public signature/data layout.
+Also put a symbol in `public.*` when any of these are true:
+
+- It appears in a public function signature.
+- It appears in a public type field.
+- It appears in a public alias.
+- It appears in a public template parameter or return type.
+- It is a member function of a public struct or class.
+- A public template definition in `public.tpp` calls it.
+
+Put a symbol in `private.*` only when all uses stay in the owner or in sibling
+`.cpp`, `private.hpp`, or `private.tpp` files under the same immediate parent. A
+symbol cannot be private when a public header or public `.tpp` outside the owner
+names it, or when it appears in a public signature or public type layout.
+
+Member functions adopt the placement status of their owning type. A member
+function of a public struct or class is a public symbol and belongs in
+`public.*`. A member function of a private struct or class is a private symbol
+and belongs in `private.*`.
+
+If a helper appears in the body of a public template definition in `public.tpp`,
+keep that helper in `public.*`. Public headers include `public.tpp`, and files
+that include those public headers compile the public template body.
+
+A helper used only by non-template definitions in the owner's `public.cpp` may
+be private when it is not in a public signature or data layout. The same rule
+applies to helpers used only by public member function definitions in the
+owner's `public.cpp`. This helper exception applies to free functions, not to
+member functions of public types.
 
 Public declarations belong in `public.hpp`; public template definitions in
 `public.tpp`; public non-template definitions in `public.cpp`.
@@ -79,9 +122,9 @@ src/simulation/actuators/propulsor/public.cpp
 src/simulation/actuators/propulsor/private.cpp
 ```
 
-Use subfolders for independently meaningful parts such as `actuators/propulsor`,
+Use subfolders for module boundaries such as `actuators/propulsor`,
 `actuators/surface`, `avionics/sensors`, `avionics/computers`,
-`control/pid/controllers/<controller>`,
+`control/shared`, `control/pid/controllers/<controller>`,
 `control/linear_quadratic/controllers/<controller>`,
 `estimation/kalman/estimators/<estimator>`, `transforms/s3`,
 `transforms/se3`, `transforms/so3`, and `util/<utility>`.
@@ -94,14 +137,25 @@ Do not keep independent submodules as flat files like `controllers/lqr.hpp` or
 Headers must include what they directly use. Do not rely on accidental
 transitive includes.
 
-- Public headers may include needed `public.hpp` headers.
+- Public headers may include `public.hpp` headers for symbols they directly
+  name.
 - Public headers must not include another module's `private.hpp`.
-- Private headers may include their owning `public.hpp` and direct public dependencies.
+- Private headers may include their owner's `public.hpp` and public headers for
+  symbols they directly name.
+- Source files may include their owner's `private.hpp`.
+- Source files, `private.hpp`, and `private.tpp` may include a sibling
+  `private.hpp` under the same immediate parent.
+- Public headers and public `.tpp` files must not include any `private.hpp`
+  outside their owner.
+- In headers, place `.hpp` includes at the top after `#pragma once` and before
+  declarations or definitions.
+- The matching `.tpp` include is the only include that may appear at the bottom
+  of a header.
 - Source files must include their owning header directly.
 - Standard library headers must be included directly by the file that uses them.
 - Do not use broad aggregate headers to hide missing direct includes.
 
-External code should include public headers, for example
+Files outside the owner should include public headers, for example
 `simulation/actuators/propulsor/public.hpp`, not private owner headers such as
 `simulation/actuators/propulsor/private.hpp`.
 
@@ -113,25 +167,6 @@ user explicitly asks for compatibility wrappers.
 ## Current Exceptions
 
 New exceptions require explicit user approval.
-
-### `include/simulation/control/shared.hpp`
-
-This is the only approved `shared.hpp` under `include/simulation`.
-
-Reason: control child public headers need shared control input/output types
-without including `simulation/control/public.hpp`, because that aggregate
-includes the child controllers and would create include cycles.
-
-Rules:
-
-- `control/shared.hpp` replaces the old `control/interface.hpp` role.
-- Control child public headers should include `simulation/control/shared.hpp`
-  when they need shared control interface types.
-- Control child public headers should not include `simulation/control/public.hpp`
-  to get those shared types.
-- No other `shared.hpp`, `shared.tpp`, or `shared.cpp` layer should be added
-  under `include/simulation` or `src/simulation`.
-- `SIMULATION_CONTROL_PUBLIC_NO_SUBMODULE_INCLUDES` must not return.
 
 ### CARE/SLICOT Wrapper
 
@@ -152,7 +187,9 @@ asks.
 
 When creating or refactoring a module:
 
-1. Identify every external symbol and put it in `public.*`.
+1. Identify every symbol used outside its owner and outside sibling `.cpp`,
+   `private.hpp`, or `private.tpp` files under the same immediate parent, then
+   put it in `public.*`.
 2. Put private-only symbols in `private.*`.
 3. Put template definitions in the matching `.tpp`.
 4. Put non-template definitions in the matching `.cpp`.
@@ -160,11 +197,12 @@ When creating or refactoring a module:
 6. Make each source file include its owning header directly.
 7. Use a real subfolder for independent submodules.
 8. Verify no public header includes another module's private header.
-9. Verify no deleted old path or non-control `shared.*` path is referenced.
-10. Verify no unnecessary empty shell files were created.
-11. Verify private free functions are declared in `private.hpp` and defined in
+9. Verify no `.hpp` include appears after declarations or definitions.
+10. Verify no deleted old path or flat `shared.*` path is referenced.
+11. Verify no unnecessary empty shell files were created.
+12. Verify private free functions are declared in `private.hpp` and defined in
     `private.cpp`.
-12. Smoke compile the new public and private headers independently.
+13. Smoke compile the new public and private headers independently.
 
 ## Refactor Constraints
 
@@ -293,11 +331,13 @@ namespace foo {
 ```
 
 `foo::PublicArgument` and `foo::PublicResult` cannot live only in `private.hpp`
-if external code must compile the `foo::public_function()` declaration.
+if a file outside `foo` must compile the `foo::public_function()` declaration.
 
 ### Public Class Member
 
-Public member functions of public types are public symbols.
+Member functions of public types are public symbols. Declare public type member
+functions in `public.hpp`, and define public type member functions in
+`public.cpp` or `public.tpp`.
 
 ```cpp
 // include/simulation/foo/public.hpp
@@ -330,18 +370,24 @@ A type used only to organize implementation details stays private.
 namespace foo {
     struct PrivateType {
         int value = 0;
+
+        int private_member(int value);
     };
 
     PrivateType make_private_type(int value);
 }
 ```
 
-Move it to `public.hpp` only if external code must name it or it appears in a
-public signature/data layout.
+Member functions of private types are private symbols. Declare private type
+member functions in `private.hpp`, and define private type member functions in
+`private.cpp` or `private.tpp`.
+
+Move it to `public.hpp` only if a file outside the owner must name it or it
+appears in a public signature/data layout.
 
 ### Public Template
 
-Templates that external code instantiates must be public.
+Templates instantiated by files outside the owner must be public.
 
 ```cpp
 // include/simulation/foo/public.hpp
@@ -446,21 +492,20 @@ A child-only helper belongs in `parent/child/private.*`, not in
 
 ### Helper Shared Across Sibling Submodules
 
-If sibling submodules both need a helper, choose based on visibility:
+If sibling submodules both need a helper, choose based on which files name it:
 
 ```cpp
-// include/simulation/parent/public.hpp
-#include "simulation/parent/child_a/public.hpp"
-#include "simulation/parent/child_b/public.hpp"
-
+// include/simulation/parent/child_a/private.hpp
 namespace parent {
-    int shared_public_function(int value);
+    int child_a_helper(int value);
 }
 ```
 
-Use public placement if the helper is part of the cross-submodule API. If it is
-only an implementation detail shared by sibling internals, stop and decide on an
-explicit owning module/submodule instead of creating an ad hoc `shared.*` file.
+Sibling submodules under the same immediate parent may include each other's
+`private.hpp` from `.cpp`, `private.hpp`, or `private.tpp` files. Use public
+placement only if the helper is declared by the parent public header, a file
+outside the parent names it, or it appears in a public signature/data layout. Do
+not create an ad hoc `shared.*` file for sibling implementation sharing.
 
 ### Aggregates
 
@@ -495,12 +540,12 @@ namespace foo {
 
 Create `private.*` only when there are real private symbols to own.
 
-### Control Shared Exception
+### Shared Control Submodule
 
-Control is the only approved shared-header exception.
+Use a real `control/shared` submodule for shared control interface types.
 
 ```cpp
-// include/simulation/control/shared.hpp
+// include/simulation/control/shared/public.hpp
 #pragma once
 #include "simulation/dynamics/public.hpp"
 
@@ -510,5 +555,6 @@ namespace control {
 }
 ```
 
-Control child public headers may include it for shared control interface types.
-Do not create other `shared.hpp`, `shared.tpp`, or `shared.cpp` files.
+Control child public headers may include it for shared control interface types
+without including the parent `simulation/control/public.hpp` aggregate. Do not
+create flat `shared.hpp`, `shared.tpp`, or `shared.cpp` files.

@@ -18,5 +18,9 @@ namespace transforms {
     Eigen::Matrix3d eul_to_C_extr(double a, double b, double c, const std::string& order);
     Eigen::Matrix3d eul_to_C_intr(double a, double b, double c, const std::string& order);
 
+    Eigen::Vector3d R_to_eul_extr(const Eigen::Matrix3d& R, const std::string& order);
+    Eigen::Vector3d R_to_eul_intr(const Eigen::Matrix3d& R, const std::string& order);
+    Eigen::Vector3d C_to_eul_extr(const Eigen::Matrix3d& C, const std::string& order);
+    Eigen::Vector3d C_to_eul_intr(const Eigen::Matrix3d& C, const std::string& order);
 
 }

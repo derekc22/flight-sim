@@ -2,7 +2,7 @@
 #include <Eigen/Dense>
 #include "simulation/dynamics/public.hpp"
 #include "simulation/linearization/public.hpp"
-#include "simulation/control/shared.hpp"
+#include "simulation/control/shared/public.hpp"
 #include "simulation/control/linear_quadratic/public.hpp"
 #include "simulation/guidance/public.hpp"
 
