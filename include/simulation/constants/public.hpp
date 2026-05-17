@@ -9,6 +9,7 @@ namespace constants {
     inline constexpr double g_earth = 9.80665;      // [ms^-2]
     inline constexpr double pi = 3.1415926535897932384626433832795028841971693993751;
     inline constexpr double eps = 1e-9;
+    inline constexpr double eps_strict = 1e-12;
     inline constexpr double dt = 0.01;              // [s]
     inline constexpr double gamma_air = 1.4;        // [-]
     inline constexpr double R_air = 287.052874247;  // [J·kg^-1·K^-1]

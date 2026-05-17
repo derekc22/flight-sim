@@ -5,7 +5,7 @@ C++ flight simulator with FlightGear integration
 ## Setup
 - Install FlightGear: https://www.flightgear.org/download/
 
-- Clone the repository
+- Clone the repository:
   ```bash
   git clone git@github.com:derekc22/flight-sim.git
   ```
@@ -19,10 +19,10 @@ C++ flight simulator with FlightGear integration
 - Install C++ dependencies:
   ```bash
   # Ubuntu
-  sudo apt install libeigen3-dev libcppad-dev nlohmann-json3-dev libslicot-dev gfortran
+  sudo apt install libeigen3-dev libcppad-dev nlohmann-json3-dev libslicot-dev gfortran libgtest-dev
 
   # macOS
-  brew install eigen cppad nlohmann-json slicot gcc
+  brew install eigen cppad nlohmann-json slicot gcc googletest
   ```
 
 ## Usage
@@ -69,6 +69,12 @@ C++ flight simulator with FlightGear integration
 Run a 60-second simulation of the C172 with control and avionics. Data and plots are saved to `data/c172_test` and `plots/c172_test`, respectively
 ```bash
 scripts/run.sh -a c172p -t 60 -c -s -d -p -o c172_test
+```
+
+## Testing
+Unit tests are implemented with Google Test and are run using:
+```bash
+scripts/test.sh
 ```
 
 ## References:
