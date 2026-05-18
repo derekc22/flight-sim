@@ -74,8 +74,12 @@ namespace util {
         return prev_val.slerp(1-alpha, val_adjusted);
     }
 
-    Eigen::VectorXd vec_clamp(const Eigen::VectorXd& x, const Eigen::VectorXd& x_min, const Eigen::VectorXd& x_max){
+    Eigen::VectorXd vec_clamp(const Eigen::VectorXd& x, const Eigen::VectorXd& x_min, const Eigen::VectorXd& x_max) {
         return x.cwiseMax(x_min).cwiseMin(x_max);
+    }
+
+    bool vec_is_close(const Eigen::VectorXd& a, const Eigen::VectorXd& b) {
+        return a.size() == b.size() && a.isApprox(b, constants::eps_strict);
     }
 
 }

@@ -15,12 +15,12 @@ namespace control {
     };
 
     struct LinearQuadraticIntegrator : LinearQuadraticRegulator {
-        IntegratedStateVector zN_t_err_integral = Eigen::Vector3d::Zero();
+        IntegratedStateVector integral = Eigen::Vector3d::Zero();
 
         LinearQuadraticIntegrator(const LinearQuadraticIntegratorParameters& params);
         ControlOutput step(const LinearFullStateFeedbackControllerInput& controller_input);
 
-        LinearQuadraticControllerInput make_linear_quadratic_controller_input(const LinearFullStateFeedbackControllerInput& controller_input, const IntegratedStateVector& zN_t_err_integral_candidate);
+        LinearQuadraticControllerInput make_linear_quadratic_controller_input(const LinearFullStateFeedbackControllerInput& controller_input, const IntegratedStateVector& integral_candidate);
         IntegratedStateVector integrate_state_err(const dynamics::StateVector_T<double>& zN_t, const dynamics::StateVector_T<double>& zN_t_des);
     };
 

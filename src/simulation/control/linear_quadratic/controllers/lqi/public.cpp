@@ -30,11 +30,11 @@ namespace control {
         IntegratedStateVector pqr_zN_t = zN_t.segment<integrated_state_dim>(3);  // grab p, q, r
         IntegratedStateVector pqr_zN_t_des = zN_t_des.segment<integrated_state_dim>(3);
 
-        return zN_t_err_integral + (pqr_zN_t_des - pqr_zN_t) * constants::dt;     // integrate
+        return integral + (pqr_zN_t_des - pqr_zN_t) * constants::dt;     // integrate
     }
 
 
-    LinearQuadraticControllerInput LinearQuadraticIntegrator::make_linear_quadratic_controller_input(const LinearFullStateFeedbackControllerInput& controller_input, const IntegratedStateVector& zN_t_err_integral_new) {
+    LinearQuadraticControllerInput LinearQuadraticIntegrator::make_linear_quadratic_controller_input(const LinearFullStateFeedbackControllerInput& controller_input, const IntegratedStateVector& integral_new) {
         size_t n = constants::state_dim;
         size_t m = constants::input_dim;
         size_t i = integrated_state_dim;
@@ -54,7 +54,7 @@ namespace control {
         dynamics::StateVector_T<double> zN_t_des = unpack_linear_quadratic_regulator_setpoint(controller_input.setpoint);
 
         AugmentedStateVector zN_t_aug;
-        zN_t_aug << zN_t, zN_t_err_integral_new;
+        zN_t_aug << zN_t, integral_new;
 
         AugmentedStateVector zN_t_des_aug;
         zN_t_des_aug << zN_t_des, IntegratedStateVector::Zero();
@@ -70,13 +70,13 @@ namespace control {
     ControlOutput LinearQuadraticIntegrator::step(const LinearFullStateFeedbackControllerInput& controller_input) {
 
         // integral candidate
-        IntegratedStateVector zN_t_err_integral_new = integrate_state_err(
+        IntegratedStateVector integral_new = integrate_state_err(
             dynamics::unpack_rigid_body_state(controller_input.zN_t), 
             unpack_linear_quadratic_regulator_setpoint(controller_input.setpoint)
         );
 
         actuators::ActuatorInputsVector_T<double> u_deviation = policy.step(
-            make_linear_quadratic_controller_input(controller_input, zN_t_err_integral_new)
+            make_linear_quadratic_controller_input(controller_input, integral_new)
         );
 
         // unsaturated control
@@ -88,7 +88,7 @@ namespace control {
         actuators::ActuatorInputsVector_T<double> u = util::vec_clamp(u_unsat, u_min, u_max);
 
         // anti-windup
-        if ((u.array() == u_unsat.array()).all()) { zN_t_err_integral = zN_t_err_integral_new; }
+        if (util::vec_is_close(u, u_unsat)) { integral = integral_new; }
 
         return make_control_output(u);
     }
