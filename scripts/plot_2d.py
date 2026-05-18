@@ -17,7 +17,8 @@ def main():
         plt.grid()
         
         if ref_data is not None:
-            plt.plot(t, ref_data[:, i + 1], linewidth=2, label="reference", linestyle="--")
+            rmse = np.sqrt(np.mean((data[:, i + 1] - ref_data[:, i + 1]) ** 2))
+            plt.plot(t, ref_data[:, i + 1], linewidth=2, label=f"reference, RMSE={rmse:.3f}", linestyle="--")
             plt.legend()
 
     plt.suptitle(args.title)
