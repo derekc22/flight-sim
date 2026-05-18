@@ -29,7 +29,7 @@ find_library(QUADMATH_LIB NAMES quadmath HINTS /opt/homebrew/opt/gcc/lib/gcc/cur
 
 # Collect all source files
 file(GLOB_RECURSE SOURCES "src/*.cpp")
-list(FILTER SOURCES EXCLUDE REGEX "src/simulation/control/linear_quadratic/private\\.cpp$")
+list(FILTER SOURCES EXCLUDE REGEX "src/simulation/control/linear_quadratic/slicot_care\\.cpp$")
 set(TESTED_SOURCES ${SOURCES})
 list(FILTER TESTED_SOURCES EXCLUDE REGEX "src/main\\.cpp$")
 file(GLOB_RECURSE TEST_SOURCES CONFIGURE_DEPENDS "tests/*.cpp")
@@ -45,7 +45,7 @@ set_source_files_properties(${SLICOT_CARE_WRAPPER_OBJ} PROPERTIES EXTERNAL_OBJEC
 
 # Standalone CARE library
 add_library(control_care STATIC
-    src/simulation/control/linear_quadratic/private.cpp
+    src/simulation/control/linear_quadratic/slicot_care.cpp
     ${SLICOT_CARE_WRAPPER_OBJ}
 )
 target_include_directories(control_care PUBLIC ${CMAKE_SOURCE_DIR}/include)
@@ -77,4 +77,5 @@ target_link_libraries(flight_sim_tests PRIVATE
     GTest::gtest
     GTest::gtest_main
 )
+set_target_properties(flight_sim_tests PROPERTIES BUILD_RPATH "$<TARGET_FILE_DIR:GTest::gtest>;$<TARGET_FILE_DIR:GTest::gtest_main>")
 gtest_discover_tests(flight_sim_tests)

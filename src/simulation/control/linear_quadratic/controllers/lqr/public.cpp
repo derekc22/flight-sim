@@ -1,11 +1,11 @@
 #include "simulation/actuators/propulsor/public.hpp"
 #include "simulation/actuators/surface/public.hpp"
 #include "simulation/actuators/public.hpp"
-// #include "simulation/control/public.hpp"
 #include "simulation/control/linear_quadratic/controllers/lqr/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/guidance/public.hpp"
 #include "simulation/trim/public.hpp"
+#include "simulation/control/linear_quadratic/private.hpp"
 
 namespace control {
 
@@ -44,25 +44,13 @@ namespace control {
     }
 
     ControlOutput LinearQuadraticRegulator::step(const LinearFullStateFeedbackControllerInput& controller_input){
-        actuators::SurfaceActuatorInputs_T<double> u_surface{};
-        actuators::PropulsorActuatorInputs_T<double> u_propulsor{};
-
         actuators::ActuatorInputsVector_T<double> u_deviation = policy.step(
             make_linear_quadratic_controller_input(controller_input)
         );
         actuators::ActuatorInputsVector_T<double> u_trim = actuators::unpack_actuator_inputs_T(controller_input.u_sol_trim);
-
         actuators::ActuatorInputsVector_T<double> u_cmd = u_deviation + u_trim;
 
-        u_surface.elevator_cmd = u_cmd[0];
-        u_surface.aileron_cmd = u_cmd[1];
-        u_surface.rudder_cmd = u_cmd[2];
-
-        u_propulsor.front_propulsor_cmd = u_cmd[3];
-        u_propulsor.left_propulsor_cmd = u_cmd[4];
-        u_propulsor.right_propulsor_cmd = u_cmd[5];
-
-        return { u_surface, u_propulsor };
+        return make_control_output(u_cmd);
     }
 
 }

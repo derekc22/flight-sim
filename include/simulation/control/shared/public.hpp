@@ -30,6 +30,8 @@ namespace control {
     struct LinearFullStateFeedbackControllerInput {
         const dynamics::RigidBodyState& zN_t;
         const actuators::ActuatorInputs_T<double>& u_sol_trim;
+        const actuators::SurfaceActuators& surface_actuators;
+        const actuators::PropulsorActuators& propulsor_actuators;
         const linearization::StateJacobian& A;
         const linearization::TrimInputJacobian& B;
         const guidance::LinearFullStateFeedbackSetpoint& setpoint;

@@ -132,8 +132,12 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
     operating::OperatingProperties& operating_properties = aircraft.operating_properties;
     guidance::GuidanceProperties& guidance_properties = aircraft.guidance_properties;
 
+    // extract reuseable quantities
     dynamics::Mass mass = structural_properties.Mass;
     dynamics::InertiaTensor J = structural_properties.J;
+    
+    actuators::SurfaceActuators& surface_actuators = actuator_properties.surface_actuators;
+    actuators::PropulsorActuators& propulsor_actuators = actuator_properties.propulsor_actuators;
 
     actuators::SurfaceActuatorInputs_T<double> u_surface_actual_prev{};
     actuators::PropulsorActuatorInputs_T<double> u_propulsor_actual_prev{};
@@ -208,7 +212,7 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
 
                 /** @deprecated */
                 // overwrite actuator lag state with trim controls
-                // trim::update_actuators_from_trim(actuator_properties.surface_actuators, actuator_properties.propulsor_actuators, trim_sol);
+                // trim::update_actuators_from_trim(surface_actuators, propulsor_actuators, trim_sol);
 
                 // linearize
                 lin_sol = linearization::linearize_trim_solution(aircraft, trim_sol);
@@ -266,10 +270,10 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
 
         if (sim_in.control_bool) {
             control::ControllerInput controller_input {
-                .axial_controller_input = control::AxialControllerInput{ .zN_t = zN_t, .surface_actuators = actuator_properties.surface_actuators, .setpoint = guidance::AxialSetpoint{ setpoint } },
-                .velocity_controller_input = control::VelocityControllerInput{ .zN_t = zN_t, .propulsor_actuators = actuator_properties.propulsor_actuators, .setpoint = guidance::VelocitySetpoint{ setpoint } },
-                .linear_full_state_feedback_controller_input = control::LinearFullStateFeedbackControllerInput{ .zN_t = zN_t, .u_sol_trim = trim_sol.input, .A = lin_sol.A, .B = lin_sol.B, .setpoint = guidance::LinearFullStateFeedbackSetpoint{ setpoint } },
-                .nonlinear_controller_input = control::NonlinearControllerInput{ .zN_t = zN_t, .surface_actuators = actuator_properties.surface_actuators, .propulsor_actuators = actuator_properties.propulsor_actuators, .setpoint = guidance::NonlinearSetpoint{ setpoint } }
+                .axial_controller_input = control::AxialControllerInput{ .zN_t = zN_t, .surface_actuators = surface_actuators, .setpoint = guidance::AxialSetpoint{ setpoint } },
+                .velocity_controller_input = control::VelocityControllerInput{ .zN_t = zN_t, .propulsor_actuators = propulsor_actuators, .setpoint = guidance::VelocitySetpoint{ setpoint } },
+                .linear_full_state_feedback_controller_input = control::LinearFullStateFeedbackControllerInput{ .zN_t = zN_t, .u_sol_trim = trim_sol.input, .surface_actuators = surface_actuators, .propulsor_actuators = propulsor_actuators, .A = lin_sol.A, .B = lin_sol.B, .setpoint = guidance::LinearFullStateFeedbackSetpoint{ setpoint } },
+                .nonlinear_controller_input = control::NonlinearControllerInput{ .zN_t = zN_t, .surface_actuators = surface_actuators, .propulsor_actuators = propulsor_actuators, .setpoint = guidance::NonlinearSetpoint{ setpoint } }
             };
             u_cmd = control_properties.step(controller_input, sim_in.trim_bool);
         }
@@ -291,7 +295,7 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
         dynamics::Moment MB_aero = WB_aero.M;
 
         // compute propulsive forces and momments
-        propulsion::PropulsiveWrench WB_propulsive = propulsion::step_propulsive_forces_moments(actuator_properties.propulsor_actuators, xN_t, static_atm_state, u_propulsor_actual);
+        propulsion::PropulsiveWrench WB_propulsive = propulsion::step_propulsive_forces_moments(propulsor_actuators, xN_t, static_atm_state, u_propulsor_actual);
         dynamics::Force FB_propulsive = WB_propulsive.F;
         dynamics::Moment MB_propulsive = WB_propulsive.M;
 

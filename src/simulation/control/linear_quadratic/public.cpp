@@ -1,7 +1,7 @@
 #include <algorithm>
 #include "simulation/actuators/public.hpp"
-#include "simulation/control/linear_quadratic/private.hpp"
 #include "simulation/control/linear_quadratic/public.hpp"
+#include "simulation/control/linear_quadratic/slicot_care.hpp"
 #include "simulation/dynamics/public.hpp"
 
 namespace control {
@@ -15,14 +15,10 @@ namespace control {
             params.K = lqr_gain(controller_input.B, params.R, care_sol.P);
         }
 
-        dynamics::StateVector_T<double> zN_t_deviation = controller_input.zN_t - controller_input.zN_t_des;
+        Eigen::VectorXd zN_t_deviation = controller_input.zN_t - controller_input.zN_t_des;
 
         actuators::ActuatorInputsVector_T<double> u_deviation;
-        if (!params.integrator_bool){
-            u_deviation = -params.K.value() * zN_t_deviation;
-        } else {
-            ; // LQI logic
-        }
+        u_deviation = -params.K.value() * zN_t_deviation;
 
         return u_deviation;
     }

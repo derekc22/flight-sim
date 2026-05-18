@@ -1,12 +1,13 @@
-#include <algorithm>
 #include <cmath>
+#include <stdexcept>
 #include "simulation/constants/public.hpp"
 #include "simulation/util/public.hpp"
 
 namespace util {
 
     double clamp(double x, double min_val, double max_val) {
-        if (max_val <= min_val) return min_val;
+        if (max_val < min_val) { throw std::runtime_error("util::clamp: max_val must be greater than or equal to min_val"); }
+        if (max_val == min_val) return min_val;
         if (x > max_val) return max_val;
         if (x < min_val) return min_val;
         return x;
@@ -14,22 +15,22 @@ namespace util {
 
     double clamp_symmetric(double x, double max_abs) {
         if (max_abs <= 0.0) return 0.0;
-        return std::clamp(x, -max_abs, max_abs);
+        return clamp(x, -max_abs, max_abs);
     }
 
     double clamp_positive(double x, double max_val) {
         if (max_val <= 0.0) return 0.0;
-        return std::clamp(x, 0.0, max_val);
+        return clamp(x, 0.0, max_val);
     }
 
     double clamp_to_1(double x) {
         // clamps to [-1, 1]
-        return std::clamp(x, -1.0, 1.0);
+        return clamp(x, -1.0, 1.0);
     }
 
     double clamp_inside_1(double x) {
         // clamps to [-1+eps, 1-eps]
-        return std::clamp(x, -1.0 + constants::eps, 1.0 - constants::eps);
+        return clamp(x, -1.0 + constants::eps, 1.0 - constants::eps);
     }
 
     double wrap_to_pi(double x) {
@@ -71,6 +72,10 @@ namespace util {
         if (prev_val.coeffs().dot(val.coeffs()) < 0.0) val_adjusted.coeffs() *= -1.0;
 
         return prev_val.slerp(1-alpha, val_adjusted);
+    }
+
+    Eigen::VectorXd vec_clamp(const Eigen::VectorXd& x, const Eigen::VectorXd& x_min, const Eigen::VectorXd& x_max){
+        return x.cwiseMax(x_min).cwiseMin(x_max);
     }
 
 }

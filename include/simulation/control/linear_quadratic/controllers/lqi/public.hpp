@@ -1,17 +1,27 @@
 #pragma once
 #include <Eigen/Dense>
 #include "simulation/control/linear_quadratic/controllers/lqr/public.hpp"
+#include "simulation/dynamics/public.hpp"
+#include "simulation/constants/public.hpp"
 
 namespace control {
+
+    inline constexpr std::size_t integrated_state_dim = 3;  // p, q, r are the integrated states
+    using IntegratedStateVector = Eigen::Matrix<double, integrated_state_dim, 1>;
+    using AugmentedStateVector = Eigen::Matrix<double, constants::state_dim + integrated_state_dim, 1>;
 
     struct LinearQuadraticIntegratorParameters : LinearQuadraticRegulatorParameters {
         Eigen::MatrixXd Qi;
     };
 
     struct LinearQuadraticIntegrator : LinearQuadraticRegulator {
-        LinearQuadraticIntegrator(const LinearQuadraticIntegratorParameters& params);
+        IntegratedStateVector zN_t_err_integral = Eigen::Vector3d::Zero();
 
-        LinearQuadraticControllerInput make_linear_quadratic_controller_input(const LinearFullStateFeedbackControllerInput& controller_input) override;
+        LinearQuadraticIntegrator(const LinearQuadraticIntegratorParameters& params);
+        ControlOutput step(const LinearFullStateFeedbackControllerInput& controller_input);
+
+        LinearQuadraticControllerInput make_linear_quadratic_controller_input(const LinearFullStateFeedbackControllerInput& controller_input, const IntegratedStateVector& zN_t_err_integral_candidate);
+        IntegratedStateVector integrate_state_err(const dynamics::StateVector_T<double>& zN_t, const dynamics::StateVector_T<double>& zN_t_des);
     };
 
 }

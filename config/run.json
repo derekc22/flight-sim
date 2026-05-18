@@ -2,7 +2,7 @@
     "aerodynamics_config": "aerodynamics/c172p/default.json",
     "structural_config": "structural/c172p/default.json",
     "initialization_config": "initialization/c172p/trim_level.json",
-    "control_config": "control/lqr_level.json",
+    "control_config": "control/lqi_level.json",
     "estimation_config": "estimation/lkf.json",
     "guidance_config": "guidance/interpolated/lqr_level.json",
     "avionics_config": "avionics/default.json",
