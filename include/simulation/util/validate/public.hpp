@@ -10,7 +10,7 @@ namespace util {
     void validate_shape(const Eigen::DenseBase<T>& M, Eigen::Index rows, Eigen::Index cols, const std::string& context, const std::string& name);
 
     template <typename T>
-    void validate_sqaure(const Eigen::DenseBase<T>& M, const std::string& context, const std::string& name);
+    void validate_square(const Eigen::DenseBase<T>& M, const std::string& context, const std::string& name);
 
     template <typename T>
     void validate_value(int a, int b, const std::string& context, const std::string& name_a, const std::string& name_b);

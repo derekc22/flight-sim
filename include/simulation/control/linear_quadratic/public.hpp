@@ -2,16 +2,16 @@
 #include <optional>
 #include <Eigen/Dense>
 #include "simulation/actuators/public.hpp"
-#include "simulation/dynamics/public.hpp"
-#include "simulation/linearization/public.hpp"
+// #include "simulation/dynamics/public.hpp"
+// #include "simulation/linearization/public.hpp"
 
 namespace control {
 
     struct LinearQuadraticControllerInput {
-        dynamics::StateVector_T<double> zN_t;
-        dynamics::StateVector_T<double> zN_t_des;
-        linearization::StateJacobian A;
-        linearization::TrimInputJacobian B;
+        Eigen::VectorXd zN_t;
+        Eigen::VectorXd zN_t_des;
+        Eigen::MatrixXd A;
+        Eigen::Matrix<double, Eigen::Dynamic, constants::input_dim> B;
     };
 
     struct LinearQuadraticControllerParameters {

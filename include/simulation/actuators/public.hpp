@@ -1,5 +1,6 @@
 #pragma once
 #include <Eigen/Dense>
+#include <utility> // For std::pair
 #include "simulation/actuators/propulsor/public.hpp"
 #include "simulation/actuators/surface/public.hpp"
 #include "simulation/constants/public.hpp"
@@ -48,6 +49,8 @@ namespace actuators {
     ActuatorInputsVector_T<double> unpack_actuator_inputs(const SurfaceActuatorInputs_T<double>& u_surface, const PropulsorActuatorInputs_T<double>& u_propulsor);
 
     ActuatorLimits_T<double> pack_actuator_limits(const SurfaceActuators& surface_actuators, const PropulsorActuators& propulsor_actuators);
+
+    std::pair<ActuatorInputsVector_T<double>, ActuatorInputsVector_T<double>> unpack_actuator_limits(const SurfaceActuators& surface_actuators, const PropulsorActuators& propulsor_actuators);
 
     struct ActuatorProperties {
         SurfaceActuators surface_actuators;

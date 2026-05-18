@@ -9,21 +9,34 @@ namespace util {
     template <typename T>
     void validate_shape(const Eigen::DenseBase<T>& M, Eigen::Index rows, Eigen::Index cols, const std::string& context, const std::string& name) {
         if (M.rows() != rows || M.cols() != cols) {
-            throw std::invalid_argument(context + ": incorrect shape for " + name + ". Must be (" + std::to_string(rows) + " x " + std::to_string(cols) + ")");
+            throw std::invalid_argument(
+                "util::validate_shape: " + context + ": incorrect shape for " + name +
+                ". Must be (" + std::to_string(rows) + " x " + std::to_string(cols) + ")" +
+                ". Got (" + std::to_string(M.rows()) + " x " + std::to_string(M.cols()) + ")"
+            );
         }
     }
 
     template <typename T>
-    void validate_sqaure(const Eigen::DenseBase<T>& M, const std::string& context, const std::string& name) {
+    void validate_square(const Eigen::DenseBase<T>& M, const std::string& context, const std::string& name) {
         if (M.rows() != M.cols()) {
-            throw std::invalid_argument(context + ": " + name + " must be square");
+            throw std::invalid_argument(
+                "util::validate_square: " + context + ": " + name +
+                " must be square. Got (" +
+                std::to_string(M.rows()) + " x " + std::to_string(M.cols()) + ")"
+            );
         }
     }
 
     template <typename T>
     void validate_value(int a, int b, const std::string& context, const std::string& name_a, const std::string& name_b) {
         if (a != b) {
-            throw std::invalid_argument(context + ": " + name_a + " and " + name_b + " must be equal");
+            throw std::invalid_argument(
+                "util::validate_value: " + context + ": " + name_a + " and " + name_b +
+                " must be equal. Got " +
+                name_a + " = " + std::to_string(a) + ", " +
+                name_b + " = " + std::to_string(b)
+            );
         }
     }
 
