@@ -30,10 +30,10 @@
 #include "simulation/estimation/public.hpp"
 #include "simulation/avionics/public.hpp"
 #include "simulation/operating/public.hpp"
-#include "core/io/io.hpp"
-#include "core/json/json.hpp"
-#include "core/connection/connection.hpp"
-#include "core/messages/messages.hpp"
+#include "core/io/public.hpp"
+#include "core/json/public.hpp"
+#include "core/connection/public.hpp"
+#include "core/messages/public.hpp"
 
 
 struct SimulationInput {
