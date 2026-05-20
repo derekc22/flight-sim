@@ -1,6 +1,13 @@
-# Simulation Layout Rules
+# C++ Layout Rules
 
-Rules for active `include/simulation` and `src/simulation` code.
+Rules for active C++ code under these roots:
+
+```text
+include/simulation
+src/simulation
+include/core
+src/core
+```
 
 ## Core Rule
 
@@ -10,17 +17,22 @@ Private symbols belong in `private.*`.
 
 The owner of a symbol is the module or submodule directory where the symbol is
 declared. For example, a symbol declared in
-`include/simulation/transforms/so3/public.hpp` is owned by `transforms/so3`.
+`include/simulation/transforms/so3/public.hpp` is owned by
+`simulation/transforms/so3`. A symbol declared in
+`include/core/json/control/private.hpp` is owned by `core/json/control`.
 
 Sibling submodules are submodule directories with the same immediate parent.
-For example, `transforms/so3`, `transforms/s3`, and `transforms/se3` are sibling
-submodules under `transforms`.
+For example, `simulation/transforms/so3`, `simulation/transforms/s3`, and
+`simulation/transforms/se3` are sibling submodules under
+`simulation/transforms`. `core/json/control`, `core/json/estimation`, and
+`core/json/guidance` are sibling submodules under `core/json`.
 
 A symbol is public when any of these files includes it, calls it, constructs it,
 stores it, names it, or needs it to compile a declaration:
 
 - A file in a different module.
-- A file in `src/main.cpp`, `src/core`, JSON, messages, IO, or tests.
+- A file in `src/main.cpp` or tests.
+- For `simulation` symbols, any file in `src/core`, JSON, messages, or IO.
 - A public header or public `.tpp` in any sibling submodule.
 
 A symbol is private when all uses stay in one of these places:
@@ -36,12 +48,12 @@ A symbol is private when all uses stay in one of these places:
 These are allowed file roles, not required files:
 
 ```text
-include/simulation/<module>/public.hpp
-include/simulation/<module>/public.tpp
-include/simulation/<module>/private.hpp
-include/simulation/<module>/private.tpp
-src/simulation/<module>/public.cpp
-src/simulation/<module>/private.cpp
+include/<area>/<module>/public.hpp
+include/<area>/<module>/public.tpp
+include/<area>/<module>/private.hpp
+include/<area>/<module>/private.tpp
+src/<area>/<module>/public.cpp
+src/<area>/<module>/private.cpp
 ```
 
 - `public.hpp`: public declarations, types, aliases, constants, and template declarations.
@@ -65,8 +77,9 @@ header includes them.
 
 Put a symbol in `public.*` when a file outside the owner uses it, except for
 uses from sibling `.cpp`, `private.hpp`, or `private.tpp` files under the same
-immediate parent. `src/main.cpp`, `src/core`, JSON, messages, IO, and tests
-always count as outside the owner.
+immediate parent. `src/main.cpp` and tests always count as outside the owner.
+For `simulation` symbols, `src/core`, JSON, messages, and IO also always count
+as outside the owner.
 
 Also put a symbol in `public.*` when any of these are true:
 
@@ -129,8 +142,21 @@ Use subfolders for module boundaries such as `actuators/propulsor`,
 `estimation/kalman/estimators/<estimator>`, `transforms/s3`,
 `transforms/se3`, `transforms/so3`, and `util/<utility>`.
 
+Core modules use the same layout. Top-level core modules include
+`connection`, `interface`, `io`, `json`, and `messages`. Core JSON parser
+submodules must be real subfolders, such as:
+
+```text
+include/core/json/control/public.hpp
+include/core/json/control/private.hpp
+src/core/json/control/public.cpp
+src/core/json/control/private.cpp
+```
+
 Do not keep independent submodules as flat files like `controllers/lqr.hpp` or
-`transforms/so3.hpp`.
+`transforms/so3.hpp`. Do not keep flat core paths such as
+`core/json/control.hpp`, `core/json/json.hpp`, `core/io/io.hpp`,
+`core/connection/connection.hpp`, or `core/messages/messages.hpp`.
 
 ## Includes And Aggregates
 
@@ -157,7 +183,9 @@ transitive includes.
 
 Files outside the owner should include public headers, for example
 `simulation/actuators/propulsor/public.hpp`, not private owner headers such as
-`simulation/actuators/propulsor/private.hpp`.
+`simulation/actuators/propulsor/private.hpp`. Core files follow the same rule:
+use `core/json/control/public.hpp`, not `core/json/control/private.hpp`, from
+outside `core/json/control`.
 
 A module-level `public.hpp` can be a used public aggregate. A used aggregate may
 contain no declarations after its includes; an unused aggregate wrapper should
@@ -167,6 +195,18 @@ user explicitly asks for compatibility wrappers.
 ## Current Exceptions
 
 New exceptions require explicit user approval.
+
+### Core Interface Placeholder
+
+These files are intentionally retained as empty placeholders:
+
+```text
+include/core/interface/public.hpp
+src/core/interface/public.cpp
+```
+
+Reason: `core/interface` is reserved as a module boundary by explicit user
+request, even though it currently has no declarations or definitions.
 
 ### CARE/SLICOT Wrapper
 
@@ -198,7 +238,8 @@ When creating or refactoring a module:
 7. Use a real subfolder for independent submodules.
 8. Verify no public header includes another module's private header.
 9. Verify no `.hpp` include appears after declarations or definitions.
-10. Verify no deleted old path or flat `shared.*` path is referenced.
+10. Verify no deleted old path, flat core path, or flat `shared.*` path is
+    referenced.
 11. Verify no unnecessary empty shell files were created.
 12. Verify private free functions are declared in `private.hpp` and defined in
     `private.cpp`.

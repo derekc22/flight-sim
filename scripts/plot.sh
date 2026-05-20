@@ -131,9 +131,11 @@ python "$PLOT_2D" -d "$DATA_DIR/M_prop.csv" \
   -l "Mx_prop(t) [Nm]" "My_prop(t) [Nm]" "Mz_prop(t) [Nm]" \
   -t "propulsive moment vs time"
 
-python "$PLOT_2D" -d "$DATA_DIR/windB.csv" \
-  -l "windB_x(t) [m/s]" "windB_y(t) [m/s]" "windB_z(t) [m/s]" \
-  -t "wind vs time"
+if [ -f "$DATA_PATH/windB.csv" ]; then
+  python "$PLOT_2D" -d "$DATA_DIR/windB.csv" \
+    -l "windB_x(t) [m/s]" "windB_y(t) [m/s]" "windB_z(t) [m/s]" \
+    -t "wind vs time"
+fi
 
 python "$PLOT_3D" -d "$DATA_DIR/p.csv" \
   -l "x(t) [m]" "y(t) [m]" "z(t) [m]" \
