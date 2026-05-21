@@ -4,8 +4,8 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#include "simulation/analysis/private.hpp"
-#include "simulation/analysis/public.hpp"
+#include "analysis/eigenanalysis/private.hpp"
+#include "analysis/eigenanalysis/public.hpp"
 #include "simulation/constants/public.hpp"
 #include "simulation/linearization/public.hpp"
 

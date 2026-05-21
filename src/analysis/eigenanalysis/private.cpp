@@ -3,7 +3,7 @@
 #include <iomanip>
 #include <sstream>
 #include <string>
-#include "simulation/analysis/private.hpp"
+#include "analysis/eigenanalysis/private.hpp"
 
 namespace analysis {
 

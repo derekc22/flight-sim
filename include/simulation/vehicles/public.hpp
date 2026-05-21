@@ -1,6 +1,7 @@
 #pragma once
 #include <optional>
 #include <Eigen/Dense>
+#include <string>
 #include "simulation/frames/public.hpp"
 #include "simulation/structural/public.hpp"
 #include "simulation/dynamics/public.hpp"
@@ -201,6 +202,7 @@ namespace vehicles {
 
 
     struct Aircraft {
+        std::string id;
         frames::NEDFrameECEF NEDFrameECEF;
         frames::FRDFrameNED FRDFrameNED;
         frames::FRDFrameECEF FRDFrameECEF;
@@ -216,6 +218,7 @@ namespace vehicles {
         estimation::EstimationProperties estimation_properties;
 
         Aircraft(
+            const std::string& id,
             const structural::StructuralProperties& structural_properties,
             const aerodynamics::AerodynamicProperties& aerodynamic_properties,
             const actuators::ActuatorProperties& actuator_properties,

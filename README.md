@@ -3,9 +3,12 @@
 C++ flight simulator with FlightGear integration
 
 ## Installation
-Download FlightGear: https://www.flightgear.org/download/
+Download FlightGear: 
+```
+https://www.flightgear.org/download/
+```
 
-Clone the repository:
+Clone repository:
 ```bash
 git clone git@github.com:derekc22/flight-sim.git
 ```
@@ -24,7 +27,10 @@ sudo apt install libeigen3-dev libcppad-dev nlohmann-json3-dev libslicot-dev gfo
 # macOS
 brew install eigen cppad nlohmann-json slicot gcc googletest
 ```
-
+Install MATLAB Runtime:
+```
+https://www.mathworks.com/products/compiler/matlab-runtime.html
+```
 ## Usage
 
 - The simulator is configured via JSON files in the `config/` directory
@@ -39,6 +45,7 @@ Update the following environment variables in `.env` with the corresponding path
 - `SRC`: Project `schema` directory
 - `DEST`: FlightGear `Protocol` directory 
 - `FG`: FlightGear executable
+- `MATLAB`: MATLAB executable
   
 Update the following JSON configuration file paths in `config/run.json`:
 - `initialization_config`: Initial conditions
@@ -55,7 +62,7 @@ Update the following JSON configuration file paths in `config/run.json`:
 
 To run the simulation:
   ```bash
-  scripts/run.sh -a <AIRCRAFT> -t <TIME_SEC> [-r TRIM] [-s SENSOR] [-c CONTROL] [-e ESTIMATION] [-w WIND] [-v VERBOSE] [-d DATA] [-p PLOT] -o <OUT_DIR>
+  scripts/run.sh -a <AIRCRAFT> -t <TIME_SEC> [-r TRIM] [-s SENSOR] [-c CONTROL] [-e ESTIMATION] [-w WIND] [-v VERBOSE] [-d DATA] [-p PLOT] -o <DATA_DIR> [-m ANALYSIS]
   ```
 - `-a AIRCRAFT`: Aircraft to simulate (e.g. ASW28, c172p)
 - `-t TIME_SEC`: Simulation time in seconds
@@ -67,7 +74,8 @@ To run the simulation:
 - `-v VERBOSE`: Enable verbose output
 - `-d DATA`: Enable data logging
 - `-p PLOT`: Enable plotting
-- `-o OUT_DIR`: Output directory
+- `-o DATA_DIR`: Data directory
+- `-m ANALYSIS`: Enable post-run analysis 
   
 ## Example
 Run a 60-second simulation of the C172 with control and avionics. Data and plots are saved to `data/c172_test` and `plots/c172_test`, respectively:
@@ -87,6 +95,10 @@ scripts/test.sh -t <TEST_SUITE>
 # See available test suites
 scripts/test.sh -h
 ```
+
+## Analysis
+- Post-run analysis is implemented via MATLAB. To run the analysis, use the `-m` flag with `run.sh`
+- The current implementation requires an active MATLAB license. A planned transition to pre-compiled binaries will remove this requirement, requiring only the MATLAB Runtime instead
 
 ## References:
 https://hopsan.github.io/tutorials/tutorial_flightgear.pdf

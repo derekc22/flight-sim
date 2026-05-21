@@ -22,7 +22,6 @@
 #include "simulation/actuators/surface/public.hpp"
 #include "simulation/control/public.hpp"
 #include "simulation/trim/public.hpp"
-#include "simulation/analysis/public.hpp"
 #include "simulation/linearization/public.hpp"
 #include "simulation/propulsion/public.hpp"
 #include "simulation/geography/public.hpp"
@@ -34,6 +33,7 @@
 #include "core/json/public.hpp"
 #include "core/connection/public.hpp"
 #include "core/messages/public.hpp"
+#include "analysis/eigenanalysis/public.hpp"
 
 
 struct SimulationInput {
@@ -46,15 +46,18 @@ struct SimulationInput {
     bool wind_bool;
     bool verbose_bool;
     bool data_bool;
-    std::string out_dir;
+    std::string data_dir;
     io::DataManager data_manager;
+    bool analysis_bool;
+    io::AnalysisManager analysis_manager;
 };
 
-struct SimulationOutput {
-    trim::TrimSolution trim_sol;
-    linearization::TrimLinearization lin_sol;
-    analysis::TrimEigenAnalysis eig_sol;
-};
+/** @deprecated */
+// struct SimulationOutput {
+//     trim::TrimSolution trim_sol;
+//     linearization::TrimLinearization lin_sol;
+//     analysis::TrimEigenAnalysis eig_sol;
+// };
 
 struct SimulationContext {
     dynamics::RigidBodyState xN_t;
@@ -69,13 +72,14 @@ struct SimulationContext {
 };
 
 
-vehicles::Aircraft load(bool trim_bool) {
+vehicles::Aircraft load(const std::string& aircraft_id, bool trim_bool) {
     structural::StructuralProperties structural_properties = json::parse_structural_config();
     actuators::ActuatorProperties actuator_properties = json::parse_actuator_config(structural_properties);
     control::ControlProperties control_properties = json::parse_control_config();
 
     // create vehicle from config
     vehicles::Aircraft aircraft {
+        aircraft_id,
         structural_properties,
         json::parse_aerodynamics_config(),
         actuator_properties,
@@ -93,33 +97,20 @@ vehicles::Aircraft load(bool trim_bool) {
 }
 
 
-void cleanup(SimulationInput& sim_in, SimulationOutput& sim_out) {
-    std::string out_dir_path = "data/" + sim_in.out_dir + "/";
+void cleanup(SimulationInput& sim_in) {
+    std::string data_dir_path = "data/" + sim_in.data_dir;
+    // std::string data_dir_path = "data/" + sim_in.data_dir + "/";
 
     // save data
-    sim_in.data_manager.save(out_dir_path);
-
-    // log trim
-    if (sim_in.data_bool) {
-        if (sim_in.trim_bool) {
-            io::write_txt(trim::print_trim_solution(sim_out.trim_sol), out_dir_path, "trim_sol");
-
-            // log linearization and eigenanalysis
-            if (sim_out.trim_sol.converged) {
-                io::write_txt(linearization::print_linearization_solution(sim_out.lin_sol), out_dir_path, "lin_sol");
-                io::write_csv(Eigen::MatrixXd(sim_out.lin_sol.A), out_dir_path, "lin_sol_A");
-                io::write_csv(Eigen::MatrixXd(sim_out.lin_sol.B), out_dir_path, "lin_sol_B");
-                io::write_txt(analysis::print_eigen_analysis(sim_out.eig_sol), out_dir_path, "eig_sol");
-            }
-        }
-    }
+    sim_in.data_manager.save(data_dir_path);
+    sim_in.analysis_manager.save(data_dir_path);
 
     // dump configs
-    json::dump_configs(out_dir_path);
+    json::dump_configs(data_dir_path);
 }
 
 
-void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
+void run(SimulationInput& sim_in) {
     // pack aircraft object
     vehicles::Aircraft& aircraft = sim_in.aircraft;
 
@@ -154,6 +145,11 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
     // initialize windB
     atmospheric::Wind windB{ constants::Zero3 };
 
+    // initialize analysis context
+    io::AnalysisContext analysis_context{
+        .aircraft_id=aircraft.id
+    };
+
     // initialize udp connections
     connection::UDPOut udp_out(5510);
     connection::UDPIn udp_in("127.0.0.1", 5511);
@@ -181,9 +177,11 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
         // trim and linearization
         if (sim_in.trim_bool && !trim_sol.attempted) {
             trim_sol = trim::inspect_trim(aircraft, windB);
-            sim_out.trim_sol = trim_sol;
 
-            if (trim_sol.converged){
+            // update analysis context
+            analysis_context.trim_sol = trim_sol;
+
+            if (trim_sol.converged) {
                 // obtain full state from trim solution
                 auto [xN_t_trim, ads_t_trim] = trim::update_state_from_trim(xN_t, trim_sol);
 
@@ -218,11 +216,15 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
                 lin_sol = linearization::linearize_trim_solution(aircraft, trim_sol);
 
                 // perform eigenanalysis
-                const analysis::TrimEigenAnalysis eig_sol = analysis::trim_linearization_eigen_analysis(lin_sol);
+                analysis::TrimEigenAnalysis eig_sol = analysis::trim_linearization_eigen_analysis(lin_sol);
 
-                sim_out.lin_sol = lin_sol;
-                sim_out.eig_sol = eig_sol;
+                // update analysis context
+                analysis_context.lin_sol = lin_sol;
+                analysis_context.eig_sol = eig_sol;
             }
+
+            // step analysis manager
+            sim_in.analysis_manager.step(analysis_context);
         }
 
         // initialize measurements to ground truth
@@ -359,7 +361,7 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
     }
 
     // cleanup
-    cleanup(sim_in, sim_out);
+    cleanup(sim_in);
 }
 
 
@@ -367,30 +369,36 @@ void run(SimulationInput& sim_in, SimulationOutput& sim_out) {
 
 
 int main(int argc, char* argv[]) {
-    if (argc != 10) { return 1; }
+    if (argc != 12) { return 1; }
+
+    std::string aircraft_id = argv[1];
 
     double time_sec;
-    try { time_sec = std::stod(argv[1]); }
+    try { time_sec = std::stod(argv[2]); }
     catch (const std::exception&) {std::cerr << "invalid TIME_SEC: " << argv[1] << std::endl; return 1; }
     if (!std::isfinite(time_sec) || time_sec <= 0.0) { std::cerr << "TIME_SEC must be > 0" << std::endl; return 1; }
 
-    bool trim_bool = std::stoi(argv[2]) == 1;
-    bool sensor_bool = std::stoi(argv[3]) == 1;
-    bool control_bool = std::stoi(argv[4]) == 1;
-    bool estimation_bool = std::stoi(argv[5]) == 1;
-    bool wind_bool = std::stoi(argv[6]) == 1;
-    bool verbose_bool = std::stoi(argv[7]) == 1;
-    bool data_bool = std::stoi(argv[8]) == 1;
-    std::string out_dir = argv[9];
+    bool trim_bool = std::stoi(argv[3]) == 1;
+    bool sensor_bool = std::stoi(argv[4]) == 1;
+    bool control_bool = std::stoi(argv[5]) == 1;
+    bool estimation_bool = std::stoi(argv[6]) == 1;
+    bool wind_bool = std::stoi(argv[7]) == 1;
+    bool verbose_bool = std::stoi(argv[8]) == 1;
+    bool data_bool = std::stoi(argv[9]) == 1;
+    std::string data_dir = argv[10];
+    bool analysis_bool = std::stoi(argv[11]) == 1;
 
     // load vehicle
-    vehicles::Aircraft aircraft = load(trim_bool);
+    vehicles::Aircraft aircraft = load(aircraft_id, trim_bool);
 
     // compute number of simulation steps
     int tf = std::max(1, static_cast<int>(std::ceil(time_sec / constants::dt)));
 
     // create data manager
     io::DataManager data_manager{tf, data_bool, control_bool, sensor_bool, estimation_bool, wind_bool};
+
+    // create analysis manager
+    io::AnalysisManager analysis_manager{data_bool, analysis_bool, trim_bool};
 
     // create simulation input
     SimulationInput sim_in {
@@ -403,15 +411,17 @@ int main(int argc, char* argv[]) {
         .wind_bool=wind_bool,
         .verbose_bool=verbose_bool,
         .data_bool=data_bool,
-        .out_dir=out_dir,
-        .data_manager=data_manager
+        .data_dir=data_dir,
+        .data_manager=data_manager,
+        .analysis_bool=analysis_bool,
+        .analysis_manager=analysis_manager
     };
 
     // declare simulation output
-    SimulationOutput sim_out;
+    // SimulationOutput sim_out;
 
     // run case
-    run(sim_in, sim_out);
+    run(sim_in);
 
     return 0;
 }

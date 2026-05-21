@@ -1,37 +1,27 @@
 #!/bin/bash
 set -e
 
-OUT_DIR="$1"
-AIRCRAFT="$2"
-TIME_SEC="$3"
-TRIM_BOOL="$4"
-SENSOR_BOOL="$5"
-CONTROL_BOOL="$6"
-ESTIMATION_BOOL="$7"
-WIND_BOOL="$8"
-VERBOSE_BOOL="$9"
-DATA_BOOL="${10}"
-PLOT_BOOL="${11}"
-TEST_BOOL="${12}"
-QUICK_BOOL="${13}"
+DATA_DIR=""
 
-OUT_PATH="data/$OUT_DIR/args.txt"
+for arg in "$@"; do
+	if [[ "$arg" != *=* ]]; then
+		echo "ERROR: expected KEY=VALUE argument, got '$arg'" >&2
+		exit 1
+	fi
+
+	if [[ "${arg%%=*}" == "DATA_DIR" ]]; then
+		DATA_DIR="${arg#*=}"
+	fi
+done
+
+if [[ -z "$DATA_DIR" ]]; then
+	echo "ERROR: DATA_DIR is required" >&2
+	exit 1
+fi
+
+OUT_PATH="data/$DATA_DIR/args.txt"
 mkdir -p "$(dirname "$OUT_PATH")"
 
-cat > "$OUT_PATH" <<EOF
-AIRCRAFT=$AIRCRAFT
-TIME_SEC=$TIME_SEC
-TRIM_BOOL=$TRIM_BOOL
-SENSOR_BOOL=$SENSOR_BOOL
-CONTROL_BOOL=$CONTROL_BOOL
-ESTIMATION_BOOL=$ESTIMATION_BOOL
-WIND_BOOL=$WIND_BOOL
-VERBOSE_BOOL=$VERBOSE_BOOL
-DATA_BOOL=$DATA_BOOL
-PLOT_BOOL=$PLOT_BOOL
-TEST_BOOL=$TEST_BOOL
-QUICK_BOOL=$QUICK_BOOL
-OUT_DIR=$OUT_DIR
-EOF
+printf "%s\n" "$@" > "$OUT_PATH"
 
 echo "File saved successfully to $OUT_PATH"

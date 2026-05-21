@@ -33,7 +33,7 @@ namespace control {
         const actuators::SurfaceActuators& surface_actuators;
         const actuators::PropulsorActuators& propulsor_actuators;
         const linearization::StateJacobian& A;
-        const linearization::TrimInputJacobian& B;
+        const linearization::InputJacobian& B;
         const guidance::LinearFullStateFeedbackSetpoint& setpoint;
     };
     struct LinearFullStateFeedbackControllerParameters {};

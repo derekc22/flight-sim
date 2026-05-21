@@ -1,7 +1,7 @@
 #pragma once
 #include <complex>
 #include <string>
-#include "simulation/analysis/public.hpp"
+#include "analysis/eigenanalysis/public.hpp"
 
 namespace analysis {
 

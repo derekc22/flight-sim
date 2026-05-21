@@ -15,14 +15,15 @@ USAGE: $0
   [-v VERBOSE_BOOL]
   [-d DATA_BOOL]
   [-p PLOT_BOOL]
-  -o <OUT_DIR>
-  [-z TEST_BOOL]
+  -o <DATA_DIR>
+  [-m ANALYSIS_BOOL]
+  [-z HEADLESS_BOOL]
   [-q QUICK_BOOL]
 EOF
 	exit "$exit_code"
 }
 
-while getopts "a:t:o:rscewvdpzqh" opt; do
+while getopts "a:t:rscewvdpo:mzqh" opt; do
 	case "$opt" in
 		a) AIRCRAFT="$OPTARG" ;;
 		t) TIME_SEC="$OPTARG" ;;
@@ -33,9 +34,10 @@ while getopts "a:t:o:rscewvdpzqh" opt; do
 		w) WIND_BOOL=1 ;;
 		v) VERBOSE_BOOL=1 ;;
 		d) DATA_BOOL=1 ;;
-		o) OUT_DIR="$OPTARG" ;;
 		p) PLOT_BOOL=1 ;;
-		z) TEST_BOOL=1 ;;
+		o) DATA_DIR="$OPTARG" ;;
+		m) ANALYSIS_BOOL=1 ;;
+		z) HEADLESS_BOOL=1 ;;
 		q) QUICK_BOOL=1 ;;
 			h) usage 0 ;;
 			?) usage 1 ;;
@@ -51,9 +53,10 @@ done
 : "${VERBOSE_BOOL:=0}"
 : "${DATA_BOOL:=0}"
 : "${PLOT_BOOL:=0}"
-: "${TEST_BOOL:=0}"
+: "${DATA_DIR:=$(date +"%Y%b%d_%H-%M-%S")}"
+: "${ANALYSIS_BOOL:=0}"
+: "${HEADLESS_BOOL:=0}"
 : "${QUICK_BOOL:=0}"
-: "${OUT_DIR:=$(date +"%Y%b%d_%H-%M-%S")}"
 
 # required args check
 [[ -z "$AIRCRAFT" || -z "$TIME_SEC" ]] && usage 1
@@ -64,7 +67,12 @@ if [[ "$DATA_BOOL" -eq 0 && "$PLOT_BOOL" -eq 1 ]]; then
 	exit 1
 fi
 
-if [ "$TEST_BOOL" -eq 0 ]; then
+if [[ "$DATA_BOOL" -eq 0 && "$ANALYSIS_BOOL" -eq 1 ]]; then
+	echo "ERROR: DATA_BOOL must be enabled for ANALYSIS_BOOL to be enabled" >&2
+	exit 1
+fi
+
+if [ "$HEADLESS_BOOL" -eq 0 ]; then
 	source .env
 
 	cd "$DIR" || exit 1
@@ -82,7 +90,7 @@ if [ "$QUICK_BOOL" -eq 0 ]; then
 	rm -rf build
 fi
 
-if [[ "$QUICK_BOOL" -eq 1 && "$TEST_BOOL" -eq 0 ]]; then
+if [[ "$QUICK_BOOL" -eq 1 && "$HEADLESS_BOOL" -eq 0 ]]; then
 	sleep 10
 fi
 
@@ -90,6 +98,7 @@ cmake -B build -S .
 cmake --build build
 
 ./build/flight-sim \
+	"$AIRCRAFT" \
 	"$TIME_SEC" \
 	"$TRIM_BOOL" \
 	"$SENSOR_BOOL" \
@@ -98,25 +107,31 @@ cmake --build build
 	"$WIND_BOOL" \
 	"$VERBOSE_BOOL" \
 	"$DATA_BOOL" \
-	"$OUT_DIR"
+	"$DATA_DIR" \
+	"$ANALYSIS_BOOL" \
 
 if [ "$DATA_BOOL" -eq 1 ]; then
 	./scripts/dump_args.sh \
-		"$OUT_DIR" \
-		"$AIRCRAFT" \
-		"$TIME_SEC" \
-		"$TRIM_BOOL" \
-		"$SENSOR_BOOL" \
-		"$CONTROL_BOOL" \
-		"$ESTIMATION_BOOL" \
-		"$WIND_BOOL" \
-		"$VERBOSE_BOOL" \
-		"$DATA_BOOL" \
-		"$PLOT_BOOL" \
-		"$TEST_BOOL" \
-		"$QUICK_BOOL"
+		AIRCRAFT="$AIRCRAFT" \
+		TIME_SEC="$TIME_SEC" \
+		TRIM_BOOL="$TRIM_BOOL" \
+		SENSOR_BOOL="$SENSOR_BOOL" \
+		CONTROL_BOOL="$CONTROL_BOOL" \
+		ESTIMATION_BOOL="$ESTIMATION_BOOL" \
+		WIND_BOOL="$WIND_BOOL" \
+		VERBOSE_BOOL="$VERBOSE_BOOL" \
+		DATA_BOOL="$DATA_BOOL" \
+		PLOT_BOOL="$PLOT_BOOL" \
+		DATA_DIR="$DATA_DIR" \
+		ANALYSIS_BOOL="$ANALYSIS_BOOL" \
+		HEADLESS_BOOL="$HEADLESS_BOOL" \
+		QUICK_BOOL="$QUICK_BOOL"
 fi
 
 if [ "$PLOT_BOOL" -eq 1 ]; then
-	./scripts/plot.sh "$OUT_DIR"
+	./scripts/plot.sh "$DATA_DIR"
+fi
+
+if [ "$ANALYSIS_BOOL" -eq 1 ]; then
+	./scripts/init_matlab.sh "$DATA_DIR"
 fi
