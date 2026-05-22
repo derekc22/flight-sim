@@ -1,0 +1,15 @@
+{
+    "time_config": "analysis/time/default.json",
+    "frequency_config": "analysis/frequency/default.json",
+    "stability_config": "analysis/stability/default.json",
+    "root_locus_config": "analysis/root_locus/default.json",
+    "state_space_config": "analysis/state_space/default.json",
+    "controller_design_config": "analysis/controller_design/default.json",
+    "closed_loop_config": "analysis/closed_loop/default.json",
+    "model_properties_config": "analysis/model_properties/default.json",
+    "robust_control_config": "analysis/robust_control/default.json",
+    "nonlinear_config": "analysis/nonlinear/default.json",
+    "system_identification_config": "analysis/system_identification/default.json",
+    "model_reduction_config": "analysis/model_reduction/default.json",
+    "uncertainty_sampling_config": "analysis/uncertainty_sampling/default.json"
+}

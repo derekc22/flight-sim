@@ -5,8 +5,8 @@ CONDA_BASE=$(conda info --base)
 source "$CONDA_BASE/etc/profile.d/conda.sh"
 conda activate ame532
 
-PLOT_2D="scripts/plot_2d.py"
-PLOT_3D="scripts/plot_3d.py"
+PLOT_2D="scripts/python/plot_2d.py"
+PLOT_3D="scripts/python/plot_3d.py"
 
 if [ -z "$1" ]; then
   echo "Usage: $0 <DATA_DIR>"

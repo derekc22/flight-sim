@@ -1,0 +1,10 @@
+{
+  "pole_placement": {
+    "desired_poles": []
+  },
+  "eigenstructure_assignment": {
+    "bool": true,
+    "desired_eigenvalues": [],
+    "desired_eigenvectors": []
+  }
+}

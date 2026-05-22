@@ -1,0 +1,10 @@
+{
+  "simulation": true,
+  "equilibrium_points": true,
+  "linearization": true,
+  "phase_portrait": true,
+  "local_stability": true,
+  "region_of_attraction": true,
+  "bifurcation_sweep": true,
+  "nonlinear_mpc": true
+}

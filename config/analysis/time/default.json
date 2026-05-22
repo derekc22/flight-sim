@@ -1,0 +1,7 @@
+{
+  "step": true,
+  "impulse": true,
+  "initial_condition": true,
+  "arbitrary_input": true,
+  "metrics": true
+}

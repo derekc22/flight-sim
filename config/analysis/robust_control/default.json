@@ -1,0 +1,18 @@
+{
+  "uncertainty": {
+    "parametric": true,
+    "dynamic": true
+  },
+  "analysis": {
+    "robust_stability": true,
+    "robust_performance": true,
+    "worst_case_gain": true,
+    "mu_analysis": true,
+    "disk_margins": true
+  },
+  "synthesis": {
+    "hinf": true,
+    "mixed_sensitivity": true,
+    "mu_synthesis": true
+  }
+}

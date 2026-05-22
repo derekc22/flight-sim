@@ -129,9 +129,5 @@ if [ "$DATA_BOOL" -eq 1 ]; then
 fi
 
 if [ "$PLOT_BOOL" -eq 1 ]; then
-	./scripts/plot.sh "$DATA_DIR"
-fi
-
-if [ "$ANALYSIS_BOOL" -eq 1 ]; then
-	./scripts/init_matlab.sh "$DATA_DIR"
+	./scripts/python/plot.sh "$DATA_DIR"
 fi
