@@ -1,5 +1,5 @@
 % clear workspace 
-clearvars -except data_dir_path data_mat_path plot_dir_path; clc
+clearvars -except DATA_DIR_PATH DATA_MAT_PATH; clc
 
 % add util to path
 addpath("util")
@@ -8,7 +8,7 @@ addpath("util")
 fprintf('Enter MATLAB script: %s.m\n', mfilename)
 
 % load data from .mat file
-data_mat = load(data_mat_path);
+data_mat = load(DATA_MAT_PATH);
 %--------------------------------------------------------------------------
 
 % validate variables
@@ -19,7 +19,7 @@ sys = ss(data_mat.A, data_mat.B, data_mat.C, data_mat.D);
 G = tf(sys);
 
 % save data to .mat file
-save(data_mat_path, "sys", "G", "-append")
+save(DATA_MAT_PATH, "sys", "G", "-append")
 
 %--------------------------------------------------------------------------
 % end script

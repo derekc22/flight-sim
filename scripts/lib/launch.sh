@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-AIRCRAFT="${1:?usage: ./scripts/launch.sh <AIRCRAFT>}"
+AIRCRAFT="${1:?usage: ./scripts/lib/launch.sh <AIRCRAFT>}"
 
 source .env
 

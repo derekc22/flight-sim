@@ -1,0 +1,8 @@
+{
+	"step": true,
+	"impulse": true,
+	"ramp": true,
+	"sine": true,
+	"initial_condition": true,
+	"metrics": true
+}

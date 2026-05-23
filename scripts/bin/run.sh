@@ -77,10 +77,10 @@ if [ "$HEADLESS_BOOL" -eq 0 ]; then
 
 	cd "$DIR" || exit 1
 
-	./scripts/write_in_xml.sh
-	./scripts/write_out_xml.sh
+	./scripts/lib/write_in_xml.sh
+	./scripts/lib/write_out_xml.sh
 
-	./scripts/launch.sh "$AIRCRAFT" &
+	./scripts/lib/launch.sh "$AIRCRAFT" &
 	FG_PID=$!
 
 	trap 'kill "$FG_PID" 2>/dev/null || true' EXIT
@@ -111,7 +111,7 @@ cmake --build build
 	"$ANALYSIS_BOOL" \
 
 if [ "$DATA_BOOL" -eq 1 ]; then
-	./scripts/dump_args.sh \
+	./scripts/lib/dump_args.sh \
 		AIRCRAFT="$AIRCRAFT" \
 		TIME_SEC="$TIME_SEC" \
 		TRIM_BOOL="$TRIM_BOOL" \
@@ -129,5 +129,9 @@ if [ "$DATA_BOOL" -eq 1 ]; then
 fi
 
 if [ "$PLOT_BOOL" -eq 1 ]; then
-	./scripts/python/plot.sh "$DATA_DIR"
+	./scripts/lib/plot/plot.sh "$DATA_DIR"
+fi
+
+if [ "$ANALYSIS_BOOL" -eq 1 ]; then
+	./scripts/lib/analysis/init.sh "$DATA_DIR"
 fi
