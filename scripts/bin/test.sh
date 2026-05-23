@@ -23,7 +23,7 @@ while getopts "t:h" opt; do
 	esac
 done
 
-# set defaults for TEST_SUITE flag
+# set default for TEST_SUITE flag
 : "${TEST_SUITE:=0}"
 
 cmake -S . -B build -DGTest_DIR=/opt/homebrew/lib/cmake/GTest

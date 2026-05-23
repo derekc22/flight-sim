@@ -41,7 +41,7 @@ fprintf('Exit MATLAB script: %s.m\n', mfilename)
 
 
 
-%% Functions
+%% functions
 function [A, B, C, D] = loadABCD(DATA_DIR_PATH, matrix_paths)
     A = readmatrix(fullfile(DATA_DIR_PATH, matrix_paths.A));
     B = readmatrix(fullfile(DATA_DIR_PATH, matrix_paths.B));

@@ -16,6 +16,7 @@ namespace io {
 
     void AnalysisManager::step(const AnalysisContext& context) {
         if (data_bool && analysis_bool) {
+            aircraft_id = context.aircraft_id;
 
             if (trim_bool) {
                 trim_sol = context.trim_sol;
@@ -29,7 +30,6 @@ namespace io {
     }
 
     void AnalysisManager::save(const std::string& data_dir_path) {
-
         if (data_bool && analysis_bool) {
 
             MatlabContext matlab_context {

@@ -129,7 +129,7 @@ if [ "$DATA_BOOL" -eq 1 ]; then
 fi
 
 if [ "$PLOT_BOOL" -eq 1 ]; then
-	./scripts/lib/plot/plot.sh "$DATA_DIR"
+	./scripts/bin/plot.sh "$DATA_DIR"
 fi
 
 if [ "$ANALYSIS_BOOL" -eq 1 ]; then
