@@ -39,6 +39,7 @@ save(DATA_MAT_PATH, ...
     "n", "m", ...
     "A", "B", "C", "D"...
 )
+fprintf("File saved successfully to %s\n", char(DATA_MAT_PATH))
 
 %--------------------------------------------------------------------------
 % end script
@@ -55,4 +56,3 @@ function [A, B, C, D] = loadABCD(DATA_DIR_PATH, matrix_paths)
     C = readmatrix(fullfile(DATA_DIR_PATH, matrix_paths.C));
     D = readmatrix(fullfile(DATA_DIR_PATH, matrix_paths.D));
 end
-

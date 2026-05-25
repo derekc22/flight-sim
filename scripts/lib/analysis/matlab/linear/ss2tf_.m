@@ -20,6 +20,7 @@ G = tf(sys);
 
 % save data to .mat file
 save(DATA_MAT_PATH, "sys", "G", "-append")
+fprintf("File saved successfully to %s\n", char(DATA_MAT_PATH))
 
 %--------------------------------------------------------------------------
 % end script

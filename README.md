@@ -56,6 +56,8 @@ Update the following JSON configuration file paths in `config/run.json`:
 - `estimation_config`: Estimation properties
 - `guidance_config`: Guidance properties
 - `operating_config`: Operating properties
+
+Update the JSON configuration file paths in `config/analyze.json`
   
 ## Run
 
@@ -77,7 +79,7 @@ To run the simulation:
 - `-m ANALYSIS`: Enable post-run analysis 
   
 ## Example
-Run a 60-second simulation of the C172 with control and avionics enabled. Data and plots are saved to `results/data/c172_test` and `results/figures/c172_test`, respectively:
+Run a 60-second simulation of the C172 with control and avionics enabled. Data, plots, and reports are saved to `results/data/c172_test`, `results/figures/c172_test`, and `results/reports/c172_test`, respectively.
 ```bash
 scripts/run.sh -a c172p -t 60 -c -s -d -p -o c172_test
 ```
@@ -96,7 +98,8 @@ scripts/test.sh -h
 ```
 
 ## Analysis
-- Post-run analysis is implemented via MATLAB. To run the analysis, use the `-m` flag with `run.sh`
+- Post-run analysis is implemented with MATLAB and configured via `config/analyze.json`
+- To run the analysis, use the `-m` flag with `run.sh`
 - The current implementation requires an active MATLAB license. A planned transition to pre-compiled binaries will remove this requirement, requiring only the MATLAB Runtime instead
 
 ## References:

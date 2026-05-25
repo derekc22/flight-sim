@@ -34,7 +34,8 @@ jsonFieldsExist(json_config, [ ...
 t = 0:data_mat.dt:json_config.time_sec;
 
 % open txt file
-info_fid = fopen(fullfile(REPORT_DIR_PATH, "lsiminfo.txt"), "w");
+info_path = fullfile(REPORT_DIR_PATH, "lsiminfo.txt");
+info_fid = fopen(info_path, "w");
 
 % step response
 if json_config.step
@@ -97,6 +98,7 @@ if json_config.sine
 end
 
 fclose(info_fid);
+fprintf("File saved successfully to %s\n", char(info_path))
 
 %--------------------------------------------------------------------------
 % end script
@@ -123,7 +125,9 @@ function simulateAndPlotResponse(G, dt, t, n_outputs, n_inputs, plot_dir_path, i
         sgtitle(sprintf('%s, input %d', response_title, input_idx));
 
         fname = sprintf("%s_%d.pdf", file_prefix, input_idx);
-        print(gcf, char(fullfile(plot_dir_path, fname)), "-dpdf", "-vector", "-bestfit")
+        save_path = fullfile(plot_dir_path, fname);
+        print(gcf, char(save_path), "-dpdf", "-vector", "-bestfit")
+        fprintf("File saved successfully to %s\n", char(save_path))
 
         close(gcf)
 
