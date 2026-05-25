@@ -29,7 +29,7 @@ namespace io {
         }
     }
 
-    void AnalysisManager::save(const std::string& data_dir_path) {
+    void AnalysisManager::save(const std::string& data_dir_path, const std::string& report_dir_path) {
         if (data_bool && analysis_bool) {
 
             MatlabContext matlab_context {
@@ -37,11 +37,11 @@ namespace io {
             };
 
             if (trim_bool) {
-                write_txt(trim::print_trim_solution(trim_sol), data_dir_path, "trim_sol");
+                write_txt(trim::print_trim_solution(trim_sol), report_dir_path, "trim_sol");
 
                 if (trim_sol.converged) {
 
-                    write_txt(linearization::print_linearization_solution(lin_sol), data_dir_path, "lin_sol");
+                    write_txt(linearization::print_linearization_solution(lin_sol), report_dir_path, "lin_sol");
 
                     std::string A_fname = "lin_sol_A";
                     std::string B_fname = "lin_sol_B";
@@ -53,7 +53,7 @@ namespace io {
                     write_csv(Eigen::MatrixXd(lin_sol.C), data_dir_path, C_fname);
                     write_csv(Eigen::MatrixXd(lin_sol.D), data_dir_path, D_fname);
 
-                    write_txt(analysis::print_eigen_analysis(eig_sol), data_dir_path, "eig_sol");
+                    write_txt(analysis::print_eigen_analysis(eig_sol), report_dir_path, "eig_sol");
 
                     matlab_context.A_csv = A_fname + ".csv";
                     matlab_context.B_csv = B_fname + ".csv";

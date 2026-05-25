@@ -82,10 +82,11 @@ namespace runner {
 
     void SimulationRunner::cleanup() {
         std::string data_dir_path = options.data_dir_path;
+        std::string report_dir_path = options.report_dir_path;
 
         // save data
         data_manager.save(data_dir_path);
-        analysis_manager.save(data_dir_path);
+        analysis_manager.save(data_dir_path, report_dir_path);
 
         // dump configs
         json::dump_configs(data_dir_path);

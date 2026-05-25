@@ -1,7 +1,6 @@
 name: ame532
 channels:
   - conda-forge
-  - robostack-humble
   - defaults
 dependencies:
   - _openmp_mutex=4.5=7_kmp_llvm

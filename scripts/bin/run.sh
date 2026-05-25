@@ -61,6 +61,8 @@ done
 : "${QUICK_BOOL:=0}"
 
 DATA_DIR_PATH="$PROJ_PATH/results/data/$DATA_DIR"
+PLOT_DIR_PATH="$PROJ_PATH/results/figures/$DATA_DIR"
+REPORT_DIR_PATH="$PROJ_PATH/results/reports/$DATA_DIR"
 
 # required args check
 [[ -z "$AIRCRAFT" || -z "$TIME_SEC" ]] && usage 1
@@ -77,6 +79,8 @@ if [[ "$DATA_BOOL" -eq 0 && "$ANALYSIS_BOOL" -eq 1 ]]; then
 fi
 
 cd "$PROJ_PATH" || exit 1
+
+"$PROJ_PATH/scripts/lib/create_dirs.sh" "$DATA_DIR_PATH" "$PLOT_DIR_PATH" "$REPORT_DIR_PATH"
 
 if [ "$HEADLESS_BOOL" -eq 0 ]; then
 	"$PROJ_PATH/scripts/lib/write_in_xml.sh"
@@ -110,7 +114,8 @@ cmake --build "$PROJ_PATH/build"
 	"$VERBOSE_BOOL" \
 	"$DATA_BOOL" \
 	"$DATA_DIR_PATH" \
-	"$ANALYSIS_BOOL" \
+	"$REPORT_DIR_PATH" \
+	"$ANALYSIS_BOOL"
 
 if [ "$DATA_BOOL" -eq 1 ]; then
 	"$PROJ_PATH/scripts/lib/dump_args.sh" \

@@ -16,7 +16,6 @@ def init_plot(spatial=False):
     data_path = args.data
     ref_data_path = args.ref
     plot_dir_path = args.save
-    os.makedirs(plot_dir_path, exist_ok=True)
     dtn = datetime.now().strftime("%Y%b%d_%H-%M-%S")
 
     save_fname = os.path.splitext(os.path.basename(data_path))[0]

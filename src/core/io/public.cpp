@@ -10,8 +10,6 @@
 namespace io {
 
     void write_txt(const std::string& text, const std::string& dir_path, const std::string& fname) {
-        create_dir(dir_path);
-
         const auto file_path = std::filesystem::path(dir_path) / (fname + ".txt");
         std::ofstream file_txt(file_path);
         if (!file_txt.is_open()) { throw std::runtime_error("Failed to open file: " + file_path.string()); }
@@ -22,8 +20,6 @@ namespace io {
     }
 
     void write_csv(const Eigen::MatrixXd& data, const std::string& dir_path, const std::string& fname) {
-        create_dir(dir_path);
-
         const auto file_path = std::filesystem::path(dir_path) / (fname + ".csv");
         std::ofstream file_csv(file_path);
         if (!file_csv.is_open()) { throw std::runtime_error("Failed to open file: " + file_path.string()); }

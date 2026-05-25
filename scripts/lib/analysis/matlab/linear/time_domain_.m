@@ -1,5 +1,5 @@
 % clear workspace 
-clearvars -except DATA_DIR_PATH DATA_MAT_PATH PLOT_DIR_PATH CONFIG_PATH; clc
+clearvars -except DATA_DIR_PATH DATA_MAT_PATH PLOT_DIR_PATH REPORT_DIR_PATH CONFIG_PATH; clc
 
 % add util to path
 addpath("../util")
@@ -30,14 +30,11 @@ jsonFieldsExist(json_config, [ ...
     "sine" ...
 ])
 
-% make plot directory as it may not exist
-mkdir(PLOT_DIR_PATH)
-
 [n_outputs, n_inputs] = size(data_mat.G);
 t = 0:data_mat.dt:json_config.time_sec;
 
 % open txt file
-info_fid = fopen(fullfile(DATA_DIR_PATH, "lsiminfo.txt"), "w");
+info_fid = fopen(fullfile(REPORT_DIR_PATH, "lsiminfo.txt"), "w");
 
 % step response
 if json_config.step

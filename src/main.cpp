@@ -7,7 +7,7 @@
 #include "simulation/runner/public.hpp"
 
 int main(int argc, char* argv[]) {
-    if (argc != 12) { return 1; }
+    if (argc != 13) { return 1; }
 
     std::string aircraft_id = argv[1];
 
@@ -24,7 +24,8 @@ int main(int argc, char* argv[]) {
     bool verbose_bool = std::stoi(argv[8]) == 1;
     bool data_bool = std::stoi(argv[9]) == 1;
     std::string data_dir_path = argv[10];
-    bool analysis_bool = std::stoi(argv[11]) == 1;
+    std::string report_dir_path = argv[11];
+    bool analysis_bool = std::stoi(argv[12]) == 1;
 
     // compute number of simulation steps
     int tf = std::max(1, static_cast<int>(std::ceil(time_sec / constants::dt)));
@@ -41,11 +42,9 @@ int main(int argc, char* argv[]) {
         .verbose_bool=verbose_bool,
         .data_bool=data_bool,
         .data_dir_path=data_dir_path,
+        .report_dir_path=report_dir_path,
         .analysis_bool=analysis_bool
     };
-
-    // declare simulation output
-    // SimulationOutput sim_out;
 
     // run case
     runner::SimulationRunner sim_runner{sim_options};

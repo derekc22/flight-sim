@@ -21,7 +21,8 @@ if [[ -z "$DATA_DIR" ]]; then
 	exit 1
 fi
 
-ARGS_PATH="$PROJ_PATH/results/data/$DATA_DIR/args.txt"
+REPORT_DIR_PATH="$PROJ_PATH/results/reports/$DATA_DIR"
+ARGS_PATH="$REPORT_DIR_PATH/args.txt"
 printf "%s\n" "$@" > "$ARGS_PATH"
 
 echo "File saved successfully to $ARGS_PATH"

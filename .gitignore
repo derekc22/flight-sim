@@ -3,6 +3,7 @@
 build/
 results/data/
 results/figures/
+results/reports/
 .idea/
 **/archive/**
 AGENTS.md
