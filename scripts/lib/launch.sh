@@ -1,11 +1,11 @@
 #!/bin/bash
 set -e
 
-AIRCRAFT="${1:?usage: ./scripts/lib/launch.sh <AIRCRAFT>}"
-
 source .env
 
-exec "$FG" \
+AIRCRAFT="${1:?usage: $0 <AIRCRAFT>}"
+
+exec "$FG_PATH" \
 --ignore-autosave \
 --generic=socket,out,100,127.0.0.1,5510,udp,udp-out \
 --generic=socket,in,100,127.0.0.1,5511,udp,udp-in \

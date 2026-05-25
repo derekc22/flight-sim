@@ -41,11 +41,11 @@ https://www.mathworks.com/products/compiler/matlab-runtime.html
 ## Setup
 
 Update the following environment variables in `.env` with the corresponding paths on your machine:
-- `DIR`: Project root
-- `SRC`: Project `schema` directory
-- `DEST`: FlightGear `Protocol` directory 
-- `FG`: FlightGear executable
-- `MATLAB`: MATLAB executable
+- `PROJ_PATH`: Project root
+- `SCHEMA_PATH`: Project `schema` directory
+- `PRTCL_PATH`: FlightGear `Protocol` directory
+- `FG_PATH`: FlightGear executable
+- `MATLAB_PATH`: MATLAB executable
   
 Update the following JSON configuration file paths in `config/run.json`:
 - `initialization_config`: Initial conditions
@@ -78,7 +78,7 @@ To run the simulation:
 - `-m ANALYSIS`: Enable post-run analysis 
   
 ## Example
-Run a 60-second simulation of the C172 with control and avionics. Data and plots are saved to `data/c172_test` and `plots/c172_test`, respectively:
+Run a 60-second simulation of the C172 with control and avionics enabled. Data and plots are saved to `results/data/c172_test` and `results/figures/c172_test`, respectively:
 ```bash
 scripts/run.sh -a c172p -t 60 -c -s -d -p -o c172_test
 ```

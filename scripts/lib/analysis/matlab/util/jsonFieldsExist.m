@@ -3,7 +3,7 @@ function jsonFieldsExist(data, fieldPaths)
 
     for fieldPath = fieldPaths
         if ~jsonPathExists(data, fieldPath)
-            error("Error: %s is not present in JSON data", fieldPath);
+            error("Error: key '%s' is not present in JSON", fieldPath);
         end
     end
 

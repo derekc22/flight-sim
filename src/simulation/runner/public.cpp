@@ -1,21 +1,8 @@
-#include "simulation/runner/public.hpp"
 #include <chrono>
 #include <string>
 #include <thread>
 #include <Eigen/Dense>
-#include "analysis/eigenanalysis/public.hpp"
-#include "core/connection/public.hpp"
-#include "core/json/actuators/public.hpp"
-#include "core/json/aerodynamics/public.hpp"
-#include "core/json/avionics/public.hpp"
-#include "core/json/control/public.hpp"
-#include "core/json/estimation/public.hpp"
-#include "core/json/guidance/public.hpp"
-#include "core/json/initialization/public.hpp"
-#include "core/json/operating/public.hpp"
-#include "core/json/public.hpp"
-#include "core/json/structural/public.hpp"
-#include "core/messages/public.hpp"
+#include "simulation/runner/public.hpp"
 #include "simulation/actuators/public.hpp"
 #include "simulation/aerodynamics/public.hpp"
 #include "simulation/atmospheric/public.hpp"
@@ -33,6 +20,19 @@
 #include "simulation/structural/public.hpp"
 #include "simulation/trim/public.hpp"
 #include "simulation/vehicles/public.hpp"
+#include "core/connection/public.hpp"
+#include "core/json/actuators/public.hpp"
+#include "core/json/aerodynamics/public.hpp"
+#include "core/json/avionics/public.hpp"
+#include "core/json/control/public.hpp"
+#include "core/json/estimation/public.hpp"
+#include "core/json/guidance/public.hpp"
+#include "core/json/initialization/public.hpp"
+#include "core/json/operating/public.hpp"
+#include "core/json/public.hpp"
+#include "core/json/structural/public.hpp"
+#include "core/messages/public.hpp"
+#include "analysis/eigenanalysis/public.hpp"
 
 namespace runner {
 
@@ -81,8 +81,7 @@ namespace runner {
     SimulationRunner::~SimulationRunner() = default;
 
     void SimulationRunner::cleanup() {
-        std::string data_dir_path = "data/" + options.data_dir;
-        // std::string data_dir_path = "data/" + sim_in.data_dir + "/";
+        std::string data_dir_path = options.data_dir_path;
 
         // save data
         data_manager.save(data_dir_path);

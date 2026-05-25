@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+source .env
+
 usage() {
 	exit_code="$1"
 	cat >&2 <<EOF
@@ -26,11 +28,13 @@ done
 # set default for TEST_SUITE flag
 : "${TEST_SUITE:=0}"
 
-cmake -S . -B build -DGTest_DIR=/opt/homebrew/lib/cmake/GTest
-cmake --build build --target flight_sim_tests
+cd "$PROJ_PATH" || exit 1
+
+cmake -S "$PROJ_PATH" -B "$PROJ_PATH/build" -DGTest_DIR=/opt/homebrew/lib/cmake/GTest
+cmake --build "$PROJ_PATH/build" --target flight_sim_tests
 
 if [ "$TEST_SUITE" = "0" ]; then
-    ctest --test-dir build --output-on-failure
+    ctest --test-dir "$PROJ_PATH/build" --output-on-failure
 else
-    ./build/flight_sim_tests --gtest_filter="${TEST_SUITE}.*"
+    "$PROJ_PATH/build/flight_sim_tests" --gtest_filter="${TEST_SUITE}.*"
 fi

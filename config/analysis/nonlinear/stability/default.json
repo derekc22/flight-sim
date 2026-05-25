@@ -1,0 +1,6 @@
+{
+    "convergence": true,
+    "divergence": true,
+    "local_stability_from_linearization": true,
+    "empirical_region_of_attraction": false
+}

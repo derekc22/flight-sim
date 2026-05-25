@@ -3,7 +3,7 @@ set -e
 
 source .env
 
-SRC_OUT="${SRC}/udp-out.xml"
-DEST_OUT="${DEST}/udp-out.xml"
+SRC_PATH="${SCHEMA_PATH}/udp-out.xml"
+DEST_PATH="${PRTCL_PATH}/udp-out.xml"
 
-cp "$SRC_OUT" "$DEST_OUT"
+cp "$SRC_PATH" "$DEST_PATH"

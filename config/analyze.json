@@ -1,15 +1,22 @@
 {
-    "time_response_config": "analysis/time_response/default.json",
-    "frequency_response_config": null,
-    "stability_config": null,
-    "root_locus_config": null,
-    "state_space_config": null,
-    "controller_design_config": null,
-    "closed_loop_config": null,
-    "model_properties_config": null,
-    "robust_control_config": null,
-    "nonlinear_config": null,
-    "system_identification_config": null,
-    "model_reduction_config": null,
-    "uncertainty_sampling_config": null
+    "linear": {
+        "time_domain": "analysis/linear/time_domain/default.json",
+        "frequency_domain": null,
+        "stability": null,
+        "root_locus": null,
+        "state_space": null,
+        "closed_loop": null,
+        "controller_design": null,
+        "model_properties": null,
+        "model_reduction": null,
+        "robust_control": null,
+        "modal": null,
+        "system_identification": null
+    },
+    "nonlinear": {
+        "time_domain": null,
+        "stability": null,
+        "phase_space": null,
+        "system_identification": null
+    }
 }

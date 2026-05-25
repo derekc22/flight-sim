@@ -1,17 +1,37 @@
 #!/bin/bash
 set -e
 
+source .env
+
 if [ -z "$1" ]; then
 	echo "Usage: $0 <DATA_DIR>"
 	exit 1
 fi
 
 DATA_DIR="$1"
+ANALYZE_CONFIG_PATH="$PROJ_PATH/config/analyze.json"
 
-while IFS=$'\t' read -r key rel_path; do
-	if [ "$rel_path" != "null" ]; then
-		script_name="${key%_config}"
-		config_path="config/$rel_path"
-		"./scripts/lib/analysis/${script_name}.sh" "$DATA_DIR" "$config_path"
+run_group() {
+	group="$1"
+	enabled_count="$(jq -r --arg group "$group" '.[$group] // {} | to_entries | map(select(.value != null)) | length' "$ANALYZE_CONFIG_PATH")"
+
+	if [ "$enabled_count" -eq 0 ]; then
+		return
 	fi
-done < <(jq -r 'to_entries[] | [.key, .value] | @tsv' config/analyze.json)
+
+	INIT_SCRIPT_PATH="$PROJ_PATH/scripts/lib/analysis/$group/init.sh"
+
+	# run init.sh
+	"$INIT_SCRIPT_PATH" "$DATA_DIR"
+
+	while IFS=$'\t' read -r analysis rel_path; do
+		SCRIPT_PATH="$PROJ_PATH/scripts/lib/analysis/$group/$analysis.sh"
+		CONFIG_PATH="$PROJ_PATH/config/$rel_path"
+
+		# run analysis script
+		"$SCRIPT_PATH" "$DATA_DIR" "$CONFIG_PATH"
+	done < <(jq -r --arg group "$group" '.[$group] // {} | to_entries[] | select(.value != null) | [.key, .value] | @tsv' "$ANALYZE_CONFIG_PATH")
+}
+
+run_group linear
+run_group nonlinear

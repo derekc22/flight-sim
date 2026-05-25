@@ -1,0 +1,5 @@
+{
+    "root_locus": {
+        "gain_range": [0, 100]
+    }
+}

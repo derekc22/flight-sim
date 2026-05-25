@@ -14,16 +14,16 @@ namespace json {
         return run_path.parent_path() / path;
     }
 
-    void write_json(const nlohmann::json& config, const std::string& dir, const std::string& fname) {
-        std::filesystem::create_directories(dir);
+    void write_json(const nlohmann::json& config, const std::string& dir_path, const std::string& fname) {
+        std::filesystem::create_directories(dir_path);
 
-        const auto path_name = std::filesystem::path(dir) / (fname + ".json");
-        std::ofstream file_json(path_name);
-        if (!file_json.is_open()) { throw std::runtime_error("Failed to open file: " + path_name.string()); }
+        const auto file_path = std::filesystem::path(dir_path) / (fname + ".json");
+        std::ofstream file_json(file_path);
+        if (!file_json.is_open()) { throw std::runtime_error("Failed to open file: " + file_path.string()); }
 
         file_json << config.dump(4) << "\n";
         file_json.close();
-        std::cout << "File saved successfully to " << path_name.string() << std::endl;
+        std::cout << "File saved successfully to " << file_path.string() << std::endl;
     }
 
 }

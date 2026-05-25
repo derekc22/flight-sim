@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+source .env
+
 DATA_DIR=""
 
 for arg in "$@"; do
@@ -19,9 +21,7 @@ if [[ -z "$DATA_DIR" ]]; then
 	exit 1
 fi
 
-OUT_PATH="data/$DATA_DIR/args.txt"
-mkdir -p "$(dirname "$OUT_PATH")"
+ARGS_PATH="$PROJ_PATH/results/data/$DATA_DIR/args.txt"
+printf "%s\n" "$@" > "$ARGS_PATH"
 
-printf "%s\n" "$@" > "$OUT_PATH"
-
-echo "File saved successfully to $OUT_PATH"
+echo "File saved successfully to $ARGS_PATH"

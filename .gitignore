@@ -1,8 +1,8 @@
 .vscode/
 .DS_Store
 build/
-/data/
-figures/
+results/data/
+results/figures/
 .idea/
 **/archive/**
 AGENTS.md
@@ -13,6 +13,5 @@ figures/
 __pycache__
 CLAUDE.md
 .cache/
-/ame532/**/*.pdf
 *.asv
 *.mat

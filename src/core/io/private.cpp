@@ -7,13 +7,13 @@
 
 namespace io {
 
-    void create_dir(const std::string& dir) {
-        std::filesystem::create_directories(dir);
+    void create_dir(const std::string& dir_path) {
+        std::filesystem::create_directories(dir_path);
     }
 
     void save_vector_to_file(const std::vector<int>& data, const std::string& fname){
-        std::string path_name = "data/" + fname + ".csv";
-        std::ofstream file_v(path_name);
+        std::string file_path = "results/data/" + fname + ".csv";
+        std::ofstream file_v(file_path);
         for (size_t i = 0; i < data.size(); i++){
             file_v << data[i];
             if (i < data.size() - 1) file_v << ",";  // comma delimiter

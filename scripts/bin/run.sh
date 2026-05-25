@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+source .env
+
 usage() {
 	exit_code="$1"
 	cat >&2 <<EOF
@@ -57,6 +59,7 @@ done
 : "${ANALYSIS_BOOL:=0}"
 : "${HEADLESS_BOOL:=0}"
 : "${QUICK_BOOL:=0}"
+DATA_DIR_PATH="$PROJ_PATH/results/data/$DATA_DIR"
 
 # required args check
 [[ -z "$AIRCRAFT" || -z "$TIME_SEC" ]] && usage 1
@@ -72,46 +75,44 @@ if [[ "$DATA_BOOL" -eq 0 && "$ANALYSIS_BOOL" -eq 1 ]]; then
 	exit 1
 fi
 
+cd "$PROJ_PATH" || exit 1
+
 if [ "$HEADLESS_BOOL" -eq 0 ]; then
-	source .env
+	"$PROJ_PATH/scripts/lib/write_in_xml.sh"
+	"$PROJ_PATH/scripts/lib/write_out_xml.sh"
 
-	cd "$DIR" || exit 1
-
-	./scripts/lib/write_in_xml.sh
-	./scripts/lib/write_out_xml.sh
-
-	./scripts/lib/launch.sh "$AIRCRAFT" &
+	"$PROJ_PATH/scripts/lib/launch.sh" "$AIRCRAFT" &
 	FG_PID=$!
 
 	trap 'kill "$FG_PID" 2>/dev/null || true' EXIT
 fi
 
 if [ "$QUICK_BOOL" -eq 0 ]; then
-	rm -rf build
+	rm -rf "$PROJ_PATH/build"
 fi
 
 if [[ "$QUICK_BOOL" -eq 1 && "$HEADLESS_BOOL" -eq 0 ]]; then
 	sleep 10
 fi
 
-cmake -B build -S .
-cmake --build build
+cmake -B "$PROJ_PATH/build" -S "$PROJ_PATH"
+cmake --build "$PROJ_PATH/build"
 
-./build/flight-sim \
+"$PROJ_PATH/build/flight-sim" \
 	"$AIRCRAFT" \
 	"$TIME_SEC" \
 	"$TRIM_BOOL" \
 	"$SENSOR_BOOL" \
 	"$CONTROL_BOOL" \
 	"$ESTIMATION_BOOL" \
-	"$WIND_BOOL" \
-	"$VERBOSE_BOOL" \
-	"$DATA_BOOL" \
-	"$DATA_DIR" \
-	"$ANALYSIS_BOOL" \
+		"$WIND_BOOL" \
+		"$VERBOSE_BOOL" \
+		"$DATA_BOOL" \
+		"$DATA_DIR_PATH" \
+		"$ANALYSIS_BOOL" \
 
 if [ "$DATA_BOOL" -eq 1 ]; then
-	./scripts/lib/dump_args.sh \
+	"$PROJ_PATH/scripts/lib/dump_args.sh" \
 		AIRCRAFT="$AIRCRAFT" \
 		TIME_SEC="$TIME_SEC" \
 		TRIM_BOOL="$TRIM_BOOL" \
@@ -129,9 +130,9 @@ if [ "$DATA_BOOL" -eq 1 ]; then
 fi
 
 if [ "$PLOT_BOOL" -eq 1 ]; then
-	./scripts/bin/plot.sh "$DATA_DIR"
+	"$PROJ_PATH/scripts/bin/plot.sh" "$DATA_DIR"
 fi
 
 if [ "$ANALYSIS_BOOL" -eq 1 ]; then
-	./scripts/lib/analysis/init.sh "$DATA_DIR"
+	"$PROJ_PATH/scripts/bin/analyze.sh" "$DATA_DIR"
 fi

@@ -1,8 +1,0 @@
-{
-  "poles_zeros": true,
-  "pole_zero_map": true,
-  "damping": true,
-  "is_stable": true,
-  "gain_phase_margin": true,
-  "all_margins": true
-}

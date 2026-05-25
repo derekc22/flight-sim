@@ -25,7 +25,7 @@ namespace runner {
         bool wind_bool;
         bool verbose_bool;
         bool data_bool;
-        std::string data_dir;
+        std::string data_dir_path;
         bool analysis_bool;
     };
 

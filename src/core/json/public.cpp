@@ -86,15 +86,15 @@ namespace json {
         return resolve_config_path(run_path, run_config.at(key).get<std::string>());
     }
 
-    void dump_configs(const std::string& dir) {
+    void dump_configs(const std::string& dir_path) {
         const auto run_path = std::filesystem::path("config") / "run.json";
         const auto run_config = read_json_file(run_path);
-        write_json(run_config, dir, "run");
+        write_json(run_config, dir_path, "run");
 
         for (const auto& [key, value] : run_config.items()) {
             if (!value.is_string()) { throw std::runtime_error("json::dump_configs: expected string path for key '" + key + "'"); }
             const auto config_path = resolve_config_path(run_path, value.get<std::string>());
-            write_json(read_json_file(config_path), dir, key);
+            write_json(read_json_file(config_path), dir_path, key);
         }
     }
 

@@ -5,7 +5,7 @@ from plot_util import init_plot
 
 def main():
 
-    args, data, ref_data, t, nplots, labels, save_fpath = init_plot(spatial=False)
+    args, data, ref_data, t, nplots, labels, save_path = init_plot(spatial=False)
 
     plt.figure(figsize=(10, 3 * nplots))
 
@@ -23,10 +23,10 @@ def main():
 
     plt.suptitle(args.title)
     plt.tight_layout()
-    plt.savefig(save_fpath)
+    plt.savefig(save_path)
     plt.close()
 
-    print(f"File saved successfully to {save_fpath}")
+    print(f"File saved successfully to {save_path}")
 
 if __name__ == "__main__":
     main()

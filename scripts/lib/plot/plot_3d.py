@@ -5,7 +5,7 @@ from plot_util import init_plot
 
 def main():
 
-    args, data, ref_data, _, _, labels, save_fpath = init_plot(spatial=True)
+    args, data, ref_data, _, _, labels, save_path = init_plot(spatial=True)
 
     fig = plt.figure(figsize=(10, 8))
     ax = fig.add_subplot(111, projection="3d")
@@ -28,10 +28,10 @@ def main():
 
     plt.title(args.title)
     plt.tight_layout()
-    plt.savefig(save_fpath)
+    plt.savefig(save_path)
     plt.close()
 
-    print(f"File saved successfully to {save_fpath}")
+    print(f"File saved successfully to {save_path}")
 
 if __name__ == "__main__":
     main()
