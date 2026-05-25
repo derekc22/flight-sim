@@ -27,7 +27,7 @@ jsonFieldsExist(json_config, [ ...
     "step", ...
     "impulse", ...
     "ramp", ...
-    "sine", ...
+    "sine" ...
 ])
 
 % make plot directory as it may not exist
@@ -35,6 +35,9 @@ mkdir(PLOT_DIR_PATH)
 
 [n_outputs, n_inputs] = size(data_mat.G);
 t = 0:data_mat.dt:json_config.time_sec;
+
+% open txt file
+info_fid = fopen(fullfile(DATA_DIR_PATH, "lsiminfo.txt"), "w");
 
 % step response
 if json_config.step
@@ -45,6 +48,7 @@ if json_config.step
         n_outputs, ...
         n_inputs, ...
         PLOT_DIR_PATH, ...
+        info_fid, ...
         "step_response", ...
         @(t, dt) ones(length(t), 1) ...
     );
@@ -59,6 +63,7 @@ if json_config.impulse
         n_outputs, ...
         n_inputs, ...
         PLOT_DIR_PATH, ...
+        info_fid, ...
         "impulse_response", ...
         @makeImpulseInput ...
     );
@@ -73,6 +78,7 @@ if json_config.ramp
         n_outputs, ...
         n_inputs, ...
         PLOT_DIR_PATH, ...
+        info_fid, ...
         "ramp_response", ...
         @(t, dt) t ...
     );
@@ -87,11 +93,13 @@ if json_config.sine
         n_outputs, ...
         n_inputs, ...
         PLOT_DIR_PATH, ...
+        info_fid, ...
         "sine_response", ...
         @(t, dt) sin(t) ...
     );
 end
 
+fclose(info_fid);
 
 %--------------------------------------------------------------------------
 % end script
@@ -102,7 +110,7 @@ fprintf('Exit MATLAB script: %s.m\n', mfilename)
 
 
 %% functions
-function simulateAndPlotResponse(G, dt, t, n_outputs, n_inputs, plot_dir_path, file_prefix, make_input_signal)
+function simulateAndPlotResponse(G, dt, t, n_outputs, n_inputs, plot_dir_path, info_fid, file_prefix, make_input_signal)
     response_title = strrep(file_prefix, "_", " ");
 
     for input_idx = 1:n_inputs
@@ -121,8 +129,10 @@ function simulateAndPlotResponse(G, dt, t, n_outputs, n_inputs, plot_dir_path, f
         print(gcf, char(fullfile(plot_dir_path, fname)), "-dpdf", "-vector", "-bestfit")
 
         close(gcf)
-    end
 
+        info = lsiminfo(y, t);
+        writeLsimInfo(info_fid, info, file_prefix, input_idx)
+    end
 end
 
 function plotOutputs(t, y, n_outputs)
@@ -134,11 +144,32 @@ function plotOutputs(t, y, n_outputs)
         xlabel('time [s]');
         ylabel(sprintf('y_%d', output_idx));
     end
+end
 
+function writeLsimInfo(info_fid, info, file_prefix, input_idx)
+    response_title = strrep(file_prefix, "_", " ");
+    fields = fieldnames(info);
+
+    fprintf(info_fid, "%s, input %d\n", response_title, input_idx);
+    fprintf(info_fid, "%s\n", repmat('-', 1, 60));
+
+    for output_idx = 1:length(info)
+        fprintf(info_fid, "output %d\n", output_idx);
+
+        for field_idx = 1:length(fields)
+            field_name = fields{field_idx};
+            field_value = info(output_idx).(field_name);
+
+            fprintf(info_fid, "  %s: %.10g\n", field_name, field_value);
+        end
+
+        fprintf(info_fid, "\n");
+    end
+
+    fprintf(info_fid, "\n");
 end
 
 function u = makeImpulseInput(t, dt)
     u = zeros(length(t), 1);
     u(1) = 1 / dt;
-
 end

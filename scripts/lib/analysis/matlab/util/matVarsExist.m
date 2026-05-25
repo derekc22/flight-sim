@@ -8,5 +8,4 @@ function matVarsExist(data, varNames)
             error("Error: variable '%s' is not present in MAT data", varName);
         end
     end
-
 end

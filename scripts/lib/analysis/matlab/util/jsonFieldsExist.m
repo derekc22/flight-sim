@@ -6,7 +6,6 @@ function jsonFieldsExist(data, fieldPaths)
             error("Error: key '%s' is not present in JSON", fieldPath);
         end
     end
-
 end
 
 function pathExists = jsonPathExists(data, fieldPath)
@@ -25,5 +24,4 @@ function pathExists = jsonPathExists(data, fieldPath)
 
         current = current.(part);
     end
-
 end

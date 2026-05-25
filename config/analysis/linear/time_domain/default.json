@@ -3,6 +3,5 @@
     "step": true,
     "impulse": true,
     "ramp": true,
-    "sine": true,
-    "metrics": true
+    "sine": true
 }

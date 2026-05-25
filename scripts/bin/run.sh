@@ -59,6 +59,7 @@ done
 : "${ANALYSIS_BOOL:=0}"
 : "${HEADLESS_BOOL:=0}"
 : "${QUICK_BOOL:=0}"
+
 DATA_DIR_PATH="$PROJ_PATH/results/data/$DATA_DIR"
 
 # required args check
@@ -105,11 +106,11 @@ cmake --build "$PROJ_PATH/build"
 	"$SENSOR_BOOL" \
 	"$CONTROL_BOOL" \
 	"$ESTIMATION_BOOL" \
-		"$WIND_BOOL" \
-		"$VERBOSE_BOOL" \
-		"$DATA_BOOL" \
-		"$DATA_DIR_PATH" \
-		"$ANALYSIS_BOOL" \
+	"$WIND_BOOL" \
+	"$VERBOSE_BOOL" \
+	"$DATA_BOOL" \
+	"$DATA_DIR_PATH" \
+	"$ANALYSIS_BOOL" \
 
 if [ "$DATA_BOOL" -eq 1 ]; then
 	"$PROJ_PATH/scripts/lib/dump_args.sh" \
