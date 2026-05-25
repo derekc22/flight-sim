@@ -42,7 +42,6 @@ https://www.mathworks.com/products/compiler/matlab-runtime.html
 
 Update the following environment variables in `.env` with the corresponding paths on your machine:
 - `PROJ_PATH`: Project root
-- `SCHEMA_PATH`: Project `schema` directory
 - `PRTCL_PATH`: FlightGear `Protocol` directory
 - `FG_PATH`: FlightGear executable
 - `MATLAB_PATH`: MATLAB executable
