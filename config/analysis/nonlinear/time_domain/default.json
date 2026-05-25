@@ -1,0 +1,9 @@
+{
+    "state_history": true,
+    "output_history": true,
+    "tracking_error": true,
+    "overshoot": true,
+    "settling_time": true,
+    "constraint_violations": true,
+    "actuator_saturation": true
+}

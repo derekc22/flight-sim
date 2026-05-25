@@ -1,0 +1,7 @@
+{
+    "time_sec": 5,
+    "step": true,
+    "impulse": true,
+    "ramp": true,
+    "sine": true
+}

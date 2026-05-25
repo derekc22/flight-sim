@@ -719,6 +719,7 @@ namespace vehicles {
     }
 
     Aircraft::Aircraft(
+        const std::string& id,
         const structural::StructuralProperties& structural_properties,
         const aerodynamics::AerodynamicProperties& aerodynamic_properties,
         const actuators::ActuatorProperties& actuator_properties,
@@ -728,6 +729,7 @@ namespace vehicles {
         const guidance::GuidanceProperties& guidance_properties,
         const estimation::EstimationProperties& estimation_properties
     ) :
+        id(id),
         NEDFrameECEF{},
         FRDFrameECEF{},
         FRDFrameNED{&NEDFrameECEF},

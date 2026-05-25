@@ -1,0 +1,85 @@
+#pragma once
+#include <chrono>
+#include <string>
+#include "core/connection/public.hpp"
+#include "core/io/analysis/public.hpp"
+#include "core/io/data/public.hpp"
+#include "simulation/actuators/propulsor/public.hpp"
+#include "simulation/actuators/surface/public.hpp"
+#include "simulation/atmospheric/public.hpp"
+#include "simulation/dynamics/public.hpp"
+#include "simulation/geography/public.hpp"
+#include "simulation/linearization/public.hpp"
+#include "simulation/trim/public.hpp"
+#include "simulation/vehicles/public.hpp"
+
+namespace runner {
+
+    struct SimulationOptions {
+        std::string aircraft_id;
+        int tf;
+        bool trim_bool;
+        bool sensor_bool;
+        bool control_bool;
+        bool estimation_bool;
+        bool wind_bool;
+        bool verbose_bool;
+        bool data_bool;
+        std::string data_dir_path;
+        bool analysis_bool;
+    };
+
+    /** @deprecated */
+    // struct SimulationOutput {
+    //     trim::TrimSolution trim_sol;
+    //     linearization::TrimLinearization lin_sol;
+    //     analysis::TrimEigenAnalysis eig_sol;
+    // };
+
+    struct SimulationContext {
+        dynamics::RigidBodyState xN_t;
+        dynamics::RigidBodyState yN_t;
+        dynamics::RigidBodyState zN_t;
+        dynamics::Wrench WB_net;
+        atmospheric::StaticAtmosphericState static_atm_state;
+        geography::GeographicState geographic_state;
+        atmospheric::Wind windB;
+        trim::TrimSolution trim_sol;
+        linearization::TrimLinearization lin_sol;
+    };
+
+    vehicles::Aircraft load(const std::string& aircraft_id, bool trim_bool);
+
+    struct SimulationRunner {
+        SimulationOptions options;
+        vehicles::Aircraft aircraft;
+        io::DataManager data_manager;
+        io::AnalysisManager analysis_manager;
+
+        actuators::SurfaceActuatorInputs_T<double> u_surface_actual_prev{};
+        actuators::PropulsorActuatorInputs_T<double> u_propulsor_actual_prev{};
+
+        // initialize trim and linearization solutions
+        trim::TrimSolution trim_sol;
+        linearization::TrimLinearization lin_sol;
+
+        // initialize net force and moment
+        dynamics::Force FB_net;
+        dynamics::Moment MB_net;
+        dynamics::Wrench WB_net;
+
+        // initialize windB
+        atmospheric::Wind windB;
+
+        connection::UDPOut udp_out;
+        connection::UDPIn udp_in;
+        std::chrono::steady_clock::time_point next;
+
+        SimulationRunner(SimulationOptions options);
+        ~SimulationRunner();
+
+        void cleanup();
+        void run();
+        void step(int t);
+    };
+}

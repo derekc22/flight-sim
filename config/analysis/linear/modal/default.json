@@ -1,0 +1,6 @@
+{
+    "natural_frequencies": true,
+    "damping_ratios": true,
+    "mode_shapes": true,
+    "participation_factors": true
+}

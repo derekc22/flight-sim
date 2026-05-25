@@ -1,0 +1,7 @@
+{
+    "bode": true,
+    "nyquist": true,
+    "nichols": true,
+    "singular_value": true,
+    "frequency_response": true
+}
