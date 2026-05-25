@@ -36,7 +36,7 @@ https://www.mathworks.com/products/compiler/matlab-runtime.html
 - The simulator is configured via JSON files in the `config/` directory
 - `config/run.json` selects which JSON configuration files are active for a given run
 - `.env` stores local machine paths for the repository, FlightGear, and the FlightGear protocol directory
-- `scripts/run.sh` is the main entry point. It handles the normal run workflow, including launching FlightGear and running the simulator.
+- `scripts/bin/run.sh` is the main entry point. It handles the normal run workflow, including launching FlightGear and running the simulator.
 
 ## Setup
 
@@ -63,7 +63,7 @@ Update the JSON configuration file paths in `config/analyze.json`
 
 To run the simulation:
   ```bash
-  scripts/run.sh -a <AIRCRAFT> -t <TIME_SEC> [-r TRIM] [-s SENSOR] [-c CONTROL] [-e ESTIMATION] [-w WIND] [-v VERBOSE] [-d DATA] [-p PLOT] -o <DATA_DIR> [-m ANALYSIS]
+  scripts/bin/run.sh -a <AIRCRAFT> -t <TIME_SEC> [-r TRIM] [-s SENSOR] [-c CONTROL] [-e ESTIMATION] [-w WIND] [-v VERBOSE] [-d DATA] [-p PLOT] -o <DATA_DIR> [-m ANALYSIS]
   ```
 - `-a AIRCRAFT`: Aircraft to simulate (e.g. ASW28, c172p)
 - `-t TIME_SEC`: Simulation time in seconds
@@ -81,20 +81,20 @@ To run the simulation:
 ## Example
 Run a 60-second simulation of the C172 with control and avionics enabled. Data, plots, and reports are saved to `results/data/c172_test`, `results/figures/c172_test`, and `results/reports/c172_test`, respectively.
 ```bash
-scripts/run.sh -a c172p -t 60 -c -s -d -p -o c172_test
+scripts/bin/run.sh -a c172p -t 60 -c -s -d -p -o c172_test
 ```
 
 ## Tests
 Unit tests are implemented with Google Test:
 ```bash
 # Run all tests
-scripts/test.sh
+scripts/bin/test.sh
 
 # Run a specific test suite
-scripts/test.sh -t <TEST_SUITE>
+scripts/bin/test.sh -t <TEST_SUITE>
 
 # See available test suites
-scripts/test.sh -h
+scripts/bin/test.sh -h
 ```
 
 ## Analysis
