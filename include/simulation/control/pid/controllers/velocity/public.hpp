@@ -6,7 +6,7 @@
 
 namespace control {
 
-    struct VelocityPIDParameters : PIDControllerParameters, VelocityControllerParameters {};
+    struct VelocityPIDParameters : PIDParameters, VelocityControllerParameters {};
 
     struct VelocityPID {
         VelocityPIDParameters params;

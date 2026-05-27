@@ -14,19 +14,22 @@ namespace linearization {
     using OutputJacobian = Eigen::Matrix<double, constants::state_dim, constants::state_dim>;
     using FeedthroughJacobian = Eigen::Matrix<double, constants::state_dim, constants::input_dim>;
 
-    struct TrimLinearization {
+    struct LocalLinearization {
         StateJacobian A = StateJacobian::Zero();
         InputJacobian B = InputJacobian::Zero();
         OutputJacobian C = OutputJacobian::Identity();
         FeedthroughJacobian D = FeedthroughJacobian::Zero();
     };
 
-    struct DiscretizedTrimLinearization {
+    struct DiscretizedLocalLinearization {
         StateJacobian A = StateJacobian::Zero();
         InputJacobian B = InputJacobian::Zero();
+        OutputJacobian C = OutputJacobian::Identity();
+        FeedthroughJacobian D = FeedthroughJacobian::Zero();
     };
 
-    DiscretizedTrimLinearization discretize(const linearization::TrimLinearization& lin_sol);
-    TrimLinearization linearize_trim_solution(vehicles::Aircraft& aircraft, const trim::TrimSolution& trim_sol);
-    std::string print_linearization_solution(const TrimLinearization& lin);
+    DiscretizedLocalLinearization discretize(const linearization::LocalLinearization& lin_sol);
+    DiscretizedLocalLinearization discretize_euler(const linearization::LocalLinearization& lin_sol);
+    LocalLinearization linearize_operating_point(vehicles::Aircraft& aircraft, const operating::OperatingPoint& operating_point, const operating::OperatingConditions& conditions);
+    std::string print_linearization_solution(const LocalLinearization& lin);
 }

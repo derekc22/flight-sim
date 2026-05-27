@@ -8,6 +8,7 @@
 #include "simulation/propulsion/public.hpp"
 #include "simulation/trim/public.hpp"
 #include "simulation/util/public.hpp"
+#include "simulation/operating/public.hpp"
 
 namespace trim {
 
@@ -27,7 +28,7 @@ namespace trim {
     }
 
     template <typename T>
-    actuators::SurfaceActuatorInputs_T<T> build_surface_actuator_inputs_from_trim_T(const actuators::ActuatorInputs_T<T>& u, const actuators::FixedActuatorInputs_T& fixed_actuator_inputs) {
+    actuators::SurfaceActuatorInputs_T<T> build_surface_actuator_inputs_from_trim_T(const actuators::ActuatorInputs_T<T>& u, const actuators::FixedActuatorInputs& fixed_actuator_inputs) {
         return {
             .elevator_cmd = u.elevator_cmd,
             .aileron_cmd = u.aileron_cmd,
@@ -56,7 +57,7 @@ namespace trim {
     }
 
     template <typename T>
-    dynamics::Wrench_T<T> compute_trim_net_wrench_T(const dynamics::State_T<T>& x, const dynamics::Twist_T<T>& twist, const actuators::ActuatorInputs_T<T>& u, const TrimModel& model, const TrimConditions& conditions) {
+    dynamics::Wrench_T<T> compute_trim_net_wrench_T(const dynamics::State_T<T>& x, const dynamics::Twist_T<T>& twist, const actuators::ActuatorInputs_T<T>& u, const TrimModel& model, const operating::OperatingConditions& conditions) {
         const actuators::SurfaceActuatorInputs_T<T> surface_actuator_inputs = build_surface_actuator_inputs_from_trim_T(u, model.fixed_actuator_inputs);
         const dynamics::Wrench_T<T> aero_wrench = aerodynamics::step_aero_forces_moments_T<T>(model.aerodynamic, model.structural, twist, conditions.static_atm_state, surface_actuator_inputs, conditions.windB);
 
@@ -70,7 +71,7 @@ namespace trim {
     }
 
     template <typename T>
-    dynamics::StateDot_T<T> compute_trim_state_dot_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u, const TrimModel& model, const TrimConditions& conditions) {
+    dynamics::StateDot_T<T> compute_trim_state_dot_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u, const TrimModel& model, const operating::OperatingConditions& conditions) {
         const dynamics::Twist_T<T> twist = build_twist_from_trim_state_T(x);
         const dynamics::Wrench_T<T> net_wrench = compute_trim_net_wrench_T<T>(x, twist, u, model, conditions);
         const constants::Vector3_T<T> v_dot = dynamics::ddtB_vB_BI_T<T>(twist.v, twist.w, model.structural.Mass.data, net_wrench.F);

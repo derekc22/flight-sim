@@ -1,12 +1,15 @@
 #pragma once
-#include "simulation/estimation/public.hpp"
+#include "simulation/estimation/kalman/public.hpp"
 
 namespace estimation {
 
-    struct ExtendedKalmanFilterParameters : KalmanFilterEstimatorParameters {};
+    struct ExtendedKalmanFilterParameters : KalmanFilterParameters, KalmanFilterEstimatorParameters {};
 
     struct ExtendedKalmanFilter {
+        ExtendedKalmanFilterParameters params;
+        KalmanFilter policy;
+
         ExtendedKalmanFilter(const ExtendedKalmanFilterParameters& params);
-        EstimationOutput step(const KalmanFilterInput& estimator_input);
+        EstimationOutput step(const KalmanFilterEstimatorInput& estimator_input);
     };
 }

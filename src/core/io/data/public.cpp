@@ -75,8 +75,8 @@ namespace io {
             eul_DT->insert(t, eul_t.data);
             w_DT->insert(t, context.xN_t.w.data);
             v_DT->insert(t, context.xN_t.v.data);
-            u_surface_DT->insert(t, actuators::unpack_full_surface_actuator_inputs(context.u_surface_actual));
-            u_propulsor_DT->insert(t, actuators::unpack_full_propulsor_actuator_inputs(context.u_propulsor_actual));
+            u_surface_DT->insert(t, actuators::unpack_full_surface_actuator_inputs(context.u_surface));
+            u_propulsor_DT->insert(t, actuators::unpack_full_propulsor_actuator_inputs(context.u_propulsor));
             F_net_DT->insert(t, context.WB_net.F.data);
             M_net_DT->insert(t, context.WB_net.M.data);
             F_aero_DT->insert(t, context.WB_aero.F.data);

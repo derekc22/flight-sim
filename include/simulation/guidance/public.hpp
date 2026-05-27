@@ -26,9 +26,10 @@ namespace guidance {
         Interpolated
     };
 
+    // The guidance vector stores psi, which is not a state variable, hence the +1
     inline constexpr std::size_t guidance_state_dim = constants::state_dim + 1;
 
-    using GuidanceStateVector = Eigen::Matrix<double, guidance_state_dim, 1>;
+    using GuidanceVector = Eigen::Matrix<double, guidance_state_dim, 1>;
 
     struct TrajectoryComponents {
         Eigen::MatrixXd v_traj;
@@ -47,6 +48,6 @@ namespace guidance {
         GuidanceSetpoint step(int t, int tf);
     };
 
-    GuidanceStateVector unpack_rigid_body_state_guidance(const dynamics::RigidBodyState& xN_t);
+    GuidanceVector unpack_rigid_body_state_guidance(const dynamics::RigidBodyState& xN_t);
 
 }

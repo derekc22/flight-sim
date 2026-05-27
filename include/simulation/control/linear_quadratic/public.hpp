@@ -2,8 +2,6 @@
 #include <optional>
 #include <Eigen/Dense>
 #include "simulation/actuators/public.hpp"
-// #include "simulation/dynamics/public.hpp"
-// #include "simulation/linearization/public.hpp"
 
 namespace control {
 
@@ -18,7 +16,6 @@ namespace control {
         Eigen::MatrixXd Q;
         Eigen::MatrixXd R;
         std::optional<Eigen::MatrixXd> K;
-        bool integrator_bool = false;
     };
 
     struct LinearQuadraticController {

@@ -12,7 +12,7 @@
 namespace trim {
 
     template <typename T>
-    TrimResidual<T> compute_trim_residual(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions) {
+    TrimResidual<T> compute_trim_residual(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u, const TrimModel& model, const TrimTarget& target, const operating::OperatingConditions& conditions) {
         const dynamics::StateDot_T<T> trim_state_dot = compute_trim_state_dot_T<T>(x, u, model, conditions);
         const dynamics::Twist_T<T> twist = build_twist_from_trim_state_T(x);
         const aerodynamics::AerodynamicState_T<T> ads = aerodynamics::compute_aerodynamic_state_T<T>(twist, conditions.windB);
@@ -57,7 +57,7 @@ namespace trim {
     }
 
     template <typename T>
-    TrimResidualVector_T<T> compute_trim_residual_vector_T(const TrimVariablesVector_T<T>& z, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions, bool use_physical_controls) {
+    TrimResidualVector_T<T> compute_trim_residual_vector_T(const TrimVariablesVector_T<T>& z, const TrimModel& model, const TrimTarget& target, const operating::OperatingConditions& conditions, bool use_physical_controls) {
         const dynamics::State_T<T> x = pack_trim_state_T<T>(z);
 
         actuators::ActuatorInputs_T<T> u;

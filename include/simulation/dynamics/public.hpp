@@ -154,6 +154,9 @@ namespace dynamics {
     StateVector_T<T> unpack_state_T(const State_T<T>& x);
 
     template <typename T>
+    State_T<T> pack_state_vector(const StateVector_T<T>& z);
+
+    template <typename T>
     StateDotVector_T<T> unpack_state_dot_T(const StateDot_T<T>& x_dot);
 
     template <typename T>
@@ -222,6 +225,8 @@ namespace dynamics {
     TranslationalVelocity trans_kin_vel(const TranslationalVelocity& xt_dot, const TranslationalAcceleration& xt_ddot);
 
     AngularVelocity eul_dot_to_wB_BI(const EulerAngleRates& eul_dot, const EulerAngles& eul);
+
+    State_T<double> pack_rigid_body_state(const RigidBodyState& xN_t);
 
     StateVector_T<double> unpack_rigid_body_state(const RigidBodyState& xN_t);
 

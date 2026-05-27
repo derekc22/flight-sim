@@ -3,7 +3,7 @@
     "structural_config": "simulation/structural/c172p/default.json",
     "initialization_config": "simulation/initialization/c172p/trim_level.json",
     "control_config": "simulation/control/lqi_level.json",
-    "estimation_config": "simulation/estimation/lkf.json",
+    "estimation_config": "simulation/estimation/ekf.json",
     "guidance_config": "simulation/guidance/interpolated/lqr_level.json",
     "avionics_config": "simulation/avionics/default.json",
     "actuator_config": "simulation/actuators/c172p/default.json",

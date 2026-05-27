@@ -13,6 +13,7 @@
 #include "simulation/trim/private.hpp"
 #include "simulation/util/cppad/public.hpp"
 #include "simulation/util/public.hpp"
+#include "simulation/operating/public.hpp"
 
 namespace trim {
 
@@ -78,7 +79,7 @@ namespace trim {
         if (options.min_step_scale <= 0.0 || options.min_step_scale > 1.0) throw std::invalid_argument("trim::_validate_trim_solve_options: min_step_scale must be in (0, 1]");
     }
 
-    dynamics::Wrench compute_trim_wrench(const dynamics::State_T<double>& x, const actuators::ActuatorInputs_T<double>& u, const TrimModel& model, const TrimConditions& conditions) {
+    dynamics::Wrench compute_trim_wrench(const dynamics::State_T<double>& x, const actuators::ActuatorInputs_T<double>& u, const TrimModel& model, const operating::OperatingConditions& conditions) {
         const dynamics::Twist_T<double> twist = build_twist_from_trim_state_T<double>(x);
         const dynamics::Wrench_T<double> net_wrench = compute_trim_net_wrench_T<double>(x, twist, u, model, conditions);
 
@@ -88,13 +89,13 @@ namespace trim {
         };
     }
 
-    TrimSolution build_trim_solution(const TrimVariablesVector_T<double>& z, const TrimResidualVector_T<double>& residual, const TrimResidualVector_T<double>& weighted_residual, const TrimModel& model, const TrimConditions& conditions, bool converged, std::size_t iterations) {
+    TrimSolution build_trim_solution(const TrimVariablesVector_T<double>& z, const TrimResidualVector_T<double>& residual, const TrimResidualVector_T<double>& weighted_residual, const TrimModel& model, const operating::OperatingConditions& conditions, bool converged, std::size_t iterations) {
         TrimSolution out;
-        out.state = pack_trim_state_T<double>(z);
-        out.input = pack_trim_actuator_inputs_T<double>(z, model.actuator_limits);
+        out.operating_point.state = pack_trim_state_T<double>(z);
+        out.operating_point.input = pack_trim_actuator_inputs_T<double>(z, model.actuator_limits);
         out.conditions = conditions;
-        out.wrench = compute_trim_wrench(out.state, out.input, model, out.conditions);
-        out.variables = unpack_trim_variables_T<double>(out.state, out.input);
+        out.wrench = compute_trim_wrench(out.operating_point.state, out.operating_point.input, model, out.conditions);
+        out.variables = unpack_trim_variables_T<double>(out.operating_point.state, out.operating_point.input);
         out.attempted = true;
         out.converged = converged;
         out.iterations = iterations;
@@ -137,11 +138,11 @@ namespace trim {
         return out;
     }
 
-    TrimResidualVector_T<double> compute_trim_residual_vector(const TrimVariablesVector_T<double>& z, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions, bool use_physical_controls) {
+    TrimResidualVector_T<double> compute_trim_residual_vector(const TrimVariablesVector_T<double>& z, const TrimModel& model, const TrimTarget& target, const operating::OperatingConditions& conditions, bool use_physical_controls) {
         return compute_trim_residual_vector_T<double>(z, model, target, conditions, use_physical_controls);
     }
 
-    TrimResidualJacobian compute_trim_residual_jac(const TrimVariablesVector_T<double>& z, const TrimModel& model, const TrimTarget& target, const TrimConditions& conditions, bool use_physical_controls) {
+    TrimResidualJacobian compute_trim_residual_jac(const TrimVariablesVector_T<double>& z, const TrimModel& model, const TrimTarget& target, const operating::OperatingConditions& conditions, bool use_physical_controls) {
         CppAD::eigen_vector<CppAD::AD<double>> z_tracked_cppad = util::start_autodiff_tracking(z);
         const TrimResidualVector_T<CppAD::AD<double>> residual_tracked = compute_trim_residual_vector_T<CppAD::AD<double>>(
             util::eigen_vector_from_cppad_vector<CppAD::AD<double>, trim_variable_dim>(z_tracked_cppad),
@@ -216,16 +217,5 @@ namespace trim {
 
         return build_trim_solution(z, residual, weighted_residual, model, problem.conditions, false, iterations_completed);
     }
-
-    /** @deprecated */
-    // void update_actuators_from_trim(actuators::SurfaceActuators& surface_actuators, actuators::PropulsorActuators& propulsor_actuators, const TrimSolution& trim_sol) {
-    //     surface_actuators.aileron.prev_cmd = trim_sol.input.aileron_cmd;
-    //     surface_actuators.elevator.prev_cmd = trim_sol.input.elevator_cmd;
-    //     surface_actuators.rudder.prev_cmd = trim_sol.input.rudder_cmd;
-
-    //     propulsor_actuators.front_propulsor.prev_cmd = trim_sol.input.front_propulsor_cmd;
-    //     propulsor_actuators.left_propulsor.prev_cmd = trim_sol.input.left_propulsor_cmd;
-    //     propulsor_actuators.right_propulsor.prev_cmd = trim_sol.input.right_propulsor_cmd;
-    // }
 
 }

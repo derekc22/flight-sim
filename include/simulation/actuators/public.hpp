@@ -13,7 +13,7 @@ namespace actuators {
     template <typename T>
     using ActuatorLimitsVector_T = Eigen::Matrix<T, constants::input_dim, 2>;
 
-    struct FixedActuatorInputs_T {
+    struct FixedActuatorInputs {
         double flap = 0.0;
         double spoiler = 0.0;
     };
@@ -45,6 +45,8 @@ namespace actuators {
 
     template <typename T>
     ActuatorLimitsVector_T<T> unpack_actuator_limits_T(const ActuatorLimits_T<T>& limits);
+
+    ActuatorInputs_T<double> pack_actuator_inputs(const SurfaceActuatorInputs_T<double>& u_surface, const PropulsorActuatorInputs_T<double>& u_propulsor);
 
     ActuatorInputsVector_T<double> unpack_actuator_inputs(const SurfaceActuatorInputs_T<double>& u_surface, const PropulsorActuatorInputs_T<double>& u_propulsor);
 

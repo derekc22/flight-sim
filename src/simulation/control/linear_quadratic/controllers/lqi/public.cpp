@@ -22,7 +22,6 @@ namespace control {
         policy = LinearQuadraticController({ 
             .Q = Q_aug, 
             .R = params.R,
-            .integrator_bool = true
         });
     };
 
@@ -51,7 +50,7 @@ namespace control {
         B_aug.block(0, 0, n, m) = controller_input.B;
 
         dynamics::StateVector_T<double> zN_t = dynamics::unpack_rigid_body_state(controller_input.zN_t);
-        dynamics::StateVector_T<double> zN_t_des = unpack_linear_quadratic_regulator_setpoint(controller_input.setpoint);
+        dynamics::StateVector_T<double> zN_t_des = unpack_linear_quadratic_controller_setpoint(controller_input.setpoint);
 
         AugmentedStateVector zN_t_aug;
         zN_t_aug << zN_t, integral_new;
@@ -72,7 +71,7 @@ namespace control {
         // integral candidate
         IntegratedStateVector integral_new = integrate_state_err(
             dynamics::unpack_rigid_body_state(controller_input.zN_t), 
-            unpack_linear_quadratic_regulator_setpoint(controller_input.setpoint)
+            unpack_linear_quadratic_controller_setpoint(controller_input.setpoint)
         );
 
         actuators::ActuatorInputsVector_T<double> u_deviation = policy.step(

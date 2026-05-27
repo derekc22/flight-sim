@@ -18,6 +18,5 @@ namespace control {
         ControlOutput step(const LinearFullStateFeedbackControllerInput& controller_input);
 
         LinearQuadraticControllerInput make_linear_quadratic_controller_input(const LinearFullStateFeedbackControllerInput& controller_input);
-        dynamics::StateVector_T<double> unpack_linear_quadratic_regulator_setpoint(const guidance::LinearFullStateFeedbackSetpoint& linear_quadratic_regulator_setpoint);
     };
 }

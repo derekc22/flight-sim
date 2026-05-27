@@ -7,16 +7,16 @@
 #include "simulation/linearization/public.hpp"
 
 namespace analysis {
-    using TrimEigenvalues = Eigen::Matrix<std::complex<double>, constants::state_dim, 1>;
-    using TrimEigenvectors = Eigen::Matrix<std::complex<double>, constants::state_dim, constants::state_dim>;
+    using Eigenvalues = Eigen::Matrix<std::complex<double>, constants::state_dim, 1>;
+    using Eigenvectors = Eigen::Matrix<std::complex<double>, constants::state_dim, constants::state_dim>;
 
-    struct TrimEigenAnalysis {
-        TrimEigenvalues eigenvalues = TrimEigenvalues::Zero();
-        TrimEigenvectors eigenvectors = TrimEigenvectors::Zero();
+    struct EigenAnalysis {
+        Eigenvalues eigenvalues = Eigenvalues::Zero();
+        Eigenvectors eigenvectors = Eigenvectors::Zero();
     };
 
-    TrimEigenAnalysis trim_linearization_eigen_analysis(const linearization::TrimLinearization& lin);
+    EigenAnalysis local_linearization_eigen_analysis(const linearization::LocalLinearization& lin);
 
-    std::string print_eigen_analysis(const TrimEigenAnalysis& eig);
+    std::string print_eigen_analysis(const EigenAnalysis& eig);
 
 }

@@ -4,7 +4,7 @@
 
 namespace control {
 
-    PIDController::PIDController(const PIDControllerParameters& params) : params(params) {}
+    PIDController::PIDController(const PIDParameters& params) : params(params) {}
 
     double PIDController::step(const PIDControllerInput& controller_input) {
         double err = controller_input.meas_des - controller_input.meas;

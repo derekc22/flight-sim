@@ -1,6 +1,7 @@
 #include <chrono>
 #include <string>
 #include <thread>
+#include <optional>
 #include <Eigen/Dense>
 #include "simulation/runner/public.hpp"
 #include "simulation/actuators/public.hpp"
@@ -60,23 +61,23 @@ namespace runner {
         return aircraft;
     }
 
-    SimulationRunner::SimulationRunner(SimulationOptions options)
-        : options(options),
-          // load vehicle
-          aircraft(load(options.aircraft_id, options.trim_bool)),
-          // create data manager
-          data_manager(options.tf, options.data_bool, options.control_bool, options.sensor_bool, options.estimation_bool, options.wind_bool),
-          // create analysis manager
-          analysis_manager(options.data_bool, options.analysis_bool, options.trim_bool),
-          FB_net{ constants::Zero3 },
-          MB_net{ constants::Zero3 },
-          WB_net{ .F = FB_net, .M = MB_net },
-          windB{ constants::Zero3 },
-          // initialize udp connections
-          udp_out(5510),
-          udp_in("127.0.0.1", 5511),
-          // start timer
-          next(std::chrono::steady_clock::now()) {}
+    SimulationRunner::SimulationRunner(SimulationOptions options) : 
+        options(options),
+        // load vehicle
+        aircraft(load(options.aircraft_id, options.trim_bool)),
+        // create data manager
+        data_manager(options.tf, options.data_bool, options.control_bool, options.sensor_bool, options.estimation_bool, options.wind_bool),
+        // create analysis manager
+        analysis_manager(options.data_bool, options.analysis_bool, options.trim_bool),
+        FB_net{ constants::Zero3 },
+        MB_net{ constants::Zero3 },
+        WB_net{ .F = FB_net, .M = MB_net },
+        windB{ constants::Zero3 },
+        // initialize udp connections
+        udp_out(5510),
+        udp_in("127.0.0.1", 5511),
+        // start timer
+        next(std::chrono::steady_clock::now()) {}
 
     SimulationRunner::~SimulationRunner() = default;
 
@@ -167,22 +168,19 @@ namespace runner {
                 // overwrite local state with trim state
                 xN_t = xN_t_trim;
                 WB_net = WB_net_trim;
-                u_surface_actual_prev.elevator_cmd = trim_sol.input.elevator_cmd;
-                u_surface_actual_prev.aileron_cmd = trim_sol.input.aileron_cmd;
-                u_surface_actual_prev.rudder_cmd = trim_sol.input.rudder_cmd;
-                u_propulsor_actual_prev.front_propulsor_cmd = trim_sol.input.front_propulsor_cmd;
-                u_propulsor_actual_prev.left_propulsor_cmd = trim_sol.input.left_propulsor_cmd;
-                u_propulsor_actual_prev.right_propulsor_cmd = trim_sol.input.right_propulsor_cmd;
+                auto [u_surf_trim, u_prop_trim] = trim::update_actuators_from_trim(u_surface_actual_prev, u_propulsor_actual_prev, trim_sol);
+                u_surface_actual_prev = u_surf_trim;
+                u_propulsor_actual_prev = u_prop_trim;
 
                 /** @deprecated */
                 // overwrite actuator lag state with trim controls
-                // trim::update_actuators_from_trim(surface_actuators, propulsor_actuators, trim_sol);
+                // trim::update_actuators_lag_from_trim(surface_actuators, propulsor_actuators, trim_sol);
 
                 // linearize
-                lin_sol = linearization::linearize_trim_solution(aircraft, trim_sol);
+                lin_sol = linearization::linearize_operating_point(aircraft, trim_sol.operating_point, trim_sol.conditions);
 
                 // perform eigenanalysis
-                analysis::TrimEigenAnalysis eig_sol = analysis::trim_linearization_eigen_analysis(lin_sol);
+                analysis::EigenAnalysis eig_sol = analysis::local_linearization_eigen_analysis(lin_sol);
 
                 // update analysis context
                 analysis_context.lin_sol = lin_sol;
@@ -211,14 +209,42 @@ namespace runner {
         dynamics::RigidBodyState zN_t = yN_t;
 
         if (options.estimation_bool) {
+            linearization::LocalLinearization estimator_lin_sol;
+            operating::OperatingPoint estimator_operating_point;
+            operating::OperatingConditions estimator_conditions;
+
+            if (estimation_properties.kalman_filter_estimator_type == estimation::EstimatorType::ExtendedKalmanFilter) {
+                dynamics::State_T<double> y_state = dynamics::pack_rigid_body_state(yN_t);
+                actuators::ActuatorInputs_T<double> actuator_inputs = actuators::pack_actuator_inputs(u_surface_actual_prev, u_propulsor_actual_prev);
+
+                estimator_operating_point = operating::OperatingPoint {
+                    .state = y_state,
+                    .input = actuator_inputs
+                };
+
+                estimator_conditions = {
+                    .static_atm_state = static_atm_state,
+                    .windB = windB
+                };
+
+                estimator_lin_sol = linearization::linearize_operating_point(aircraft, estimator_operating_point, estimator_conditions);
+
+            } else {
+                estimator_lin_sol = lin_sol;
+                estimator_operating_point = trim_sol.operating_point;
+                estimator_conditions = trim_sol.conditions;
+            }
+
             estimation::EstimationInput estimation_input {
                 .yN_t = yN_t,
-                .estimator_input = estimation::KalmanFilterInput {
+                .estimator_input = estimation::KalmanFilterEstimatorInput {
                     .yN_t = yN_t,
-                    .lin_sol = lin_sol,
-                    .trim_sol = trim_sol,
+                    .lin_sol = estimator_lin_sol,
+                    .operating_point = estimator_operating_point,
                     .u_surface_actual_prev = u_surface_actual_prev,
-                    .u_propulsor_actual_prev = u_propulsor_actual_prev
+                    .u_propulsor_actual_prev = u_propulsor_actual_prev,
+                    .conditions = estimator_conditions,
+                    .aircraft = aircraft
                 }
             };
 
@@ -240,7 +266,7 @@ namespace runner {
             control::ControllerInput controller_input {
                 .axial_controller_input = control::AxialControllerInput{ .zN_t = zN_t, .surface_actuators = surface_actuators, .setpoint = guidance::AxialSetpoint{ setpoint } },
                 .velocity_controller_input = control::VelocityControllerInput{ .zN_t = zN_t, .propulsor_actuators = propulsor_actuators, .setpoint = guidance::VelocitySetpoint{ setpoint } },
-                .linear_full_state_feedback_controller_input = control::LinearFullStateFeedbackControllerInput{ .zN_t = zN_t, .u_sol_trim = trim_sol.input, .surface_actuators = surface_actuators, .propulsor_actuators = propulsor_actuators, .A = lin_sol.A, .B = lin_sol.B, .setpoint = guidance::LinearFullStateFeedbackSetpoint{ setpoint } },
+                .linear_full_state_feedback_controller_input = control::LinearFullStateFeedbackControllerInput{ .zN_t = zN_t, .u_sol_trim = trim_sol.operating_point.input, .surface_actuators = surface_actuators, .propulsor_actuators = propulsor_actuators, .A = lin_sol.A, .B = lin_sol.B, .setpoint = guidance::LinearFullStateFeedbackSetpoint{ setpoint } },
                 .nonlinear_controller_input = control::NonlinearControllerInput{ .zN_t = zN_t, .surface_actuators = surface_actuators, .propulsor_actuators = propulsor_actuators, .setpoint = guidance::NonlinearSetpoint{ setpoint } }
             };
             u_cmd = control_properties.step(controller_input, options.trim_bool);
@@ -295,8 +321,8 @@ namespace runner {
             .xN_t=xN_t,
             .yN_t=yN_t,
             .zN_t=zN_t,
-            .u_surface_actual=u_surface_actual,
-            .u_propulsor_actual=u_propulsor_actual,
+            .u_surface=u_surface_actual,
+            .u_propulsor=u_propulsor_actual,
             .WB_net=WB_net,
             .WB_aero=WB_aero,
             .WB_propulsive=WB_propulsive,
