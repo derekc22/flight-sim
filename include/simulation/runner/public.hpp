@@ -33,8 +33,8 @@ namespace runner {
     /** @deprecated */
     // struct SimulationOutput {
     //     trim::TrimSolution trim_sol;
-    //     linearization::TrimLinearization lin_sol;
-    //     analysis::TrimEigenAnalysis eig_sol;
+    //     linearization::LocalLinearization lin_sol;
+    //     analysis::EigenAnalysis eig_sol;
     // };
 
     struct SimulationContext {
@@ -46,7 +46,7 @@ namespace runner {
         geography::GeographicState geographic_state;
         atmospheric::Wind windB;
         trim::TrimSolution trim_sol;
-        linearization::TrimLinearization lin_sol;
+        linearization::LocalLinearization lin_sol;
     };
 
     vehicles::Aircraft load(const std::string& aircraft_id, bool trim_bool);
@@ -62,7 +62,7 @@ namespace runner {
 
         // initialize trim and linearization solutions
         trim::TrimSolution trim_sol;
-        linearization::TrimLinearization lin_sol;
+        linearization::LocalLinearization lin_sol;
 
         // initialize net force and moment
         dynamics::Force FB_net;

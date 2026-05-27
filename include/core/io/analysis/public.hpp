@@ -9,8 +9,8 @@ namespace io {
     struct AnalysisContext {
         std::string aircraft_id;
         trim::TrimSolution trim_sol;
-        linearization::TrimLinearization lin_sol;
-        analysis::TrimEigenAnalysis eig_sol;
+        linearization::LocalLinearization lin_sol;
+        analysis::EigenAnalysis eig_sol;
     };
 
     struct AnalysisManager {
@@ -20,8 +20,8 @@ namespace io {
 
         std::string aircraft_id;
         trim::TrimSolution trim_sol;
-        linearization::TrimLinearization lin_sol;
-        analysis::TrimEigenAnalysis eig_sol;
+        linearization::LocalLinearization lin_sol;
+        analysis::EigenAnalysis eig_sol;
 
         void step(const AnalysisContext& context);
         void save(const std::string& data_dir_path, const std::string& report_dir_path);

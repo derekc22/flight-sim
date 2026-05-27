@@ -1,5 +1,5 @@
 {
-    "estimator_type": "LinearKalmanFilter",
+    "estimator_type": "ExtendedKalmanFilter",
     "parameters": {
         "P0": [
             [0.062200547, 0, 0, 0, 0, 0, 0, 0],

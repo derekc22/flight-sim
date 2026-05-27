@@ -12,6 +12,7 @@
 #include "simulation/propulsion/public.hpp"
 #include "simulation/aerodynamics/public.hpp"
 #include "simulation/structural/public.hpp"
+#include "simulation/operating/public.hpp"
 
 namespace control { struct ControlOutput; }
 namespace vehicles { struct Aircraft; }
@@ -22,11 +23,6 @@ namespace trim {
 
     template <typename T>
     using TrimVariablesVector_T = Eigen::Matrix<T, trim_variable_dim, 1>;
-
-    struct TrimConditions {
-        atmospheric::StaticAtmosphericState static_atm_state;
-        atmospheric::Wind windB{ constants::Zero3 };
-    };
 
     template <typename T>
     struct TrimResidual {
@@ -51,13 +47,12 @@ namespace trim {
         const aerodynamics::AerodynamicProperties& aerodynamic;
         const actuators::PropulsorActuators& propulsor_actuators;
         actuators::ActuatorLimits_T<double> actuator_limits;
-        actuators::FixedActuatorInputs_T fixed_actuator_inputs{};
+        actuators::FixedActuatorInputs fixed_actuator_inputs{};
     };
 
     struct TrimSolution {
-        dynamics::State_T<double> state;
-        actuators::ActuatorInputs_T<double> input;
-        TrimConditions conditions;
+        operating::OperatingPoint operating_point;
+        operating::OperatingConditions conditions;
         dynamics::Wrench wrench{};
         TrimResidual<double> residual;
         TrimResidual<double> weighted_residual;
@@ -76,7 +71,7 @@ namespace trim {
     dynamics::Twist_T<T> build_twist_from_trim_state_T(const dynamics::State_T<T>& x);
 
     template <typename T>
-    actuators::SurfaceActuatorInputs_T<T> build_surface_actuator_inputs_from_trim_T(const actuators::ActuatorInputs_T<T>& u, const actuators::FixedActuatorInputs_T& fixed_actuator_inputs);
+    actuators::SurfaceActuatorInputs_T<T> build_surface_actuator_inputs_from_trim_T(const actuators::ActuatorInputs_T<T>& u, const actuators::FixedActuatorInputs& fixed_actuator_inputs);
 
     template <typename T>
     actuators::PropulsorActuatorInputs_T<T> build_propulsor_actuator_inputs_from_trim_T(const actuators::ActuatorInputs_T<T>& u);
@@ -85,10 +80,10 @@ namespace trim {
     constants::Vector3_T<T> gB_T(const T& phi, const T& theta);
 
     template <typename T>
-    dynamics::Wrench_T<T> compute_trim_net_wrench_T(const dynamics::State_T<T>& x, const dynamics::Twist_T<T>& twist, const actuators::ActuatorInputs_T<T>& u, const TrimModel& model, const TrimConditions& conditions);
+    dynamics::Wrench_T<T> compute_trim_net_wrench_T(const dynamics::State_T<T>& x, const dynamics::Twist_T<T>& twist, const actuators::ActuatorInputs_T<T>& u, const TrimModel& model, const operating::OperatingConditions& conditions);
 
     template <typename T>
-    dynamics::StateDot_T<T> compute_trim_state_dot_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u, const TrimModel& model, const TrimConditions& conditions);
+    dynamics::StateDot_T<T> compute_trim_state_dot_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u, const TrimModel& model, const operating::OperatingConditions& conditions);
 
     template <typename T>
     TrimVariablesVector_T<T> unpack_trim_variables_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u);
@@ -102,6 +97,8 @@ namespace trim {
     template <typename T>
     actuators::ActuatorInputs_T<T> pack_trim_actuator_inputs_T(const TrimVariablesVector_T<T>& z, const actuators::ActuatorLimits_T<double>& actuator_limits);
 
+    TrimModel build_trim_model(vehicles::Aircraft& aircraft);
+
     TrimSolution inspect_trim(vehicles::Aircraft& aircraft, const atmospheric::Wind& wind);
 
     std::string print_trim_solution(const TrimSolution& trim_sol);
@@ -109,6 +106,11 @@ namespace trim {
     std::pair<dynamics::RigidBodyState, aerodynamics::AerodynamicState> update_state_from_trim(const dynamics::RigidBodyState& xN_t, const TrimSolution& trim_sol);
 
     control::ControlOutput set_control_inputs_from_trim(const TrimSolution& trim_sol);
+
+    /** @deprecated */
+    // void update_actuators_lag_from_trim(actuators::SurfaceActuators& surface_actuators, actuators::PropulsorActuators& propulsor_actuators, const TrimSolution& trim_sol);
+
+    std::pair<actuators::SurfaceActuatorInputs_T<double>, actuators::PropulsorActuatorInputs_T<double>> update_actuators_from_trim(actuators::SurfaceActuatorInputs_T<double>& surface_actuator_inputs, actuators::PropulsorActuatorInputs_T<double>& propulsor_actuator_inputs, const TrimSolution& trim_sol);
 
 }
 

@@ -1,5 +1,6 @@
 #pragma once
 #include <Eigen/Dense>
+#include "simulation/control/shared/public.hpp"
 #include "simulation/control/linear_quadratic/controllers/lqr/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/constants/public.hpp"

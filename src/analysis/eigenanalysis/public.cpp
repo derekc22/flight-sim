@@ -11,19 +11,19 @@
 
 namespace analysis {
 
-    TrimEigenAnalysis trim_linearization_eigen_analysis(const linearization::TrimLinearization& lin_sol) {
+    EigenAnalysis local_linearization_eigen_analysis(const linearization::LocalLinearization& lin_sol) {
         Eigen::EigenSolver<linearization::StateJacobian> solver(lin_sol.A);
         if (solver.info() != Eigen::Success) {
-            throw std::runtime_error("analysis::trim_linearization_eigen_analysis: eigenvalue computation failed");
+            throw std::runtime_error("analysis::local_linearization_eigen_analysis: eigenvalue computation failed");
         }
 
-        return TrimEigenAnalysis{
+        return EigenAnalysis{
             .eigenvalues = solver.eigenvalues(),
             .eigenvectors = solver.eigenvectors(),
         };
     }
 
-    std::string print_eigen_analysis(const TrimEigenAnalysis& eig) {
+    std::string print_eigen_analysis(const EigenAnalysis& eig) {
         std::ostringstream out;
         for (int mode = 0; mode < constants::state_dim; ++mode) {
             out << "mode " << mode << ":\n";

@@ -23,8 +23,8 @@ namespace io {
         const dynamics::RigidBodyState& xN_t;
         const dynamics::RigidBodyState& yN_t;
         const dynamics::RigidBodyState& zN_t;
-        const actuators::SurfaceActuatorInputs_T<double>& u_surface_actual;
-        const actuators::PropulsorActuatorInputs_T<double>& u_propulsor_actual;
+        const actuators::SurfaceActuatorInputs_T<double>& u_surface;
+        const actuators::PropulsorActuatorInputs_T<double>& u_propulsor;
         const dynamics::Wrench& WB_net;
         const dynamics::Wrench& WB_aero;
         const dynamics::Wrench& WB_propulsive;

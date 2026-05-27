@@ -1,6 +1,7 @@
+#include <Eigen/Dense>
 #include <stdexcept>
 #include <string>
-#include <Eigen/Dense>
+#include <tuple>
 #include <nlohmann/json.hpp>
 #include "core/json/estimation/private.hpp"
 #include "core/json/public.hpp"
@@ -12,25 +13,33 @@
 
 namespace json {
 
-    estimation::LinearKalmanFilterParameters parse_linear_kalman_filter_parameters(const nlohmann::json& estimator_json) {
+    std::tuple<Eigen::MatrixXd, Eigen::MatrixXd, Eigen::MatrixXd> parse_kalman_filter_parameters(const nlohmann::json& estimator_json) {
         const auto& parameters_json = estimator_json.at("parameters");
-        if (!parameters_json.is_object()) { throw std::runtime_error("json::parse_linear_kalman_filter_parameters expected parameters object"); }
-        if (!parameters_json.contains("C") || !parameters_json.contains("P0") || !parameters_json.contains("Q0") || !parameters_json.contains("R0")) {
-            throw std::runtime_error("json::parse_linear_kalman_filter_parameters requires C, P0, Q0, and R0");
+        if (!parameters_json.is_object()) { throw std::runtime_error("json::parse_kalman_filter_parameters expected parameters object"); }
+        if ( !parameters_json.contains("P0") || !parameters_json.contains("Q") || !parameters_json.contains("R")) {
+            throw std::runtime_error("json::parse_kalman_filter_parameters requires P0, Q, and R");
         }
 
-        estimation::LinearKalmanFilterParameters params{};
-        params.C = parse_MatrixXd(parameters_json.at("C"));
-        params.P0 = parse_MatrixXd(parameters_json.at("P0"));
-        params.Q0 = parse_MatrixXd(parameters_json.at("Q0"));
-        params.R0 = parse_MatrixXd(parameters_json.at("R0"));
+        Eigen::MatrixXd P0 = parse_MatrixXd(parameters_json.at("P0"));
+        Eigen::MatrixXd Q = parse_MatrixXd(parameters_json.at("Q"));
+        Eigen::MatrixXd R = parse_MatrixXd(parameters_json.at("R"));
 
-        const std::string context = "json::parse_linear_kalman_filter_parameters";
-        util::validate_shape(params.C, constants::state_dim, constants::state_dim, context, "C");
-        util::validate_shape(params.P0, constants::state_dim, constants::state_dim, context, "P0");
-        util::validate_shape(params.Q0, constants::state_dim, constants::state_dim, context, "Q0");
-        util::validate_shape(params.R0, constants::state_dim, constants::state_dim, context, "R0");
-        return params;
+        const std::string context = "json::parse_kalman_filter_parameters";
+        util::validate_shape(P0, constants::state_dim, constants::state_dim, context, "P0");
+        util::validate_shape(Q, constants::state_dim, constants::state_dim, context, "Q");
+        util::validate_shape(R, constants::state_dim, constants::state_dim, context, "R");
+
+        return { P0, Q, R };
+    }
+
+    estimation::LinearKalmanFilterParameters parse_linear_kalman_filter_parameters(const nlohmann::json& estimator_json) {
+        auto [P0, Q, R] = parse_kalman_filter_parameters(estimator_json);
+        return { P0, Q, R };
+    }
+
+    estimation::ExtendedKalmanFilterParameters parse_extended_kalman_filter_parameters(const nlohmann::json& estimator_json) {
+        auto [P0, Q, R] = parse_kalman_filter_parameters(estimator_json);
+        return { P0, Q, R };
     }
 
     estimation::KalmanFilterEstimator make_kalman_filter_estimator(estimation::EstimatorType estimator_type, const nlohmann::json& estimator_json) {
@@ -41,7 +50,7 @@ namespace json {
             }
 
             case estimation::EstimatorType::ExtendedKalmanFilter: {
-                estimation::ExtendedKalmanFilterParameters params{};
+                estimation::ExtendedKalmanFilterParameters params = parse_extended_kalman_filter_parameters(estimator_json);
                 return make_stateful_kalman_filter_estimator<struct estimation::ExtendedKalmanFilter, estimation::KalmanFilterEstimator, estimation::ExtendedKalmanFilterParameters>(params);
             }
 

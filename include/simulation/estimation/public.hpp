@@ -1,5 +1,6 @@
 #pragma once
 #include <functional>
+#include "simulation/estimation/shared/public.hpp"
 #include "simulation/actuators/propulsor/public.hpp"
 #include "simulation/actuators/surface/public.hpp"
 #include "simulation/dynamics/public.hpp"
@@ -8,31 +9,17 @@
 
 namespace estimation {
 
-    struct EstimationOutput {
-        dynamics::RigidBodyState zN_t;  // state estimate
-    };
-
-    struct KalmanFilterInput {
-        dynamics::RigidBodyState yN_t;
-        linearization::TrimLinearization lin_sol;
-        trim::TrimSolution trim_sol;
-        actuators::SurfaceActuatorInputs_T<double> u_surface_actual_prev;
-        actuators::PropulsorActuatorInputs_T<double> u_propulsor_actual_prev;
-    };
-
-    struct KalmanFilterEstimatorParameters {};
-
     enum class EstimatorType {
         None,
         LinearKalmanFilter,
         ExtendedKalmanFilter
     };
 
-    using KalmanFilterEstimator = std::function<EstimationOutput(const KalmanFilterInput&)>;
+    using KalmanFilterEstimator = std::function<EstimationOutput(const KalmanFilterEstimatorInput&)>;
 
     struct EstimationInput {
         const dynamics::RigidBodyState& yN_t;
-        const KalmanFilterInput& estimator_input;
+        const KalmanFilterEstimatorInput& estimator_input;
     };
 
     struct EstimationProperties {
