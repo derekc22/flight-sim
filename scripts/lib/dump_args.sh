@@ -3,7 +3,7 @@ set -e
 
 source .env
 
-DATA_DIR=""
+OUT_DIR=""
 
 for arg in "$@"; do
 	if [[ "$arg" != *=* ]]; then
@@ -11,17 +11,17 @@ for arg in "$@"; do
 		exit 1
 	fi
 
-	if [[ "${arg%%=*}" == "DATA_DIR" ]]; then
-		DATA_DIR="${arg#*=}"
+	if [[ "${arg%%=*}" == "OUT_DIR" ]]; then
+		OUT_DIR="${arg#*=}"
 	fi
 done
 
-if [[ -z "$DATA_DIR" ]]; then
-	echo "ERROR: DATA_DIR is required" >&2
+if [[ -z "$OUT_DIR" ]]; then
+	echo "ERROR: OUT_DIR is required" >&2
 	exit 1
 fi
 
-REPORT_DIR_PATH="$PROJ_PATH/results/reports/$DATA_DIR"
+REPORT_DIR_PATH="$PROJ_PATH/results/reports/$OUT_DIR"
 ARGS_PATH="$REPORT_DIR_PATH/args.txt"
 printf "%s\n" "$@" > "$ARGS_PATH"
 

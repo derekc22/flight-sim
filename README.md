@@ -63,7 +63,7 @@ Update the JSON configuration file paths in `config/analyze.json`
 
 To run the simulation:
   ```bash
-  scripts/bin/run.sh -a <AIRCRAFT> -t <TIME_SEC> [-r TRIM] [-s SENSOR] [-c CONTROL] [-e ESTIMATION] [-w WIND] [-v VERBOSE] [-d DATA] [-p PLOT] -o <DATA_DIR> [-m ANALYSIS]
+  scripts/bin/run.sh -a <AIRCRAFT> -t <TIME_SEC> [-r TRIM] [-s SENSOR] [-c CONTROL] [-e ESTIMATION] [-w WIND] [-v VERBOSE] [-d DATA] [-p PLOT] -o <OUT_DIR> [-m ANALYSIS]
   ```
 - `-a AIRCRAFT`: Aircraft to simulate (e.g. ASW28, c172p)
 - `-t TIME_SEC`: Simulation time in seconds
@@ -75,7 +75,7 @@ To run the simulation:
 - `-v VERBOSE`: Enable verbose output
 - `-d DATA`: Enable data logging
 - `-p PLOT`: Enable plotting
-- `-o DATA_DIR`: Data directory
+- `-o OUT_DIR`: Output directory name
 - `-m ANALYSIS`: Enable post-run analysis 
   
 ## Example

@@ -4,11 +4,11 @@ set -e
 source .env
 
 if [ -z "$1" ]; then
-	echo "Usage: $0 <DATA_DIR>"
+	echo "Usage: $0 <OUT_DIR>"
 	exit 1
 fi
 
-DATA_DIR="$1"
+OUT_DIR="$1"
 ANALYZE_CONFIG_PATH="$PROJ_PATH/config/analyze.json"
 
 run_group() {
@@ -22,14 +22,14 @@ run_group() {
 	INIT_SCRIPT_PATH="$PROJ_PATH/scripts/lib/analysis/$group/init.sh"
 
 	# run init.sh
-	"$INIT_SCRIPT_PATH" "$DATA_DIR"
+	"$INIT_SCRIPT_PATH" "$OUT_DIR"
 
 	while IFS=$'\t' read -r analysis rel_path; do
 		SCRIPT_PATH="$PROJ_PATH/scripts/lib/analysis/$group/$analysis.sh"
 		CONFIG_PATH="$PROJ_PATH/config/$rel_path"
 
 		# run analysis script
-		"$SCRIPT_PATH" "$DATA_DIR" "$CONFIG_PATH"
+		"$SCRIPT_PATH" "$OUT_DIR" "$CONFIG_PATH"
 	done < <(jq -r --arg group "$group" '.[$group] // {} | to_entries[] | select(.value != null) | [.key, .value] | @tsv' "$ANALYZE_CONFIG_PATH")
 }
 

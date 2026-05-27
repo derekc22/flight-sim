@@ -17,7 +17,7 @@ USAGE: $0
   [-v VERBOSE_BOOL]
   [-d DATA_BOOL]
   [-p PLOT_BOOL]
-  -o <DATA_DIR>
+  -o <OUT_DIR>
   [-m ANALYSIS_BOOL]
   [-z HEADLESS_BOOL]
   [-q QUICK_BOOL]
@@ -37,7 +37,7 @@ while getopts "a:t:rscewvdpo:mzqh" opt; do
 		v) VERBOSE_BOOL=1 ;;
 		d) DATA_BOOL=1 ;;
 		p) PLOT_BOOL=1 ;;
-		o) DATA_DIR="$OPTARG" ;;
+		o) OUT_DIR="$OPTARG" ;;
 		m) ANALYSIS_BOOL=1 ;;
 		z) HEADLESS_BOOL=1 ;;
 		q) QUICK_BOOL=1 ;;
@@ -55,14 +55,14 @@ done
 : "${VERBOSE_BOOL:=0}"
 : "${DATA_BOOL:=0}"
 : "${PLOT_BOOL:=0}"
-: "${DATA_DIR:=$(date +"%Y%b%d_%H-%M-%S")}"
+: "${OUT_DIR:=$(date +"%Y%b%d_%H-%M-%S")}"
 : "${ANALYSIS_BOOL:=0}"
 : "${HEADLESS_BOOL:=0}"
 : "${QUICK_BOOL:=0}"
 
-DATA_DIR_PATH="$PROJ_PATH/results/data/$DATA_DIR"
-PLOT_DIR_PATH="$PROJ_PATH/results/figures/$DATA_DIR"
-REPORT_DIR_PATH="$PROJ_PATH/results/reports/$DATA_DIR"
+DATA_DIR_PATH="$PROJ_PATH/results/data/$OUT_DIR"
+PLOT_DIR_PATH="$PROJ_PATH/results/figures/$OUT_DIR"
+REPORT_DIR_PATH="$PROJ_PATH/results/reports/$OUT_DIR"
 
 # required args check
 [[ -z "$AIRCRAFT" || -z "$TIME_SEC" ]] && usage 1
@@ -129,16 +129,16 @@ if [ "$DATA_BOOL" -eq 1 ]; then
 		VERBOSE_BOOL="$VERBOSE_BOOL" \
 		DATA_BOOL="$DATA_BOOL" \
 		PLOT_BOOL="$PLOT_BOOL" \
-		DATA_DIR="$DATA_DIR" \
+		OUT_DIR="$OUT_DIR" \
 		ANALYSIS_BOOL="$ANALYSIS_BOOL" \
 		HEADLESS_BOOL="$HEADLESS_BOOL" \
 		QUICK_BOOL="$QUICK_BOOL"
 fi
 
 if [ "$PLOT_BOOL" -eq 1 ]; then
-	"$PROJ_PATH/scripts/bin/plot.sh" "$DATA_DIR"
+	"$PROJ_PATH/scripts/bin/plot.sh" "$OUT_DIR"
 fi
 
 if [ "$ANALYSIS_BOOL" -eq 1 ]; then
-	"$PROJ_PATH/scripts/bin/analyze.sh" "$DATA_DIR"
+	"$PROJ_PATH/scripts/bin/analyze.sh" "$OUT_DIR"
 fi

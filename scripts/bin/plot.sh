@@ -11,13 +11,13 @@ PLOT_2D_PATH="$PROJ_PATH/scripts/lib/plot/plot_2d.py"
 PLOT_3D_PATH="$PROJ_PATH/scripts/lib/plot/plot_3d.py"
 
 if [ -z "$1" ]; then
-	echo "Usage: $0 <DATA_DIR>"
+	echo "Usage: $0 <OUT_DIR>"
 	exit 1
 fi
 
-DATA_DIR="$1"
-DATA_DIR_PATH="$PROJ_PATH/results/data/$DATA_DIR"
-PLOT_DIR_PATH="$PROJ_PATH/results/figures/$DATA_DIR"
+OUT_DIR="$1"
+DATA_DIR_PATH="$PROJ_PATH/results/data/$OUT_DIR"
+PLOT_DIR_PATH="$PROJ_PATH/results/figures/$OUT_DIR"
 
 python "$PLOT_2D_PATH" -d "$DATA_DIR_PATH/p.csv" -s "$PLOT_DIR_PATH" \
 -l "x(t) [m]" "y(t) [m]" "z(t) [m]" \

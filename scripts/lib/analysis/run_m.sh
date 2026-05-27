@@ -4,19 +4,19 @@ set -e
 source .env
 
 if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ]; then
-    echo "Usage: $0 <DATA_DIR> <ANALYSIS_TYPE> <MATLAB_SCRIPT> [CONFIG_PATH]"
+    echo "Usage: $0 <OUT_DIR> <ANALYSIS_TYPE> <MATLAB_SCRIPT> [CONFIG_PATH]"
     exit 1
 fi
 
-DATA_DIR="$1"
+OUT_DIR="$1"
 ANALYSIS_TYPE="$2"
 MATLAB_SCRIPT="$3"
 CONFIG_PATH="$4"
 
-DATA_DIR_PATH="$PROJ_PATH/results/data/$DATA_DIR"
-DATA_MAT_PATH="$PROJ_PATH/results/data/$DATA_DIR/data.mat"
-PLOT_DIR_PATH="$PROJ_PATH/results/figures/$DATA_DIR"
-REPORT_DIR_PATH="$PROJ_PATH/results/reports/$DATA_DIR"
+DATA_DIR_PATH="$PROJ_PATH/results/data/$OUT_DIR"
+DATA_MAT_PATH="$PROJ_PATH/results/data/$OUT_DIR/data.mat"
+PLOT_DIR_PATH="$PROJ_PATH/results/figures/$OUT_DIR"
+REPORT_DIR_PATH="$PROJ_PATH/results/reports/$OUT_DIR"
 MATLAB_SCRIPT_DIR_PATH="$PROJ_PATH/scripts/lib/analysis/matlab/$ANALYSIS_TYPE"
 
 "$MATLAB_PATH" -batch \
