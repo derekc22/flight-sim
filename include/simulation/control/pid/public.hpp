@@ -11,7 +11,7 @@ namespace control {
         double limit_min;
     };
 
-    struct PIDParameters {
+    struct PIDControllerParameters {
         double Kp;
         double Kd;
         double Ki;
@@ -19,12 +19,12 @@ namespace control {
     };
 
     struct PIDController {
-        PIDParameters params;
+        PIDControllerParameters params;
         double integral = 0.0;
         double d_filtered = 0.0;
         double prev_err = 0.0;
 
-        PIDController(const PIDParameters& params);
+        PIDController(const PIDControllerParameters& params);
         double step(const PIDControllerInput& controller_input);
     };
 }
