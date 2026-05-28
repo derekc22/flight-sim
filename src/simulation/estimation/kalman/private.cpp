@@ -3,7 +3,7 @@
 
 namespace estimation {
 
-    dynamics::RigidBodyState pack_state_estimate(const dynamics::RigidBodyState& yN_t, const dynamics::StateVector_T<double>& zN_t) {
+    dynamics::RigidBodyState pack_kalman_state_estimate(const dynamics::RigidBodyState& yN_t, const dynamics::StateVector_T<double>& zN_t) {
         dynamics::RigidBodyState zN_t_packed = yN_t;
 
         dynamics::EulerAngles eul_meas;

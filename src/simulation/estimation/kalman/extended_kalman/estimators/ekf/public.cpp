@@ -26,7 +26,8 @@ namespace estimation {
 
     dynamics::RigidBodyState ExtendedKalmanFilter::pack_extended_kalman_policy_state_estimate(const ExtendedKalmanEstimatorInput& input, const dynamics::StateVector_T<double>& zN_t_pred) {
         dynamics::StateVector_T<double> zN_t = zN_t_pred;  // EKF predicts full state, so do not add back trim state
-        return pack_state_estimate(input.yN_t, zN_t);
+
+        return pack_kalman_state_estimate(input.yN_t, zN_t);
     }
 
     EstimationOutput ExtendedKalmanFilter::step(const ExtendedKalmanEstimatorInput& input) {

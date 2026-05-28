@@ -31,7 +31,7 @@ namespace estimation {
         dynamics::StateVector_T<double> zN_trim = dynamics::unpack_state_T(input.operating_point.state);
         dynamics::StateVector_T<double> zN_t = zN_t_pred + zN_trim;  // LKF predicts deviation state, so trim state is added back
 
-        return pack_state_estimate(input.yN_t, zN_t);
+        return pack_kalman_state_estimate(input.yN_t, zN_t);
     }
 
     EstimationOutput LinearKalmanFilter::step(const LinearKalmanEstimatorInput& input) {
