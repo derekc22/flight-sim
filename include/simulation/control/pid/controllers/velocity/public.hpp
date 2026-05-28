@@ -6,16 +6,16 @@
 
 namespace control {
 
-    struct VelocityPIDParameters : PIDControllerParameters, VelocityControllerParameters {};
+    struct VelocityPIDParameters : PIDPolicyParameters {};
 
     struct VelocityPID {
         VelocityPIDParameters params;
-        PIDController policy;
+        PIDPolicy policy;
 
         VelocityPID(const VelocityPIDParameters& params);
-        ControlOutput step(const VelocityControllerInput& controller_input);
+        ControlOutput step(const VelocityControllerInput& input);
 
-        PIDControllerInput make_pid_controller_input(const VelocityControllerInput& controller_input);
+        PIDPolicyInput make_pid_policy_input(const VelocityControllerInput& input);
         std::tuple<double, double, double> allocate_thrust(double T_tot, const actuators::PropulsorActuators& propulsor_actuators);
     };
 }

@@ -30,13 +30,6 @@ namespace runner {
         bool analysis_bool;
     };
 
-    /** @deprecated */
-    // struct SimulationOutput {
-    //     trim::TrimSolution trim_sol;
-    //     linearization::LocalLinearization lin_sol;
-    //     analysis::EigenAnalysis eig_sol;
-    // };
-
     struct SimulationContext {
         dynamics::RigidBodyState xN_t;
         dynamics::RigidBodyState yN_t;

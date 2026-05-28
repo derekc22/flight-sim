@@ -41,7 +41,6 @@ namespace avionics {
     }
 
 
-    // std::pair<dynamics::RigidBodyState, aerodynamics::AerodynamicState> get_state_from_avionics(
     dynamics::RigidBodyState get_state_from_avionics(
         const dynamics::RigidBodyState& xN_t, 
         const aerodynamics::AerodynamicState& ads_t, 
@@ -90,21 +89,6 @@ namespace avionics {
             .w = cache.sensors.wB_BI
         };
 
-        // aerodynamics::AerodynamicState ads_t_meas = aerodynamics::compute_aerodynamic_state(yN_t, wind);
-
-        // not needed 
-        // atmospheric::StaticAtmosphericState static_atmo_meas = {
-        //     .P=cache.sensors.P,
-        //     .T=cache.computers.T,
-        //     .rho=cache.computers.rho,
-        //     .mu=static_atm_t.mu,
-        // };
-
-        // geography::GeographicState geo_state_meas = {
-        //     .lat = 
-        // }
-        
-        // return { yN_t, ads_t_meas };
         return yN_t;
     }
 

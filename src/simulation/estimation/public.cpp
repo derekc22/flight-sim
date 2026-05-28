@@ -3,14 +3,21 @@
 
 namespace estimation {
 
-    EstimationOutput EstimationProperties::step(const EstimationInput& estimation_input, bool trim_bool) {
-        EstimationOutput out{ .zN_t = estimation_input.yN_t };
+    EstimationOutput EstimationProperties::step(const EstimatorInputs& inputs, bool trim_bool) {
+        EstimationOutput out{ .zN_t = inputs.yN_t };
 
-        if (kalman_filter_estimator) {
-            if (kalman_filter_estimator_type == EstimatorType::LinearKalmanFilter && !trim_bool) {
-                throw std::runtime_error("estimation::EstimationProperties::step LinearKalmanFilter requires trim");
+        if (extended_kalman_estimator) {
+            out = extended_kalman_estimator(inputs.extended_kalman_estimator_input);
+        }
+
+        if (!trim_bool) {
+            if (linear_kalman_estimator) { throw std::runtime_error("estimation::EstimationProperties::step LinearKalmanEstimator requires trim"); }
+        }
+
+        if (trim_bool) {
+            if (linear_kalman_estimator) {
+                out = linear_kalman_estimator(inputs.linear_kalman_estimator_input);
             }
-            out = kalman_filter_estimator(estimation_input.estimator_input);
         }
 
         return out;

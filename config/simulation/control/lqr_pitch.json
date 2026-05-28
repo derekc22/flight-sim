@@ -1,6 +1,6 @@
 {
-    "linear_full_state_feedback": {
-        "control_type": "LinearQuadraticRegulator",
+    "linear_quadratic": {
+        "controller_type": "LinearQuadraticRegulator",
         "parameters": {
             "Q": [
                 [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],

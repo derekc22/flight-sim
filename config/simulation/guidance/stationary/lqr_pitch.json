@@ -1,6 +1,6 @@
 {
     "trajectory_type": "stationary",
-    "linear_full_state_feedback": {
+    "linear_quadratic": {
         "v": [[34.7848, 8.47198e-04, 3.29174e-01]],
         "w": [[6.40911e-05, 9.41998e-04, -3.15590e-05]],
         "eul": [[0.0, 0.254752, -1.76344e-05]]

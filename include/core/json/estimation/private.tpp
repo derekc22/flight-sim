@@ -1,11 +1,10 @@
 #pragma once
-#include "simulation/estimation/public.hpp"
 
 namespace json {
 
-    template <typename EstimatorType, typename EstimatorClass, typename EstimatorParametersType>
-    EstimatorClass make_stateful_kalman_filter_estimator(const EstimatorParametersType& params) {
-        return [estimator = EstimatorType{ params }](const estimation::KalmanFilterEstimatorInput& input) mutable {
+    template <typename Estimator, typename EstimatorClass, typename EstimatorParameters, typename EstimatorClassInput>
+    EstimatorClass make_stateful_estimator(const EstimatorParameters& params) {
+        return [estimator = Estimator{ params }](const EstimatorClassInput& input) mutable {
             return estimator.step(input);
         };
     }

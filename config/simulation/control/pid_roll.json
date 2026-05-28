@@ -1,6 +1,6 @@
 {
     "axial": {
-        "control_type": "AxialPID",
+        "controller_type": "AxialPID",
         "parameters": {
             "Kp_roll": 30,
             "Ki_roll": 5,

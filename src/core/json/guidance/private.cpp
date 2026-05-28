@@ -12,28 +12,28 @@
 
 namespace json {
 
-    void validate_axial_control_setpoint(const nlohmann::json& guidance_json, const control::ControlType& control_type) {
-        if (control_type == control::ControlType::DamperPID) {
+    void validate_axial_control_setpoint(const nlohmann::json& guidance_json, const control::ControllerType& controller_type) {
+        if (controller_type == control::ControllerType::DamperPID) {
             if (guidance_json.contains("v")) { throw std::runtime_error("json::validate_axial_control_setpoint: DamperPID does not require v"); }
             if (guidance_json.contains("w")) { throw std::runtime_error("json::validate_axial_control_setpoint: DamperPID does not require w"); }
             if (guidance_json.contains("eul")) { throw std::runtime_error("json::validate_axial_control_setpoint: DamperPID does not require eul"); }
         }
 
-        if (control_type == control::ControlType::AxialPID) {
+        if (controller_type == control::ControllerType::AxialPID) {
             if (guidance_json.contains("v")) { throw std::runtime_error("json::validate_axial_control_setpoint: AxialPID does not require v"); }
             if (!guidance_json.contains("w")) { throw std::runtime_error("json::validate_axial_control_setpoint: AxialPID requires w"); }
             if (!guidance_json.contains("eul")) { throw std::runtime_error("json::validate_axial_control_setpoint: AxialPID requires eul"); }
         }
     }
 
-    guidance::TrajectoryComponents& parse_axial_control_setpoint(const nlohmann::json& guidance_json, const control::ControlType& control_type, guidance::TrajectoryComponents& traj_components) {
-        validate_axial_control_setpoint(guidance_json, control_type);
+    guidance::TrajectoryComponents& parse_axial_control_setpoint(const nlohmann::json& guidance_json, const control::ControllerType& controller_type, guidance::TrajectoryComponents& traj_components) {
+        validate_axial_control_setpoint(guidance_json, controller_type);
 
-        if (control_type == control::ControlType::DamperPID) {
+        if (controller_type == control::ControllerType::DamperPID) {
             traj_components.n_rows = 1;
         }
 
-        if (control_type == control::ControlType::AxialPID) {
+        if (controller_type == control::ControllerType::AxialPID) {
             traj_components.w_traj = parse_MatrixXd(guidance_json.at("w"));
             traj_components.eul_traj = parse_MatrixXd(guidance_json.at("eul"));
             traj_components.n_rows = traj_components.w_traj.rows();
@@ -41,43 +41,43 @@ namespace json {
         return traj_components;
     }
 
-    void validate_velocity_control_setpoint(const nlohmann::json& guidance_json, const control::ControlType& control_type) {
-        if (control_type == control::ControlType::VelocityPID) {
+    void validate_velocity_control_setpoint(const nlohmann::json& guidance_json, const control::ControllerType& controller_type) {
+        if (controller_type == control::ControllerType::VelocityPID) {
             if (!guidance_json.contains("v")) { throw std::runtime_error("json::validate_velocity_control_setpoint: VelocityPID requires v"); }
             if (guidance_json.contains("w")) { throw std::runtime_error("json::validate_velocity_control_setpoint: VelocityPID does not require w"); }
             if (guidance_json.contains("eul")) { throw std::runtime_error("json::validate_velocity_control_setpoint: VelocityPID does not require eul"); }
         }
     }
 
-    guidance::TrajectoryComponents& parse_velocity_control_setpoint(const nlohmann::json& guidance_json, const control::ControlType& control_type, guidance::TrajectoryComponents& traj_components) {
-        validate_velocity_control_setpoint(guidance_json, control_type);
+    guidance::TrajectoryComponents& parse_velocity_control_setpoint(const nlohmann::json& guidance_json, const control::ControllerType& controller_type, guidance::TrajectoryComponents& traj_components) {
+        validate_velocity_control_setpoint(guidance_json, controller_type);
 
-        if (control_type == control::ControlType::VelocityPID) {
+        if (controller_type == control::ControllerType::VelocityPID) {
             traj_components.v_traj = parse_MatrixXd(guidance_json.at("v"));
             traj_components.n_rows = traj_components.v_traj.rows();
         }
         return traj_components;
     }
 
-    void validate_linear_full_state_feedback_control_setpoint(const nlohmann::json& guidance_json, const control::ControlType& control_type) {
+    void validate_linear_quadratic_control_setpoint(const nlohmann::json& guidance_json, const control::ControllerType& controller_type) {
         if (
-            control_type == control::ControlType::LinearQuadraticRegulator ||
-            control_type == control::ControlType::LinearQuadraticTracker ||
-            control_type == control::ControlType::LinearQuadraticIntegrator
+            controller_type == control::ControllerType::LinearQuadraticRegulator ||
+            controller_type == control::ControllerType::LinearQuadraticTracker ||
+            controller_type == control::ControllerType::LinearQuadraticIntegrator
         ) {
-            if (!guidance_json.contains("v")) { throw std::runtime_error("json::validate_linear_full_state_feedback_control_setpoint: linear_full_state_feedback requires v"); }
-            if (!guidance_json.contains("w")) { throw std::runtime_error("json::validate_linear_full_state_feedback_control_setpoint: linear_full_state_feedback requires w"); }
-            if (!guidance_json.contains("eul")) { throw std::runtime_error("json::validate_linear_full_state_feedback_control_setpoint: linear_full_state_feedback requires eul"); }
+            if (!guidance_json.contains("v")) { throw std::runtime_error("json::validate_linear_quadratic_control_setpoint: linear_quadratic requires v"); }
+            if (!guidance_json.contains("w")) { throw std::runtime_error("json::validate_linear_quadratic_control_setpoint: linear_quadratic requires w"); }
+            if (!guidance_json.contains("eul")) { throw std::runtime_error("json::validate_linear_quadratic_control_setpoint: linear_quadratic requires eul"); }
         }
     }
 
-    guidance::TrajectoryComponents& parse_linear_full_state_feedback_control_setpoint(const nlohmann::json& guidance_json, const control::ControlType& control_type, guidance::TrajectoryComponents& traj_components) {
-        validate_linear_full_state_feedback_control_setpoint(guidance_json, control_type);
+    guidance::TrajectoryComponents& parse_linear_quadratic_control_setpoint(const nlohmann::json& guidance_json, const control::ControllerType& controller_type, guidance::TrajectoryComponents& traj_components) {
+        validate_linear_quadratic_control_setpoint(guidance_json, controller_type);
 
         if (
-            control_type == control::ControlType::LinearQuadraticRegulator ||
-            control_type == control::ControlType::LinearQuadraticTracker ||
-            control_type == control::ControlType::LinearQuadraticIntegrator
+            controller_type == control::ControllerType::LinearQuadraticRegulator ||
+            controller_type == control::ControllerType::LinearQuadraticTracker ||
+            controller_type == control::ControllerType::LinearQuadraticIntegrator
         ) {
             traj_components.v_traj = parse_MatrixXd(guidance_json.at("v"));
             traj_components.w_traj = parse_MatrixXd(guidance_json.at("w"));
@@ -87,11 +87,11 @@ namespace json {
         return traj_components;
     }
 
-    void validate_nonlinear_control_setpoint(const nlohmann::json& guidance_json, const control::ControlType& control_type) {
+    void validate_nonlinear_control_setpoint(const nlohmann::json& guidance_json, const control::ControllerType& controller_type) {
         if (
-            control_type == control::ControlType::FeedbackLinearization ||
-            control_type == control::ControlType::NonlinearDynamicInversion ||
-            control_type == control::ControlType::IncrementalNonlinearDynamicInversion
+            controller_type == control::ControllerType::FeedbackLinearization ||
+            controller_type == control::ControllerType::NonlinearDynamicInversion ||
+            controller_type == control::ControllerType::IncrementalNonlinearDynamicInversion
         ) {
             if (!guidance_json.contains("v")) { throw std::runtime_error("json::validate_nonlinear_control_setpoint: nonlinear requires v"); }
             if (!guidance_json.contains("w")) { throw std::runtime_error("json::validate_nonlinear_control_setpoint: nonlinear requires w"); }
@@ -99,13 +99,13 @@ namespace json {
         }
     }
 
-    guidance::TrajectoryComponents& parse_nonlinear_control_setpoint(const nlohmann::json& guidance_json, const control::ControlType& control_type, guidance::TrajectoryComponents& traj_components) {
-        validate_nonlinear_control_setpoint(guidance_json, control_type);
+    guidance::TrajectoryComponents& parse_nonlinear_control_setpoint(const nlohmann::json& guidance_json, const control::ControllerType& controller_type, guidance::TrajectoryComponents& traj_components) {
+        validate_nonlinear_control_setpoint(guidance_json, controller_type);
 
         if (
-            control_type == control::ControlType::FeedbackLinearization ||
-            control_type == control::ControlType::NonlinearDynamicInversion ||
-            control_type == control::ControlType::IncrementalNonlinearDynamicInversion
+            controller_type == control::ControllerType::FeedbackLinearization ||
+            controller_type == control::ControllerType::NonlinearDynamicInversion ||
+            controller_type == control::ControllerType::IncrementalNonlinearDynamicInversion
         ) {
             traj_components.v_traj = parse_MatrixXd(guidance_json.at("v"));
             traj_components.w_traj = parse_MatrixXd(guidance_json.at("w"));
@@ -118,15 +118,15 @@ namespace json {
     void validate_guidance(const nlohmann::json& guidance_json){
         bool axial_bool = guidance_json.contains("axial");
         bool velocity_bool = guidance_json.contains("velocity");
-        bool linear_full_state_feedback_bool = guidance_json.contains("linear_full_state_feedback");
+        bool linear_quadratic_bool = guidance_json.contains("linear_quadratic");
         bool nonlinear_bool = guidance_json.contains("nonlinear");
 
-        if (axial_bool && linear_full_state_feedback_bool) { throw std::runtime_error("json::validate_guidance: axial and linear_full_state_feedback guidance cannot both be present"); }
+        if (axial_bool && linear_quadratic_bool) { throw std::runtime_error("json::validate_guidance: axial and linear_quadratic guidance cannot both be present"); }
         if (axial_bool && nonlinear_bool) { throw std::runtime_error("json::validate_guidance: axial and nonlinear guidance cannot both be present"); }
 
-        if (linear_full_state_feedback_bool && nonlinear_bool) { throw std::runtime_error("json::validate_guidance: linear_full_state_feedback and nonlinear guidance cannot both be present"); }
+        if (linear_quadratic_bool && nonlinear_bool) { throw std::runtime_error("json::validate_guidance: linear_quadratic and nonlinear guidance cannot both be present"); }
 
-        if (velocity_bool && linear_full_state_feedback_bool) { throw std::runtime_error("json::validate_guidance: velocity and linear_full_state_feedback guidance cannot both be present"); }
+        if (velocity_bool && linear_quadratic_bool) { throw std::runtime_error("json::validate_guidance: velocity and linear_quadratic guidance cannot both be present"); }
         if (velocity_bool && nonlinear_bool) { throw std::runtime_error("json::validate_guidance: velocity and nonlinear guidance cannot both be present"); }
     }
 
@@ -188,22 +188,22 @@ namespace json {
 
         if (config.contains("axial")) {
             const auto& axial_guidance_json = config.at("axial");
-            traj_components = parse_axial_control_setpoint(axial_guidance_json, control_properties.axial_control_type, traj_components);
+            traj_components = parse_axial_control_setpoint(axial_guidance_json, control_properties.axial_controller_type, traj_components);
         }
 
         if (config.contains("velocity")) {
             const auto& velocity_guidance_json = config.at("velocity");
-            traj_components = parse_velocity_control_setpoint(velocity_guidance_json, control_properties.velocity_control_type, traj_components);
+            traj_components = parse_velocity_control_setpoint(velocity_guidance_json, control_properties.velocity_controller_type, traj_components);
         }
 
-        if (config.contains("linear_full_state_feedback")) {
-            const auto& linear_full_state_feedback_guidance_json = config.at("linear_full_state_feedback");
-            traj_components = parse_linear_full_state_feedback_control_setpoint(linear_full_state_feedback_guidance_json, control_properties.linear_full_state_feedback_control_type, traj_components);
+        if (config.contains("linear_quadratic")) {
+            const auto& linear_quadratic_guidance_json = config.at("linear_quadratic");
+            traj_components = parse_linear_quadratic_control_setpoint(linear_quadratic_guidance_json, control_properties.linear_quadratic_controller_type, traj_components);
         }
 
         if (config.contains("nonlinear")) {
             const auto& nonlinear_guidance_json = config.at("nonlinear");
-            traj_components = parse_nonlinear_control_setpoint(nonlinear_guidance_json, control_properties.nonlinear_control_type, traj_components);
+            traj_components = parse_nonlinear_control_setpoint(nonlinear_guidance_json, control_properties.nonlinear_controller_type, traj_components);
         }
 
         fill_missing_trajectory_components(traj_components);

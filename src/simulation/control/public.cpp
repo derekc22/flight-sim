@@ -1,26 +1,28 @@
 #include <Eigen/Dense>
+#include <stdexcept>
 #include "simulation/control/public.hpp"
 
 namespace control {
 
-    ControlOutput ControlProperties::step(const ControllerInput& controller_input, bool trim_bool) {
+    ControlOutput ControlProperties::step(const ControllerInputs& inputs, bool trim_bool) {
         ControlOutput out{};
 
         if (!trim_bool) {
             if (axial_controller) {
-                out.surface_inputs = axial_controller(controller_input.axial_controller_input).surface_inputs;
+                out.surface_inputs = axial_controller(inputs.axial_controller_input).surface_inputs;
             }
             if (velocity_controller) {
-                out.propulsor_inputs = velocity_controller(controller_input.velocity_controller_input).propulsor_inputs;
+                out.propulsor_inputs = velocity_controller(inputs.velocity_controller_input).propulsor_inputs;
             }
             if (nonlinear_controller) {
-                out = nonlinear_controller(controller_input.nonlinear_controller_input);
+                out = nonlinear_controller(inputs.nonlinear_controller_input);
             }
+            if (linear_quadratic_controller) { throw std::runtime_error("control::ControlProperties::step LinearQuadraticController requires trim"); }
         }
 
         if (trim_bool) {
-            if (linear_full_state_feedback_controller) {
-                out = linear_full_state_feedback_controller(controller_input.linear_full_state_feedback_controller_input);
+            if (linear_quadratic_controller) {
+                out = linear_quadratic_controller(inputs.linear_quadratic_controller_input);
             }
         }
 

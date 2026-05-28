@@ -48,10 +48,10 @@ namespace control {
         return { T_front, T_left, T_right };
     }
 
-    PIDControllerInput VelocityPID::make_pid_controller_input(const VelocityControllerInput& controller_input){
-        dynamics::RigidBodyState zN_t = controller_input.zN_t;
-        actuators::PropulsorActuators propulsor_actuators = controller_input.propulsor_actuators;
-        guidance::VelocitySetpoint setpoint = controller_input.setpoint;
+    PIDPolicyInput VelocityPID::make_pid_policy_input(const VelocityControllerInput& input){
+        dynamics::RigidBodyState zN_t = input.zN_t;
+        actuators::PropulsorActuators propulsor_actuators = input.propulsor_actuators;
+        guidance::VelocitySetpoint setpoint = input.setpoint;
 
         double limit_max_overall = propulsor_actuators.front_propulsor.limit_max + propulsor_actuators.left_propulsor.limit_max + propulsor_actuators.right_propulsor.limit_max;
         double limit_min_overall = propulsor_actuators.front_propulsor.limit_min + propulsor_actuators.left_propulsor.limit_min + propulsor_actuators.right_propulsor.limit_min;
@@ -64,15 +64,15 @@ namespace control {
         };
     }
 
-    ControlOutput VelocityPID::step(const VelocityControllerInput& controller_input) {
+    ControlOutput VelocityPID::step(const VelocityControllerInput& input) {
         actuators::SurfaceActuatorInputs_T<double> u_surface{};
         actuators::PropulsorActuatorInputs_T<double> u_propulsor{};
 
         double T_tot = policy.step(
-            make_pid_controller_input(controller_input)
+            make_pid_policy_input(input)
         );
 
-        auto [T_front, T_left, T_right] = allocate_thrust(T_tot, controller_input.propulsor_actuators);
+        auto [T_front, T_left, T_right] = allocate_thrust(T_tot, input.propulsor_actuators);
 
         u_propulsor.front_propulsor_cmd = T_front;
         u_propulsor.left_propulsor_cmd = T_left;

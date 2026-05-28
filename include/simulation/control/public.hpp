@@ -1,26 +1,17 @@
 #pragma once
-#include <Eigen/Dense>
 #include <functional>
 #include "simulation/control/shared/public.hpp"
-#include "simulation/control/pid/public.hpp"
-#include "simulation/control/pid/controllers/axial/public.hpp"
-#include "simulation/control/pid/controllers/damper/public.hpp"
-#include "simulation/control/pid/controllers/velocity/public.hpp"
-#include "simulation/control/linear_quadratic/public.hpp"
-#include "simulation/control/linear_quadratic/controllers/lqr/public.hpp"
-#include "simulation/control/linear_quadratic/controllers/lqi/public.hpp"
-#include "simulation/control/linear_quadratic/controllers/lqt/public.hpp"
 
 namespace control {
 
-    enum class ControlType {
+    enum class ControllerType {
         None,
-        // Axial
+        // Attitude
         AxialPID,
         DamperPID,
         // Velocity
         VelocityPID,
-        // Linear Full State Feedback
+        // Linear Quadratic
         LinearQuadraticRegulator,
         LinearQuadraticTracker,
         LinearQuadraticIntegrator,
@@ -30,33 +21,33 @@ namespace control {
         IncrementalNonlinearDynamicInversion
     };
 
-    using AxialController = std::function<ControlOutput(const AxialControllerInput&)>;
+    using AttitudeController = std::function<ControlOutput(const AttitudeControllerInput&)>;
 
     using VelocityController = std::function<ControlOutput(const VelocityControllerInput&)>;
 
-    using LinearFullStateFeedbackController = std::function<ControlOutput(const LinearFullStateFeedbackControllerInput&)>;
+    using LinearQuadraticController = std::function<ControlOutput(const LinearQuadraticControllerInput&)>;
 
     using NonlinearController = std::function<ControlOutput(const NonlinearControllerInput&)>;
 
-    struct ControllerInput {
-        const AxialControllerInput& axial_controller_input;
+    struct ControllerInputs {
+        const AttitudeControllerInput& axial_controller_input;
         const VelocityControllerInput& velocity_controller_input;
-        const LinearFullStateFeedbackControllerInput& linear_full_state_feedback_controller_input;
+        const LinearQuadraticControllerInput& linear_quadratic_controller_input;
         const NonlinearControllerInput& nonlinear_controller_input;
     };
 
     struct ControlProperties {
-        ControlType axial_control_type = ControlType::None;
-        ControlType velocity_control_type = ControlType::None;
-        ControlType linear_full_state_feedback_control_type = ControlType::None;
-        ControlType nonlinear_control_type = ControlType::None;
+        ControllerType axial_controller_type = ControllerType::None;
+        ControllerType velocity_controller_type = ControllerType::None;
+        ControllerType linear_quadratic_controller_type = ControllerType::None;
+        ControllerType nonlinear_controller_type = ControllerType::None;
 
-        AxialController axial_controller;
+        AttitudeController axial_controller;
         VelocityController velocity_controller;
-        LinearFullStateFeedbackController linear_full_state_feedback_controller;
+        LinearQuadraticController linear_quadratic_controller;
         NonlinearController nonlinear_controller;
 
-        ControlOutput step(const ControllerInput& controller_input, bool trim_bool);
+        ControlOutput step(const ControllerInputs& inputs, bool trim_bool);
     };
 
 }

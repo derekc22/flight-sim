@@ -7,14 +7,14 @@
 
 namespace json {
 
-    void validate_axial_control_setpoint(const nlohmann::json& guidance_json, const control::ControlType& control_type);
-    guidance::TrajectoryComponents& parse_axial_control_setpoint(const nlohmann::json& guidance_json, const control::ControlType& control_type, guidance::TrajectoryComponents& traj_components);
-    void validate_velocity_control_setpoint(const nlohmann::json& guidance_json, const control::ControlType& control_type);
-    guidance::TrajectoryComponents& parse_velocity_control_setpoint(const nlohmann::json& guidance_json, const control::ControlType& control_type, guidance::TrajectoryComponents& traj_components);
-    void validate_linear_full_state_feedback_control_setpoint(const nlohmann::json& guidance_json, const control::ControlType& control_type);
-    guidance::TrajectoryComponents& parse_linear_full_state_feedback_control_setpoint(const nlohmann::json& guidance_json, const control::ControlType& control_type, guidance::TrajectoryComponents& traj_components);
-    void validate_nonlinear_control_setpoint(const nlohmann::json& guidance_json, const control::ControlType& control_type);
-    guidance::TrajectoryComponents& parse_nonlinear_control_setpoint(const nlohmann::json& guidance_json, const control::ControlType& control_type, guidance::TrajectoryComponents& traj_components);
+    void validate_axial_control_setpoint(const nlohmann::json& guidance_json, const control::ControllerType& controller_type);
+    guidance::TrajectoryComponents& parse_axial_control_setpoint(const nlohmann::json& guidance_json, const control::ControllerType& controller_type, guidance::TrajectoryComponents& traj_components);
+    void validate_velocity_control_setpoint(const nlohmann::json& guidance_json, const control::ControllerType& controller_type);
+    guidance::TrajectoryComponents& parse_velocity_control_setpoint(const nlohmann::json& guidance_json, const control::ControllerType& controller_type, guidance::TrajectoryComponents& traj_components);
+    void validate_linear_quadratic_control_setpoint(const nlohmann::json& guidance_json, const control::ControllerType& controller_type);
+    guidance::TrajectoryComponents& parse_linear_quadratic_control_setpoint(const nlohmann::json& guidance_json, const control::ControllerType& controller_type, guidance::TrajectoryComponents& traj_components);
+    void validate_nonlinear_control_setpoint(const nlohmann::json& guidance_json, const control::ControllerType& controller_type);
+    guidance::TrajectoryComponents& parse_nonlinear_control_setpoint(const nlohmann::json& guidance_json, const control::ControllerType& controller_type, guidance::TrajectoryComponents& traj_components);
     void validate_guidance(const nlohmann::json& guidance_json);
     void validate_trajectory_type(const guidance::TrajectoryComponents& traj_components, guidance::TrajectoryType traj_type);
     guidance::TrajectoryType map_trajectory_type(const std::string& trajectory_type_str);

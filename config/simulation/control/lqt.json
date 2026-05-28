@@ -1,6 +1,6 @@
 {
-    "linear_full_state_feedback": {
-        "control_type": "LinearQuadraticTracker",
+    "linear_quadratic": {
+        "controller_type": "LinearQuadraticTracker",
         "parameters": {
             "Q": [
                 [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
