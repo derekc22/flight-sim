@@ -36,6 +36,14 @@ namespace dynamics {
     }
 
     template <typename T>
+    Twist_T<T> build_twist_from_state_T(const State_T<T>& x) {
+        Twist_T<T> twist;
+        twist.v << x.vx, x.vy, x.vz;
+        twist.w << x.p, x.q, x.r;
+        return twist;
+    }
+
+    template <typename T>
     constants::Vector3_T<T> ddtB_vB_BI_T(const constants::Vector3_T<T>& vB, const constants::Vector3_T<T>& wB_BI, double mass, const constants::Vector3_T<T>& FB_net) {
         return (FB_net / T(mass)) - wB_BI.cross(vB);
     }

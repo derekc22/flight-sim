@@ -5,9 +5,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-
 #include "simulation/aerodynamics/public.hpp"
-
 #include "simulation/actuators/surface/public.hpp"
 #include "simulation/constants/public.hpp"
 #include "simulation/structural/public.hpp"

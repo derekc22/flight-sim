@@ -24,14 +24,14 @@ namespace structural {
         std::vector<Geometry> geometries;
         std::unordered_map<std::string, size_t> geometryIDs;
 
-        dynamics::Mass Mass;
+        dynamics::Mass mass;
         dynamics::CenterOfGravity CG;
         dynamics::InertiaTensor J;
 
         StructuralProperties(const std::vector<Geometry>& g);
 
         Geometry& get_geometry(const std::string& id);
-        double compute_Mass();
+        double compute_mass();
         Eigen::Vector3d compute_CG();
         Eigen::Matrix3d compute_J();
         Eigen::Matrix3d compute_local_J(const Geometry& geom);

@@ -116,6 +116,27 @@ namespace dynamics {
         Moment M;
     };
 
+    struct VerticalSpeed {
+        double data;
+    };
+
+    struct SpecificForce {
+        Eigen::Vector3d data;
+    };
+
+    struct Gravity {
+        Eigen::Vector3d data;
+    };
+
+    struct CenterOfGravity {
+        Eigen::Vector3d data;
+    };
+
+    struct Twist {
+        TranslationalVelocity v;
+        AngularVelocity w;
+    };
+
     template <typename T>
     using StateVector_T = Eigen::Matrix<T, constants::state_dim, 1>;
 
@@ -151,6 +172,18 @@ namespace dynamics {
     };
 
     template <typename T>
+    struct Twist_T {
+        constants::Vector3_T<T> v = constants::Zero3_T<T>;
+        constants::Vector3_T<T> w = constants::Zero3_T<T>;
+    };
+
+    template <typename T>
+    struct Wrench_T {
+        constants::Vector3_T<T> F = constants::Zero3_T<T>;
+        constants::Vector3_T<T> M = constants::Zero3_T<T>;
+    };
+
+    template <typename T>
     StateVector_T<T> unpack_state_T(const State_T<T>& x);
 
     template <typename T>
@@ -158,6 +191,9 @@ namespace dynamics {
 
     template <typename T>
     StateDotVector_T<T> unpack_state_dot_T(const StateDot_T<T>& x_dot);
+
+    template <typename T>
+    Twist_T<T> build_twist_from_state_T(const State_T<T>& x);
 
     template <typename T>
     constants::Vector3_T<T> ddtB_vB_BI_T(const constants::Vector3_T<T>& vB, const constants::Vector3_T<T>& wB_BI, double mass, const constants::Vector3_T<T>& FB_net);
@@ -185,39 +221,6 @@ namespace dynamics {
     AngularVelocity CIB_dot_to_wB_BI(const OrientationMatrixRate& CIB_dot, const OrientationMatrix& CIB);
     AngularVelocity qIB_dot_to_wB_BI(const OrientationQuaternionRate& qIB_dot, const OrientationQuaternion& qIB);
     EulerAngleRates wB_BI_to_eul_dot(const AngularVelocity& wB_BI, const EulerAngles& eul);
-
-    struct VerticalSpeed {
-        double data;
-    };
-
-    struct SpecificForce {
-        Eigen::Vector3d data;
-    };
-
-    struct Gravity {
-        Eigen::Vector3d data;
-    };
-
-    struct CenterOfGravity {
-        Eigen::Vector3d data;
-    };
-
-    struct Twist {
-        TranslationalVelocity v;
-        AngularVelocity w;
-    };
-
-    template <typename T>
-    struct Twist_T {
-        constants::Vector3_T<T> v = constants::Zero3_T<T>;
-        constants::Vector3_T<T> w = constants::Zero3_T<T>;
-    };
-
-    template <typename T>
-    struct Wrench_T {
-        constants::Vector3_T<T> F = constants::Zero3_T<T>;
-        constants::Vector3_T<T> M = constants::Zero3_T<T>;
-    };
 
     /** @warning The parent of F must be an inertial frame: ECEFFrame or NEDFrameECEF */
     RigidBodyState compute_rigid_body_state(const frames::Frame& F);

@@ -1,7 +1,6 @@
 #include <string>
 #include "simulation/frames/public.hpp"
 #include "simulation/frames/private.hpp"
-
 #include "simulation/transforms/public.hpp"
 #include "simulation/constants/public.hpp"
 #include "simulation/util/public.hpp"

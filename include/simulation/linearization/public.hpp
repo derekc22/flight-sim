@@ -2,9 +2,9 @@
 #include <Eigen/Dense>
 #include <string>
 #include "simulation/constants/public.hpp"
-#include "simulation/trim/public.hpp"
+#include "simulation/autodiff/public.hpp"
 
-namespace vehicles { struct Aircraft; }
+namespace vehicles { struct Aircraft; } // forward declare
 
 namespace linearization {
 
@@ -30,6 +30,6 @@ namespace linearization {
 
     DiscretizedLocalLinearization discretize(const linearization::LocalLinearization& lin_sol);
     DiscretizedLocalLinearization discretize_euler(const linearization::LocalLinearization& lin_sol);
-    LocalLinearization linearize_operating_point(vehicles::Aircraft& aircraft, const operating::OperatingPoint& operating_point, const operating::OperatingConditions& conditions);
+    LocalLinearization linearize_operating_point(vehicles::Aircraft& aircraft, const autodiff::OperatingPoint& operating_point, const autodiff::OperatingConditions& conditions);
     std::string print_linearization_solution(const LocalLinearization& lin);
 }

@@ -13,28 +13,13 @@
 #include "simulation/trim/private.hpp"
 #include "simulation/util/public.hpp"
 #include "simulation/vehicles/public.hpp"
+#include "simulation/autodiff/public.hpp"
 
 namespace trim {
 
-    TrimModel build_trim_model(vehicles::Aircraft& aircraft) {
-        actuators::PropulsorActuators& propulsor_actuators = aircraft.actuator_properties.propulsor_actuators;
-        actuators::ActuatorLimits_T<double> actuator_limits = actuators::pack_actuator_limits(aircraft.actuator_properties.surface_actuators, propulsor_actuators);
-
-        return {
-            .structural = aircraft.structural_properties,
-            .aerodynamic = aircraft.aerodynamic_properties,
-            .propulsor_actuators = propulsor_actuators,
-            .actuator_limits = actuator_limits,
-            .fixed_actuator_inputs = actuators::FixedActuatorInputs{
-                .flap = aircraft.operating_properties.fixed_actuator_inputs.flap,
-                .spoiler = aircraft.operating_properties.fixed_actuator_inputs.spoiler,
-            }
-        };
-    }
-
     TrimSolution inspect_trim(vehicles::Aircraft& aircraft, const atmospheric::Wind& wind) {
 
-        TrimModel model = build_trim_model(aircraft);
+        autodiff::AutoDiffModel model = autodiff::build_autodiff_model(aircraft);
         const actuators::ActuatorLimits_T actuator_limits = model.actuator_limits;
         const actuators::ActuatorInputs_T actuator_limits_max = model.actuator_limits.limit_max;
         const actuators::ActuatorInputs_T actuator_limits_min = model.actuator_limits.limit_min;
@@ -49,7 +34,7 @@ namespace trim {
                 .vz = aircraft.FRDFrameNED.vB_BN.data(2),
                 .psi_dot = aircraft.FRDFrameNED.eulNB_dot.psi_dot()
             },
-            .conditions = operating::OperatingConditions{
+            .conditions = autodiff::OperatingConditions{
                 .static_atm_state = atmospheric::compute_static_atmospheric_state(aircraft.FRDFrameECEF),
                 .windB = wind,
             },

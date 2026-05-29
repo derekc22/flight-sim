@@ -8,13 +8,14 @@
 #include "simulation/propulsion/public.hpp"
 #include "simulation/trim/public.hpp"
 #include "simulation/util/public.hpp"
+#include "simulation/autodiff/public.hpp"
 
 namespace trim {
 
     template <typename T>
-    TrimResidual<T> compute_trim_residual(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u, const TrimModel& model, const TrimTarget& target, const operating::OperatingConditions& conditions) {
-        const dynamics::StateDot_T<T> trim_state_dot = compute_trim_state_dot_T<T>(x, u, model, conditions);
-        const dynamics::Twist_T<T> twist = build_twist_from_trim_state_T(x);
+    TrimResidual<T> compute_trim_residual(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u, const autodiff::AutoDiffModel& model, const TrimTarget& target, const autodiff::OperatingConditions& conditions) {
+        const dynamics::StateDot_T<T> trim_state_dot = autodiff::compute_state_dot_T<T>(x, u, model, conditions);
+        const dynamics::Twist_T<T> twist = dynamics::build_twist_from_state_T(x);
         const aerodynamics::AerodynamicState_T<T> ads = aerodynamics::compute_aerodynamic_state_T<T>(twist, conditions.windB);
         const constants::Vector3_T<T> eul_dot = dynamics::wB_BI_to_eul_dot_T<T>(twist.w, x.theta, x.phi);
 
@@ -57,11 +58,11 @@ namespace trim {
     }
 
     template <typename T>
-    TrimResidualVector_T<T> compute_trim_residual_vector_T(const TrimVariablesVector_T<T>& z, const TrimModel& model, const TrimTarget& target, const operating::OperatingConditions& conditions, bool use_physical_controls) {
-        const dynamics::State_T<T> x = pack_trim_state_T<T>(z);
+    TrimResidualVector_T<T> compute_trim_residual_vector_T(const autodiff::AutoDiffVariableVector_T<T>& z, const autodiff::AutoDiffModel& model, const TrimTarget& target, const autodiff::OperatingConditions& conditions, bool use_physical_controls) {
+        const dynamics::State_T<T> x = autodiff::pack_autodiff_state_T<T>(z);
 
         actuators::ActuatorInputs_T<T> u;
-        if (use_physical_controls) u = pack_trim_actuator_inputs_T<T>(z);
+        if (use_physical_controls) u = autodiff::pack_autodiff_actuator_inputs_T<T>(z);
         else u = pack_trim_actuator_inputs_T<T>(z, model.actuator_limits);
 
         const TrimResidual<T> residual = compute_trim_residual<T>(x, u, model, target, conditions);

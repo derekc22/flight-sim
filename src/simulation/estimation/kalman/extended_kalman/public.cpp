@@ -2,8 +2,7 @@
 #include "simulation/actuators/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/constants/public.hpp"
-#include "simulation/operating/public.hpp"
-#include "simulation/trim/public.hpp"
+#include "simulation/autodiff/public.hpp"
 #include "simulation/linearization/public.hpp"
 #include "simulation/estimation/kalman/extended_kalman/public.hpp"
 #include "simulation/estimation/kalman/private.hpp"
@@ -17,14 +16,14 @@ namespace estimation {
 
         dynamics::State_T<double> x = dynamics::pack_state_vector(prev.z);
         actuators::ActuatorInputs_T<double> u = actuators::pack_actuator_inputs_T<double>(input.ut_1);
-        trim::TrimModel model = trim::build_trim_model(input.aircraft);
+        autodiff::AutoDiffModel model = autodiff::build_autodiff_model(input.aircraft);
 
         // A @ zN_t_bar + B @ ut_1 -> f(zN_t_bar, ut_1)
-        dynamics::StateDot_T<double> x_dot = trim::compute_trim_state_dot_T(x, u, model, input.conditions);
+        dynamics::StateDot_T<double> x_dot = autodiff::compute_state_dot_T(x, u, model, input.conditions);
         dynamics::StateVector_T<double> zN_t_bar = prev.z + dynamics::unpack_state_dot_T(x_dot) * constants::dt;
 
         // A -> Ft
-        operating::OperatingPoint operating_point{ .state = x, .input = u };
+        autodiff::OperatingPoint operating_point{ .state = x, .input = u };
         linearization::LocalLinearization lin_sol = linearization::linearize_operating_point(input.aircraft, operating_point, input.conditions);
         linearization::StateJacobian Ft = linearization::discretize_euler(lin_sol).A;
 

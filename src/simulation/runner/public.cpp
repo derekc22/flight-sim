@@ -116,7 +116,7 @@ namespace runner {
         guidance::GuidanceProperties& guidance_properties = aircraft.guidance_properties;
 
         // extract reuseable quantities
-        dynamics::Mass mass = structural_properties.Mass;
+        dynamics::Mass mass = structural_properties.mass;
         dynamics::InertiaTensor J = structural_properties.J;
         
         actuators::SurfaceActuators& surface_actuators = actuator_properties.surface_actuators;
@@ -210,14 +210,14 @@ namespace runner {
 
         if (options.estimation_bool) {
             linearization::LocalLinearization estimator_lin_sol;
-            operating::OperatingPoint estimator_operating_point;
-            operating::OperatingConditions estimator_conditions;
+            autodiff::OperatingPoint estimator_operating_point;
+            autodiff::OperatingConditions estimator_conditions;
 
             if (estimation_properties.extended_kalman_estimator_type == estimation::EstimatorType::ExtendedKalmanFilter) {
                 dynamics::State_T<double> y_state = dynamics::pack_rigid_body_state(yN_t);
                 actuators::ActuatorInputs_T<double> actuator_inputs = actuators::pack_actuator_inputs(u_surface_actual_prev, u_propulsor_actual_prev);
 
-                estimator_operating_point = operating::OperatingPoint {
+                estimator_operating_point = autodiff::OperatingPoint {
                     .state = y_state,
                     .input = actuator_inputs
                 };

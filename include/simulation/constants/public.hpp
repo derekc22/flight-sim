@@ -59,4 +59,6 @@ namespace constants {
     inline constexpr std::size_t fixed_input_dim = fixed_surface_input_dim + fixed_propulsor_input_dim;
     inline constexpr std::size_t input_dim = surface_input_dim + propulsor_input_dim;
     inline constexpr std::size_t full_input_dim = input_dim + fixed_input_dim;
+
+    inline constexpr std::size_t state_input_dim = state_dim + input_dim;
 }
