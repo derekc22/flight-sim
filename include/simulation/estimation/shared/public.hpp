@@ -16,15 +16,21 @@ namespace estimation {
         dynamics::RigidBodyState zN_t;  // state estimate
     };
 
-    struct KalmanFilterEstimatorInput {
+    struct LinearKalmanEstimatorInput {
         dynamics::RigidBodyState yN_t;
+        operating::OperatingPoint operating_point;
         linearization::LocalLinearization lin_sol;
+        actuators::SurfaceActuatorInputs_T<double> u_surface_actual_prev;
+        actuators::PropulsorActuatorInputs_T<double> u_propulsor_actual_prev;
+    };
+
+    struct ExtendedKalmanEstimatorInput {
+        dynamics::RigidBodyState yN_t;
         operating::OperatingPoint operating_point;
         actuators::SurfaceActuatorInputs_T<double> u_surface_actual_prev;
         actuators::PropulsorActuatorInputs_T<double> u_propulsor_actual_prev;
-        operating::OperatingConditions conditions;
         vehicles::Aircraft& aircraft;
+        operating::OperatingConditions conditions;
     };
-    struct KalmanFilterEstimatorParameters {};
 
 }

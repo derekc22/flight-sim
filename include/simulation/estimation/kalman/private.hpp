@@ -1,16 +1,20 @@
-#include "simulation/actuators/public.hpp"
+#pragma once
+#include <Eigen/Dense>
 #include "simulation/dynamics/public.hpp"
-#include "simulation/estimation/public.hpp"
-#include "simulation/estimation/kalman/public.hpp"
 
 namespace estimation {
 
-    dynamics::StateVector_T<double> make_measurement_deviation(const KalmanFilterEstimatorInput& estimator_input);
+    struct KalmanState {
+        dynamics::StateVector_T<double> z;  // state estimate
+        Eigen::MatrixXd P;  // state estimate error covariance matrix
+    };
 
-    actuators::ActuatorInputsVector_T<double> make_input_deviation(const KalmanFilterEstimatorInput& estimator_input);
+    struct KalmanPolicyParameters {
+        Eigen::MatrixXd P0; // initial state estimate error covariance matrix
+        Eigen::MatrixXd Q;  // measurement noise covariance matrix
+        Eigen::MatrixXd R;  // process noise covariance matrix
+    };
 
-    dynamics::RigidBodyState pack_state_estimate(const KalmanFilterEstimatorInput& estimator_input, const dynamics::StateVector_T<double>& zN_t_deviation, bool nonlinear_bool);
-
-    KalmanFilterInput make_kalman_filter_input(const KalmanFilterEstimatorInput& estimator_input, bool nonlinear_bool);
+    dynamics::RigidBodyState pack_kalman_state_estimate(const dynamics::RigidBodyState& yN_t, const dynamics::StateVector_T<double>& zN_t);
 
 }

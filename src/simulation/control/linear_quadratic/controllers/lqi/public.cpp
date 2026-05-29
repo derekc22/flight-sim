@@ -19,7 +19,7 @@ namespace control {
         Q_aug.block(0, 0, n, n) = params.Q;
         Q_aug.block(n, n, i, i) = params.Qi;
 
-        policy = LinearQuadraticController({ 
+        policy = LinearQuadraticPolicy({ 
             .Q = Q_aug, 
             .R = params.R,
         });
@@ -33,13 +33,13 @@ namespace control {
     }
 
 
-    LinearQuadraticControllerInput LinearQuadraticIntegrator::make_linear_quadratic_controller_input(const LinearFullStateFeedbackControllerInput& controller_input, const IntegratedStateVector& integral_new) {
+    LinearQuadraticPolicyInput LinearQuadraticIntegrator::make_linear_quadratic_policy_input(const LinearQuadraticControllerInput& input, const IntegratedStateVector& integral_new) {
         size_t n = constants::state_dim;
         size_t m = constants::input_dim;
         size_t i = integrated_state_dim;
 
         Eigen::MatrixXd A_aug = Eigen::MatrixXd::Zero(n + i, n + i);
-        A_aug.block(0, 0, n, n) = controller_input.A;
+        A_aug.block(0, 0, n, n) = input.A;
 
         // Ci selects the integrated states p, q, r from the state vector for the LQI controller - it is not the system-wide output matrix C
         Eigen::MatrixXd Ci = Eigen::MatrixXd::Zero(integrated_state_dim, constants::state_dim);
@@ -47,10 +47,10 @@ namespace control {
         A_aug.block(n, 0, i, n) = -Ci;
 
         Eigen::MatrixXd B_aug = Eigen::MatrixXd::Zero(n + i, m);
-        B_aug.block(0, 0, n, m) = controller_input.B;
+        B_aug.block(0, 0, n, m) = input.B;
 
-        dynamics::StateVector_T<double> zN_t = dynamics::unpack_rigid_body_state(controller_input.zN_t);
-        dynamics::StateVector_T<double> zN_t_des = unpack_linear_quadratic_controller_setpoint(controller_input.setpoint);
+        dynamics::StateVector_T<double> zN_t = dynamics::unpack_rigid_body_state(input.zN_t);
+        dynamics::StateVector_T<double> zN_t_des = unpack_linear_quadratic_control_setpoint(input.setpoint);
 
         AugmentedStateVector zN_t_aug;
         zN_t_aug << zN_t, integral_new;
@@ -58,32 +58,33 @@ namespace control {
         AugmentedStateVector zN_t_des_aug;
         zN_t_des_aug << zN_t_des, IntegratedStateVector::Zero();
 
+        AugmentedStateVector zN_t_aug_deviation = zN_t_aug - zN_t_des_aug;
+
         return {
-            .zN_t = zN_t_aug,
-            .zN_t_des = zN_t_des_aug,
+            .zN_t = zN_t_aug_deviation,
             .A = A_aug,
             .B = B_aug
         };
     }
 
-    ControlOutput LinearQuadraticIntegrator::step(const LinearFullStateFeedbackControllerInput& controller_input) {
+    ControlOutput LinearQuadraticIntegrator::step(const LinearQuadraticControllerInput& input) {
 
         // integral candidate
         IntegratedStateVector integral_new = integrate_state_err(
-            dynamics::unpack_rigid_body_state(controller_input.zN_t), 
-            unpack_linear_quadratic_controller_setpoint(controller_input.setpoint)
+            dynamics::unpack_rigid_body_state(input.zN_t), 
+            unpack_linear_quadratic_control_setpoint(input.setpoint)
         );
 
         actuators::ActuatorInputsVector_T<double> u_deviation = policy.step(
-            make_linear_quadratic_controller_input(controller_input, integral_new)
+            make_linear_quadratic_policy_input(input, integral_new)
         );
 
         // unsaturated control
-        actuators::ActuatorInputsVector_T<double> u_trim = actuators::unpack_actuator_inputs_T(controller_input.u_sol_trim);
+        actuators::ActuatorInputsVector_T<double> u_trim = actuators::unpack_actuator_inputs_T(input.u_sol_trim);
         actuators::ActuatorInputsVector_T<double> u_unsat = u_deviation + u_trim;
 
         // saturate
-        auto [u_min, u_max] = actuators::unpack_actuator_limits(controller_input.surface_actuators, controller_input.propulsor_actuators);
+        auto [u_min, u_max] = actuators::unpack_actuator_limits(input.surface_actuators, input.propulsor_actuators);
         actuators::ActuatorInputsVector_T<double> u = util::vec_clamp(u_unsat, u_min, u_max);
 
         // anti-windup

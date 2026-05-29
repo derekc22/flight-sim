@@ -2,9 +2,9 @@
 
 namespace json {
 
-    template <typename ControllerType, typename ControllerClass, typename ControllerParametersType, typename ControllerInputType>
-    ControllerClass make_stateful_controller(const ControllerParametersType& params) {
-        return [controller = ControllerType{ params }](const ControllerInputType& input) mutable {
+    template <typename Controller, typename ControllerClass, typename ControllerParameters, typename ControllerClassInput>
+    ControllerClass make_stateful_controller(const ControllerParameters& params) {
+        return [controller = Controller{ params }](const ControllerClassInput& input) mutable {
             return controller.step(input);
         };
     }

@@ -5,23 +5,22 @@
 
 namespace control {
 
-    struct LinearQuadraticControllerInput {
+    struct LinearQuadraticPolicyInput {
         Eigen::VectorXd zN_t;
-        Eigen::VectorXd zN_t_des;
         Eigen::MatrixXd A;
         Eigen::Matrix<double, Eigen::Dynamic, constants::input_dim> B;
     };
 
-    struct LinearQuadraticControllerParameters {
+    struct LinearQuadraticPolicyParameters {
         Eigen::MatrixXd Q;
         Eigen::MatrixXd R;
         std::optional<Eigen::MatrixXd> K;
     };
 
-    struct LinearQuadraticController {
-        LinearQuadraticControllerParameters params;
+    struct LinearQuadraticPolicy {
+        LinearQuadraticPolicyParameters params;
 
-        LinearQuadraticController(const LinearQuadraticControllerParameters& params);
-        actuators::ActuatorInputsVector_T<double> step(const LinearQuadraticControllerInput& controller_input);
+        LinearQuadraticPolicy(const LinearQuadraticPolicyParameters& params);
+        actuators::ActuatorInputsVector_T<double> step(const LinearQuadraticPolicyInput& input);
     };
 }

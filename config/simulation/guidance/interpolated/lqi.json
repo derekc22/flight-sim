@@ -1,6 +1,6 @@
 {
     "trajectory_type": "interpolated",
-    "linear_full_state_feedback": {
+    "linear_quadratic": {
         "v": [[54.0, 0.0, -0.12], [56.0, 0.0, 0.02]],
         "w": [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0]],
         "eul": [[0.0, 0.0, 0.0], [0.0, 0.04, 0.0]]

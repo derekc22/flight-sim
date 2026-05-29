@@ -16,7 +16,7 @@ namespace guidance {
 
     struct VelocitySetpoint : GuidanceSetpoint {};
 
-    struct LinearFullStateFeedbackSetpoint : GuidanceSetpoint {};
+    struct LinearQuadraticSetpoint : GuidanceSetpoint {};
 
     struct NonlinearSetpoint : GuidanceSetpoint {};
 

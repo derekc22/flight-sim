@@ -1,6 +1,6 @@
 {
     "axial": {
-        "control_type": "DamperPID",
+        "controller_type": "DamperPID",
         "parameters": {
             "Kp_roll": 1,
             "Kp_pitch": 1,

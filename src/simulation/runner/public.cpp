@@ -213,7 +213,7 @@ namespace runner {
             operating::OperatingPoint estimator_operating_point;
             operating::OperatingConditions estimator_conditions;
 
-            if (estimation_properties.kalman_filter_estimator_type == estimation::EstimatorType::ExtendedKalmanFilter) {
+            if (estimation_properties.extended_kalman_estimator_type == estimation::EstimatorType::ExtendedKalmanFilter) {
                 dynamics::State_T<double> y_state = dynamics::pack_rigid_body_state(yN_t);
                 actuators::ActuatorInputs_T<double> actuator_inputs = actuators::pack_actuator_inputs(u_surface_actual_prev, u_propulsor_actual_prev);
 
@@ -227,29 +227,32 @@ namespace runner {
                     .windB = windB
                 };
 
-                estimator_lin_sol = linearization::linearize_operating_point(aircraft, estimator_operating_point, estimator_conditions);
-
-            } else {
+            } else if (estimation_properties.linear_kalman_estimator_type == estimation::EstimatorType::LinearKalmanFilter) {
                 estimator_lin_sol = lin_sol;
                 estimator_operating_point = trim_sol.operating_point;
-                estimator_conditions = trim_sol.conditions;
             }
 
-            estimation::EstimationInput estimation_input {
+            estimation::EstimatorInputs estimator_inputs {
                 .yN_t = yN_t,
-                .estimator_input = estimation::KalmanFilterEstimatorInput {
+                .linear_kalman_estimator_input = estimation::LinearKalmanEstimatorInput {
                     .yN_t = yN_t,
+                    .operating_point = estimator_operating_point,
                     .lin_sol = estimator_lin_sol,
+                    .u_surface_actual_prev = u_surface_actual_prev,
+                    .u_propulsor_actual_prev = u_propulsor_actual_prev,
+                },
+                .extended_kalman_estimator_input = estimation::ExtendedKalmanEstimatorInput {
+                    .yN_t = yN_t,
                     .operating_point = estimator_operating_point,
                     .u_surface_actual_prev = u_surface_actual_prev,
                     .u_propulsor_actual_prev = u_propulsor_actual_prev,
-                    .conditions = estimator_conditions,
-                    .aircraft = aircraft
+                    .aircraft = aircraft,
+                    .conditions = estimator_conditions
                 }
             };
 
             // overwrite local estimation state with estimator estimates
-            zN_t = estimation_properties.step(estimation_input, options.trim_bool).zN_t;
+            zN_t = estimation_properties.step(estimator_inputs, options.trim_bool).zN_t;
         }
 
         // specify guidance setpoint
@@ -263,13 +266,13 @@ namespace runner {
         }
 
         if (options.control_bool) {
-            control::ControllerInput controller_input {
-                .axial_controller_input = control::AxialControllerInput{ .zN_t = zN_t, .surface_actuators = surface_actuators, .setpoint = guidance::AxialSetpoint{ setpoint } },
+            control::ControllerInputs controller_inputs {
+                .axial_controller_input = control::AttitudeControllerInput{ .zN_t = zN_t, .surface_actuators = surface_actuators, .setpoint = guidance::AxialSetpoint{ setpoint } },
                 .velocity_controller_input = control::VelocityControllerInput{ .zN_t = zN_t, .propulsor_actuators = propulsor_actuators, .setpoint = guidance::VelocitySetpoint{ setpoint } },
-                .linear_full_state_feedback_controller_input = control::LinearFullStateFeedbackControllerInput{ .zN_t = zN_t, .u_sol_trim = trim_sol.operating_point.input, .surface_actuators = surface_actuators, .propulsor_actuators = propulsor_actuators, .A = lin_sol.A, .B = lin_sol.B, .setpoint = guidance::LinearFullStateFeedbackSetpoint{ setpoint } },
+                .linear_quadratic_controller_input = control::LinearQuadraticControllerInput{ .zN_t = zN_t, .u_sol_trim = trim_sol.operating_point.input, .surface_actuators = surface_actuators, .propulsor_actuators = propulsor_actuators, .A = lin_sol.A, .B = lin_sol.B, .setpoint = guidance::LinearQuadraticSetpoint{ setpoint } },
                 .nonlinear_controller_input = control::NonlinearControllerInput{ .zN_t = zN_t, .surface_actuators = surface_actuators, .propulsor_actuators = propulsor_actuators, .setpoint = guidance::NonlinearSetpoint{ setpoint } }
             };
-            u_cmd = control_properties.step(controller_input, options.trim_bool);
+            u_cmd = control_properties.step(controller_inputs, options.trim_bool);
         }
 
         u_cmd.surface_inputs.flap_cmd = operating_properties.fixed_actuator_inputs.flap;

@@ -1,11 +1,7 @@
 #pragma once
 #include <functional>
 #include "simulation/estimation/shared/public.hpp"
-#include "simulation/actuators/propulsor/public.hpp"
-#include "simulation/actuators/surface/public.hpp"
 #include "simulation/dynamics/public.hpp"
-#include "simulation/linearization/public.hpp"
-#include "simulation/trim/public.hpp"
 
 namespace estimation {
 
@@ -15,17 +11,23 @@ namespace estimation {
         ExtendedKalmanFilter
     };
 
-    using KalmanFilterEstimator = std::function<EstimationOutput(const KalmanFilterEstimatorInput&)>;
+    using LinearKalmanEstimator = std::function<EstimationOutput(const LinearKalmanEstimatorInput&)>;
 
-    struct EstimationInput {
+    using ExtendedKalmanEstimator = std::function<EstimationOutput(const ExtendedKalmanEstimatorInput&)>;
+
+    struct EstimatorInputs {
         const dynamics::RigidBodyState& yN_t;
-        const KalmanFilterEstimatorInput& estimator_input;
+        const LinearKalmanEstimatorInput& linear_kalman_estimator_input;
+        const ExtendedKalmanEstimatorInput& extended_kalman_estimator_input;
     };
 
     struct EstimationProperties {
-        EstimatorType kalman_filter_estimator_type = EstimatorType::None;
-        KalmanFilterEstimator kalman_filter_estimator;
+        EstimatorType linear_kalman_estimator_type = EstimatorType::None;
+        EstimatorType extended_kalman_estimator_type = EstimatorType::None;
 
-        EstimationOutput step(const EstimationInput& estimation_input, bool trim_bool);
+        LinearKalmanEstimator linear_kalman_estimator;
+        ExtendedKalmanEstimator extended_kalman_estimator;
+
+        EstimationOutput step(const EstimatorInputs& inputs, bool trim_bool);
     };
 }

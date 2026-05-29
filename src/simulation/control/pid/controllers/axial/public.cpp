@@ -2,7 +2,6 @@
 #include <stdexcept>
 #include "simulation/actuators/propulsor/public.hpp"
 #include "simulation/actuators/surface/public.hpp"
-// #include "simulation/control/public.hpp"
 #include "simulation/control/pid/controllers/axial/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/guidance/public.hpp"
@@ -35,15 +34,15 @@ namespace control {
         )
     {};
 
-    PIDControllerInput AxialPID::make_pid_controller_input(const AxialControllerInput& controller_input, ControlAxis control_axis){
-        dynamics::RigidBodyState zN_t = controller_input.zN_t;
-        actuators::SurfaceActuators surface_actuators = controller_input.surface_actuators;
-        guidance::AxialSetpoint setpoint = controller_input.setpoint;
+    PIDPolicyInput AxialPID::make_pid_policy_input(const AttitudeControllerInput& input, ControlAxis axis){
+        dynamics::RigidBodyState zN_t = input.zN_t;
+        actuators::SurfaceActuators surface_actuators = input.surface_actuators;
+        guidance::AxialSetpoint setpoint = input.setpoint;
 
         dynamics::EulerAngles eul_meas_t;
         eul_meas_t.set(zN_t.q);
 
-        switch (control_axis) {
+        switch (axis) {
             case ControlAxis::Lateral:
                 return {
                     .meas = eul_meas_t.phi(),
@@ -72,24 +71,24 @@ namespace control {
                 };
 
             default:
-                throw std::runtime_error("control::make_pid_controller_input invalid control axis");
+                throw std::runtime_error("control::make_pid_policy_input invalid control axis");
         }
     }
 
-    ControlOutput AxialPID::step(const AxialControllerInput& controller_input){
+    ControlOutput AxialPID::step(const AttitudeControllerInput& input){
         actuators::SurfaceActuatorInputs_T<double> u_surface{};
         actuators::PropulsorActuatorInputs_T<double> u_propulsor{};
 
         u_surface.aileron_cmd = lateral_policy.step(
-            make_pid_controller_input(controller_input, ControlAxis::Lateral)
+            make_pid_policy_input(input, ControlAxis::Lateral)
         );
 
         u_surface.elevator_cmd = longitudinal_policy.step(
-            make_pid_controller_input(controller_input, ControlAxis::Longitudinal)
+            make_pid_policy_input(input, ControlAxis::Longitudinal)
         );
 
         u_surface.rudder_cmd = vertical_policy.step(
-            make_pid_controller_input(controller_input, ControlAxis::Vertical)
+            make_pid_policy_input(input, ControlAxis::Vertical)
         );
 
         return { u_surface, u_propulsor };

@@ -19,9 +19,9 @@ namespace control {
         IntegratedStateVector integral = Eigen::Vector3d::Zero();
 
         LinearQuadraticIntegrator(const LinearQuadraticIntegratorParameters& params);
-        ControlOutput step(const LinearFullStateFeedbackControllerInput& controller_input);
+        ControlOutput step(const LinearQuadraticControllerInput& input);
 
-        LinearQuadraticControllerInput make_linear_quadratic_controller_input(const LinearFullStateFeedbackControllerInput& controller_input, const IntegratedStateVector& integral_candidate);
+        LinearQuadraticPolicyInput make_linear_quadratic_policy_input(const LinearQuadraticControllerInput& input, const IntegratedStateVector& integral_candidate);
         IntegratedStateVector integrate_state_err(const dynamics::StateVector_T<double>& zN_t, const dynamics::StateVector_T<double>& zN_t_des);
     };
 
