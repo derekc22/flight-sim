@@ -1,3 +1,4 @@
+#include <Eigen/Dense>
 #include "simulation/dynamics/public.hpp"
 #include "simulation/estimation/kalman/private.hpp"
 
