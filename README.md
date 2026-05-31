@@ -35,8 +35,11 @@ https://www.mathworks.com/products/compiler/matlab-runtime.html
 
 - The simulator is configured via JSON files in the `config/` directory
 - `config/run.json` selects which JSON configuration files are active for a given run
+- `scripts/bin/run.sh` runs the simulation and launches FlightGear
+- `scripts/bin/plot.sh` generates plots from logged data
+- `scripts/bin/analyze.sh` runs post-run analysis with MATLAB
+- `scripts/bin/test.sh` runs unit tests
 - `.env` stores local machine paths for the repository, FlightGear, and the FlightGear protocol directory
-- `scripts/bin/run.sh` is the main entry point. It handles the normal run workflow, including launching FlightGear and running the simulator.
 
 ## Setup
 
@@ -79,10 +82,24 @@ To run the simulation:
 - `-m ANALYSIS`: Enable post-run analysis 
   
 ## Example
-Run a 60-second simulation of the C172 with control and avionics enabled. Data, plots, and reports are saved to `results/data/c172_test`, `results/figures/c172_test`, and `results/reports/c172_test`, respectively.
+Run a 60-second simulation of the C172 with control and avionics enabled. Data, plots, and reports are saved to `results/data/c172_test`, `results/figures/c172_test`, and `results/reports/c172_test`, respectively:
 ```bash
 scripts/bin/run.sh -a c172p -t 60 -c -s -d -p -o c172_test
 ```
+
+## Plotting
+To generate plots from logged data, use the `-p` flag with `run.sh` or run:
+```bash
+scripts/bin/plot.sh <OUT_DIR>
+```
+
+## Analysis
+Post-run analysis is implemented with MATLAB and configured via `config/analyze.json`. To run the analysis, use the `-m` flag with `run.sh` or run:
+
+```bash
+scripts/bin/analyze.sh <OUT_DIR>
+```
+The current analysis implementation requires an active MATLAB license. A planned transition to pre-compiled binaries will remove this requirement, requiring only the MATLAB Runtime instead
 
 ## Tests
 Unit tests are implemented with Google Test:
@@ -96,11 +113,6 @@ scripts/bin/test.sh -t <TEST_SUITE>
 # See available test suites
 scripts/bin/test.sh -h
 ```
-
-## Analysis
-- Post-run analysis is implemented with MATLAB and configured via `config/analyze.json`
-- To run the analysis, use the `-m` flag with `run.sh`
-- The current implementation requires an active MATLAB license. A planned transition to pre-compiled binaries will remove this requirement, requiring only the MATLAB Runtime instead
 
 ## References:
 https://hopsan.github.io/tutorials/tutorial_flightgear.pdf
