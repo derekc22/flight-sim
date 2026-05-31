@@ -6,7 +6,7 @@
 #include "simulation/actuators/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/linearization/public.hpp"
-#include "simulation/autodiff/public.hpp"
+#include "simulation/operating/public.hpp"
 
 namespace vehicles { struct Aircraft; } // forward declare
 
@@ -18,7 +18,7 @@ namespace estimation {
 
     struct LinearKalmanEstimatorInput {
         dynamics::RigidBodyState yN_t;
-        autodiff::OperatingPoint operating_point;
+        operating::OperatingPoint operating_point;
         linearization::LocalLinearization lin_sol;
         actuators::SurfaceActuatorInputs_T<double> u_surface_actual_prev;
         actuators::PropulsorActuatorInputs_T<double> u_propulsor_actual_prev;
@@ -26,11 +26,11 @@ namespace estimation {
 
     struct ExtendedKalmanEstimatorInput {
         dynamics::RigidBodyState yN_t;
-        autodiff::OperatingPoint operating_point;
+        operating::OperatingPoint operating_point;
         actuators::SurfaceActuatorInputs_T<double> u_surface_actual_prev;
         actuators::PropulsorActuatorInputs_T<double> u_propulsor_actual_prev;
         vehicles::Aircraft& aircraft;
-        autodiff::OperatingConditions conditions;
+        operating::OperatingConditions conditions;
     };
 
 }

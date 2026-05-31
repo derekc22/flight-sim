@@ -29,7 +29,7 @@ namespace util {
     }
 
     template <typename T>
-    void validate_value(int a, int b, const std::string& context, const std::string& name_a, const std::string& name_b) {
+    void validate_value(T a, T b, const std::string& context, const std::string& name_a, const std::string& name_b) {
         if (a != b) {
             throw std::invalid_argument(
                 "util::validate_value: " + context + ": " + name_a + " and " + name_b +

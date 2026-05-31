@@ -12,7 +12,7 @@
 #include "simulation/propulsion/public.hpp"
 #include "simulation/aerodynamics/public.hpp"
 #include "simulation/structural/public.hpp"
-#include "simulation/autodiff/public.hpp"
+#include "simulation/operating/public.hpp"
 
 namespace control { struct ControlOutput; } // forward declare
 namespace vehicles { struct Aircraft; } // forward declare
@@ -20,7 +20,7 @@ namespace vehicles { struct Aircraft; } // forward declare
 namespace trim {
 
     template <typename T>
-    struct TrimResidual {
+    struct TrimResidual_T {
         T vx_dot = T(0);
         T vy_dot = T(0);
         T vz_dot = T(0);
@@ -38,12 +38,12 @@ namespace trim {
     };
 
     struct TrimSolution {
-        autodiff::OperatingPoint operating_point;
-        autodiff::OperatingConditions conditions;
+        operating::OperatingPoint operating_point;
+        operating::OperatingConditions conditions;
         dynamics::Wrench wrench{};
-        TrimResidual<double> residual;
-        TrimResidual<double> weighted_residual;
-        autodiff::AutoDiffVariableVector_T<double> variables = autodiff::AutoDiffVariableVector_T<double>::Zero();
+        TrimResidual_T<double> residual;
+        TrimResidual_T<double> weighted_residual;
+        operating::StateInputVector_T<double> variables = operating::StateInputVector_T<double>::Zero();
         bool attempted = false;
         bool converged = false;
         std::size_t iterations = 0;
@@ -55,7 +55,7 @@ namespace trim {
     T get_control_from_solver_space_T(const T& u_solver, double limit_min, double limit_max);
 
     template <typename T>
-    actuators::ActuatorInputs_T<T> pack_trim_actuator_inputs_T(const autodiff::AutoDiffVariableVector_T<T>& z, const actuators::ActuatorLimits_T<double>& actuator_limits);
+    actuators::ActuatorInputs_T<T> pack_trim_actuator_inputs_T(const operating::StateInputVector_T<T>& z, const actuators::ActuatorLimits_T<double>& actuator_limits);
 
     TrimSolution inspect_trim(vehicles::Aircraft& aircraft, const atmospheric::Wind& wind);
 

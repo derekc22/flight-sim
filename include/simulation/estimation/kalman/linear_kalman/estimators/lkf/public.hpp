@@ -18,7 +18,7 @@ namespace estimation {
         EstimationOutput step(const LinearKalmanEstimatorInput& input);
 
         LinearKalmanPolicyInput make_linear_kalman_policy_input(const LinearKalmanEstimatorInput& input);
-        dynamics::RigidBodyState pack_linear_kalman_policy_state_estimate(const LinearKalmanEstimatorInput& input, const dynamics::StateVector_T<double>& zN_t_pred);
+        dynamics::RigidBodyState make_lkf_state_estimate(const LinearKalmanEstimatorInput& input, const dynamics::StateVector_T<double>& zN_t_pred);
 
     };
 

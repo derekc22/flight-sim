@@ -6,6 +6,7 @@
 #include "simulation/dynamics/public.hpp"
 #include "simulation/linearization/public.hpp"
 #include "simulation/autodiff/public.hpp"
+#include "simulation/operating/public.hpp"
 #include "simulation/util/cppad/public.hpp"
 #include "simulation/vehicles/public.hpp"
 
@@ -40,15 +41,15 @@ namespace linearization {
         return { .A = Ak, .B = Bk, .C = lin_sol.C, .D = lin_sol.D };
     }
 
-    LocalLinearization linearize_operating_point(vehicles::Aircraft& aircraft, const autodiff::OperatingPoint& operating_point, const autodiff::OperatingConditions& conditions) {
+    LocalLinearization linearize_operating_point(vehicles::Aircraft& aircraft, const operating::OperatingPoint& operating_point, const operating::OperatingConditions& conditions) {
         const autodiff::AutoDiffModel model = autodiff::build_autodiff_model(aircraft);
 
-        const autodiff::AutoDiffVariableVector_T<double> z = autodiff::unpack_autodiff_variables_T<double>(operating_point.state, operating_point.input);
+        const operating::StateInputVector_T<double> z = operating::unpack_state_input_T<double>(operating_point.state, operating_point.input);
         CppAD::eigen_vector<CppAD::AD<double>> z_tracked = util::start_autodiff_tracking(z);
 
-        const autodiff::AutoDiffVariableVector_T<CppAD::AD<double>> z_vec = util::eigen_vector_from_cppad_vector<CppAD::AD<double>, constants::state_input_dim>(z_tracked);
-        const dynamics::State_T<CppAD::AD<double>> x_t = autodiff::pack_autodiff_state_T<CppAD::AD<double>>(z_vec);
-        const actuators::ActuatorInputs_T<CppAD::AD<double>> u_t = autodiff::pack_autodiff_actuator_inputs_T<CppAD::AD<double>>(z_vec);
+        const operating::StateInputVector_T<CppAD::AD<double>> z_vec = util::eigen_vector_from_cppad_vector<CppAD::AD<double>, constants::state_input_dim>(z_tracked);
+        const dynamics::State_T<CppAD::AD<double>> x_t = operating::pack_state_T<CppAD::AD<double>>(z_vec);
+        const actuators::ActuatorInputs_T<CppAD::AD<double>> u_t = operating::pack_actuator_inputs_T<CppAD::AD<double>>(z_vec);
         
         const dynamics::StateDot_T<CppAD::AD<double>> state_dot = autodiff::compute_state_dot_T<CppAD::AD<double>>(x_t, u_t, model, conditions);
         const dynamics::StateDotVector_T<CppAD::AD<double>> x_dot_vec = dynamics::unpack_state_dot_T(state_dot);

@@ -14,7 +14,7 @@ namespace control {
         dynamics::RigidBodyState zN_t = input.zN_t;
         guidance::LinearQuadraticSetpoint setpoint = input.setpoint;
 
-        dynamics::StateVector_T<double> zN_t_deviation = dynamics::unpack_rigid_body_state(zN_t) - unpack_linear_quadratic_control_setpoint(setpoint);
+        dynamics::StateVector_T<double> zN_t_deviation = dynamics::unpack_state(zN_t) - unpack_state(setpoint);
 
         return {
             .zN_t = zN_t_deviation,

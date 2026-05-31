@@ -18,8 +18,8 @@ namespace actuators {
         n_prop = RBP * constants::ei;
     }
 
-    FullPropulsorActuatorInputsVector_T<double> unpack_full_propulsor_actuator_inputs(const PropulsorActuatorInputs_T<double>& u_propulsor) {
-        FullPropulsorActuatorInputsVector_T<double> out;
+    PropulsorActuatorInputsVector_T<double> unpack_propulsor_actuator_inputs(const PropulsorActuatorInputs_T<double>& u_propulsor) {
+        PropulsorActuatorInputsVector_T<double> out;
         out << u_propulsor.front_propulsor_cmd,
                u_propulsor.left_propulsor_cmd,
                u_propulsor.right_propulsor_cmd;

@@ -174,7 +174,7 @@ namespace json {
             qIB.set(dynamics::EulerAngles{ traj_components.eul_traj.row(i).transpose() });
             rbs_temp.q = qIB;
 
-            guidance::GuidanceVector traj_row_merged = guidance::unpack_rigid_body_state_guidance(rbs_temp);
+            guidance::GuidanceSetpointVector traj_row_merged = guidance::unpack_guidance_setpoint(rbs_temp);
             traj.data.row(i) = traj_row_merged.transpose();
         }
         return traj;

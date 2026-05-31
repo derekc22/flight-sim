@@ -14,6 +14,7 @@
 #include "simulation/util/public.hpp"
 #include "simulation/vehicles/public.hpp"
 #include "simulation/autodiff/public.hpp"
+#include "simulation/operating/public.hpp"
 
 namespace trim {
 
@@ -34,7 +35,7 @@ namespace trim {
                 .vz = aircraft.FRDFrameNED.vB_BN.data(2),
                 .psi_dot = aircraft.FRDFrameNED.eulNB_dot.psi_dot()
             },
-            .conditions = autodiff::OperatingConditions{
+            .conditions = operating::OperatingConditions{
                 .static_atm_state = atmospheric::compute_static_atmospheric_state(aircraft.FRDFrameECEF),
                 .windB = wind,
             },

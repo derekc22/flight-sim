@@ -1,7 +1,6 @@
 
 #include <stdexcept>
 #include "simulation/actuators/surface/public.hpp"
-// #include "simulation/control/public.hpp"
 #include "simulation/control/pid/controllers/damper/public.hpp"
 #include "simulation/dynamics/public.hpp"
 

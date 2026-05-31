@@ -117,10 +117,10 @@ namespace dynamics {
     AngularVelocity eul_dot_to_wB_BI(const EulerAngleRates& eul_dot, const EulerAngles& eul) {
         double theta = eul.theta();
         double phi = eul.phi();
-        return { eul_dot_to_wB_BI_T<double>(eul_dot.data, theta, phi) };
+        return { eul_dot_to_wB_BI_mat(theta, phi) * eul_dot.data };
     }
 
-    State_T<double> pack_rigid_body_state(const RigidBodyState& xN_t){
+    State_T<double> pack_state(const RigidBodyState& xN_t){
         TranslationalVelocity vB_BI = xN_t.v;
         AngularVelocity wB_BI = xN_t.w;
         EulerAngles eulIB;
@@ -138,8 +138,8 @@ namespace dynamics {
         };
     }
 
-    StateVector_T<double> unpack_rigid_body_state(const RigidBodyState& xN_t){
-        return unpack_state_T(pack_rigid_body_state(xN_t));
+    StateVector_T<double> unpack_state(const RigidBodyState& xN_t){
+        return unpack_state_T(pack_state(xN_t));
     }
 
     RigidBodyState step_rigid_body(const RigidBodyState& xB_BI_t, const Mass& mass, const InertiaTensor& J, const Wrench& WB_net_t){

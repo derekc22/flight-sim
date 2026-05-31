@@ -5,6 +5,7 @@
 #include "simulation/actuators/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/linearization/public.hpp"
+#include "simulation/operating/public.hpp"
 #include "simulation/estimation/kalman/private.hpp"
 
 namespace vehicles { struct Aircraft; } // forward declare
@@ -14,7 +15,7 @@ namespace estimation {
     struct ExtendedKalmanPolicyInput {
         dynamics::StateVector_T<double> yN_t;
         actuators::ActuatorInputsVector_T<double> ut_1;
-        autodiff::OperatingConditions conditions;
+        operating::OperatingConditions conditions;
         vehicles::Aircraft& aircraft;
     };
 

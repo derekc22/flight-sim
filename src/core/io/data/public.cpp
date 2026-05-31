@@ -12,9 +12,9 @@ namespace io {
     DataTable::DataTable(const Eigen::MatrixXd& d) : data(d), n_rows(static_cast<int>(data.rows())), n_cols(static_cast<int>(data.cols())) {}
 
     void DataTable::insert(int t, const Eigen::VectorXd& input) {
-        if (input.cols() > 1) { throw std::runtime_error("DataTablensert Eigen::Matrix passed for 'input', expected Eigen::Vector"); }
-        if (input.rows() > n_cols - 1) { throw std::runtime_error("DataTablensert Number of rows in 'input' exceeds number of columns in DataTable"); }
-        if (t > n_rows - 1) { throw std::runtime_error("DataTablensert Input index 't' exceeds number of rows in DataTable"); }
+        if (input.cols() > 1) { throw std::runtime_error("DataTable::insert Eigen::Matrix passed for 'input', expected Eigen::Vector"); }
+        if (input.rows() > n_cols - 1) { throw std::runtime_error("DataTable::insert Number of rows in 'input' exceeds number of columns in DataTable"); }
+        if (t > n_rows - 1) { throw std::runtime_error("DataTable::insert Input index 't' exceeds number of rows in DataTable"); }
 
         data(t, 0) = t * constants::dt;
         Eigen::Index cols_to_copy = data.cols() - 1;
@@ -75,8 +75,8 @@ namespace io {
             eul_DT->insert(t, eul_t.data);
             w_DT->insert(t, context.xN_t.w.data);
             v_DT->insert(t, context.xN_t.v.data);
-            u_surface_DT->insert(t, actuators::unpack_full_surface_actuator_inputs(context.u_surface));
-            u_propulsor_DT->insert(t, actuators::unpack_full_propulsor_actuator_inputs(context.u_propulsor));
+            u_surface_DT->insert(t, actuators::unpack_surface_actuator_inputs(context.u_surface));
+            u_propulsor_DT->insert(t, actuators::unpack_propulsor_actuator_inputs(context.u_propulsor));
             F_net_DT->insert(t, context.WB_net.F.data);
             M_net_DT->insert(t, context.WB_net.M.data);
             F_aero_DT->insert(t, context.WB_aero.F.data);
@@ -152,7 +152,7 @@ namespace io {
             }
 
             if (wind_bool) {
-                write_csv(windB_DT->data, data_dir_path, "windB");
+                write_csv(windB_DT->data, data_dir_path, "wind");
             }
         }
     }

@@ -49,8 +49,8 @@ namespace control {
         Eigen::MatrixXd B_aug = Eigen::MatrixXd::Zero(n + i, m);
         B_aug.block(0, 0, n, m) = input.B;
 
-        dynamics::StateVector_T<double> zN_t = dynamics::unpack_rigid_body_state(input.zN_t);
-        dynamics::StateVector_T<double> zN_t_des = unpack_linear_quadratic_control_setpoint(input.setpoint);
+        dynamics::StateVector_T<double> zN_t = dynamics::unpack_state(input.zN_t);
+        dynamics::StateVector_T<double> zN_t_des = unpack_state(input.setpoint);
 
         AugmentedStateVector zN_t_aug;
         zN_t_aug << zN_t, integral_new;
@@ -71,8 +71,8 @@ namespace control {
 
         // integral candidate
         IntegratedStateVector integral_new = integrate_state_err(
-            dynamics::unpack_rigid_body_state(input.zN_t), 
-            unpack_linear_quadratic_control_setpoint(input.setpoint)
+            dynamics::unpack_state(input.zN_t), 
+            unpack_state(input.setpoint)
         );
 
         actuators::ActuatorInputsVector_T<double> u_deviation = policy.step(

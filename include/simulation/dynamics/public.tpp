@@ -4,7 +4,7 @@
 namespace dynamics {
 
     template <typename T>
-    State_T<T> pack_state_vector(const StateVector_T<T>& z) {
+    State_T<T> pack_state_T(const StateVector_T<T>& z) {
         return { 
             .vx = z(0), 
             .vy = z(1), 
@@ -71,22 +71,4 @@ namespace dynamics {
         return wB_BI_to_eul_dot_mat_T<T>(theta, phi) * wB_BI;
     }
 
-    template <typename T>
-    constants::Matrix3_T<T> eul_dot_to_wB_BI_mat_T(const T& theta, const T& phi) {
-        constants::Matrix3_T<T> T_mat;
-        T_mat << T(1), T(0), -util::sin(theta),
-                 T(0), util::cos(phi), util::sin(phi) * util::cos(theta),
-                 T(0), -util::sin(phi), util::cos(phi) * util::cos(theta);
-        return T_mat;
-    }
-
-    template <typename T>
-    constants::Vector3_T<T> eul_dot_to_wB_BI_T(const constants::Vector3_T<T>& eul_dot, const T& theta, const T& phi) {
-        return eul_dot_to_wB_BI_mat_T<T>(theta, phi) * eul_dot;
-    }
-
-    template <typename T>
-    constants::Vector3_T<T> ddtB_to_ddtI_T(const constants::Vector3_T<T>& ddtB_v, const constants::Vector3_T<T>& v, const constants::Vector3_T<T>& w) {
-        return ddtB_v + w.cross(v);
-    }
 }

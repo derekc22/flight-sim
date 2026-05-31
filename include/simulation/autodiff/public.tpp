@@ -4,6 +4,7 @@
 #include "simulation/aerodynamics/public.hpp"
 #include "simulation/constants/public.hpp"
 #include "simulation/dynamics/public.hpp"
+#include "simulation/operating/public.hpp"
 #include "simulation/propulsion/public.hpp"
 #include "simulation/util/public.hpp"
 
@@ -39,7 +40,7 @@ namespace autodiff {
     }
 
     template <typename T>
-    dynamics::Wrench_T<T> compute_autodiff_net_wrench_T(const dynamics::State_T<T>& x, const dynamics::Twist_T<T>& twist, const actuators::ActuatorInputs_T<T>& u, const AutoDiffModel& model, const autodiff::OperatingConditions& conditions) {
+    dynamics::Wrench_T<T> compute_autodiff_net_wrench_T(const dynamics::State_T<T>& x, const dynamics::Twist_T<T>& twist, const actuators::ActuatorInputs_T<T>& u, const AutoDiffModel& model, const operating::OperatingConditions& conditions) {
         const actuators::SurfaceActuatorInputs_T<T> surface_actuator_inputs = build_surface_actuator_inputs_from_autodiff_T(u, model.fixed_actuator_inputs);
         const dynamics::Wrench_T<T> aero_wrench = aerodynamics::step_aero_forces_moments_T<T>(model.aerodynamic, model.structural, twist, conditions.static_atm_state, surface_actuator_inputs, conditions.windB);
 
@@ -53,7 +54,7 @@ namespace autodiff {
     }
 
     template <typename T>
-    dynamics::StateDot_T<T> compute_state_dot_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u, const AutoDiffModel& model, const autodiff::OperatingConditions& conditions) {
+    dynamics::StateDot_T<T> compute_state_dot_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u, const AutoDiffModel& model, const operating::OperatingConditions& conditions) {
         const dynamics::Twist_T<T> twist = dynamics::build_twist_from_state_T(x);
         const dynamics::Wrench_T<T> net_wrench = compute_autodiff_net_wrench_T<T>(x, twist, u, model, conditions);
         const constants::Vector3_T<T> v_dot = dynamics::ddtB_vB_BI_T<T>(twist.v, twist.w, model.structural.mass.data, net_wrench.F);
@@ -69,44 +70,6 @@ namespace autodiff {
             .r_dot = w_dot.z(),
             .phi_dot = eul_dot.x(),
             .theta_dot = eul_dot.y(),
-        };
-    }
-
-    template <typename T>
-    AutoDiffVariableVector_T<T> unpack_autodiff_variables_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u) {
-        AutoDiffVariableVector_T<T> out;
-        out << x.vx, x.vy, x.vz,
-               x.p, x.q, x.r,
-               x.phi, x.theta,
-               u.elevator_cmd, u.aileron_cmd, u.rudder_cmd,
-               u.front_propulsor_cmd, u.left_propulsor_cmd, u.right_propulsor_cmd;
-        return out;
-    }
-
-    template <typename T>
-    dynamics::State_T<T> pack_autodiff_state_T(const AutoDiffVariableVector_T<T>& z) {
-        return {
-            .vx = z(0),
-            .vy = z(1),
-            .vz = z(2),
-            .p = z(3),
-            .q = z(4),
-            .r = z(5),
-            .phi = z(6),
-            .theta = z(7),
-        };
-    }
-
-    template <typename T>
-    actuators::ActuatorInputs_T<T> pack_autodiff_actuator_inputs_T(const AutoDiffVariableVector_T<T>& z) {
-        return {
-            .elevator_cmd = z(8),
-            .aileron_cmd = z(9),
-            .rudder_cmd = z(10),
-
-            .front_propulsor_cmd = z(11),
-            .left_propulsor_cmd = z(12),
-            .right_propulsor_cmd = z(13),
         };
     }
 

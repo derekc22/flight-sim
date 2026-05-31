@@ -4,6 +4,7 @@
 #include "simulation/constants/public.hpp"
 #include "simulation/autodiff/public.hpp"
 #include "simulation/linearization/public.hpp"
+#include "simulation/operating/public.hpp"
 #include "simulation/estimation/kalman/extended_kalman/public.hpp"
 #include "simulation/estimation/kalman/private.hpp"
 
@@ -14,7 +15,7 @@ namespace estimation {
     std::tuple<KalmanState, linearization::OutputJacobian> ExtendedKalmanPolicy::predict(const ExtendedKalmanPolicyInput& input) {
         KalmanState prev = state.value();
 
-        dynamics::State_T<double> x = dynamics::pack_state_vector(prev.z);
+        dynamics::State_T<double> x = dynamics::pack_state_T(prev.z);
         actuators::ActuatorInputs_T<double> u = actuators::pack_actuator_inputs_T<double>(input.ut_1);
         autodiff::AutoDiffModel model = autodiff::build_autodiff_model(input.aircraft);
 
@@ -23,7 +24,7 @@ namespace estimation {
         dynamics::StateVector_T<double> zN_t_bar = prev.z + dynamics::unpack_state_dot_T(x_dot) * constants::dt;
 
         // A -> Ft
-        autodiff::OperatingPoint operating_point{ .state = x, .input = u };
+        operating::OperatingPoint operating_point{ .state = x, .input = u };
         linearization::LocalLinearization lin_sol = linearization::linearize_operating_point(input.aircraft, operating_point, input.conditions);
         linearization::StateJacobian Ft = linearization::discretize_euler(lin_sol).A;
 

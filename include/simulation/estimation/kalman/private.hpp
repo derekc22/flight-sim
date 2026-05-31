@@ -15,6 +15,6 @@ namespace estimation {
         Eigen::MatrixXd R;  // process noise covariance matrix
     };
 
-    dynamics::RigidBodyState pack_kalman_state_estimate(const dynamics::RigidBodyState& yN_t, const dynamics::StateVector_T<double>& zN_t);
+    dynamics::RigidBodyState make_kalman_state_estimate(const dynamics::RigidBodyState& yN_t, const dynamics::StateVector_T<double>& zN_t);
 
 }
