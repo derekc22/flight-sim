@@ -4,16 +4,16 @@
 namespace dynamics {
 
     template <typename T>
-    State_T<T> pack_state_vector(const StateVector_T<T>& z) {
-        return { 
-            .vx = z(0), 
-            .vy = z(1), 
-            .vz = z(2), 
-            .p = z(3), 
-            .q = z(4), 
-            .r = z(5), 
-            .phi = z(6), 
-            .theta = z(7) 
+    State_T<T> pack_state_T(const StateVector_T<T>& z_vec) {
+        return {
+            .vx = z_vec(0),
+            .vy = z_vec(1),
+            .vz = z_vec(2),
+            .p = z_vec(3),
+            .q = z_vec(4),
+            .r = z_vec(5),
+            .phi = z_vec(6),
+            .theta = z_vec(7)
         };
     }
 
@@ -33,6 +33,14 @@ namespace dynamics {
                x_dot.p_dot, x_dot.q_dot, x_dot.r_dot,
                x_dot.phi_dot, x_dot.theta_dot;
         return out;
+    }
+
+    template <typename T>
+    Twist_T<T> build_twist_from_state_T(const State_T<T>& x) {
+        Twist_T<T> twist;
+        twist.v << x.vx, x.vy, x.vz;
+        twist.w << x.p, x.q, x.r;
+        return twist;
     }
 
     template <typename T>
@@ -64,21 +72,12 @@ namespace dynamics {
     }
 
     template <typename T>
-    constants::Matrix3_T<T> eul_dot_to_wB_BI_mat_T(const T& theta, const T& phi) {
-        constants::Matrix3_T<T> T_mat;
-        T_mat << T(1), T(0), -util::sin(theta),
-                 T(0), util::cos(phi), util::sin(phi) * util::cos(theta),
-                 T(0), -util::sin(phi), util::cos(phi) * util::cos(theta);
-        return T_mat;
+    constants::Vector3_T<T> gB_T(const T& phi, const T& theta) {
+        constants::Vector3_T<T> gB;
+        gB << -T(constants::g_earth) * util::sin(theta),
+               T(constants::g_earth) * util::sin(phi) * util::cos(theta),
+               T(constants::g_earth) * util::cos(phi) * util::cos(theta);
+        return gB;
     }
 
-    template <typename T>
-    constants::Vector3_T<T> eul_dot_to_wB_BI_T(const constants::Vector3_T<T>& eul_dot, const T& theta, const T& phi) {
-        return eul_dot_to_wB_BI_mat_T<T>(theta, phi) * eul_dot;
-    }
-
-    template <typename T>
-    constants::Vector3_T<T> ddtB_to_ddtI_T(const constants::Vector3_T<T>& ddtB_v, const constants::Vector3_T<T>& v, const constants::Vector3_T<T>& w) {
-        return ddtB_v + w.cross(v);
-    }
 }

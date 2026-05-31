@@ -12,9 +12,15 @@
 #include "simulation/frames/public.hpp"
 #include "simulation/geography/public.hpp"
 #include "simulation/vehicles/public.hpp"
-#include "simulation/transforms/public.hpp"
 #include "simulation/constants/public.hpp"
 #include "simulation/util/public.hpp"
+#include "simulation/structural/public.hpp"
+#include "simulation/control/public.hpp"
+#include "simulation/estimation/public.hpp"
+#include "simulation/actuators/public.hpp"
+#include "simulation/operating/public.hpp"
+#include "simulation/avionics/public.hpp"
+#include "simulation/guidance/public.hpp"
 
 
 
@@ -773,10 +779,6 @@ namespace vehicles {
             << "-------------------------------------------------------------------------------" << "\n\n";
     }
 
-
     // void StepOptions::_clear() noexcept { *this = StepOptions{}; }
-
-
-
 
 }

@@ -12,9 +12,9 @@ namespace io {
     DataTable::DataTable(const Eigen::MatrixXd& d) : data(d), n_rows(static_cast<int>(data.rows())), n_cols(static_cast<int>(data.cols())) {}
 
     void DataTable::insert(int t, const Eigen::VectorXd& input) {
-        if (input.cols() > 1) { throw std::runtime_error("DataTablensert Eigen::Matrix passed for 'input', expected Eigen::Vector"); }
-        if (input.rows() > n_cols - 1) { throw std::runtime_error("DataTablensert Number of rows in 'input' exceeds number of columns in DataTable"); }
-        if (t > n_rows - 1) { throw std::runtime_error("DataTablensert Input index 't' exceeds number of rows in DataTable"); }
+        if (input.cols() > 1) { throw std::runtime_error("DataTable::insert Eigen::Matrix passed for 'input', expected Eigen::Vector"); }
+        if (input.rows() > n_cols - 1) { throw std::runtime_error("DataTable::insert Number of rows in 'input' exceeds number of columns in DataTable"); }
+        if (t > n_rows - 1) { throw std::runtime_error("DataTable::insert Input index 't' exceeds number of rows in DataTable"); }
 
         data(t, 0) = t * constants::dt;
         Eigen::Index cols_to_copy = data.cols() - 1;
@@ -69,14 +69,14 @@ namespace io {
 
         if (data_bool) {
             dynamics::EulerAngles eul_t;
-            eul_t.set(context.xN_t.q);
+            eul_t.set(context.Xt.q);
 
-            p_DT->insert(t, context.xN_t.p.data);
+            p_DT->insert(t, context.Xt.p.data);
             eul_DT->insert(t, eul_t.data);
-            w_DT->insert(t, context.xN_t.w.data);
-            v_DT->insert(t, context.xN_t.v.data);
-            u_surface_DT->insert(t, actuators::unpack_full_surface_actuator_inputs(context.u_surface));
-            u_propulsor_DT->insert(t, actuators::unpack_full_propulsor_actuator_inputs(context.u_propulsor));
+            w_DT->insert(t, context.Xt.w.data);
+            v_DT->insert(t, context.Xt.v.data);
+            u_surface_DT->insert(t, actuators::unpack_surface_actuator_inputs(context.u_surface));
+            u_propulsor_DT->insert(t, actuators::unpack_propulsor_actuator_inputs(context.u_propulsor));
             F_net_DT->insert(t, context.WB_net.F.data);
             M_net_DT->insert(t, context.WB_net.M.data);
             F_aero_DT->insert(t, context.WB_aero.F.data);
@@ -92,20 +92,20 @@ namespace io {
 
             if (sensor_bool) {
                 dynamics::EulerAngles eul_meas_t;
-                eul_meas_t.set(context.yN_t.q);
-                p_meas_DT->insert(t, context.yN_t.p.data);
+                eul_meas_t.set(context.Yt.q);
+                p_meas_DT->insert(t, context.Yt.p.data);
                 eul_meas_DT->insert(t, eul_meas_t.data);
-                w_meas_DT->insert(t, context.yN_t.w.data);
-                v_meas_DT->insert(t, context.yN_t.v.data);
+                w_meas_DT->insert(t, context.Yt.w.data);
+                v_meas_DT->insert(t, context.Yt.v.data);
             }
 
             if (estimation_bool) {
                 dynamics::EulerAngles eul_est_t;
-                eul_est_t.set(context.zN_t.q);
-                p_est_DT->insert(t, context.zN_t.p.data);
+                eul_est_t.set(context.Zt.q);
+                p_est_DT->insert(t, context.Zt.p.data);
                 eul_est_DT->insert(t, eul_est_t.data);
-                w_est_DT->insert(t, context.zN_t.w.data);
-                v_est_DT->insert(t, context.zN_t.v.data);
+                w_est_DT->insert(t, context.Zt.w.data);
+                v_est_DT->insert(t, context.Zt.v.data);
             }
 
             if (wind_bool) {
@@ -152,7 +152,7 @@ namespace io {
             }
 
             if (wind_bool) {
-                write_csv(windB_DT->data, data_dir_path, "windB");
+                write_csv(windB_DT->data, data_dir_path, "wind");
             }
         }
     }

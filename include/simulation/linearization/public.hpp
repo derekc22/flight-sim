@@ -2,9 +2,9 @@
 #include <Eigen/Dense>
 #include <string>
 #include "simulation/constants/public.hpp"
-#include "simulation/trim/public.hpp"
+#include "simulation/operating/public.hpp"
 
-namespace vehicles { struct Aircraft; }
+namespace vehicles { struct Aircraft; } // forward declare
 
 namespace linearization {
 

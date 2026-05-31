@@ -22,7 +22,7 @@ namespace control {
         return { u_surface, u_propulsor };
     }
 
-    dynamics::StateVector_T<double> unpack_linear_quadratic_control_setpoint(const guidance::LinearQuadraticSetpoint& setpoint){
+    dynamics::StateVector_T<double> unpack_state(const guidance::LinearQuadraticSetpoint& setpoint){
         dynamics::TranslationalVelocity vB_BI = setpoint.vB_BI;
         dynamics::AngularVelocity wB_BI = setpoint.wB_BI;
         dynamics::EulerAngles eulIB = setpoint.eulIB;

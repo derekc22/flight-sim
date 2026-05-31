@@ -13,28 +13,14 @@
 #include "simulation/trim/private.hpp"
 #include "simulation/util/public.hpp"
 #include "simulation/vehicles/public.hpp"
+#include "simulation/autodiff/public.hpp"
+#include "simulation/operating/public.hpp"
 
 namespace trim {
 
-    TrimModel build_trim_model(vehicles::Aircraft& aircraft) {
-        actuators::PropulsorActuators& propulsor_actuators = aircraft.actuator_properties.propulsor_actuators;
-        actuators::ActuatorLimits_T<double> actuator_limits = actuators::pack_actuator_limits(aircraft.actuator_properties.surface_actuators, propulsor_actuators);
-
-        return {
-            .structural = aircraft.structural_properties,
-            .aerodynamic = aircraft.aerodynamic_properties,
-            .propulsor_actuators = propulsor_actuators,
-            .actuator_limits = actuator_limits,
-            .fixed_actuator_inputs = actuators::FixedActuatorInputs{
-                .flap = aircraft.operating_properties.fixed_actuator_inputs.flap,
-                .spoiler = aircraft.operating_properties.fixed_actuator_inputs.spoiler,
-            }
-        };
-    }
-
     TrimSolution inspect_trim(vehicles::Aircraft& aircraft, const atmospheric::Wind& wind) {
 
-        TrimModel model = build_trim_model(aircraft);
+        autodiff::AutoDiffModel model = autodiff::build_autodiff_model(aircraft);
         const actuators::ActuatorLimits_T actuator_limits = model.actuator_limits;
         const actuators::ActuatorInputs_T actuator_limits_max = model.actuator_limits.limit_max;
         const actuators::ActuatorInputs_T actuator_limits_min = model.actuator_limits.limit_min;
@@ -178,23 +164,23 @@ namespace trim {
     }
 
 
-    std::pair<dynamics::RigidBodyState, aerodynamics::AerodynamicState> update_state_from_trim(const dynamics::RigidBodyState& xN_t, const TrimSolution& trim_sol) {
+    std::pair<dynamics::RigidBodyState, aerodynamics::AerodynamicState> update_state_from_trim(const dynamics::RigidBodyState& Xt, const TrimSolution& trim_sol) {
             dynamics::EulerAngles eul_curr;
-            eul_curr.set(xN_t.q);
+            eul_curr.set(Xt.q);
             dynamics::EulerAngles eul_trim{ Eigen::Vector3d(eul_curr.psi(), trim_sol.operating_point.state.theta, trim_sol.operating_point.state.phi) };
             dynamics::OrientationQuaternion qNB_trim;
             qNB_trim.set(eul_trim);
 
-            dynamics::RigidBodyState xN_t_trim = {
-                .p = xN_t.p,
+            dynamics::RigidBodyState Xt_trim = {
+                .p = Xt.p,
                 .v = dynamics::TranslationalVelocity{ Eigen::Vector3d(trim_sol.operating_point.state.vx, trim_sol.operating_point.state.vy, trim_sol.operating_point.state.vz) },
                 .q = qNB_trim,
                 .w = dynamics::AngularVelocity{ Eigen::Vector3d(trim_sol.operating_point.state.p, trim_sol.operating_point.state.q, trim_sol.operating_point.state.r) },
             };
 
-            aerodynamics::AerodynamicState ads_t_trim = aerodynamics::compute_aerodynamic_state(xN_t_trim, trim_sol.conditions.windB);
+            aerodynamics::AerodynamicState aero_state_t_trim = aerodynamics::compute_aerodynamic_state(Xt_trim, trim_sol.conditions.windB);
 
-        return { xN_t_trim, ads_t_trim };
+        return { Xt_trim, aero_state_t_trim };
     }
 
     control::ControlOutput set_control_inputs_from_trim(const TrimSolution& trim_sol){

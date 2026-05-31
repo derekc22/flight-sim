@@ -5,10 +5,11 @@
 #include "simulation/constants/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/linearization/public.hpp"
-#include "simulation/trim/public.hpp"
+#include "simulation/autodiff/public.hpp"
+#include "simulation/operating/public.hpp"
 #include "simulation/util/cppad/public.hpp"
 #include "simulation/vehicles/public.hpp"
-#include "simulation/operating/public.hpp"
+
 
 namespace linearization {
 
@@ -41,30 +42,21 @@ namespace linearization {
     }
 
     LocalLinearization linearize_operating_point(vehicles::Aircraft& aircraft, const operating::OperatingPoint& operating_point, const operating::OperatingConditions& conditions) {
-        const trim::TrimModel model{
-            .structural = aircraft.structural_properties,
-            .aerodynamic = aircraft.aerodynamic_properties,
-            .propulsor_actuators = aircraft.actuator_properties.propulsor_actuators,
-            .actuator_limits = actuators::pack_actuator_limits(aircraft.actuator_properties.surface_actuators, aircraft.actuator_properties.propulsor_actuators),
-            .fixed_actuator_inputs = actuators::FixedActuatorInputs{
-                .flap = aircraft.operating_properties.fixed_actuator_inputs.flap,
-                .spoiler = aircraft.operating_properties.fixed_actuator_inputs.spoiler,
-            },
-        };
+        const autodiff::AutoDiffModel model = autodiff::build_autodiff_model(aircraft);
 
-        const trim::TrimVariablesVector_T<double> z = trim::unpack_trim_variables_T<double>(operating_point.state, operating_point.input);
-        CppAD::eigen_vector<CppAD::AD<double>> z_t = util::start_autodiff_tracking(z);
+        const operating::StateInputVector_T<double> z = operating::unpack_state_input_T<double>(operating_point.state, operating_point.input);
+        CppAD::eigen_vector<CppAD::AD<double>> z_tracked = util::start_autodiff_tracking(z);
 
-        const trim::TrimVariablesVector_T<CppAD::AD<double>> z_vec = util::eigen_vector_from_cppad_vector<CppAD::AD<double>, trim::trim_variable_dim>(z_t);
-        const dynamics::State_T<CppAD::AD<double>> x_t = trim::pack_trim_state_T<CppAD::AD<double>>(z_vec);
-        const actuators::ActuatorInputs_T<CppAD::AD<double>> u_t = trim::pack_trim_actuator_inputs_T<CppAD::AD<double>>(z_vec);
+        const operating::StateInputVector_T<CppAD::AD<double>> z_vec = util::eigen_vector_from_cppad_vector<CppAD::AD<double>, constants::state_input_dim>(z_tracked);
+        const dynamics::State_T<CppAD::AD<double>> xt = operating::pack_state_T<CppAD::AD<double>>(z_vec);
+        const actuators::ActuatorInputs_T<CppAD::AD<double>> ut = operating::pack_actuator_inputs_T<CppAD::AD<double>>(z_vec);
         
-        const dynamics::StateDot_T<CppAD::AD<double>> state_dot = trim::compute_trim_state_dot_T<CppAD::AD<double>>(x_t, u_t, model, conditions);
+        const dynamics::StateDot_T<CppAD::AD<double>> state_dot = autodiff::compute_state_dot_T<CppAD::AD<double>>(xt, ut, model, conditions);
         const dynamics::StateDotVector_T<CppAD::AD<double>> x_dot_vec = dynamics::unpack_state_dot_T(state_dot);
-        const CppAD::eigen_vector<CppAD::AD<double>> x_dot_t = util::cppad_vector_from_eigen_vector(x_dot_vec);
+        const CppAD::eigen_vector<CppAD::AD<double>> x_dot_tracked = util::cppad_vector_from_eigen_vector(x_dot_vec);
         
-        CppAD::ADFun<double> f(z_t, x_dot_t);
-        const Eigen::Matrix<double, constants::state_dim, trim::trim_variable_dim> jac_map = util::compute_jac<constants::state_dim, trim::trim_variable_dim>(f, z);
+        CppAD::ADFun<double> f(z_tracked, x_dot_tracked);
+        const Eigen::Matrix<double, constants::state_dim, constants::state_input_dim> jac_map = util::compute_jac<constants::state_dim, constants::state_input_dim>(f, z);
 
         LocalLinearization out;
         out.A = jac_map.leftCols<constants::state_dim>();

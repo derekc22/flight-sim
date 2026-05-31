@@ -20,9 +20,9 @@ namespace io {
     };
 
     struct DataContext {
-        const dynamics::RigidBodyState& xN_t;
-        const dynamics::RigidBodyState& yN_t;
-        const dynamics::RigidBodyState& zN_t;
+        const dynamics::RigidBodyState& Xt;
+        const dynamics::RigidBodyState& Yt;
+        const dynamics::RigidBodyState& Zt;
         const actuators::SurfaceActuatorInputs_T<double>& u_surface;
         const actuators::PropulsorActuatorInputs_T<double>& u_propulsor;
         const dynamics::Wrench& WB_net;

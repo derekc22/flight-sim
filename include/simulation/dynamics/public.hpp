@@ -116,6 +116,27 @@ namespace dynamics {
         Moment M;
     };
 
+    struct VerticalSpeed {
+        double data;
+    };
+
+    struct SpecificForce {
+        Eigen::Vector3d data;
+    };
+
+    struct Gravity {
+        Eigen::Vector3d data;
+    };
+
+    struct CenterOfGravity {
+        Eigen::Vector3d data;
+    };
+
+    struct Twist {
+        TranslationalVelocity v;
+        AngularVelocity w;
+    };
+
     template <typename T>
     using StateVector_T = Eigen::Matrix<T, constants::state_dim, 1>;
 
@@ -151,63 +172,6 @@ namespace dynamics {
     };
 
     template <typename T>
-    StateVector_T<T> unpack_state_T(const State_T<T>& x);
-
-    template <typename T>
-    State_T<T> pack_state_vector(const StateVector_T<T>& z);
-
-    template <typename T>
-    StateDotVector_T<T> unpack_state_dot_T(const StateDot_T<T>& x_dot);
-
-    template <typename T>
-    constants::Vector3_T<T> ddtB_vB_BI_T(const constants::Vector3_T<T>& vB, const constants::Vector3_T<T>& wB_BI, double mass, const constants::Vector3_T<T>& FB_net);
-
-    template <typename T>
-    constants::Vector3_T<T> ddtB_wB_BI_T(const constants::Vector3_T<T>& wB_BI, const Eigen::Matrix3d& J, const constants::Vector3_T<T>& MB_net);
-
-    template <typename T>
-    constants::Vector3_T<T> wB_BI_to_eul_dot_T(const constants::Vector3_T<T>& wB_BI, const T& theta, const T& phi);
-
-    template <typename T>
-    constants::Vector3_T<T> eul_dot_to_wB_BI_T(const constants::Vector3_T<T>& eul_dot, const T& theta, const T& phi);
-
-    template <typename T>
-    constants::Matrix3_T<T> eul_dot_to_wB_BI_mat_T(const T& theta, const T& phi);
-
-    template <typename T>
-    constants::Matrix3_T<T> wB_BI_to_eul_dot_mat_T(const T& theta, const T& phi);
-
-    template <typename T>
-    constants::Vector3_T<T> ddtB_to_ddtI_T(const constants::Vector3_T<T>& ddtB_v, const constants::Vector3_T<T>& v, const constants::Vector3_T<T>& w);
-
-    Position trans_kin(const Position& xt, const TranslationalVelocity& xt_dot, const TranslationalAcceleration& xt_ddot);
-    OrientationQuaternion quat_kin(const OrientationQuaternion& qIB_t, const AngularVelocity& wB_BI_t);
-    AngularVelocity CIB_dot_to_wB_BI(const OrientationMatrixRate& CIB_dot, const OrientationMatrix& CIB);
-    AngularVelocity qIB_dot_to_wB_BI(const OrientationQuaternionRate& qIB_dot, const OrientationQuaternion& qIB);
-    EulerAngleRates wB_BI_to_eul_dot(const AngularVelocity& wB_BI, const EulerAngles& eul);
-
-    struct VerticalSpeed {
-        double data;
-    };
-
-    struct SpecificForce {
-        Eigen::Vector3d data;
-    };
-
-    struct Gravity {
-        Eigen::Vector3d data;
-    };
-
-    struct CenterOfGravity {
-        Eigen::Vector3d data;
-    };
-
-    struct Twist {
-        TranslationalVelocity v;
-        AngularVelocity w;
-    };
-
-    template <typename T>
     struct Twist_T {
         constants::Vector3_T<T> v = constants::Zero3_T<T>;
         constants::Vector3_T<T> w = constants::Zero3_T<T>;
@@ -219,18 +183,55 @@ namespace dynamics {
         constants::Vector3_T<T> M = constants::Zero3_T<T>;
     };
 
+    template <typename T>
+    StateVector_T<T> unpack_state_T(const State_T<T>& x);
+
+    template <typename T>
+    State_T<T> pack_state_T(const StateVector_T<T>& z_vec);
+
+    template <typename T>
+    StateDotVector_T<T> unpack_state_dot_T(const StateDot_T<T>& x_dot);
+
+    template <typename T>
+    Twist_T<T> build_twist_from_state_T(const State_T<T>& x);
+
+    State_T<double> pack_state(const RigidBodyState& Xt);
+
+    StateVector_T<double> unpack_state(const RigidBodyState& Xt);
+
+    RigidBodyState step_rigid_body(const RigidBodyState& XB_BI_t, const Mass& mass, const InertiaTensor& J, const Wrench& WB_net_t);
+
     /** @warning The parent of F must be an inertial frame: ECEFFrame or NEDFrameECEF */
     RigidBodyState compute_rigid_body_state(const frames::Frame& F);
+
+    template <typename T>
+    constants::Vector3_T<T> ddtB_vB_BI_T(const constants::Vector3_T<T>& vB, const constants::Vector3_T<T>& wB_BI, double mass, const constants::Vector3_T<T>& FB_net);
+
+    template <typename T>
+    constants::Vector3_T<T> ddtB_wB_BI_T(const constants::Vector3_T<T>& wB_BI, const Eigen::Matrix3d& J, const constants::Vector3_T<T>& MB_net);
+
+    template <typename T>
+    constants::Vector3_T<T> wB_BI_to_eul_dot_T(const constants::Vector3_T<T>& wB_BI, const T& theta, const T& phi);
+
+    template <typename T>
+    constants::Matrix3_T<T> wB_BI_to_eul_dot_mat_T(const T& theta, const T& phi);
+
+    template <typename T>
+    constants::Vector3_T<T> gB_T(const T& phi, const T& theta);
+
+    Position trans_kin(const Position& xt, const TranslationalVelocity& xt_dot, const TranslationalAcceleration& xt_ddot);
+
+    OrientationQuaternion quat_kin(const OrientationQuaternion& qIB_t, const AngularVelocity& wB_BI_t);
+
+    AngularVelocity CIB_dot_to_wB_BI(const OrientationMatrixRate& CIB_dot, const OrientationMatrix& CIB);
+
+    AngularVelocity qIB_dot_to_wB_BI(const OrientationQuaternionRate& qIB_dot, const OrientationQuaternion& qIB);
+
+    EulerAngleRates wB_BI_to_eul_dot(const AngularVelocity& wB_BI, const EulerAngles& eul);
 
     TranslationalVelocity trans_kin_vel(const TranslationalVelocity& xt_dot, const TranslationalAcceleration& xt_ddot);
 
     AngularVelocity eul_dot_to_wB_BI(const EulerAngleRates& eul_dot, const EulerAngles& eul);
-
-    State_T<double> pack_rigid_body_state(const RigidBodyState& xN_t);
-
-    StateVector_T<double> unpack_rigid_body_state(const RigidBodyState& xN_t);
-
-    RigidBodyState step_rigid_body(const RigidBodyState& xB_BI_t, const Mass& mass, const InertiaTensor& J, const Wrench& WB_net_t);
 
 }
 #include "simulation/dynamics/public.tpp"

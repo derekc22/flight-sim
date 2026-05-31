@@ -7,12 +7,12 @@
 
 namespace guidance {
 
-    GuidanceVector unpack_rigid_body_state_guidance(const dynamics::RigidBodyState& xN_t){
+    GuidanceSetpointVector unpack_guidance_setpoint(const dynamics::RigidBodyState& Xt) {
         dynamics::EulerAngles eulIB;
-        eulIB.set(xN_t.q);
+        eulIB.set(Xt.q);
 
-        GuidanceVector out;
-        out.head<constants::state_dim>() = dynamics::unpack_rigid_body_state(xN_t);
+        GuidanceSetpointVector out;
+        out.head<constants::state_dim>() = dynamics::unpack_state(Xt);
         out(constants::state_dim) = eulIB.psi();
 
         return out;
@@ -33,7 +33,7 @@ namespace guidance {
 
             case TrajectoryType::Interpolated: {
                 if (tf <= 1) { throw std::runtime_error("GuidanceProperties::step: tf <= 1 for interpolated trajectory"); }
-                GuidanceVector setpoint_t = ((trajectory.data.row(1) - trajectory.data.row(0)) * (static_cast<double>(t) / (tf - 1)) + trajectory.data.row(0)).transpose();
+                GuidanceSetpointVector setpoint_t = ((trajectory.data.row(1) - trajectory.data.row(0)) * (static_cast<double>(t) / (tf - 1)) + trajectory.data.row(0)).transpose();
                 return pack_guidance_setpoint(setpoint_t);
             }
             break;

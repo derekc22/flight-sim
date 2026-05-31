@@ -7,7 +7,11 @@
 namespace dynamics {
 
     Eigen::Matrix3d eul_dot_to_wB_BI_mat(double theta, double phi){
-        return eul_dot_to_wB_BI_mat_T<double>(theta, phi);
+        Eigen::Matrix3d T_mat;
+        T_mat << 1.0, 0.0, -util::sin(theta),
+                 0.0, util::cos(phi), util::sin(phi) * util::cos(theta),
+                 0.0, -util::sin(phi), util::cos(phi) * util::cos(theta);
+        return T_mat;
     }
 
     Eigen::Matrix3d wB_BI_to_eul_dot_mat(double theta, double phi) {
@@ -82,7 +86,7 @@ namespace dynamics {
     }
 
     Eigen::Vector3d ddtB_to_ddtI(const Eigen::Vector3d& ddtB_v, const Eigen::Vector3d& v, const Eigen::Vector3d& w){
-        return ddtB_to_ddtI_T<double>(ddtB_v, v, w);
+        return ddtB_v + w.cross(v);
     }
 
 

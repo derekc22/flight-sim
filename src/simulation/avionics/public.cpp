@@ -42,54 +42,54 @@ namespace avionics {
 
 
     dynamics::RigidBodyState get_state_from_avionics(
-        const dynamics::RigidBodyState& xN_t, 
-        const aerodynamics::AerodynamicState& ads_t, 
+        const dynamics::RigidBodyState& Xt,
+        const aerodynamics::AerodynamicState& aero_state_t, 
         const atmospheric::StaticAtmosphericState& static_atm_t, 
-        const geography::GeographicState& gps_t,
+        const geography::GeographicState& geo_state_t,
         const dynamics::Mass& mass,
         const atmospheric::Wind & wind,
         const dynamics::Wrench& WB_net,
         AvionicsProperties& avionics_properties
     ) {
 
-        atmospheric::MachNumber Mach = atmospheric::mps_to_mach(xN_t.v, static_atm_t.T);
+        atmospheric::MachNumber Mach = atmospheric::mps_to_mach(Xt.v, static_atm_t.T);
         atmospheric::StagnationAtmosphericState stagnation_atmo_t = atmospheric::static_to_stagnation(static_atm_t, Mach);
-        dynamics::TranslationalVelocity vI_BI{ xN_t.q.data.conjugate() * xN_t.v.data };
-        double alt_dot = xN_t.p.data.normalized().dot(vI_BI.data);
+        dynamics::TranslationalVelocity vI_BI{ Xt.q.data.conjugate() * Xt.v.data };
+        double alt_dot = Xt.p.data.normalized().dot(vI_BI.data);
 
         dynamics::EulerAngles eul;
-        eul.set(xN_t.q);
+        eul.set(Xt.q);
 
         avionics::MeasurementGroundTruth meas_gt = {
-            .alpha = ads_t.alpha,
-            .accelB = dynamics::TranslationalAcceleration{ WB_net.F.data / mass.data - geography::gB(xN_t.p, xN_t.q).data },
-            .wB_BI = xN_t.w,
+            .alpha = aero_state_t.alpha,
+            .accelB = dynamics::TranslationalAcceleration{ WB_net.F.data / mass.data - geography::gB(Xt.p, Xt.q).data },
+            .wB_BI = Xt.w,
             .P0 = stagnation_atmo_t.P0,
             .P = static_atm_t.P,
             .T0 = stagnation_atmo_t.T0,
-            .pI_BI = xN_t.p,
-            .vB_BI = xN_t.v,
+            .pI_BI = Xt.p,
+            .vB_BI = Xt.v,
 
             .T = static_atm_t.T,
             .Mach = Mach,
             .heading = geography::Heading{ eul.psi() },
-            .qIB = xN_t.q,
-            .Vinf = ads_t.Vinf,
-            .alt_BE = gps_t.alt,
+            .qIB = Xt.q,
+            .Vinf = aero_state_t.Vinf,
+            .alt_BE = geo_state_t.alt,
             .alt_dot = dynamics::VerticalSpeed{ alt_dot },
             .rho = static_atm_t.rho,
         };
         
         MeasurementCache cache = avionics_properties.step(meas_gt);
 
-        dynamics::RigidBodyState yN_t = { 
+        dynamics::RigidBodyState Yt = {
             .p = cache.sensors.pI_BI_gnss,
             .v = cache.sensors.vB_BI_gnss,
             .q = cache.computers.qIB,
             .w = cache.sensors.wB_BI
         };
 
-        return yN_t;
+        return Yt;
     }
 
 }

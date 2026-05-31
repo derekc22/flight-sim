@@ -45,10 +45,10 @@ namespace aerodynamics {
         return aerodynamics::compute_aerodynamic_state(dynamics::compute_rigid_body_state(F), windB);
     }
 
-    AerodynamicWrench step_aero_forces_moments(const AerodynamicProperties& aerodynamic_properties, const structural::StructuralProperties& structural_properties, const dynamics::RigidBodyState& rigid_body_state, const atmospheric::StaticAtmosphericState& static_atm_state, const actuators::SurfaceActuatorInputs_T<double>& u, const atmospheric::Wind& windB) {
+    AerodynamicWrench step_aero_forces_moments(const AerodynamicProperties& aerodynamic_properties, const structural::StructuralProperties& structural_properties, const dynamics::RigidBodyState& X, const atmospheric::StaticAtmosphericState& static_atm_state, const actuators::SurfaceActuatorInputs_T<double>& u, const atmospheric::Wind& windB) {
         const dynamics::Twist_T<double> twist{
-            .v = rigid_body_state.v.data,
-            .w = rigid_body_state.w.data,
+            .v = X.v.data,
+            .w = X.w.data,
         };
 
         const dynamics::Wrench_T<double> loads = step_aero_forces_moments_T<double>(aerodynamic_properties, structural_properties, twist, static_atm_state, u, windB);
@@ -56,12 +56,12 @@ namespace aerodynamics {
         return { dynamics::Force{ loads.F }, dynamics::Moment{ loads.M } };
     }
 
-    AerodynamicState compute_aerodynamic_state(const dynamics::RigidBodyState& rigid_body_state, const atmospheric::Wind& windB) {
-        const dynamics::Twist_T<double> twist{ .v = rigid_body_state.v.data, .w = rigid_body_state.w.data };
+    AerodynamicState compute_aerodynamic_state(const dynamics::RigidBodyState& X, const atmospheric::Wind& windB) {
+        const dynamics::Twist_T<double> twist{ .v = X.v.data, .w = X.w.data };
 
-        const AerodynamicState_T<double> ads = compute_aerodynamic_state_T<double>(twist, windB);
+        const AerodynamicState_T<double> aero_state = compute_aerodynamic_state_T<double>(twist, windB);
 
-        return { FreeStreamVelocity{ ads.Vinf }, AngleOfAttack{ ads.alpha }, SideslipAngle{ ads.beta } };
+        return { FreeStreamVelocity{ aero_state.Vinf }, AngleOfAttack{ aero_state.alpha }, SideslipAngle{ aero_state.beta } };
     }
 
     dynamics::OrientationMatrix CBS(const aerodynamics::AngleOfAttack& alpha) {

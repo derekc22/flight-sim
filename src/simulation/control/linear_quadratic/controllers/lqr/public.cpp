@@ -11,13 +11,13 @@ namespace control {
     {};
 
     LinearQuadraticPolicyInput LinearQuadraticRegulator::make_linear_quadratic_policy_input(const LinearQuadraticControllerInput& input){
-        dynamics::RigidBodyState zN_t = input.zN_t;
+        dynamics::RigidBodyState Zt = input.Zt;
         guidance::LinearQuadraticSetpoint setpoint = input.setpoint;
 
-        dynamics::StateVector_T<double> zN_t_deviation = dynamics::unpack_rigid_body_state(zN_t) - unpack_linear_quadratic_control_setpoint(setpoint);
+        dynamics::StateVector_T<double> zt_vec_deviation = dynamics::unpack_state(Zt) - unpack_state(setpoint);
 
         return {
-            .zN_t = zN_t_deviation,
+            .zt_vec = zt_vec_deviation,
             .A = input.A,
             .B = input.B
         };

@@ -13,7 +13,7 @@
 namespace structural {
 
     StructuralProperties::StructuralProperties(const std::vector<Geometry>& g) : geometries(g) {
-        Mass = dynamics::Mass{ compute_Mass() };
+        mass = dynamics::Mass{ compute_mass() };
         CG = dynamics::CenterOfGravity{ compute_CG() };
         J = dynamics::InertiaTensor{ compute_J() };
         geometryIDs = build_IDs();
@@ -25,12 +25,12 @@ namespace structural {
         return geometries[it->second];
     }
 
-    double StructuralProperties::compute_Mass() {
+    double StructuralProperties::compute_mass() {
         double m = 0.0;
         for (const Geometry& geom : geometries) {
             m += geom.mass;
         }
-        if (m < constants::eps) { throw std::runtime_error("structural::StructuralProperties::compute_Mass: Mass must be positive"); }
+        if (m < constants::eps) { throw std::runtime_error("structural::StructuralProperties::compute_mass: mass must be positive"); }
         return m;
     }
 
@@ -41,7 +41,7 @@ namespace structural {
             cg(1) += geom.mass * geom.y_loc;
             cg(2) += geom.mass * geom.z_loc;
         }
-        cg /= Mass.data;
+        cg /= mass.data;
         return cg;
     }
 

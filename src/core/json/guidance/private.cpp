@@ -166,15 +166,15 @@ namespace json {
         guidance::Trajectory traj{ Eigen::MatrixXd::Zero(traj_components.n_rows, guidance::guidance_state_dim) };
 
         for (int i = 0; i < traj_components.n_rows; ++i) {
-            dynamics::RigidBodyState rbs_temp;
-            rbs_temp.v = dynamics::TranslationalVelocity{ traj_components.v_traj.row(i).transpose() };
-            rbs_temp.w = dynamics::AngularVelocity{ traj_components.w_traj.row(i).transpose() };
+            dynamics::RigidBodyState X;
+            X.v = dynamics::TranslationalVelocity{ traj_components.v_traj.row(i).transpose() };
+            X.w = dynamics::AngularVelocity{ traj_components.w_traj.row(i).transpose() };
 
             dynamics::OrientationQuaternion qIB;
             qIB.set(dynamics::EulerAngles{ traj_components.eul_traj.row(i).transpose() });
-            rbs_temp.q = qIB;
+            X.q = qIB;
 
-            guidance::GuidanceVector traj_row_merged = guidance::unpack_rigid_body_state_guidance(rbs_temp);
+            guidance::GuidanceSetpointVector traj_row_merged = guidance::unpack_guidance_setpoint(X);
             traj.data.row(i) = traj_row_merged.transpose();
         }
         return traj;

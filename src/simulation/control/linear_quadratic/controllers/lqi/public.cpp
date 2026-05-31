@@ -25,11 +25,11 @@ namespace control {
         });
     };
 
-    IntegratedStateVector LinearQuadraticIntegrator::integrate_state_err(const dynamics::StateVector_T<double>& zN_t, const dynamics::StateVector_T<double>& zN_t_des) {
-        IntegratedStateVector pqr_zN_t = zN_t.segment<integrated_state_dim>(3);  // grab p, q, r
-        IntegratedStateVector pqr_zN_t_des = zN_t_des.segment<integrated_state_dim>(3);
+    IntegratedStateVector LinearQuadraticIntegrator::integrate_state_err(const dynamics::StateVector_T<double>& zt_vec, const dynamics::StateVector_T<double>& zt_vec_des) {
+        IntegratedStateVector zt_vec_pqr = zt_vec.segment<integrated_state_dim>(3);  // grab p, q, r
+        IntegratedStateVector zt_vec_des_pqr = zt_vec_des.segment<integrated_state_dim>(3);
 
-        return integral + (pqr_zN_t_des - pqr_zN_t) * constants::dt;     // integrate
+        return integral + (zt_vec_des_pqr - zt_vec_pqr) * constants::dt;     // integrate
     }
 
 
@@ -49,19 +49,19 @@ namespace control {
         Eigen::MatrixXd B_aug = Eigen::MatrixXd::Zero(n + i, m);
         B_aug.block(0, 0, n, m) = input.B;
 
-        dynamics::StateVector_T<double> zN_t = dynamics::unpack_rigid_body_state(input.zN_t);
-        dynamics::StateVector_T<double> zN_t_des = unpack_linear_quadratic_control_setpoint(input.setpoint);
+        dynamics::StateVector_T<double> zt_vec = dynamics::unpack_state(input.Zt);
+        dynamics::StateVector_T<double> zt_vec_des = unpack_state(input.setpoint);
 
-        AugmentedStateVector zN_t_aug;
-        zN_t_aug << zN_t, integral_new;
+        AugmentedStateVector zt_vec_aug;
+        zt_vec_aug << zt_vec, integral_new;
 
-        AugmentedStateVector zN_t_des_aug;
-        zN_t_des_aug << zN_t_des, IntegratedStateVector::Zero();
+        AugmentedStateVector zt_vec_des_aug;
+        zt_vec_des_aug << zt_vec_des, IntegratedStateVector::Zero();
 
-        AugmentedStateVector zN_t_aug_deviation = zN_t_aug - zN_t_des_aug;
+        AugmentedStateVector zt_vec_aug_deviation = zt_vec_aug - zt_vec_des_aug;
 
         return {
-            .zN_t = zN_t_aug_deviation,
+            .zt_vec = zt_vec_aug_deviation,
             .A = A_aug,
             .B = B_aug
         };
@@ -71,8 +71,8 @@ namespace control {
 
         // integral candidate
         IntegratedStateVector integral_new = integrate_state_err(
-            dynamics::unpack_rigid_body_state(input.zN_t), 
-            unpack_linear_quadratic_control_setpoint(input.setpoint)
+            dynamics::unpack_state(input.Zt),
+            unpack_state(input.setpoint)
         );
 
         actuators::ActuatorInputsVector_T<double> u_deviation = policy.step(

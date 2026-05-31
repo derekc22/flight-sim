@@ -30,9 +30,9 @@ namespace util {
 
     template <int rows>
     CppAD::eigen_vector<CppAD::AD<double>> start_autodiff_tracking(const Eigen::Matrix<double, rows, 1>& x) {
-        CppAD::eigen_vector<CppAD::AD<double>> x_t = cppad_vector_from_eigen_vector(Eigen::Matrix<CppAD::AD<double>, rows, 1>(x.template cast<CppAD::AD<double>>()));
-        CppAD::Independent(x_t);
-        return x_t;
+        CppAD::eigen_vector<CppAD::AD<double>> x_tracked = cppad_vector_from_eigen_vector(Eigen::Matrix<CppAD::AD<double>, rows, 1>(x.template cast<CppAD::AD<double>>()));
+        CppAD::Independent(x_tracked);
+        return x_tracked;
     }
 
     template <int output_rows, int input_rows>

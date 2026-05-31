@@ -18,7 +18,7 @@ namespace estimation {
         EstimationOutput step(const ExtendedKalmanEstimatorInput& input);
 
         ExtendedKalmanPolicyInput make_extended_kalman_policy_input(const ExtendedKalmanEstimatorInput& input);
-        dynamics::RigidBodyState pack_extended_kalman_policy_state_estimate(const ExtendedKalmanEstimatorInput& input, const dynamics::StateVector_T<double>& zN_t_pred);
+        dynamics::RigidBodyState make_ekf_state_estimate(const ExtendedKalmanEstimatorInput& input, const dynamics::StateVector_T<double>& zt_vec_pred);
 
     };
 

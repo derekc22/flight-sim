@@ -116,17 +116,17 @@ namespace runner {
         guidance::GuidanceProperties& guidance_properties = aircraft.guidance_properties;
 
         // extract reuseable quantities
-        dynamics::Mass mass = structural_properties.Mass;
+        dynamics::Mass mass = structural_properties.mass;
         dynamics::InertiaTensor J = structural_properties.J;
         
         actuators::SurfaceActuators& surface_actuators = actuator_properties.surface_actuators;
         actuators::PropulsorActuators& propulsor_actuators = actuator_properties.propulsor_actuators;
 
         // get rigid body state
-        dynamics::RigidBodyState xN_t = dynamics::compute_rigid_body_state(aircraft.FRDFrameNED);
+        dynamics::RigidBodyState Xt = dynamics::compute_rigid_body_state(aircraft.FRDFrameNED);
 
         // compute static atmospheric state at current altitude
-        atmospheric::StaticAtmosphericState static_atm_state = atmospheric::compute_static_atmospheric_state(aircraft.FRDFrameECEF);
+        atmospheric::StaticAtmosphericState static_atm_state_t = atmospheric::compute_static_atmospheric_state(aircraft.FRDFrameECEF);
 
         // fetch windB
         if (options.wind_bool) {
@@ -150,7 +150,7 @@ namespace runner {
 
             if (trim_sol.converged) {
                 // obtain full state from trim solution
-                auto [xN_t_trim, ads_t_trim] = trim::update_state_from_trim(xN_t, trim_sol);
+                auto [Xt_trim, aero_state_t_trim] = trim::update_state_from_trim(Xt, trim_sol);
 
                 dynamics::Wrench WB_net_trim = trim_sol.wrench;
 
@@ -158,15 +158,15 @@ namespace runner {
                 vehicles::StepOptions TrimStepOptions;
 
                 // overwrite state with trim state
-                TrimStepOptions.FRDFrameNEDStepOpts = vehicles::FRDFrameNEDStepOptions { .rbs_BN = xN_t_trim };
-                TrimStepOptions.STABFrameFRDStepOpts = vehicles::STABFrameFRDStepOptions{ .ads = ads_t_trim };
-                TrimStepOptions.WINDFrameSTABStepOpts = vehicles::WINDFrameSTABStepOptions{ .ads = ads_t_trim };
+                TrimStepOptions.FRDFrameNEDStepOpts = vehicles::FRDFrameNEDStepOptions { .rbs_BN = Xt_trim };
+                TrimStepOptions.STABFrameFRDStepOpts = vehicles::STABFrameFRDStepOptions{ .ads = aero_state_t_trim };
+                TrimStepOptions.WINDFrameSTABStepOpts = vehicles::WINDFrameSTABStepOptions{ .ads = aero_state_t_trim };
 
                 // step frames
                 aircraft.step(TrimStepOptions);
 
                 // overwrite local state with trim state
-                xN_t = xN_t_trim;
+                Xt = Xt_trim;
                 WB_net = WB_net_trim;
                 auto [u_surf_trim, u_prop_trim] = trim::update_actuators_from_trim(u_surface_actual_prev, u_propulsor_actual_prev, trim_sol);
                 u_surface_actual_prev = u_surf_trim;
@@ -192,21 +192,21 @@ namespace runner {
         }
 
         // initialize measurements to ground truth
-        dynamics::RigidBodyState yN_t = xN_t;
+        dynamics::RigidBodyState Yt = Xt;
 
         // use sensors
         if (options.sensor_bool){
-            geography::GeographicState gps_t = geography::compute_geographic_state(aircraft.FRDFrameECEF);
+            geography::GeographicState geo_state_t = geography::compute_geographic_state(aircraft.FRDFrameECEF);
 
             // obtain full state from sensors
-            aerodynamics::AerodynamicState ads_t = aerodynamics::compute_aerodynamic_state(xN_t, windB);
+            aerodynamics::AerodynamicState aero_state_t = aerodynamics::compute_aerodynamic_state(Xt, windB);
 
             // overwrite local measurement state with sensor measurements
-            yN_t = avionics::get_state_from_avionics(xN_t, ads_t, static_atm_state, gps_t, mass, windB, WB_net, aircraft.avionics_properties);
+            Yt = avionics::get_state_from_avionics(Xt, aero_state_t, static_atm_state_t, geo_state_t, mass, windB, WB_net, aircraft.avionics_properties);
         }
 
         // initialize estimated state to measurements
-        dynamics::RigidBodyState zN_t = yN_t;
+        dynamics::RigidBodyState Zt = Yt;
 
         if (options.estimation_bool) {
             linearization::LocalLinearization estimator_lin_sol;
@@ -214,16 +214,16 @@ namespace runner {
             operating::OperatingConditions estimator_conditions;
 
             if (estimation_properties.extended_kalman_estimator_type == estimation::EstimatorType::ExtendedKalmanFilter) {
-                dynamics::State_T<double> y_state = dynamics::pack_rigid_body_state(yN_t);
+                dynamics::State_T<double> yt = dynamics::pack_state(Yt);
                 actuators::ActuatorInputs_T<double> actuator_inputs = actuators::pack_actuator_inputs(u_surface_actual_prev, u_propulsor_actual_prev);
 
                 estimator_operating_point = operating::OperatingPoint {
-                    .state = y_state,
+                    .state = yt,
                     .input = actuator_inputs
                 };
 
                 estimator_conditions = {
-                    .static_atm_state = static_atm_state,
+                    .static_atm_state = static_atm_state_t,
                     .windB = windB
                 };
 
@@ -233,16 +233,16 @@ namespace runner {
             }
 
             estimation::EstimatorInputs estimator_inputs {
-                .yN_t = yN_t,
+                .Yt = Yt,
                 .linear_kalman_estimator_input = estimation::LinearKalmanEstimatorInput {
-                    .yN_t = yN_t,
+                    .Yt = Yt,
                     .operating_point = estimator_operating_point,
                     .lin_sol = estimator_lin_sol,
                     .u_surface_actual_prev = u_surface_actual_prev,
                     .u_propulsor_actual_prev = u_propulsor_actual_prev,
                 },
                 .extended_kalman_estimator_input = estimation::ExtendedKalmanEstimatorInput {
-                    .yN_t = yN_t,
+                    .Yt = Yt,
                     .operating_point = estimator_operating_point,
                     .u_surface_actual_prev = u_surface_actual_prev,
                     .u_propulsor_actual_prev = u_propulsor_actual_prev,
@@ -252,7 +252,7 @@ namespace runner {
             };
 
             // overwrite local estimation state with estimator estimates
-            zN_t = estimation_properties.step(estimator_inputs, options.trim_bool).zN_t;
+            Zt = estimation_properties.step(estimator_inputs, options.trim_bool).Zt;
         }
 
         // specify guidance setpoint
@@ -267,10 +267,10 @@ namespace runner {
 
         if (options.control_bool) {
             control::ControllerInputs controller_inputs {
-                .axial_controller_input = control::AttitudeControllerInput{ .zN_t = zN_t, .surface_actuators = surface_actuators, .setpoint = guidance::AxialSetpoint{ setpoint } },
-                .velocity_controller_input = control::VelocityControllerInput{ .zN_t = zN_t, .propulsor_actuators = propulsor_actuators, .setpoint = guidance::VelocitySetpoint{ setpoint } },
-                .linear_quadratic_controller_input = control::LinearQuadraticControllerInput{ .zN_t = zN_t, .u_sol_trim = trim_sol.operating_point.input, .surface_actuators = surface_actuators, .propulsor_actuators = propulsor_actuators, .A = lin_sol.A, .B = lin_sol.B, .setpoint = guidance::LinearQuadraticSetpoint{ setpoint } },
-                .nonlinear_controller_input = control::NonlinearControllerInput{ .zN_t = zN_t, .surface_actuators = surface_actuators, .propulsor_actuators = propulsor_actuators, .setpoint = guidance::NonlinearSetpoint{ setpoint } }
+                .axial_controller_input = control::AttitudeControllerInput{ .Zt = Zt, .surface_actuators = surface_actuators, .setpoint = guidance::AxialSetpoint{ setpoint } },
+                .velocity_controller_input = control::VelocityControllerInput{ .Zt = Zt, .propulsor_actuators = propulsor_actuators, .setpoint = guidance::VelocitySetpoint{ setpoint } },
+                .linear_quadratic_controller_input = control::LinearQuadraticControllerInput{ .Zt = Zt, .u_sol_trim = trim_sol.operating_point.input, .surface_actuators = surface_actuators, .propulsor_actuators = propulsor_actuators, .A = lin_sol.A, .B = lin_sol.B, .setpoint = guidance::LinearQuadraticSetpoint{ setpoint } },
+                .nonlinear_controller_input = control::NonlinearControllerInput{ .Zt = Zt, .surface_actuators = surface_actuators, .propulsor_actuators = propulsor_actuators, .setpoint = guidance::NonlinearSetpoint{ setpoint } }
             };
             u_cmd = control_properties.step(controller_inputs, options.trim_bool);
         }
@@ -287,12 +287,12 @@ namespace runner {
         u_propulsor_actual_prev = u_propulsor_actual;
 
         // compute aerodynamics forces and moments
-        aerodynamics::AerodynamicWrench WB_aero = aerodynamics::step_aero_forces_moments(aerodynamic_properties, structural_properties, xN_t, static_atm_state, u_surface_actual, windB);
+        aerodynamics::AerodynamicWrench WB_aero = aerodynamics::step_aero_forces_moments(aerodynamic_properties, structural_properties, Xt, static_atm_state_t, u_surface_actual, windB);
         dynamics::Force FB_aero = WB_aero.F;
         dynamics::Moment MB_aero = WB_aero.M;
 
         // compute propulsive forces and momments
-        propulsion::PropulsiveWrench WB_propulsive = propulsion::step_propulsive_forces_moments(propulsor_actuators, xN_t, static_atm_state, u_propulsor_actual);
+        propulsion::PropulsiveWrench WB_propulsive = propulsion::step_propulsive_forces_moments(propulsor_actuators, Xt, static_atm_state_t, u_propulsor_actual);
         dynamics::Force FB_propulsive = WB_propulsive.F;
         dynamics::Moment MB_propulsive = WB_propulsive.M;
 
@@ -305,25 +305,25 @@ namespace runner {
         WB_net = dynamics::Wrench{ .F = FB_net, .M = MB_net };
 
         // compute rigid-body dynamics
-        xN_t = dynamics::step_rigid_body(xN_t, mass, J, WB_net);
+        Xt = dynamics::step_rigid_body(Xt, mass, J, WB_net);
 
         // declare StepOptions
         vehicles::StepOptions StepOpts;
 
         // set step options
-        StepOpts.FRDFrameNEDStepOpts = vehicles::FRDFrameNEDStepOptions{ .rbs_BN = xN_t };
-        aerodynamics::AerodynamicState ads_t = aerodynamics::compute_aerodynamic_state(xN_t, windB);
-        StepOpts.STABFrameFRDStepOpts = vehicles::STABFrameFRDStepOptions{ .ads = ads_t };
-        StepOpts.WINDFrameSTABStepOpts = vehicles::WINDFrameSTABStepOptions{ .ads = ads_t };
+        StepOpts.FRDFrameNEDStepOpts = vehicles::FRDFrameNEDStepOptions{ .rbs_BN = Xt };
+        aerodynamics::AerodynamicState aero_state_t = aerodynamics::compute_aerodynamic_state(Xt, windB);
+        StepOpts.STABFrameFRDStepOpts = vehicles::STABFrameFRDStepOptions{ .ads = aero_state_t };
+        StepOpts.WINDFrameSTABStepOpts = vehicles::WINDFrameSTABStepOptions{ .ads = aero_state_t };
 
         // step frames
         aircraft.step(StepOpts);
 
         // update data context
         io::DataContext data_context{
-            .xN_t=xN_t,
-            .yN_t=yN_t,
-            .zN_t=zN_t,
+            .Xt=Xt,
+            .Yt=Yt,
+            .Zt=Zt,
             .u_surface=u_surface_actual,
             .u_propulsor=u_propulsor_actual,
             .WB_net=WB_net,

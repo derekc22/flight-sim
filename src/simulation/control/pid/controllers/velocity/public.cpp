@@ -2,7 +2,6 @@
 #include <tuple>
 #include "simulation/actuators/propulsor/public.hpp"
 #include "simulation/actuators/surface/public.hpp"
-// #include "simulation/control/public.hpp"
 #include "simulation/control/pid/controllers/velocity/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/guidance/public.hpp"
@@ -49,7 +48,7 @@ namespace control {
     }
 
     PIDPolicyInput VelocityPID::make_pid_policy_input(const VelocityControllerInput& input){
-        dynamics::RigidBodyState zN_t = input.zN_t;
+        dynamics::RigidBodyState Zt = input.Zt;
         actuators::PropulsorActuators propulsor_actuators = input.propulsor_actuators;
         guidance::VelocitySetpoint setpoint = input.setpoint;
 
@@ -57,7 +56,7 @@ namespace control {
         double limit_min_overall = propulsor_actuators.front_propulsor.limit_min + propulsor_actuators.left_propulsor.limit_min + propulsor_actuators.right_propulsor.limit_min;
 
         return {
-            .meas = zN_t.v.data(0),
+            .meas = Zt.v.data(0),
             .meas_des = setpoint.vB_BI.data(0),
             .limit_max = limit_max_overall,
             .limit_min = limit_min_overall

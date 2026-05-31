@@ -8,16 +8,16 @@
 #include "simulation/linearization/public.hpp"
 #include "simulation/operating/public.hpp"
 
-namespace vehicles { struct Aircraft; }
+namespace vehicles { struct Aircraft; } // forward declare
 
 namespace estimation {
 
     struct EstimationOutput {
-        dynamics::RigidBodyState zN_t;  // state estimate
+        dynamics::RigidBodyState Zt;  // state estimate
     };
 
     struct LinearKalmanEstimatorInput {
-        dynamics::RigidBodyState yN_t;
+        dynamics::RigidBodyState Yt;
         operating::OperatingPoint operating_point;
         linearization::LocalLinearization lin_sol;
         actuators::SurfaceActuatorInputs_T<double> u_surface_actual_prev;
@@ -25,7 +25,7 @@ namespace estimation {
     };
 
     struct ExtendedKalmanEstimatorInput {
-        dynamics::RigidBodyState yN_t;
+        dynamics::RigidBodyState Yt;
         operating::OperatingPoint operating_point;
         actuators::SurfaceActuatorInputs_T<double> u_surface_actual_prev;
         actuators::PropulsorActuatorInputs_T<double> u_propulsor_actual_prev;
