@@ -82,7 +82,7 @@ namespace trim {
 
     dynamics::Wrench compute_trim_wrench(const dynamics::State_T<double>& x, const actuators::ActuatorInputs_T<double>& u, const autodiff::AutoDiffModel& model, const operating::OperatingConditions& conditions) {
         const dynamics::Twist_T<double> twist = dynamics::build_twist_from_state_T<double>(x);
-        const dynamics::Wrench_T<double> net_wrench = autodiff::compute_autodiff_net_wrench_T<double>(x, twist, u, model, conditions);
+        const dynamics::Wrench_T<double> net_wrench = autodiff::compute_net_wrench_T<double>(x, twist, u, model, conditions);
 
         return {
             .F = dynamics::Force{ net_wrench.F },
