@@ -187,7 +187,7 @@ namespace dynamics {
     StateVector_T<T> unpack_state_T(const State_T<T>& x);
 
     template <typename T>
-    State_T<T> pack_state_T(const StateVector_T<T>& z);
+    State_T<T> pack_state_T(const StateVector_T<T>& z_vec);
 
     template <typename T>
     StateDotVector_T<T> unpack_state_dot_T(const StateDot_T<T>& x_dot);
@@ -195,15 +195,14 @@ namespace dynamics {
     template <typename T>
     Twist_T<T> build_twist_from_state_T(const State_T<T>& x);
 
-    State_T<double> pack_state(const RigidBodyState& xN_t);
+    State_T<double> pack_state(const RigidBodyState& Xt);
 
-    StateVector_T<double> unpack_state(const RigidBodyState& xN_t);
+    StateVector_T<double> unpack_state(const RigidBodyState& Xt);
 
-    RigidBodyState step_rigid_body(const RigidBodyState& xB_BI_t, const Mass& mass, const InertiaTensor& J, const Wrench& WB_net_t);
+    RigidBodyState step_rigid_body(const RigidBodyState& XB_BI_t, const Mass& mass, const InertiaTensor& J, const Wrench& WB_net_t);
 
     /** @warning The parent of F must be an inertial frame: ECEFFrame or NEDFrameECEF */
     RigidBodyState compute_rigid_body_state(const frames::Frame& F);
-
 
     template <typename T>
     constants::Vector3_T<T> ddtB_vB_BI_T(const constants::Vector3_T<T>& vB, const constants::Vector3_T<T>& wB_BI, double mass, const constants::Vector3_T<T>& FB_net);
@@ -216,6 +215,9 @@ namespace dynamics {
 
     template <typename T>
     constants::Matrix3_T<T> wB_BI_to_eul_dot_mat_T(const T& theta, const T& phi);
+
+    template <typename T>
+    constants::Vector3_T<T> gB_T(const T& phi, const T& theta);
 
     Position trans_kin(const Position& xt, const TranslationalVelocity& xt_dot, const TranslationalAcceleration& xt_ddot);
 

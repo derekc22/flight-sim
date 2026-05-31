@@ -61,7 +61,7 @@ namespace trim {
 
     std::string print_trim_solution(const TrimSolution& trim_sol);
 
-    std::pair<dynamics::RigidBodyState, aerodynamics::AerodynamicState> update_state_from_trim(const dynamics::RigidBodyState& xN_t, const TrimSolution& trim_sol);
+    std::pair<dynamics::RigidBodyState, aerodynamics::AerodynamicState> update_state_from_trim(const dynamics::RigidBodyState& Xt, const TrimSolution& trim_sol);
 
     control::ControlOutput set_control_inputs_from_trim(const TrimSolution& trim_sol);
 

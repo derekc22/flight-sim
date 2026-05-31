@@ -8,13 +8,13 @@
 namespace control {
 
     PIDPolicyInput DamperPID::make_pid_policy_input(const AttitudeControllerInput& input, ControlAxis axis){
-        dynamics::RigidBodyState zN_t = input.zN_t;
+        dynamics::RigidBodyState Zt = input.Zt;
         actuators::SurfaceActuators surface_actuators = input.surface_actuators;
 
         switch (axis) {
             case ControlAxis::Lateral:
                 return {
-                    .meas = zN_t.w.p(),
+                    .meas = Zt.w.p(),
                     .meas_des = input.setpoint.wB_BI.p(),
                     .meas_dot = 0.0,
                     .limit_min = surface_actuators.aileron.limit_min,
@@ -23,7 +23,7 @@ namespace control {
 
             case ControlAxis::Longitudinal:
                 return {
-                    .meas = zN_t.w.q(),
+                    .meas = Zt.w.q(),
                     .meas_des = input.setpoint.wB_BI.q(),
                     .meas_dot = 0.0,
                     .limit_min = surface_actuators.elevator.limit_min,
@@ -32,7 +32,7 @@ namespace control {
 
             case ControlAxis::Vertical:
                 return {
-                    .meas = zN_t.w.r(),
+                    .meas = Zt.w.r(),
                     .meas_des = input.setpoint.wB_BI.r(),
                     .meas_dot = 0.0,
                     .limit_min = surface_actuators.rudder.limit_min,

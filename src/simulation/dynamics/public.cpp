@@ -9,10 +9,10 @@
 
 namespace dynamics {
 
-    Position trans_kin(const Position& xt, const TranslationalVelocity& xt_dot, const TranslationalAcceleration& xt_ddot){
-        const Eigen::Vector3d xt1 = xt.data + xt_dot.data * constants::dt + 0.5 * xt_ddot.data * (constants::dt * constants::dt);
+    Position trans_kin(const Position& pt, const TranslationalVelocity& vt, const TranslationalAcceleration& at) {
+        const Eigen::Vector3d pt1 = pt.data + vt.data * constants::dt + 0.5 * at.data * (constants::dt * constants::dt);
 
-        return { xt1 };
+        return { pt1 };
     }
 
     OrientationQuaternion quat_kin(const OrientationQuaternion& qIB_t, const AngularVelocity& wB_BI_t){
@@ -108,10 +108,10 @@ namespace dynamics {
         };
     }
 
-    TranslationalVelocity trans_kin_vel(const TranslationalVelocity& xt_dot, const TranslationalAcceleration& xt_ddot){
-        const Eigen::Vector3d xt_dot1 = xt_dot.data + xt_ddot.data * constants::dt;
+    TranslationalVelocity trans_kin_vel(const TranslationalVelocity& vt, const TranslationalAcceleration& at) {
+        const Eigen::Vector3d vt1 = vt.data + at.data * constants::dt;
 
-        return { xt_dot1 };
+        return { vt1 };
     }
 
     AngularVelocity eul_dot_to_wB_BI(const EulerAngleRates& eul_dot, const EulerAngles& eul) {
@@ -120,11 +120,11 @@ namespace dynamics {
         return { eul_dot_to_wB_BI_mat(theta, phi) * eul_dot.data };
     }
 
-    State_T<double> pack_state(const RigidBodyState& xN_t){
-        TranslationalVelocity vB_BI = xN_t.v;
-        AngularVelocity wB_BI = xN_t.w;
+    State_T<double> pack_state(const RigidBodyState& Xt){
+        TranslationalVelocity vB_BI = Xt.v;
+        AngularVelocity wB_BI = Xt.w;
         EulerAngles eulIB;
-        eulIB.set(xN_t.q);
+        eulIB.set(Xt.q);
 
         return {
             .vx = vB_BI.data(0),
@@ -138,11 +138,11 @@ namespace dynamics {
         };
     }
 
-    StateVector_T<double> unpack_state(const RigidBodyState& xN_t){
-        return unpack_state_T(pack_state(xN_t));
+    StateVector_T<double> unpack_state(const RigidBodyState& Xt){
+        return unpack_state_T(pack_state(Xt));
     }
 
-    RigidBodyState step_rigid_body(const RigidBodyState& xB_BI_t, const Mass& mass, const InertiaTensor& J, const Wrench& WB_net_t){
+    RigidBodyState step_rigid_body(const RigidBodyState& XB_BI_t, const Mass& mass, const InertiaTensor& J, const Wrench& WB_net_t){
 
         // ddtB_vB_BI_t is the body derivative of velocity expressed in the body frame, 
         // ddtI_vB_BI_t is the inertial derivative of velocity expressed in the body frame, 
@@ -153,27 +153,27 @@ namespace dynamics {
         const dynamics::Force FB_net_t = WB_net_t.F;
         const dynamics::Moment MB_net_t = WB_net_t.M;
 
-        const Eigen::Matrix3d CIB_t = transforms::quat_to_rot(xB_BI_t.q.data);
+        const Eigen::Matrix3d CIB_t = transforms::quat_to_rot(XB_BI_t.q.data);
         const Eigen::Matrix3d CBI_t = CIB_t.transpose();
 
         // Translational dynamics in body coordinates
-        const TranslationalVelocity vB_BI_t1 = trans_dyn_vel(xB_BI_t.v, xB_BI_t.w, mass, FB_net_t); 
-        const Eigen::Vector3d ddtB_vB_BI_t = ddtB_vB_BI(xB_BI_t.v, xB_BI_t.w, mass, FB_net_t).data;           // produces a body derivative
-        const Eigen::Vector3d ddtI_vB_BI_t = ddtB_to_ddtI(ddtB_vB_BI_t, xB_BI_t.v.data, xB_BI_t.w.data);      // produces an inertial derivative
+        const TranslationalVelocity vB_BI_t1 = trans_dyn_vel(XB_BI_t.v, XB_BI_t.w, mass, FB_net_t);
+        const Eigen::Vector3d ddtB_vB_BI_t = ddtB_vB_BI(XB_BI_t.v, XB_BI_t.w, mass, FB_net_t).data;           // produces a body derivative
+        const Eigen::Vector3d ddtI_vB_BI_t = ddtB_to_ddtI(ddtB_vB_BI_t, XB_BI_t.v.data, XB_BI_t.w.data);      // produces an inertial derivative
         const TranslationalAcceleration aB_BI_t{ ddtI_vB_BI_t }; // since pI_BI_t1 and vI_BI_t are inertial, aB_BI_t needs to be an inertial derivative
 
         // Rotational dynamics in body coordinates
-        const AngularVelocity wB_BI_t1 = rot_dyn(xB_BI_t.w, J, MB_net_t);
+        const AngularVelocity wB_BI_t1 = rot_dyn(XB_BI_t.w, J, MB_net_t);
 
         // Quaternion rotational kinematics
-        const OrientationQuaternion qIB_t1 = quat_kin(xB_BI_t.q, xB_BI_t.w);
+        const OrientationQuaternion qIB_t1 = quat_kin(XB_BI_t.q, XB_BI_t.w);
 
         // Convert body velocity/acceleleration to inertial for translational kinematics update on pI_BI
-        const Eigen::Vector3d vI_BI_t = CBI_t * xB_BI_t.v.data;
+        const Eigen::Vector3d vI_BI_t = CBI_t * XB_BI_t.v.data;
         const Eigen::Vector3d aI_BI_t = CBI_t * aB_BI_t.data;
 
         // Translational kinematics in inertial coordinates
-        const Position pI_BI_t1 = trans_kin(xB_BI_t.p, TranslationalVelocity { vI_BI_t }, TranslationalAcceleration { aI_BI_t });
+        const Position pI_BI_t1 = trans_kin(XB_BI_t.p, TranslationalVelocity { vI_BI_t }, TranslationalAcceleration { aI_BI_t });
 
         return { pI_BI_t1, vB_BI_t1, qIB_t1, wB_BI_t1 };
     }

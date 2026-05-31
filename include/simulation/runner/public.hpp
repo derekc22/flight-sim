@@ -31,9 +31,9 @@ namespace runner {
     };
 
     struct SimulationContext {
-        dynamics::RigidBodyState xN_t;
-        dynamics::RigidBodyState yN_t;
-        dynamics::RigidBodyState zN_t;
+        dynamics::RigidBodyState Xt;
+        dynamics::RigidBodyState Yt;
+        dynamics::RigidBodyState Zt;
         dynamics::Wrench WB_net;
         atmospheric::StaticAtmosphericState static_atm_state;
         geography::GeographicState geographic_state;

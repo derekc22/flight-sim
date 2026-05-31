@@ -4,16 +4,16 @@
 namespace dynamics {
 
     template <typename T>
-    State_T<T> pack_state_T(const StateVector_T<T>& z) {
-        return { 
-            .vx = z(0), 
-            .vy = z(1), 
-            .vz = z(2), 
-            .p = z(3), 
-            .q = z(4), 
-            .r = z(5), 
-            .phi = z(6), 
-            .theta = z(7) 
+    State_T<T> pack_state_T(const StateVector_T<T>& z_vec) {
+        return {
+            .vx = z_vec(0),
+            .vy = z_vec(1),
+            .vz = z_vec(2),
+            .p = z_vec(3),
+            .q = z_vec(4),
+            .r = z_vec(5),
+            .phi = z_vec(6),
+            .theta = z_vec(7)
         };
     }
 
@@ -69,6 +69,15 @@ namespace dynamics {
     template <typename T>
     constants::Vector3_T<T> wB_BI_to_eul_dot_T(const constants::Vector3_T<T>& wB_BI, const T& theta, const T& phi) {
         return wB_BI_to_eul_dot_mat_T<T>(theta, phi) * wB_BI;
+    }
+
+    template <typename T>
+    constants::Vector3_T<T> gB_T(const T& phi, const T& theta) {
+        constants::Vector3_T<T> gB;
+        gB << -T(constants::g_earth) * util::sin(theta),
+               T(constants::g_earth) * util::sin(phi) * util::cos(theta),
+               T(constants::g_earth) * util::cos(phi) * util::cos(theta);
+        return gB;
     }
 
 }

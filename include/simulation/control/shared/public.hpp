@@ -14,19 +14,19 @@ namespace control {
     };
 
     struct AttitudeControllerInput {
-        const dynamics::RigidBodyState& zN_t;
+        const dynamics::RigidBodyState& Zt;
         const actuators::SurfaceActuators& surface_actuators;
         const guidance::AxialSetpoint& setpoint;
     };
 
     struct VelocityControllerInput {
-        const dynamics::RigidBodyState& zN_t;
+        const dynamics::RigidBodyState& Zt;
         const actuators::PropulsorActuators& propulsor_actuators;
         const guidance::VelocitySetpoint& setpoint;
     };
 
     struct LinearQuadraticControllerInput {
-        const dynamics::RigidBodyState& zN_t;
+        const dynamics::RigidBodyState& Zt;
         const actuators::ActuatorInputs_T<double>& u_sol_trim;
         const actuators::SurfaceActuators& surface_actuators;
         const actuators::PropulsorActuators& propulsor_actuators;
@@ -36,7 +36,7 @@ namespace control {
     };
 
     struct NonlinearControllerInput {
-        const dynamics::RigidBodyState& zN_t;
+        const dynamics::RigidBodyState& Zt;
         const actuators::SurfaceActuators& surface_actuators;
         const actuators::PropulsorActuators& propulsor_actuators;
         const guidance::NonlinearSetpoint& setpoint;

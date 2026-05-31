@@ -28,9 +28,6 @@ namespace autodiff {
     actuators::PropulsorActuatorInputs_T<T> build_propulsor_actuator_inputs_from_autodiff_T(const actuators::ActuatorInputs_T<T>& u);
 
     template <typename T>
-    constants::Vector3_T<T> gB_T(const T& phi, const T& theta);
-
-    template <typename T>
     dynamics::Wrench_T<T> compute_autodiff_net_wrench_T(const dynamics::State_T<T>& x, const dynamics::Twist_T<T>& twist, const actuators::ActuatorInputs_T<T>& u, const AutoDiffModel& model, const operating::OperatingConditions& conditions);
 
     template <typename T>

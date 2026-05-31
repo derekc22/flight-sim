@@ -9,25 +9,25 @@ namespace estimation {
     {};
 
     ExtendedKalmanPolicyInput ExtendedKalmanFilter::make_extended_kalman_policy_input(const ExtendedKalmanEstimatorInput& input) {
-        dynamics::StateVector_T<double> yN_T = dynamics::unpack_state(input.yN_t);
+        dynamics::StateVector_T<double> yt_vec = dynamics::unpack_state(input.Yt);
 
-        actuators::ActuatorInputsVector_T<double> ut_1 = actuators::unpack_actuator_inputs(
+        actuators::ActuatorInputsVector_T<double> ut_1_vec = actuators::unpack_actuator_inputs(
             input.u_surface_actual_prev, 
             input.u_propulsor_actual_prev
         );
 
         return { 
-            .yN_t = yN_T,
-            .ut_1 = ut_1,
+            .yt_vec = yt_vec,
+            .ut_1_vec = ut_1_vec,
             .conditions = input.conditions,
             .aircraft = input.aircraft,
         };
     }
 
-    dynamics::RigidBodyState ExtendedKalmanFilter::make_ekf_state_estimate(const ExtendedKalmanEstimatorInput& input, const dynamics::StateVector_T<double>& zN_t_pred) {
-        dynamics::StateVector_T<double> zN_t = zN_t_pred;  // EKF predicts full state, so do not add back trim state
+    dynamics::RigidBodyState ExtendedKalmanFilter::make_ekf_state_estimate(const ExtendedKalmanEstimatorInput& input, const dynamics::StateVector_T<double>& zt_vec_pred) {
+        dynamics::StateVector_T<double> zt_vec = zt_vec_pred;  // EKF predicts full state, so do not add back trim state
 
-        return make_kalman_state_estimate(input.yN_t, zN_t);
+        return make_kalman_state_estimate(input.Yt, zt_vec);
     }
 
     EstimationOutput ExtendedKalmanFilter::step(const ExtendedKalmanEstimatorInput& input) {
@@ -35,9 +35,9 @@ namespace estimation {
             make_extended_kalman_policy_input(input)
         );
 
-        dynamics::RigidBodyState zN_t = make_ekf_state_estimate(input, kalman_state.z);
+        dynamics::RigidBodyState Zt = make_ekf_state_estimate(input, kalman_state.zt_vec);
 
-        return { .zN_t = zN_t };
+        return { .Zt = Zt };
     }
 
 }

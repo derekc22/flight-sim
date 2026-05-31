@@ -31,15 +31,6 @@ namespace autodiff {
     }
 
     template <typename T>
-    constants::Vector3_T<T> gB_T(const T& phi, const T& theta) {
-        constants::Vector3_T<T> gB;
-        gB << -T(constants::g_earth) * util::sin(theta),
-               T(constants::g_earth) * util::sin(phi) * util::cos(theta),
-               T(constants::g_earth) * util::cos(phi) * util::cos(theta);
-        return gB;
-    }
-
-    template <typename T>
     dynamics::Wrench_T<T> compute_autodiff_net_wrench_T(const dynamics::State_T<T>& x, const dynamics::Twist_T<T>& twist, const actuators::ActuatorInputs_T<T>& u, const AutoDiffModel& model, const operating::OperatingConditions& conditions) {
         const actuators::SurfaceActuatorInputs_T<T> surface_actuator_inputs = build_surface_actuator_inputs_from_autodiff_T(u, model.fixed_actuator_inputs);
         const dynamics::Wrench_T<T> aero_wrench = aerodynamics::step_aero_forces_moments_T<T>(model.aerodynamic, model.structural, twist, conditions.static_atm_state, surface_actuator_inputs, conditions.windB);
@@ -48,7 +39,7 @@ namespace autodiff {
         const dynamics::Wrench_T<T> prop_wrench = propulsion::step_propulsive_forces_moments_T<T>(model.propulsor_actuators, twist, conditions.static_atm_state, propulsor_actuator_inputs, propulsion::PropulsorOmegaDot_T<T>{});
 
         return {
-            .F = aero_wrench.F + prop_wrench.F + T(model.structural.mass.data) * gB_T(x.phi, x.theta),
+            .F = aero_wrench.F + prop_wrench.F + T(model.structural.mass.data) * dynamics::gB_T(x.phi, x.theta),
             .M = aero_wrench.M + prop_wrench.M,
         };
     }

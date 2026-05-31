@@ -164,23 +164,23 @@ namespace trim {
     }
 
 
-    std::pair<dynamics::RigidBodyState, aerodynamics::AerodynamicState> update_state_from_trim(const dynamics::RigidBodyState& xN_t, const TrimSolution& trim_sol) {
+    std::pair<dynamics::RigidBodyState, aerodynamics::AerodynamicState> update_state_from_trim(const dynamics::RigidBodyState& Xt, const TrimSolution& trim_sol) {
             dynamics::EulerAngles eul_curr;
-            eul_curr.set(xN_t.q);
+            eul_curr.set(Xt.q);
             dynamics::EulerAngles eul_trim{ Eigen::Vector3d(eul_curr.psi(), trim_sol.operating_point.state.theta, trim_sol.operating_point.state.phi) };
             dynamics::OrientationQuaternion qNB_trim;
             qNB_trim.set(eul_trim);
 
-            dynamics::RigidBodyState xN_t_trim = {
-                .p = xN_t.p,
+            dynamics::RigidBodyState Xt_trim = {
+                .p = Xt.p,
                 .v = dynamics::TranslationalVelocity{ Eigen::Vector3d(trim_sol.operating_point.state.vx, trim_sol.operating_point.state.vy, trim_sol.operating_point.state.vz) },
                 .q = qNB_trim,
                 .w = dynamics::AngularVelocity{ Eigen::Vector3d(trim_sol.operating_point.state.p, trim_sol.operating_point.state.q, trim_sol.operating_point.state.r) },
             };
 
-            aerodynamics::AerodynamicState ads_t_trim = aerodynamics::compute_aerodynamic_state(xN_t_trim, trim_sol.conditions.windB);
+            aerodynamics::AerodynamicState aero_state_t_trim = aerodynamics::compute_aerodynamic_state(Xt_trim, trim_sol.conditions.windB);
 
-        return { xN_t_trim, ads_t_trim };
+        return { Xt_trim, aero_state_t_trim };
     }
 
     control::ControlOutput set_control_inputs_from_trim(const TrimSolution& trim_sol){

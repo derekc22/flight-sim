@@ -7,12 +7,12 @@
 
 namespace guidance {
 
-    GuidanceSetpointVector unpack_guidance_setpoint(const dynamics::RigidBodyState& xN_t) {
+    GuidanceSetpointVector unpack_guidance_setpoint(const dynamics::RigidBodyState& Xt) {
         dynamics::EulerAngles eulIB;
-        eulIB.set(xN_t.q);
+        eulIB.set(Xt.q);
 
         GuidanceSetpointVector out;
-        out.head<constants::state_dim>() = dynamics::unpack_state(xN_t);
+        out.head<constants::state_dim>() = dynamics::unpack_state(Xt);
         out(constants::state_dim) = eulIB.psi();
 
         return out;

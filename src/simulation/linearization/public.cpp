@@ -48,10 +48,10 @@ namespace linearization {
         CppAD::eigen_vector<CppAD::AD<double>> z_tracked = util::start_autodiff_tracking(z);
 
         const operating::StateInputVector_T<CppAD::AD<double>> z_vec = util::eigen_vector_from_cppad_vector<CppAD::AD<double>, constants::state_input_dim>(z_tracked);
-        const dynamics::State_T<CppAD::AD<double>> x_t = operating::pack_state_T<CppAD::AD<double>>(z_vec);
-        const actuators::ActuatorInputs_T<CppAD::AD<double>> u_t = operating::pack_actuator_inputs_T<CppAD::AD<double>>(z_vec);
+        const dynamics::State_T<CppAD::AD<double>> xt = operating::pack_state_T<CppAD::AD<double>>(z_vec);
+        const actuators::ActuatorInputs_T<CppAD::AD<double>> ut = operating::pack_actuator_inputs_T<CppAD::AD<double>>(z_vec);
         
-        const dynamics::StateDot_T<CppAD::AD<double>> state_dot = autodiff::compute_state_dot_T<CppAD::AD<double>>(x_t, u_t, model, conditions);
+        const dynamics::StateDot_T<CppAD::AD<double>> state_dot = autodiff::compute_state_dot_T<CppAD::AD<double>>(xt, ut, model, conditions);
         const dynamics::StateDotVector_T<CppAD::AD<double>> x_dot_vec = dynamics::unpack_state_dot_T(state_dot);
         const CppAD::eigen_vector<CppAD::AD<double>> x_dot_tracked = util::cppad_vector_from_eigen_vector(x_dot_vec);
         

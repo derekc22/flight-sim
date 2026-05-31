@@ -69,10 +69,10 @@ namespace avionics {
 
 
     dynamics::RigidBodyState get_state_from_avionics(
-        const dynamics::RigidBodyState& xN_t, 
-        const aerodynamics::AerodynamicState& ads_t, 
-        const atmospheric::StaticAtmosphericState& static_atm_t, 
-        const geography::GeographicState& gps_t,
+        const dynamics::RigidBodyState& Xt,
+        const aerodynamics::AerodynamicState& aero_state_t,
+        const atmospheric::StaticAtmosphericState& static_atm_t,
+        const geography::GeographicState& geo_state_t,
         const dynamics::Mass& mass,
         const atmospheric::Wind & wind,
         const dynamics::Wrench& WB_net,

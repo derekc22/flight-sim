@@ -4,7 +4,7 @@
 namespace estimation {
 
     EstimationOutput EstimationProperties::step(const EstimatorInputs& inputs, bool trim_bool) {
-        EstimationOutput out{ .zN_t = inputs.yN_t };
+        EstimationOutput out{ .Zt = inputs.Yt };
 
         if (extended_kalman_estimator) {
             out = extended_kalman_estimator(inputs.extended_kalman_estimator_input);
