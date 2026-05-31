@@ -152,7 +152,7 @@ namespace io {
             }
 
             if (wind_bool) {
-                write_csv(windB_DT->data, data_dir_path, "wind");
+                write_csv(windB_DT->data, data_dir_path, "windB");
             }
         }
     }

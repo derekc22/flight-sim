@@ -11,7 +11,7 @@
 namespace autodiff {
 
     template <typename T>
-    actuators::SurfaceActuatorInputs_T<T> build_surface_actuator_inputs_T(const actuators::ActuatorInputs_T<T>& u, const actuators::FixedActuatorInputs& fixed_actuator_inputs) {
+    actuators::SurfaceActuatorInputs_T<T> pack_surface_actuator_inputs_T(const actuators::ActuatorInputs_T<T>& u, const actuators::FixedActuatorInputs& fixed_actuator_inputs) {
         return {
             .elevator_cmd = u.elevator_cmd,
             .aileron_cmd = u.aileron_cmd,
@@ -22,7 +22,7 @@ namespace autodiff {
     }
 
     template <typename T>
-    actuators::PropulsorActuatorInputs_T<T> build_propulsor_actuator_inputs_T(const actuators::ActuatorInputs_T<T>& u) {
+    actuators::PropulsorActuatorInputs_T<T> pack_propulsor_actuator_inputs_T(const actuators::ActuatorInputs_T<T>& u) {
         return {
             .front_propulsor_cmd = u.front_propulsor_cmd,
             .left_propulsor_cmd = u.left_propulsor_cmd,
@@ -32,10 +32,10 @@ namespace autodiff {
 
     template <typename T>
     dynamics::Wrench_T<T> compute_net_wrench_T(const dynamics::State_T<T>& x, const dynamics::Twist_T<T>& twist, const actuators::ActuatorInputs_T<T>& u, const AutoDiffModel& model, const operating::OperatingConditions& conditions) {
-        const actuators::SurfaceActuatorInputs_T<T> surface_actuator_inputs = build_surface_actuator_inputs_T(u, model.fixed_actuator_inputs);
+        const actuators::SurfaceActuatorInputs_T<T> surface_actuator_inputs = pack_surface_actuator_inputs_T(u, model.fixed_actuator_inputs);
         const dynamics::Wrench_T<T> aero_wrench = aerodynamics::step_aero_forces_moments_T<T>(model.aerodynamic, model.structural, twist, conditions.static_atm_state, surface_actuator_inputs, conditions.windB);
 
-        const actuators::PropulsorActuatorInputs_T<T> propulsor_actuator_inputs = build_propulsor_actuator_inputs_T(u);
+        const actuators::PropulsorActuatorInputs_T<T> propulsor_actuator_inputs = pack_propulsor_actuator_inputs_T(u);
         const dynamics::Wrench_T<T> prop_wrench = propulsion::step_propulsive_forces_moments_T<T>(model.propulsor_actuators, twist, conditions.static_atm_state, propulsor_actuator_inputs, propulsion::PropulsorOmegaDot_T<T>{});
 
         return {

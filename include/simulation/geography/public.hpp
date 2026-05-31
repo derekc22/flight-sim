@@ -34,12 +34,12 @@ namespace geography {
 
     dynamics::Gravity gN();
 
-    dynamics::Gravity gB(const dynamics::Position& pE, const dynamics::HomogeneousFrameTransformationMatrix& HEB);
+    dynamics::Gravity gB(const dynamics::Position& pE, const dynamics::HomogeneousTransformationMatrix& HEB);
     dynamics::Gravity gB(const dynamics::Position& pE, const dynamics::OrientationMatrix& CEB);
     dynamics::Gravity gB(const dynamics::Position& pE, const dynamics::OrientationQuaternion& qEB);
     dynamics::Gravity gB(const dynamics::Position& pE, const dynamics::EulerAngles& eulEB);
 
-    dynamics::Gravity gB(const dynamics::HomogeneousFrameTransformationMatrix& HNB);
+    dynamics::Gravity gB(const dynamics::HomogeneousTransformationMatrix& HNB);
     dynamics::Gravity gB(const dynamics::OrientationMatrix& CNB);
     dynamics::Gravity gB(const dynamics::OrientationQuaternion& qNB);
     dynamics::Gravity gB(const dynamics::EulerAngles& eulNB);

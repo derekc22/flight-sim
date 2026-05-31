@@ -43,7 +43,7 @@ namespace frames {
         return { &HSW, &qSW, &eulSW, &CSW_dot, &qSW_dot, &wW_WS, &eulSW_dot, &wq_WS, &vW_WS, &gW };
     }
 
-    void Frame::_set(const dynamics::HomogeneousFrameTransformationMatrix& H){
+    void Frame::_set(const dynamics::HomogeneousTransformationMatrix& H){
         _set(H.C());
         _set(H.p());
     }

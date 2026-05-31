@@ -9,7 +9,7 @@
 namespace frames {
 
     struct FrameView {
-        const dynamics::HomogeneousFrameTransformationMatrix* H;
+        const dynamics::HomogeneousTransformationMatrix* H;
         const dynamics::OrientationQuaternion* q;
         const dynamics::EulerAngles* eul;
         const dynamics::OrientationMatrixRate* C_dot;
@@ -22,7 +22,7 @@ namespace frames {
     };
 
     struct MutableFrameView {
-        dynamics::HomogeneousFrameTransformationMatrix* H;
+        dynamics::HomogeneousTransformationMatrix* H;
         dynamics::OrientationQuaternion* q;
         dynamics::EulerAngles* eul;
         dynamics::OrientationMatrixRate* C_dot;
@@ -35,7 +35,7 @@ namespace frames {
     };
 
     struct SetOptions {
-        std::optional<dynamics::HomogeneousFrameTransformationMatrix> H;
+        std::optional<dynamics::HomogeneousTransformationMatrix> H;
         std::optional<dynamics::OrientationMatrix> C;
         std::optional<dynamics::Position> p;
         std::optional<dynamics::OrientationQuaternion> q;
@@ -56,7 +56,7 @@ namespace frames {
 
         Frame(std::string n, Frame* p);
 
-        void _set(const dynamics::HomogeneousFrameTransformationMatrix& H);
+        void _set(const dynamics::HomogeneousTransformationMatrix& H);
         void _set(const dynamics::OrientationMatrix& C);
         void _set(const dynamics::Position& p);
         void _set(const dynamics::OrientationQuaternion& q);
@@ -87,7 +87,7 @@ namespace frames {
     // {ECEF} -> {NED}
     struct NEDFrameECEF : Frame {
         NEDFrameECEF();
-        dynamics::HomogeneousFrameTransformationMatrix HEN; 
+        dynamics::HomogeneousTransformationMatrix HEN; 
         dynamics::OrientationQuaternion qEN;
         dynamics::EulerAngles eulEN;
         dynamics::OrientationMatrixRate CEN_dot;
@@ -105,7 +105,7 @@ namespace frames {
     // {ECEF} -> {BODY}
     struct FRDFrameECEF : Frame {
         FRDFrameECEF();
-        dynamics::HomogeneousFrameTransformationMatrix HEB; 
+        dynamics::HomogeneousTransformationMatrix HEB; 
         dynamics::OrientationQuaternion qEB;
         dynamics::EulerAngles eulEB;
         dynamics::OrientationMatrixRate CEB_dot;
@@ -123,7 +123,7 @@ namespace frames {
     // {NED} -> {BODY}
     struct FRDFrameNED : Frame { 
         FRDFrameNED(NEDFrameECEF* pNEDFrameECEF);
-        dynamics::HomogeneousFrameTransformationMatrix HNB; 
+        dynamics::HomogeneousTransformationMatrix HNB; 
         dynamics::OrientationQuaternion qNB;
         dynamics::EulerAngles eulNB;
         dynamics::OrientationMatrixRate CNB_dot;
@@ -141,7 +141,7 @@ namespace frames {
     // {BODY} -> {STAB}
     struct STABFrameFRD : Frame {
         STABFrameFRD(FRDFrameNED* pFRDFrameNED);
-        dynamics::HomogeneousFrameTransformationMatrix HBS; 
+        dynamics::HomogeneousTransformationMatrix HBS; 
         dynamics::OrientationQuaternion qBS;
         dynamics::EulerAngles eulBS;
         dynamics::OrientationMatrixRate CBS_dot;
@@ -159,7 +159,7 @@ namespace frames {
     // {STAB} -> {WIND}
     struct WINDFrameSTAB : Frame {
         WINDFrameSTAB(STABFrameFRD* pSTABFrameFRD);
-        dynamics::HomogeneousFrameTransformationMatrix HSW; 
+        dynamics::HomogeneousTransformationMatrix HSW; 
         dynamics::OrientationQuaternion qSW;
         dynamics::EulerAngles eulSW;
         dynamics::OrientationMatrixRate CSW_dot;

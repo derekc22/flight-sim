@@ -26,12 +26,12 @@
 
 namespace vehicles {
 
-    void StepOptions::_validate(const StepOptions& opts) {
-        std::string err_msg = "vehicles::StepOptions::_validate: Invalid input, cannot pass StepOptions for FRDFrameECEFOpts and FRDFrameNEDStepOpts simultaneously";
+    void StepOptions::validate(const StepOptions& opts) {
+        std::string err_msg = "vehicles::StepOptions::validate: Invalid input, cannot pass StepOptions for FRDFrameECEFOpts and FRDFrameNEDStepOpts simultaneously";
         if (opts.FRDFrameECEFStepOpts.has_value() && opts.FRDFrameNEDStepOpts.has_value()) throw std::invalid_argument(err_msg);
     }
 
-    void _StepOptions::_validate(const frames::Frame& F, const _StepOptions& opts) {
+    void _StepOptions::validate(const frames::Frame& F, const _StepOptions& opts) {
 
         const bool has_H = opts.H.has_value();
         const bool has_C = opts.C.has_value();
@@ -59,13 +59,13 @@ namespace vehicles {
         const bool has_geo_all = (has_lat && has_lon && has_alt);
 
         if (has_geo_any && !has_geo_all) {
-            std::string err_msg = std::format("vehicles::_StepOptions::_validate: Invalid geographic input for {}, lat, lon, alt must be passed together", F.name);
+            std::string err_msg = std::format("vehicles::_StepOptions::validate: Invalid geographic input for {}, lat, lon, alt must be passed together", F.name);
             throw std::invalid_argument(err_msg);
         }
 
         // H cannot be combined with any other position or orientation representations
         if (has_H && (has_C || has_p || has_q || has_eul || has_geo_any || has_gps)) {
-            std::string err_msg = std::format("vehicles::_StepOptions::_validate: Invalid position or orientation input for {}, cannot pass C, p, q, eul, (lat, lon, alt), gps with H", F.name);
+            std::string err_msg = std::format("vehicles::_StepOptions::validate: Invalid position or orientation input for {}, cannot pass C, p, q, eul, (lat, lon, alt), gps with H", F.name);
             throw std::invalid_argument(err_msg);
         }
 
@@ -73,13 +73,13 @@ namespace vehicles {
         if ((has_p && has_geo_any) ||
             (has_p && has_gps) ||
             (has_geo_any && has_gps)) {
-            std::string err_msg = std::format("vehicles::_StepOptions::_validate: Invalid position input for {}, pass at most one of p, (lat, lon, alt), gps", F.name);
+            std::string err_msg = std::format("vehicles::_StepOptions::validate: Invalid position input for {}, pass at most one of p, (lat, lon, alt), gps", F.name);
             throw std::invalid_argument(err_msg);
         }
 
         // Only one orientation representation at a time
         if ((has_C && has_q) || (has_C && has_eul) || (has_q && has_eul)) {
-            std::string err_msg = std::format("vehicles::_StepOptions::_validate: Invalid orientation input for {}, pass at most one of C, q, eul", F.name);
+            std::string err_msg = std::format("vehicles::_StepOptions::validate: Invalid orientation input for {}, pass at most one of C, q, eul", F.name);
             throw std::invalid_argument(err_msg);
         }
 
@@ -88,7 +88,7 @@ namespace vehicles {
             (has_q_dot && (has_w || has_eul_dot || has_wq)) ||
             (has_w && (has_eul_dot || has_wq)) ||
             (has_eul_dot && has_wq)) {
-            std::string err_msg = std::format("vehicles::_StepOptions::_validate: Invalid attitude-rate input for {}, pass at most one of C_dot, q_dot, w, eul_dot, wq", F.name);
+            std::string err_msg = std::format("vehicles::_StepOptions::validate: Invalid attitude-rate input for {}, pass at most one of C_dot, q_dot, w, eul_dot, wq", F.name);
             throw std::invalid_argument(err_msg);
         }
 
@@ -99,20 +99,20 @@ namespace vehicles {
             has_v ||
             has_geo_any ||
             has_gps)) {
-            std::string err_msg = std::format("vehicles::_StepOptions::_validate: Invalid state input for {}, cannot pass H, C, p, q, eul, (lat, lon, alt), gps, C_dot, q_dot, w, eul_dot, wq with rbs", F.name);
+            std::string err_msg = std::format("vehicles::_StepOptions::validate: Invalid state input for {}, cannot pass H, C, p, q, eul, (lat, lon, alt), gps, C_dot, q_dot, w, eul_dot, wq with rbs", F.name);
             throw std::invalid_argument(err_msg);
         }
 
         // Only one aerodynamics representation at a time
         if (has_ads && (has_alpha || has_beta)) {
-            std::string err_msg = std::format("vehicles::_StepOptions::_validate: Invalid aerodynamics input for {}, cannot pass alpha, beta with ads", F.name);
+            std::string err_msg = std::format("vehicles::_StepOptions::validate: Invalid aerodynamics input for {}, cannot pass alpha, beta with ads", F.name);
             throw std::invalid_argument(err_msg);
         }
     }
 
     void Aircraft::step(const StepOptions& opts) {
 
-        StepOptions::_validate(opts);
+        StepOptions::validate(opts);
 
         if (opts.NEDFrameECEFStepOpts.has_value()) {
             _StepOptions _NEDFrameECEFStepOpts = { 
@@ -133,7 +133,7 @@ namespace vehicles {
                 .alt = opts.NEDFrameECEFStepOpts->alt_NE,
                 .gps = opts.NEDFrameECEFStepOpts->gps_NE
             };
-            _StepOptions::_validate(NEDFrameECEF, _NEDFrameECEFStepOpts);
+            _StepOptions::validate(NEDFrameECEF, _NEDFrameECEFStepOpts);
             Aircraft::step(NEDFrameECEF, _NEDFrameECEFStepOpts);
             Aircraft::step_dependents(NEDFrameECEF);
         }
@@ -158,7 +158,7 @@ namespace vehicles {
                 .rbs = opts.FRDFrameECEFStepOpts->rbs_BE,
                 .gps = opts.FRDFrameECEFStepOpts->gps_BE
             };
-            _StepOptions::_validate(FRDFrameECEF, _FRDFrameECEFStepOpts);
+            _StepOptions::validate(FRDFrameECEF, _FRDFrameECEFStepOpts);
             Aircraft::step(FRDFrameECEF, _FRDFrameECEFStepOpts);
             Aircraft::step_dependents(FRDFrameECEF);
         }
@@ -178,7 +178,7 @@ namespace vehicles {
                 .v = opts.FRDFrameNEDStepOpts->vB_BN,
                 .rbs = opts.FRDFrameNEDStepOpts->rbs_BN
             };
-            _StepOptions::_validate(FRDFrameNED, _FRDFrameNEDStepOpts);
+            _StepOptions::validate(FRDFrameNED, _FRDFrameNEDStepOpts);
             Aircraft::step(FRDFrameNED, _FRDFrameNEDStepOpts);
             Aircraft::step_dependents(FRDFrameNED);
         }
@@ -200,7 +200,7 @@ namespace vehicles {
                 .alpha = opts.STABFrameFRDStepOpts->alpha,
                 .ads = opts.STABFrameFRDStepOpts->ads
             };
-            _StepOptions::_validate(STABFrameFRD, _STABFrameFRDStepOpts);
+            _StepOptions::validate(STABFrameFRD, _STABFrameFRDStepOpts);
             Aircraft::step(STABFrameFRD, _STABFrameFRDStepOpts);
             Aircraft::step_dependents(STABFrameFRD);
         }
@@ -222,7 +222,7 @@ namespace vehicles {
                 .beta = opts.WINDFrameSTABStepOpts->beta,
                 .ads = opts.WINDFrameSTABStepOpts->ads
             };
-            _StepOptions::_validate(WINDFrameSTAB, _WINDFrameSTABStepOpts);
+            _StepOptions::validate(WINDFrameSTAB, _WINDFrameSTABStepOpts);
             Aircraft::step(WINDFrameSTAB, _WINDFrameSTABStepOpts);
             Aircraft::step_dependents(WINDFrameSTAB);
         }
@@ -700,7 +700,7 @@ namespace vehicles {
 
         // Set default values
         frames::SetOptions initStepOptions = {
-            .H = dynamics::HomogeneousFrameTransformationMatrix{ constants::HI },
+            .H = dynamics::HomogeneousTransformationMatrix{ constants::HI },
             .w = dynamics::AngularVelocity{ constants::Zero3 },
             .v = dynamics::TranslationalVelocity{ constants::Zero3 },
             .g = dynamics::Gravity{ constants::Zero3 }

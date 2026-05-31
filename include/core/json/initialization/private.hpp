@@ -10,7 +10,7 @@
 namespace json {
 
     struct ParsedStepOptions {
-        std::optional<dynamics::HomogeneousFrameTransformationMatrix> H;
+        std::optional<dynamics::HomogeneousTransformationMatrix> H;
         std::optional<dynamics::OrientationMatrix> C;
         std::optional<dynamics::Position> p;
         std::optional<dynamics::OrientationQuaternion> q;
@@ -32,8 +32,8 @@ namespace json {
     vehicles::NEDFrameECEFStepOptions parse_NEDFrameECEF_step_options(const nlohmann::json& frame_json);
     vehicles::FRDFrameECEFStepOptions parse_FRDFrameECEF_step_options(const nlohmann::json& frame_json);
     vehicles::FRDFrameNEDStepOptions parse_FRDFrameNED_step_options(const nlohmann::json& frame_json);
-    void _validate_NEDFrameECEF_initialization_config(const nlohmann::json& frame_json);
-    void _validate_FRDFrameECEF_initialization_config(const nlohmann::json& frame_json);
-    void _validate_FRDFrameNED_initialization_config(const nlohmann::json& frame_json);
-    void _validate_initialization_config(const nlohmann::json& config, bool trim_bool);
+    void validate_NEDFrameECEF_initialization_config(const nlohmann::json& frame_json);
+    void validate_FRDFrameECEF_initialization_config(const nlohmann::json& frame_json);
+    void validate_FRDFrameNED_initialization_config(const nlohmann::json& frame_json);
+    void validate_initialization_config(const nlohmann::json& config, bool trim_bool);
 }

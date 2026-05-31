@@ -52,12 +52,12 @@ namespace atmospheric {
         return { P };
     };
 
-    StaticAtmosphericState stagnation_to_static(const StagnationAtmosphericState& stagnation_atmospheric_state, const MachNumber& M) {
-        AirDensity rho = stagnation_atmospheric_state.rho;
-        DynamicViscosity mu = stagnation_atmospheric_state.mu;
+    StaticAtmosphericState stagnation_to_static(const StagnationAtmosphericState& stag_atm_state, const MachNumber& M) {
+        AirDensity rho = stag_atm_state.rho;
+        DynamicViscosity mu = stag_atm_state.mu;
 
-        StaticAirTemperature T = T_from_T0(stagnation_atmospheric_state.T0, M);
-        StaticAirPressure P = P_from_P0(stagnation_atmospheric_state.P0, M);
+        StaticAirTemperature T = T_from_T0(stag_atm_state.T0, M);
+        StaticAirPressure P = P_from_P0(stag_atm_state.P0, M);
 
         return { T, P, rho, mu };
     };

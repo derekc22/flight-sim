@@ -12,6 +12,6 @@ namespace atmospheric {
 
     StaticAirPressure P_from_P0(const StagnationAirPressure& P0, const MachNumber& M);
 
-    StaticAtmosphericState stagnation_to_static(const StagnationAtmosphericState& stagnation_atmospheric_state, const MachNumber& M);
+    StaticAtmosphericState stagnation_to_static(const StagnationAtmosphericState& stag_atm_state, const MachNumber& M);
 
 }

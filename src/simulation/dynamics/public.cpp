@@ -33,13 +33,13 @@ namespace dynamics {
     void OrientationMatrix::set(const OrientationQuaternion& q) { data = transforms::quat_to_rot(q.data); }
     void OrientationMatrix::set(const EulerAngles& eul) { data = transforms::eul_to_C(eul.psi(), eul.theta(), eul.phi(), "ZYX", "intr"); }
 
-    OrientationMatrix HomogeneousFrameTransformationMatrix::C() const { return OrientationMatrix{ transforms::C_from_H(data) }; }
-    Position HomogeneousFrameTransformationMatrix::p() const { return Position{ transforms::p_from_H(data) }; }
-    void HomogeneousFrameTransformationMatrix::set(const OrientationMatrix& C, const Position& p) { data = transforms::make_HC(C.data, p.data, "translate"); }
-    void HomogeneousFrameTransformationMatrix::set(const OrientationMatrix& C) { data = transforms::make_HC(C.data, p().data, "translate"); }
-    void HomogeneousFrameTransformationMatrix::set(const Position& p) { data = transforms::make_HC(C().data, p.data, "translate"); }
-    void HomogeneousFrameTransformationMatrix::set(const OrientationQuaternion& q) { data = transforms::make_HC(transforms::quat_to_rot(q.data), p().data, "translate"); }
-    void HomogeneousFrameTransformationMatrix::set(const EulerAngles& eul) { data = transforms::make_HC(transforms::eul_to_C(eul.psi(), eul.theta(), eul.phi(), "ZYX", "intr"), p().data, "translate"); }
+    OrientationMatrix HomogeneousTransformationMatrix::C() const { return OrientationMatrix{ transforms::C_from_H(data) }; }
+    Position HomogeneousTransformationMatrix::p() const { return Position{ transforms::p_from_H(data) }; }
+    void HomogeneousTransformationMatrix::set(const OrientationMatrix& C, const Position& p) { data = transforms::make_HC(C.data, p.data, "translate"); }
+    void HomogeneousTransformationMatrix::set(const OrientationMatrix& C) { data = transforms::make_HC(C.data, p().data, "translate"); }
+    void HomogeneousTransformationMatrix::set(const Position& p) { data = transforms::make_HC(C().data, p.data, "translate"); }
+    void HomogeneousTransformationMatrix::set(const OrientationQuaternion& q) { data = transforms::make_HC(transforms::quat_to_rot(q.data), p().data, "translate"); }
+    void HomogeneousTransformationMatrix::set(const EulerAngles& eul) { data = transforms::make_HC(transforms::eul_to_C(eul.psi(), eul.theta(), eul.phi(), "ZYX", "intr"), p().data, "translate"); }
 
     void OrientationQuaternion::set(const OrientationMatrix& C) { data = transforms::normalize_and_canonicalize(transforms::rot_to_quat(C.data)); }
     void OrientationQuaternion::set(const EulerAngles& eul) { data = transforms::normalize_and_canonicalize(transforms::eul_to_quatC(eul.psi(), eul.theta(), eul.phi(), "ZYX", "intr")); }
@@ -144,11 +144,11 @@ namespace dynamics {
 
     RigidBodyState step_rigid_body(const RigidBodyState& XB_BI_t, const Mass& mass, const InertiaTensor& J, const Wrench& WB_net_t){
 
-        // ddtB_vB_BI_t is the body derivative of velocity expressed in the body frame, 
-        // ddtI_vB_BI_t is the inertial derivative of velocity expressed in the body frame, 
-        // and aI_BI_t = CBI_t * aB_BI_t.data gives the inertial derivative of velocity expressed in the inertial frame for the inertial-position kinematics update
-        // This assumes CBI maps body components to inertial components 
-        // and that ddtB_vB_BI returns the body derivative of velocity expressed in the body frame
+        // ddtB_vB_BI_t is the body derivative of body-expressed velocity, 
+        // ddtI_vB_BI_t is the inertial derivative of body-expressed velocity, 
+        // and aI_BI_t = CBI_t * aB_BI_t.data gives the inertial derivative of inertial-expressed velocity for the inertial-expressed position update
+        // Where CBI maps body components to inertial components 
+        // and ddtB_vB_BI returns the body derivative of body-expressed velocity
 
         const dynamics::Force FB_net_t = WB_net_t.F;
         const dynamics::Moment MB_net_t = WB_net_t.M;

@@ -18,22 +18,22 @@ namespace constants {
     inline constexpr double rho_SL = 1.225;         // [kg/m^3]
     inline constexpr double T_SL = 288.0;           // [K]
 
-    // Special Matrices
+    // Special matrices
     inline const Eigen::Matrix3d I3 = Eigen::Matrix3d::Identity();
     inline const Eigen::Matrix4d HI = Eigen::Matrix4d::Identity(); // Identity homogeneous transformation matrix
     inline const Eigen::Matrix3d Zero3x3 = Eigen::Matrix3d::Zero();
 
-    // Special Vectors
+    // Special vectors
     inline const Eigen::Vector3d Zero3 = Eigen::Vector3d::Zero();
     inline const Eigen::Vector3d ei = Eigen::Vector3d(1, 0, 0);
     inline const Eigen::Vector3d ej = Eigen::Vector3d(0, 1, 0);
     inline const Eigen::Vector3d ek = Eigen::Vector3d(0, 0, 1);
 
-    // Special Quaternions
+    // Special quaternions
     inline const Eigen::Quaterniond qI = Eigen::Quaterniond::Identity();
 
 
-    // Template
+    // Template alias vectors
     template <typename T>
     using Vector3_T = Eigen::Matrix<T, 3, 1>;
 
