@@ -68,4 +68,3 @@ dependencies:
   - xorg-libxdmcp=1.1.5=hc919400_1
   - zlib-ng=2.3.3=hed4e4f5_1
   - zstd=1.5.7=hbf9d68e_6
-prefix: /opt/miniconda3/envs/ame532
