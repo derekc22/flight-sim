@@ -1,5 +1,5 @@
 {
-    "axial": {
+    "attitude": {
         "controller_type": "DamperPID",
         "parameters": {
             "Kp_roll": 1,

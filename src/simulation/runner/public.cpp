@@ -267,7 +267,7 @@ namespace runner {
 
         if (options.control_bool) {
             control::ControllerInputs controller_inputs {
-                .axial_controller_input = control::AttitudeControllerInput{ .Zt = Zt, .surface_actuators = surface_actuators, .setpoint = guidance::AxialSetpoint{ setpoint } },
+                .attitude_controller_input = control::AttitudeControllerInput{ .Zt = Zt, .surface_actuators = surface_actuators, .setpoint = guidance::AttitudeSetpoint{ setpoint } },
                 .velocity_controller_input = control::VelocityControllerInput{ .Zt = Zt, .propulsor_actuators = propulsor_actuators, .setpoint = guidance::VelocitySetpoint{ setpoint } },
                 .linear_quadratic_controller_input = control::LinearQuadraticControllerInput{ .Zt = Zt, .u_sol_trim = trim_sol.operating_point.input, .surface_actuators = surface_actuators, .propulsor_actuators = propulsor_actuators, .A = lin_sol.A, .B = lin_sol.B, .setpoint = guidance::LinearQuadraticSetpoint{ setpoint } },
                 .nonlinear_controller_input = control::NonlinearControllerInput{ .Zt = Zt, .surface_actuators = surface_actuators, .propulsor_actuators = propulsor_actuators, .setpoint = guidance::NonlinearSetpoint{ setpoint } }

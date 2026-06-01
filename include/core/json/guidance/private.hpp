@@ -7,8 +7,8 @@
 
 namespace json {
 
-    void validate_axial_control_setpoint(const nlohmann::json& guidance_json, const control::ControllerType& controller_type);
-    guidance::TrajectoryComponents& parse_axial_control_setpoint(const nlohmann::json& guidance_json, const control::ControllerType& controller_type, guidance::TrajectoryComponents& traj_components);
+    void validate_attitude_control_setpoint(const nlohmann::json& guidance_json, const control::ControllerType& controller_type);
+    guidance::TrajectoryComponents& parse_attitude_control_setpoint(const nlohmann::json& guidance_json, const control::ControllerType& controller_type, guidance::TrajectoryComponents& traj_components);
     void validate_velocity_control_setpoint(const nlohmann::json& guidance_json, const control::ControllerType& controller_type);
     guidance::TrajectoryComponents& parse_velocity_control_setpoint(const nlohmann::json& guidance_json, const control::ControllerType& controller_type, guidance::TrajectoryComponents& traj_components);
     void validate_linear_quadratic_control_setpoint(const nlohmann::json& guidance_json, const control::ControllerType& controller_type);

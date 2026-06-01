@@ -30,19 +30,19 @@ namespace control {
     using NonlinearController = std::function<ControlOutput(const NonlinearControllerInput&)>;
 
     struct ControllerInputs {
-        const AttitudeControllerInput& axial_controller_input;
+        const AttitudeControllerInput& attitude_controller_input;
         const VelocityControllerInput& velocity_controller_input;
         const LinearQuadraticControllerInput& linear_quadratic_controller_input;
         const NonlinearControllerInput& nonlinear_controller_input;
     };
 
     struct ControlProperties {
-        ControllerType axial_controller_type = ControllerType::None;
+        ControllerType attitude_controller_type = ControllerType::None;
         ControllerType velocity_controller_type = ControllerType::None;
         ControllerType linear_quadratic_controller_type = ControllerType::None;
         ControllerType nonlinear_controller_type = ControllerType::None;
 
-        AttitudeController axial_controller;
+        AttitudeController attitude_controller;
         VelocityController velocity_controller;
         LinearQuadraticController linear_quadratic_controller;
         NonlinearController nonlinear_controller;

@@ -8,8 +8,8 @@ namespace control {
         ControlOutput out{};
 
         if (!trim_bool) {
-            if (axial_controller) {
-                out.surface_inputs = axial_controller(inputs.axial_controller_input).surface_inputs;
+            if (attitude_controller) {
+                out.surface_inputs = attitude_controller(inputs.attitude_controller_input).surface_inputs;
             }
             if (velocity_controller) {
                 out.propulsor_inputs = velocity_controller(inputs.velocity_controller_input).propulsor_inputs;

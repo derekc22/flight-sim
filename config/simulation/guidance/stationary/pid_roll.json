@@ -1,6 +1,6 @@
 {
     "trajectory_type": "stationary",
-    "axial": {
+    "attitude": {
         "w": [[0.0, 0.0, 0.0]],
         "eul": [[0.0, 0.0, 0.0872665]]
     }

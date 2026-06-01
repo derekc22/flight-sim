@@ -104,7 +104,7 @@ namespace json {
         return params;
     }
 
-    control::AttitudeController make_axial_controller(control::ControllerType controller_type, const nlohmann::json& controller_json) {
+    control::AttitudeController make_attitude_controller(control::ControllerType controller_type, const nlohmann::json& controller_json) {
         switch (controller_type) {
             case control::ControllerType::AxialPID: {
                 control::AxialPIDParameters params = parse_axial_pid_parameters(controller_json);
@@ -117,7 +117,7 @@ namespace json {
             }
 
             default:
-                throw std::runtime_error("json::make_axial_controller unknown control type");
+                throw std::runtime_error("json::make_attitude_controller unknown control type");
         }
     }
 
@@ -187,9 +187,9 @@ namespace json {
         return map_controller_type(controller_type_str);
     }
 
-    void parse_axial_controller(const nlohmann::json& controller_json, control::AttitudeController& controller, control::ControllerType& controller_type) {
+    void parse_attitude_controller(const nlohmann::json& controller_json, control::AttitudeController& controller, control::ControllerType& controller_type) {
         controller_type = fetch_controller_type(controller_json);
-        controller = make_axial_controller(controller_type, controller_json);
+        controller = make_attitude_controller(controller_type, controller_json);
     }
 
     void parse_velocity_controller(const nlohmann::json& controller_json, control::VelocityController& controller, control::ControllerType& controller_type) {
@@ -208,13 +208,13 @@ namespace json {
     }
 
     void validate_controllers(const nlohmann::json& controllers_json){
-        bool axial_bool = controllers_json.contains("axial");
+        bool attitude_bool = controllers_json.contains("attitude");
         bool velocity_bool = controllers_json.contains("velocity");
         bool linear_quadratic_bool = controllers_json.contains("linear_quadratic");
         bool nonlinear_bool = controllers_json.contains("nonlinear");
 
-        if (axial_bool && linear_quadratic_bool) { throw std::runtime_error("json::validate_controllers: axial and linear_quadratic control laws cannot both be present"); }
-        if (axial_bool && nonlinear_bool) { throw std::runtime_error("json::validate_controllers: axial and nonlinear control laws cannot both be present"); }
+        if (attitude_bool && linear_quadratic_bool) { throw std::runtime_error("json::validate_controllers: attitude and linear_quadratic control laws cannot both be present"); }
+        if (attitude_bool && nonlinear_bool) { throw std::runtime_error("json::validate_controllers: attitude and nonlinear control laws cannot both be present"); }
 
         if (linear_quadratic_bool && nonlinear_bool) { throw std::runtime_error("json::validate_controllers: linear_quadratic and nonlinear control laws cannot both be present"); }
 
@@ -226,9 +226,9 @@ namespace json {
         validate_controllers(config);
         control::ControlProperties control_properties;
 
-        if (config.contains("axial")) {
-            const auto& axial_controller_json = config.at("axial");
-            parse_axial_controller(axial_controller_json, control_properties.axial_controller, control_properties.axial_controller_type);
+        if (config.contains("attitude")) {
+            const auto& attitude_controller_json = config.at("attitude");
+            parse_attitude_controller(attitude_controller_json, control_properties.attitude_controller, control_properties.attitude_controller_type);
         }
 
         if (config.contains("velocity")) {

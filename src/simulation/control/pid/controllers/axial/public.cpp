@@ -37,7 +37,7 @@ namespace control {
     PIDPolicyInput AxialPID::make_pid_policy_input(const AttitudeControllerInput& input, ControlAxis axis){
         dynamics::RigidBodyState Zt = input.Zt;
         actuators::SurfaceActuators surface_actuators = input.surface_actuators;
-        guidance::AxialSetpoint setpoint = input.setpoint;
+        guidance::AttitudeSetpoint setpoint = input.setpoint;
 
         dynamics::EulerAngles eul_meas_t;
         eul_meas_t.set(Zt.q);

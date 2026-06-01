@@ -1,5 +1,5 @@
 {
-    "axial": {
+    "attitude": {
         "controller_type": "AxialPID",
         "parameters": {
             "Kp_roll": 20,

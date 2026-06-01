@@ -12,7 +12,7 @@ namespace guidance {
         const dynamics::EulerAngles eulIB;
     };
 
-    struct AxialSetpoint : GuidanceSetpoint {};
+    struct AttitudeSetpoint : GuidanceSetpoint {};
 
     struct VelocitySetpoint : GuidanceSetpoint {};
 
