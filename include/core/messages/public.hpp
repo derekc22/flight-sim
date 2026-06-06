@@ -1,5 +1,4 @@
 #pragma once
-#include <Eigen/Dense>
 #include "simulation/geography/public.hpp"
 #include "simulation/dynamics/public.hpp"
 
@@ -20,6 +19,5 @@ namespace messages {
     };
 
     FlightGearMessageIn process_in_pkt(const geography::GeographicState& geographic_state, const dynamics::EulerAngles& attitude);
-
 
 }

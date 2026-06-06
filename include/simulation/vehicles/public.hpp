@@ -163,24 +163,9 @@ namespace vehicles {
         std::optional<WINDFrameSTABStepOptions> WINDFrameSTABStepOpts;
 
         static void validate(const StepOptions& opts);
-        // void _clear() noexcept;
     };
 
-    struct _StepOptions {
-        // Standard
-        std::optional<dynamics::HomogeneousTransformationMatrix> H;
-        std::optional<dynamics::OrientationMatrix> C;
-        std::optional<dynamics::Position> p;
-        std::optional<dynamics::OrientationQuaternion> q;
-        std::optional<dynamics::EulerAngles> eul;
-        std::optional<dynamics::OrientationMatrixRate> C_dot;
-        std::optional<dynamics::OrientationQuaternionRate> q_dot;
-        std::optional<dynamics::AngularVelocity> w;
-        std::optional<dynamics::EulerAngleRates> eul_dot;
-        std::optional<dynamics::AngularVelocityQuaternion> wq;
-        std::optional<dynamics::TranslationalVelocity> v;
-        std::optional<dynamics::Gravity> g;
-
+    struct _StepOptions : frames::StandardFrameFieldsOptional {
         // Geometric
         std::optional<geography::Latitude> lat;
         std::optional<geography::Longitude> lon;
@@ -194,7 +179,6 @@ namespace vehicles {
         std::optional<dynamics::RigidBodyState> rbs;
         std::optional<geography::GeographicState> gps;
         std::optional<aerodynamics::AerodynamicState> ads;
-
 
         static void validate(const frames::Frame& F, const _StepOptions& opts);
         explicit operator bool() const;
@@ -241,8 +225,5 @@ namespace vehicles {
         void init_frames();
         void print_state(int t, const atmospheric::Wind& windB);
     };
-
-
-
 
 }

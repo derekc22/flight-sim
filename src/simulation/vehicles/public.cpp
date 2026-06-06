@@ -27,7 +27,7 @@
 namespace vehicles {
 
     void StepOptions::validate(const StepOptions& opts) {
-        std::string err_msg = "vehicles::StepOptions::validate: Invalid input, cannot pass StepOptions for FRDFrameECEFOpts and FRDFrameNEDStepOpts simultaneously";
+        std::string err_msg = "vehicles::StepOptions::validate: Invalid input, cannot pass StepOptions for FRDFrameECEF and FRDFrameNED simultaneously";
         if (opts.FRDFrameECEFStepOpts.has_value() && opts.FRDFrameNEDStepOpts.has_value()) throw std::invalid_argument(err_msg);
     }
 
@@ -115,123 +115,83 @@ namespace vehicles {
         StepOptions::validate(opts);
 
         if (opts.NEDFrameECEFStepOpts.has_value()) {
-            _StepOptions _NEDFrameECEFStepOpts = { 
-                // H = opts.NEDFrameECEFStepOpts->HEN;
-                // C = opts.NEDFrameECEFStepOpts->CEN;
-                // p = opts.NEDFrameECEFStepOpts->pE_NE;
-                // q = opts.NEDFrameECEFStepOpts->qEN;
-                // eul = opts.NEDFrameECEFStepOpts->eulEN;
-                // C_dot = opts.NEDFrameECEFStepOpts->CEN_dot;
-                // q_dot = opts.NEDFrameECEFStepOpts->qEN_dot;
-                // w = opts.NEDFrameECEFStepOpts->wN_NE;
-                // eul_dot = opts.NEDFrameECEFStepOpts->eulEN_dot;
-                // wq = opts.NEDFrameECEFStepOpts->wq_NE;
-                // v = opts.NEDFrameECEFStepOpts->vN_NE;
-                // g = opts.NEDFrameECEFStepOpts->gN;
-                .lat = opts.NEDFrameECEFStepOpts->lat_NE,
-                .lon = opts.NEDFrameECEFStepOpts->lon_NE,
-                .alt = opts.NEDFrameECEFStepOpts->alt_NE,
-                .gps = opts.NEDFrameECEFStepOpts->gps_NE
-            };
-            _StepOptions::validate(NEDFrameECEF, _NEDFrameECEFStepOpts);
-            Aircraft::step(NEDFrameECEF, _NEDFrameECEFStepOpts);
+            _StepOptions _opts; 
+            _opts.lat = opts.NEDFrameECEFStepOpts->lat_NE;
+            _opts.lon = opts.NEDFrameECEFStepOpts->lon_NE;
+            _opts.alt = opts.NEDFrameECEFStepOpts->alt_NE;
+            _opts.gps = opts.NEDFrameECEFStepOpts->gps_NE;
+
+            _StepOptions::validate(NEDFrameECEF, _opts);
+            Aircraft::step(NEDFrameECEF, _opts);
             Aircraft::step_dependents(NEDFrameECEF);
         }
 
         if (opts.FRDFrameECEFStepOpts.has_value()) {
-            _StepOptions _FRDFrameECEFStepOpts = { 
-                .H = opts.FRDFrameECEFStepOpts->HEB,
-                .C = opts.FRDFrameECEFStepOpts->CEB,
-                .p = opts.FRDFrameECEFStepOpts->pE_BE,
-                .q = opts.FRDFrameECEFStepOpts->qEB,
-                .eul = opts.FRDFrameECEFStepOpts->eulEB,
-                .C_dot = opts.FRDFrameECEFStepOpts->CEB_dot,
-                .q_dot = opts.FRDFrameECEFStepOpts->qEB_dot,
-                .w = opts.FRDFrameECEFStepOpts->wB_BE,
-                .eul_dot = opts.FRDFrameECEFStepOpts->eulEB_dot,
-                .wq = opts.FRDFrameECEFStepOpts->wq_BE,
-                .v = opts.FRDFrameECEFStepOpts->vB_BE,
-                // g = opts.FRDFrameECEFStepOpts->gB,
-                .lat = opts.FRDFrameECEFStepOpts->lat_BE,
-                .lon = opts.FRDFrameECEFStepOpts->lon_BE,
-                .alt = opts.FRDFrameECEFStepOpts->alt_BE,
-                .rbs = opts.FRDFrameECEFStepOpts->rbs_BE,
-                .gps = opts.FRDFrameECEFStepOpts->gps_BE
-            };
-            _StepOptions::validate(FRDFrameECEF, _FRDFrameECEFStepOpts);
-            Aircraft::step(FRDFrameECEF, _FRDFrameECEFStepOpts);
+            _StepOptions _opts;
+            _opts.H = opts.FRDFrameECEFStepOpts->HEB;
+            _opts.C = opts.FRDFrameECEFStepOpts->CEB;
+            _opts.p = opts.FRDFrameECEFStepOpts->pE_BE;
+            _opts.q = opts.FRDFrameECEFStepOpts->qEB;
+            _opts.eul = opts.FRDFrameECEFStepOpts->eulEB;
+            _opts.C_dot = opts.FRDFrameECEFStepOpts->CEB_dot;
+            _opts.q_dot = opts.FRDFrameECEFStepOpts->qEB_dot;
+            _opts.w = opts.FRDFrameECEFStepOpts->wB_BE;
+            _opts.eul_dot = opts.FRDFrameECEFStepOpts->eulEB_dot;
+            _opts.wq = opts.FRDFrameECEFStepOpts->wq_BE;
+            _opts.v = opts.FRDFrameECEFStepOpts->vB_BE;
+            _opts.lat = opts.FRDFrameECEFStepOpts->lat_BE;
+            _opts.lon = opts.FRDFrameECEFStepOpts->lon_BE;
+            _opts.alt = opts.FRDFrameECEFStepOpts->alt_BE;
+            _opts.rbs = opts.FRDFrameECEFStepOpts->rbs_BE;
+            _opts.gps = opts.FRDFrameECEFStepOpts->gps_BE;
+
+            _StepOptions::validate(FRDFrameECEF, _opts);
+            Aircraft::step(FRDFrameECEF, _opts);
             Aircraft::step_dependents(FRDFrameECEF);
         }
 
         if (opts.FRDFrameNEDStepOpts.has_value()) {
-            _StepOptions _FRDFrameNEDStepOpts = { 
-                .H = opts.FRDFrameNEDStepOpts->HNB,
-                .C = opts.FRDFrameNEDStepOpts->CNB,
-                .p = opts.FRDFrameNEDStepOpts->pN_BN,
-                .q = opts.FRDFrameNEDStepOpts->qNB,
-                .eul = opts.FRDFrameNEDStepOpts->eulNB,
-                .C_dot = opts.FRDFrameNEDStepOpts->CNB_dot,
-                .q_dot = opts.FRDFrameNEDStepOpts->qNB_dot,
-                .w = opts.FRDFrameNEDStepOpts->wB_BN,
-                .eul_dot = opts.FRDFrameNEDStepOpts->eulNB_dot,
-                .wq = opts.FRDFrameNEDStepOpts->wq_BN,
-                .v = opts.FRDFrameNEDStepOpts->vB_BN,
-                .rbs = opts.FRDFrameNEDStepOpts->rbs_BN
-            };
-            _StepOptions::validate(FRDFrameNED, _FRDFrameNEDStepOpts);
-            Aircraft::step(FRDFrameNED, _FRDFrameNEDStepOpts);
+            _StepOptions _opts;
+            _opts.H = opts.FRDFrameNEDStepOpts->HNB;
+            _opts.C = opts.FRDFrameNEDStepOpts->CNB;
+            _opts.p = opts.FRDFrameNEDStepOpts->pN_BN;
+            _opts.q = opts.FRDFrameNEDStepOpts->qNB;
+            _opts.eul = opts.FRDFrameNEDStepOpts->eulNB;
+            _opts.C_dot = opts.FRDFrameNEDStepOpts->CNB_dot;
+            _opts.q_dot = opts.FRDFrameNEDStepOpts->qNB_dot;
+            _opts.w = opts.FRDFrameNEDStepOpts->wB_BN;
+            _opts.eul_dot = opts.FRDFrameNEDStepOpts->eulNB_dot;
+            _opts.wq = opts.FRDFrameNEDStepOpts->wq_BN;
+            _opts.v = opts.FRDFrameNEDStepOpts->vB_BN;
+            _opts.rbs = opts.FRDFrameNEDStepOpts->rbs_BN;
+
+            _StepOptions::validate(FRDFrameNED, _opts);
+            Aircraft::step(FRDFrameNED, _opts);
             Aircraft::step_dependents(FRDFrameNED);
         }
 
         if (opts.STABFrameFRDStepOpts.has_value()) {
-            _StepOptions _STABFrameFRDStepOpts = { 
-                // H = opts.STABFrameFRDStepOpts->HBS,
-                // C = opts.STABFrameFRDStepOpts->CBS,
-                // p = opts.STABFrameFRDStepOpts->pB_SB,
-                // q = opts.STABFrameFRDStepOpts->qBS,
-                // eul = opts.STABFrameFRDStepOpts->eulBS,
-                // C_dot = opts.STABFrameFRDStepOpts->CBS_dot,
-                // q_dot = opts.STABFrameFRDStepOpts->qBS_dot,
-                // w = opts.STABFrameFRDStepOpts->wS_SB,
-                // eul_dot = opts.STABFrameFRDStepOpts->eulBS_dot,
-                // wq = opts.STABFrameFRDStepOpts->wq_SB,
-                // v = opts.STABFrameFRDStepOpts->vS_SB,
-                // g = opts.STABFrameFRDStepOpts->gS,
-                .alpha = opts.STABFrameFRDStepOpts->alpha,
-                .ads = opts.STABFrameFRDStepOpts->ads
-            };
-            _StepOptions::validate(STABFrameFRD, _STABFrameFRDStepOpts);
-            Aircraft::step(STABFrameFRD, _STABFrameFRDStepOpts);
+            _StepOptions _opts;
+            _opts.alpha = opts.STABFrameFRDStepOpts->alpha;
+            _opts.ads = opts.STABFrameFRDStepOpts->ads;
+
+            _StepOptions::validate(STABFrameFRD, _opts);
+            Aircraft::step(STABFrameFRD, _opts);
             Aircraft::step_dependents(STABFrameFRD);
         }
 
         if (opts.WINDFrameSTABStepOpts.has_value()) {
-            _StepOptions _WINDFrameSTABStepOpts = { 
-                // H = opts.WINDFrameSTABStepOpts->HSW,
-                // C = opts.WINDFrameSTABStepOpts->CSW,
-                // p = opts.WINDFrameSTABStepOpts->pS_WS,
-                // q = opts.WINDFrameSTABStepOpts->qSW,
-                // eul = opts.WINDFrameSTABStepOpts->eulSW,
-                // C_dot = opts.WINDFrameSTABStepOpts->CSW_dot,
-                // q_dot = opts.WINDFrameSTABStepOpts->qSW_dot,
-                // w = opts.WINDFrameSTABStepOpts->wW_WS,
-                // eul_dot = opts.WINDFrameSTABStepOpts->eulSW_dot,
-                // wq = opts.WINDFrameSTABStepOpts->wq_WS,
-                // v = opts.WINDFrameSTABStepOpts->vW_WS,
-                // g = opts.WINDFrameSTABStepOpts->gW,
-                .beta = opts.WINDFrameSTABStepOpts->beta,
-                .ads = opts.WINDFrameSTABStepOpts->ads
-            };
-            _StepOptions::validate(WINDFrameSTAB, _WINDFrameSTABStepOpts);
-            Aircraft::step(WINDFrameSTAB, _WINDFrameSTABStepOpts);
+            _StepOptions _opts; 
+            _opts.beta = opts.WINDFrameSTABStepOpts->beta;
+            _opts.ads = opts.WINDFrameSTABStepOpts->ads;
+
+            _StepOptions::validate(WINDFrameSTAB, _opts);
+            Aircraft::step(WINDFrameSTAB, _opts);
             Aircraft::step_dependents(WINDFrameSTAB);
         }
 
         // Sync all gravity vectors
         step_gravity();
-
-        // // Clear options
-        // opts._clear();
     }
 
 
@@ -255,11 +215,7 @@ namespace vehicles {
                 opts.eul_dot.has_value()    ||
                 opts.wq.has_value()         ||
                 opts.v.has_value()          ||
-                opts.g.has_value()        //||
-                // opts.lat.has_value()     ||
-                // opts.lon.has_value()     ||
-                // opts.alt.has_value()     ||
-                // opts.gps.has_value()        
+                opts.g.has_value()
             ){ 
                 std::string err_msg = "vehicles::Aircraft::_step: Invalid _StepOptions input passed for NEDFrameECEF";
                 throw std::invalid_argument(err_msg);
@@ -284,7 +240,6 @@ namespace vehicles {
         // Defaults
         NEDFrameECEFSetOpts.C_dot = dynamics::OrientationMatrixRate{ constants::Zero3x3 };
         NEDFrameECEFSetOpts.v = dynamics::TranslationalVelocity{ constants::Zero3 };
-        // NEDFrameECEFSetOpts.g = geography::gN();
 
         F.set(NEDFrameECEFSetOpts); 
     }
@@ -298,23 +253,7 @@ namespace vehicles {
 
             // final guard
             if (
-                // opts.H.has_value()          ||
-                // opts.C.has_value()          ||
-                // opts.p.has_value()          ||
-                // opts.q.has_value()          ||
-                // opts.eul.has_value()        ||
-                // opts.C_dot.has_value()      ||
-                // opts.q_dot.has_value()      ||
-                // opts.w.has_value()          ||
-                // opts.eul_dot.has_value()    ||
-                // opts.wq.has_value()         ||
-                // opts.v.has_value()          ||
-                opts.g.has_value()           //||
-                // opts.lat.has_value()        ||
-                // opts.lon.has_value()        ||
-                // opts.alt.has_value()        ||
-                // opts.rbs.has_value()        ||
-                // opts.gps.has_value()        
+                opts.g.has_value()     
             ){ 
                 std::string err_msg = "vehicles::Aircraft::_step: Invalid _StepOptions input passed for FRDFrameECEF";
                 throw std::invalid_argument(err_msg);
@@ -322,27 +261,22 @@ namespace vehicles {
 
             if (opts.H.has_value()) { 
                 FRDFrameECEFSetOpts.H = *opts.H;
-                // FRDFrameECEFSetOpts.g = geography::gB(*opts.H);
             }
 
             if (opts.C.has_value()) { 
                 FRDFrameECEFSetOpts.C = *opts.C;
-                // FRDFrameECEFSetOpts.g = geography::gB(F.HEB.p(), *opts.C);
             }
 
             if (opts.p.has_value()) { 
                 FRDFrameECEFSetOpts.p = *opts.p;
-                // FRDFrameECEFSetOpts.g = geography::gB(*opts.p, F.HEB.C());
             }
 
             if (opts.q.has_value()) { 
                 FRDFrameECEFSetOpts.q = *opts.q;
-                // FRDFrameECEFSetOpts.g = geography::gB(F.HEB.p(), *opts.q);
             }
 
             if (opts.eul.has_value()) { 
                 FRDFrameECEFSetOpts.eul = *opts.eul;
-                // FRDFrameECEFSetOpts.g = geography::gB(F.HEB.p(), *opts.eul);
             }
 
             if (opts.C_dot.has_value()) { 
@@ -372,7 +306,6 @@ namespace vehicles {
             if (opts.lat.has_value() && opts.lon.has_value() && opts.alt.has_value()) { 
                 dynamics::Position p = geography::pE_from_lat_lon_alt(geography::GeographicState{ *opts.lat, *opts.lon, *opts.alt });
                 FRDFrameECEFSetOpts.p = p;
-                // FRDFrameECEFSetOpts.g = geography::gB(p, F.HEB.C());
             }
 
             if (opts.rbs.has_value()) {
@@ -380,24 +313,21 @@ namespace vehicles {
                 FRDFrameECEFSetOpts.q = opts.rbs->q;
                 FRDFrameECEFSetOpts.v = opts.rbs->v;
                 FRDFrameECEFSetOpts.w = opts.rbs->w;
-                // FRDFrameECEFSetOpts.g = geography::gB(opts.rbs->p, opts.rbs->q);
             }
 
             if (opts.gps.has_value()) {
                 dynamics::Position p = geography::pE_from_lat_lon_alt(*opts.gps);
                 FRDFrameECEFSetOpts.p = p;
-                // FRDFrameECEFSetOpts.g = geography::gB(p, F.HEB.C());
             }
         }
 
         else {
-            dynamics::Position p{ NEDFrameECEF.HEN.C().data.transpose() * FRDFrameNED.HNB.p().data + NEDFrameECEF.HEN.p().data };
+            dynamics::Position p{ frames::transform_point(FRDFrameNED.HNB.p().data, NEDFrameECEF, frames::ECEF) };
             FRDFrameECEFSetOpts.p = p;
             dynamics::OrientationMatrix C{ FRDFrameNED.HNB.C().data * NEDFrameECEF.HEN.C().data };
             FRDFrameECEFSetOpts.C = C;
             FRDFrameECEFSetOpts.w = FRDFrameNED.wB_BN;
             FRDFrameECEFSetOpts.v = FRDFrameNED.vB_BN;
-            // FRDFrameECEFSetOpts.g = geography::gB(p, C);
         }
 
         F.set(FRDFrameECEFSetOpts); 
@@ -412,23 +342,7 @@ namespace vehicles {
 
             // final guard
             if (
-                // opts.H.has_value()          ||
-                // opts.C.has_value()          ||
-                // opts.p.has_value()          ||
-                // opts.q.has_value()          ||
-                // opts.eul.has_value()        ||
-                // opts.C_dot.has_value()      ||
-                // opts.q_dot.has_value()      ||
-                // opts.w.has_value()          ||
-                // opts.eul_dot.has_value()    ||
-                // opts.wq.has_value()         ||
-                // opts.v.has_value()          ||
-                opts.g.has_value()           //||
-                // opts.lat.has_value()        ||
-                // opts.lon.has_value()        ||
-                // opts.alt.has_value()        ||
-                // opts.rbs.has_value()        ||
-                // opts.gps.has_value()        
+                opts.g.has_value()  
             ){ 
                 std::string err_msg = "vehicles::Aircraft::_step: Invalid _StepOptions input passed for FRDFrameNED";
                 throw std::invalid_argument(err_msg);
@@ -436,27 +350,22 @@ namespace vehicles {
 
             if (opts.H.has_value()) { 
                 FRDFrameNEDSetOpts.H = *opts.H;
-                // FRDFrameNEDSetOpts.g = geography::gB(*opts.H);
             }
 
             if (opts.C.has_value()) { 
                 FRDFrameNEDSetOpts.C = *opts.C;
-                // FRDFrameNEDSetOpts.g = geography::gB(*opts.C);
             }
 
             if (opts.p.has_value()) { 
                 FRDFrameNEDSetOpts.p = *opts.p;
-                // FRDFrameNEDSetOpts.g = geography::gB(F.HNB.C());
             }
 
             if (opts.q.has_value()) { 
                 FRDFrameNEDSetOpts.q = *opts.q;
-                // FRDFrameNEDSetOpts.g = geography::gB(*opts.q);
             }
 
             if (opts.eul.has_value()) { 
                 FRDFrameNEDSetOpts.eul = *opts.eul;
-                // FRDFrameNEDSetOpts.g = geography::gB(*opts.eul);
             }
 
             if (opts.C_dot.has_value()) { 
@@ -488,17 +397,15 @@ namespace vehicles {
                 FRDFrameNEDSetOpts.q = opts.rbs->q;
                 FRDFrameNEDSetOpts.v = opts.rbs->v;
                 FRDFrameNEDSetOpts.w = opts.rbs->w;
-                // FRDFrameNEDSetOpts.g = geography::gB(opts.rbs->q);
             }
         }
 
         else {
-            FRDFrameNEDSetOpts.p = dynamics::Position{ NEDFrameECEF.HEN.C().data * (FRDFrameECEF.HEB.p().data - NEDFrameECEF.HEN.p().data) };
+            FRDFrameNEDSetOpts.p = dynamics::Position{ frames::transform_point(FRDFrameECEF.HEB.p().data, frames::ECEF, NEDFrameECEF) };
             dynamics::OrientationMatrix C{ FRDFrameECEF.HEB.C().data *  NEDFrameECEF.HEN.C().data.transpose() };
             FRDFrameNEDSetOpts.C = C;
             FRDFrameNEDSetOpts.w = FRDFrameECEF.wB_BE;
             FRDFrameNEDSetOpts.v = FRDFrameECEF.vB_BE;
-            // FRDFrameNEDSetOpts.g = geography::gB(C);
         }
 
         F.set(FRDFrameNEDSetOpts); 
@@ -524,9 +431,7 @@ namespace vehicles {
                 opts.eul_dot.has_value()     ||
                 opts.wq.has_value()          ||
                 opts.v.has_value()           ||
-                opts.g.has_value()         //||
-                // opts.alpha.has_value()    ||
-                // opts.ads.has_value()        
+                opts.g.has_value()
             ){ 
                 std::string err_msg = "vehicles::Aircraft::_step: Invalid _StepOptions input passed for STABFrameFRD";
                 throw std::invalid_argument(err_msg);
@@ -535,18 +440,15 @@ namespace vehicles {
             if (opts.alpha.has_value()) { 
                 dynamics::OrientationMatrix C = aerodynamics::CBS(*opts.alpha);
                 STABFrameFRDSetOpts.C = C;
-                // STABFrameFRDSetOpts.g = geography::gS(FRDFrameNED.gB, C);
             }
 
             if (opts.ads.has_value()) {
                 dynamics::OrientationMatrix C = aerodynamics::CBS(opts.ads->alpha);
                 STABFrameFRDSetOpts.C = C;
-                // STABFrameFRDSetOpts.g = geography::gS(FRDFrameNED.gB, C);
             }
         }
 
         else {
-            // STABFrameFRDSetOpts.g = geography::gS(FRDFrameNED.gB, F.HBS.C());
         }
 
         // Defaults
@@ -577,9 +479,7 @@ namespace vehicles {
                 opts.eul_dot.has_value()     ||
                 opts.wq.has_value()          ||
                 opts.v.has_value()           ||
-                opts.g.has_value()         //||
-                // opts.beta.has_value()     ||
-                // opts.ads.has_value()        
+                opts.g.has_value()     
             ){ 
                 std::string err_msg = "vehicles::Aircraft::_step: Invalid _StepOptions input passed for WINDFrameSTAB";
                 throw std::invalid_argument(err_msg);
@@ -588,18 +488,15 @@ namespace vehicles {
             if (opts.beta.has_value()) { 
               dynamics::OrientationMatrix C = aerodynamics::CSW(*opts.beta);
                 WINDFrameSTABSetOpts.C = C;
-                // WINDFrameSTABSetOpts.g = geography::gS(STABFrameFRD.gS, C);
             }
 
             if (opts.ads.has_value()) {
                 dynamics::OrientationMatrix C = aerodynamics::CSW(opts.ads->beta);
                 WINDFrameSTABSetOpts.C = C;
-                // WINDFrameSTABSetOpts.g = geography::gS(STABFrameFRD.gS, C);
             }
         }
 
         else {
-            // WINDFrameSTABSetOpts.g = geography::gS(STABFrameFRD.gS, F.HSW.C());
         }
 
         // Defaults
@@ -699,12 +596,11 @@ namespace vehicles {
     void Aircraft::init_frames() {
 
         // Set default values
-        frames::SetOptions initStepOptions = {
-            .H = dynamics::HomogeneousTransformationMatrix{ constants::HI },
-            .w = dynamics::AngularVelocity{ constants::Zero3 },
-            .v = dynamics::TranslationalVelocity{ constants::Zero3 },
-            .g = dynamics::Gravity{ constants::Zero3 }
-        };
+        frames::SetOptions initStepOptions;
+        initStepOptions.H = dynamics::HomogeneousTransformationMatrix{ constants::HI };
+        initStepOptions.w = dynamics::AngularVelocity{ constants::Zero3 };
+        initStepOptions.v = dynamics::TranslationalVelocity{ constants::Zero3 };
+        initStepOptions.g = dynamics::Gravity{ constants::Zero3 };
 
         NEDFrameECEF.set(initStepOptions);
         FRDFrameECEF.set(initStepOptions);
@@ -778,7 +674,5 @@ namespace vehicles {
             << "wind: " << wind.x() << ", " << wind.y() << ", " << wind.z() << " [m/s]" << "\n\n"
             << "-------------------------------------------------------------------------------" << "\n\n";
     }
-
-    // void StepOptions::_clear() noexcept { *this = StepOptions{}; }
 
 }

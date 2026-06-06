@@ -131,13 +131,13 @@ namespace json {
     }
 
     void validate_trajectory_type(const guidance::TrajectoryComponents& traj_components, guidance::TrajectoryType traj_type) {
-        if (traj_type == guidance::TrajectoryType::Stationary && traj_components.n_rows > 1) { throw std::runtime_error("json::validate_trajectory_type: stationary trajectory cannot have more than one row"); }
+        if (traj_type == guidance::TrajectoryType::Regulation && traj_components.n_rows > 1) { throw std::runtime_error("json::validate_trajectory_type: regulation trajectory cannot have more than one row"); }
         if (traj_type == guidance::TrajectoryType::Interpolated && traj_components.n_rows != 2) { throw std::runtime_error("json::validate_trajectory_type: interpolated trajectory requires two rows"); }
     }
 
     guidance::TrajectoryType map_trajectory_type(const std::string& trajectory_type_str) {
-        if (trajectory_type_str == "stationary") { return guidance::TrajectoryType::Stationary; }
-        if (trajectory_type_str == "prespecified") { return guidance::TrajectoryType::Prespecified; }
+        if (trajectory_type_str == "regulation") { return guidance::TrajectoryType::Regulation; }
+        if (trajectory_type_str == "tracking") { return guidance::TrajectoryType::Tracking; }
         if (trajectory_type_str == "interpolated") { return guidance::TrajectoryType::Interpolated; }
         throw std::runtime_error("json::map_trajectory_type unknown trajectory type: " + trajectory_type_str);
     }

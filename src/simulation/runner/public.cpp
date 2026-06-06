@@ -180,7 +180,7 @@ namespace runner {
                 lin_sol = linearization::linearize_operating_point(aircraft, trim_sol.operating_point, trim_sol.conditions);
 
                 // perform eigenanalysis
-                analysis::EigenAnalysis eig_sol = analysis::local_linearization_eigen_analysis(lin_sol);
+                analysis::EigenAnalysis eig_sol = analysis::linearization_eigen_analysis(lin_sol);
 
                 // update analysis context
                 analysis_context.lin_sol = lin_sol;

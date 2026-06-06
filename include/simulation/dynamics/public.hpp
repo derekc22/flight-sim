@@ -216,9 +216,6 @@ namespace dynamics {
     template <typename T>
     constants::Matrix3_T<T> wB_BI_to_eul_dot_mat_T(const T& theta, const T& phi);
 
-    template <typename T>
-    constants::Vector3_T<T> gB_T(const T& phi, const T& theta);
-
     Position trans_kin(const Position& xt, const TranslationalVelocity& xt_dot, const TranslationalAcceleration& xt_ddot);
 
     OrientationQuaternion quat_kin(const OrientationQuaternion& qIB_t, const AngularVelocity& wB_BI_t);

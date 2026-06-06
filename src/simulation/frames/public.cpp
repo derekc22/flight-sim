@@ -169,13 +169,8 @@ namespace frames {
         if (opts.eul_dot.has_value())   { _set(*opts.eul_dot); }
         if (opts.wq.has_value())        { _set(*opts.wq); }
         if (opts.v.has_value())         { _set(*opts.v); }
-        // if (opts.a.has_value())         { _set(*opts.a); }
         if (opts.g.has_value())         { _set(*opts.g); }
-        // opts.clear();
     }
-
-    /** @deprecated */
-    // void SetOptions::clear() noexcept { *this = SetOptions{}; }
 
     Eigen::Vector3d transform_vec(const Eigen::Vector3d& vA, const Frame& A, const Frame& B) {
         Eigen::Matrix3d CRA = CRF(A);
@@ -214,8 +209,5 @@ namespace frames {
         Eigen::Vector3d pB = transforms::apply_H(HRB, pA);
         return pB;
     }
-
-
-
 
 }

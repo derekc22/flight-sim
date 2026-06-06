@@ -1,12 +1,17 @@
+#include <cstddef>
+#include <stdexcept>
+#include <Eigen/Dense>
+#include <cppad/example/cppad_eigen.hpp>
+#include <cppad/cppad.hpp>
 #include "simulation/actuators/propulsor/public.hpp"
 #include "simulation/actuators/surface/public.hpp"
 #include "simulation/actuators/public.hpp"
 #include "simulation/aerodynamics/public.hpp"
 #include "simulation/constants/public.hpp"
 #include "simulation/dynamics/public.hpp"
+#include "simulation/geography/public.hpp"
 #include "simulation/operating/public.hpp"
 #include "simulation/propulsion/public.hpp"
-#include "simulation/util/public.hpp"
 
 namespace autodiff {
 
@@ -39,7 +44,7 @@ namespace autodiff {
         const dynamics::Wrench_T<T> prop_wrench = propulsion::step_propulsive_forces_moments_T<T>(model.propulsor_actuators, twist, conditions.static_atm_state, propulsor_actuator_inputs, propulsion::PropulsorOmegaDot_T<T>{});
 
         return {
-            .F = aero_wrench.F + prop_wrench.F + T(model.structural.mass.data) * dynamics::gB_T(x.phi, x.theta),
+            .F = aero_wrench.F + prop_wrench.F + T(model.structural.mass.data) * geography::gB_T(x.phi, x.theta),
             .M = aero_wrench.M + prop_wrench.M,
         };
     }
@@ -62,6 +67,41 @@ namespace autodiff {
             .phi_dot = eul_dot.x(),
             .theta_dot = eul_dot.y(),
         };
+    }
+
+    template <typename T, std::size_t rows>
+    Eigen::Matrix<T, rows, 1> eigen_vector_from_cppad_vector(const CppAD::eigen_vector<T>& x) {
+        if (x.size() != rows) throw std::invalid_argument("autodiff::eigen_vector_from_cppad_vector: vector has incorrect size");
+
+        Eigen::Matrix<T, rows, 1> out;
+        for (std::size_t i = 0; i < rows; ++i) {
+            out(static_cast<Eigen::Index>(i)) = x[i];
+        }
+        return out;
+    }
+
+    template <typename T, int rows>
+    CppAD::eigen_vector<T> cppad_vector_from_eigen_vector(const Eigen::Matrix<T, rows, 1>& x) {
+        CppAD::eigen_vector<T> out(static_cast<std::size_t>(rows));
+        for (int i = 0; i < rows; ++i) {
+            out[i] = x(static_cast<Eigen::Index>(i));
+        }
+        return out;
+    }
+
+    template <int rows>
+    CppAD::eigen_vector<CppAD::AD<double>> start_autodiff_tracking(const Eigen::Matrix<double, rows, 1>& x) {
+        CppAD::eigen_vector<CppAD::AD<double>> x_tracked = cppad_vector_from_eigen_vector(Eigen::Matrix<CppAD::AD<double>, rows, 1>(x.template cast<CppAD::AD<double>>()));
+        CppAD::Independent(x_tracked);
+        return x_tracked;
+    }
+
+    template <int output_rows, int input_rows>
+    Eigen::Matrix<double, output_rows, input_rows> compute_jac(CppAD::ADFun<double>& f, const Eigen::Matrix<double, input_rows, 1>& x) {
+        const CppAD::eigen_vector<double> x_eval = cppad_vector_from_eigen_vector(x);
+        const CppAD::eigen_vector<double> jac_flat = f.Jacobian(x_eval);
+        const Eigen::Map<const Eigen::Matrix<double, output_rows, input_rows, Eigen::RowMajor>> jac_map(jac_flat.data());
+        return Eigen::Matrix<double, output_rows, input_rows>(jac_map);
     }
 
 }

@@ -3,6 +3,8 @@
 #include <cstddef>
 #include <utility> // For std::pair
 #include <stdexcept>
+#include <cppad/example/cppad_eigen.hpp>
+#include <cppad/cppad.hpp>
 #include "simulation/actuators/propulsor/public.hpp"
 #include "simulation/actuators/surface/public.hpp"
 #include "simulation/actuators/public.hpp"
@@ -11,7 +13,6 @@
 #include "simulation/constants/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/trim/private.hpp"
-#include "simulation/util/cppad/public.hpp"
 #include "simulation/util/public.hpp"
 #include "simulation/autodiff/public.hpp"
 #include "simulation/operating/public.hpp"
@@ -144,8 +145,8 @@ namespace trim {
     }
 
     TrimResidualJacobian compute_trim_residual_jac(const operating::StateInputVector_T<double>& z, const autodiff::AutoDiffModel& model, const TrimTarget& target, const operating::OperatingConditions& conditions, bool use_physical_controls) {
-        CppAD::eigen_vector<CppAD::AD<double>> z_tracked = util::start_autodiff_tracking(z);
-        const operating::StateInputVector_T<CppAD::AD<double>> z_vec = util::eigen_vector_from_cppad_vector<CppAD::AD<double>, constants::state_input_dim>(z_tracked);
+        CppAD::eigen_vector<CppAD::AD<double>> z_tracked = autodiff::start_autodiff_tracking(z);
+        const operating::StateInputVector_T<CppAD::AD<double>> z_vec = autodiff::eigen_vector_from_cppad_vector<CppAD::AD<double>, constants::state_input_dim>(z_tracked);
         const TrimResidualVector_T<CppAD::AD<double>> residual_tracked = compute_trim_residual_vector_T<CppAD::AD<double>>(
             z_vec,
             model,
@@ -153,9 +154,9 @@ namespace trim {
             conditions,
             use_physical_controls
         );
-        const CppAD::eigen_vector<CppAD::AD<double>> residual_tracked_cppad = util::cppad_vector_from_eigen_vector(residual_tracked);
+        const CppAD::eigen_vector<CppAD::AD<double>> residual_tracked_cppad = autodiff::cppad_vector_from_eigen_vector(residual_tracked);
         CppAD::ADFun<double> f(z_tracked, residual_tracked_cppad);
-        return util::compute_jac<trim_residual_dim, constants::state_input_dim>(f, z);
+        return autodiff::compute_jac<trim_residual_dim, constants::state_input_dim>(f, z);
     }
 
     TrimSolution solve_trim(const TrimProblem<double>& problem, const autodiff::AutoDiffModel& model, TrimSolveOptions options) {

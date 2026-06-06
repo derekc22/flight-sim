@@ -15,7 +15,7 @@ namespace analysis {
         Eigenvectors eigenvectors = Eigenvectors::Zero();
     };
 
-    EigenAnalysis local_linearization_eigen_analysis(const linearization::LocalLinearization& lin);
+    EigenAnalysis linearization_eigen_analysis(const linearization::LocalLinearization& lin);
 
     std::string print_eigen_analysis(const EigenAnalysis& eig);
 

@@ -71,13 +71,4 @@ namespace dynamics {
         return wB_BI_to_eul_dot_mat_T<T>(theta, phi) * wB_BI;
     }
 
-    template <typename T>
-    constants::Vector3_T<T> gB_T(const T& phi, const T& theta) {
-        constants::Vector3_T<T> gB;
-        gB << -T(constants::g_earth) * util::sin(theta),
-               T(constants::g_earth) * util::sin(phi) * util::cos(theta),
-               T(constants::g_earth) * util::cos(phi) * util::cos(theta);
-        return gB;
-    }
-
 }

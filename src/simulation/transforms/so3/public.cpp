@@ -36,8 +36,6 @@ namespace transforms {
         return eul_to_R_extr(a, b, c, order);
     }
 
-
-
     Eigen::Vector3d C_to_eul(const Eigen::Matrix3d& C, const std::string& order, const std::string& type) {
         if (type == "extr") return C_to_eul_extr(C, order);
         if (type == "intr") return C_to_eul_intr(C, order);

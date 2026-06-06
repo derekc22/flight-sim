@@ -66,7 +66,7 @@ Update the JSON configuration file paths in `config/analyze.json`
 
 To run the simulation:
   ```bash
-  scripts/bin/run.sh -a <AIRCRAFT> -t <TIME_SEC> [-r TRIM] [-s SENSOR] [-c CONTROL] [-e ESTIMATION] [-w WIND] [-v VERBOSE] [-d DATA] [-p PLOT] -o <OUT_DIR> [-m ANALYSIS]
+  ./scripts/bin/run.sh -a <AIRCRAFT> -t <TIME_SEC> [-r TRIM] [-s SENSOR] [-c CONTROL] [-e ESTIMATION] [-w WIND] [-v VERBOSE] [-d DATA] [-p PLOT] -o <OUT_DIR> [-m ANALYSIS]
   ```
 - `-a AIRCRAFT`: Aircraft to simulate (e.g. ASW28, c172p)
 - `-t TIME_SEC`: Simulation time in seconds
@@ -84,17 +84,17 @@ To run the simulation:
 ## Example
 Run a 60-second simulation of the C172 with control and avionics enabled. Data, plots, and reports are saved to `results/data/c172_test`, `results/figures/c172_test`, and `results/reports/c172_test`, respectively:
 ```bash
-scripts/bin/run.sh -a c172p -t 60 -c -s -d -p -o c172_test
+./scripts/bin/run.sh -a c172p -t 60 -c -s -d -p -o c172_test
 ```
 
 ## Plotting
 To generate plots from logged data, use the `-p` flag with `run.sh` or run:
 ```bash
-scripts/bin/plot.sh <OUT_DIR>
+./scripts/bin/plot.sh <OUT_DIR>
 ```
 
 ## Analysis
-Post-run analysis is implemented with MATLAB and configured via `config/analyze.json`. To run the analysis, use the `-m` flag with `run.sh` or run:
+Post-run analysis is implemented with MATLAB and configured via `config/analyze.json`. To run the analysis on logged data, use the `-m` flag with `run.sh` or run:
 
 ```bash
 scripts/bin/analyze.sh <OUT_DIR>
@@ -105,13 +105,13 @@ The current analysis implementation requires an active MATLAB license. A planned
 Unit tests are implemented with Google Test:
 ```bash
 # Run all tests
-scripts/bin/test.sh
+./scripts/bin/test.sh
 
 # Run a specific test suite
-scripts/bin/test.sh -t <TEST_SUITE>
+./scripts/bin/test.sh -t <TEST_SUITE>
 
 # See available test suites
-scripts/bin/test.sh -h
+./scripts/bin/test.sh -h
 ```
 
 ## References:

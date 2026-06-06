@@ -1,5 +1,5 @@
 {
-    "trajectory_type": "stationary",
+    "trajectory_type": "regulation",
     "attitude": {
         "w": [[0.0, 0.0, 0.0]],
         "eul": [[0.0, 0.1672665, 0.0]]

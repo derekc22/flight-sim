@@ -21,8 +21,8 @@ namespace guidance {
     struct NonlinearSetpoint : GuidanceSetpoint {};
 
     enum class TrajectoryType {
-        Stationary,
-        Prespecified,
+        Regulation,
+        Tracking,
         Interpolated
     };
 

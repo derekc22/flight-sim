@@ -1,5 +1,5 @@
 {
-    "trajectory_type": "stationary",
+    "trajectory_type": "regulation",
     "linear_quadratic": {
         "v": [[34.7848, 8.47198e-04, 3.29174e-01]],
         "w": [[6.40911e-05, 9.41998e-04, -3.15590e-05]],

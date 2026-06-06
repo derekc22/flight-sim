@@ -1,7 +1,7 @@
 {
-    "trajectory_type": "stationary",
+    "trajectory_type": "regulation",
     "linear_quadratic": {
-        "v": [[54.0, 0.0, -0.12]],
+        "v": [[8.7, 0.0, 0.0]],
         "w": [[0.0, 0.0, 0.0]],
         "eul": [[0.0, 0.0, 0.0]]
     }

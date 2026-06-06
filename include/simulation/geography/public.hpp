@@ -1,4 +1,5 @@
 #pragma once
+#include "simulation/constants/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/frames/public.hpp"
 
@@ -47,4 +48,8 @@ namespace geography {
     dynamics::Gravity gS(const dynamics::Gravity& gB, const dynamics::OrientationMatrix& CBS);
     dynamics::Gravity gW(const dynamics::Gravity& gS, const dynamics::OrientationMatrix& CSW);
 
+    template <typename T>
+    constants::Vector3_T<T> gB_T(const T& phi, const T& theta);
+
 }
+#include "simulation/geography/public.tpp"

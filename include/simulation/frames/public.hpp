@@ -34,7 +34,7 @@ namespace frames {
         dynamics::Gravity* g;
     };
 
-    struct SetOptions {
+    struct StandardFrameFieldsOptional {
         std::optional<dynamics::HomogeneousTransformationMatrix> H;
         std::optional<dynamics::OrientationMatrix> C;
         std::optional<dynamics::Position> p;
@@ -47,8 +47,9 @@ namespace frames {
         std::optional<dynamics::AngularVelocityQuaternion> wq;
         std::optional<dynamics::TranslationalVelocity> v;
         std::optional<dynamics::Gravity> g;
-        // void clear() noexcept;
     };
+
+    struct SetOptions : StandardFrameFieldsOptional {};
 
     struct Frame {
         std::string name;

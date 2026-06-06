@@ -1,9 +1,6 @@
 #pragma once
 
-#include <cstddef>
-#include <stdexcept>
 #include <Eigen/Dense>
-#include <cppad/example/cppad_eigen.hpp>
 #include <cppad/cppad.hpp>
 
 namespace util {
@@ -27,18 +24,4 @@ namespace util {
 
     Eigen::Matrix<CppAD::AD<double>, 3, 1> norm(const Eigen::Matrix<CppAD::AD<double>, 3, 1>& v);
 
-    template <typename T, std::size_t rows>
-    Eigen::Matrix<T, rows, 1> eigen_vector_from_cppad_vector(const CppAD::eigen_vector<T>& x);
-
-    template <typename T, int rows>
-    CppAD::eigen_vector<T> cppad_vector_from_eigen_vector(const Eigen::Matrix<T, rows, 1>& x);
-
-    template <int rows>
-    CppAD::eigen_vector<CppAD::AD<double>> start_autodiff_tracking(const Eigen::Matrix<double, rows, 1>& x);
-
-    template <int output_rows, int input_rows>
-    Eigen::Matrix<double, output_rows, input_rows> compute_jac(CppAD::ADFun<double>& f, const Eigen::Matrix<double, input_rows, 1>& x);
-
 }
-
-#include "simulation/util/cppad/public.tpp"

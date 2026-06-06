@@ -20,12 +20,12 @@ namespace guidance {
 
     GuidanceSetpoint GuidanceProperties::step(int t, int tf) {
         switch (trajectory_type) {
-            case TrajectoryType::Stationary: {
+            case TrajectoryType::Regulation: {
                 return pack_guidance_setpoint(trajectory.data.row(0).transpose());
             }
             break;
 
-            case TrajectoryType::Prespecified: {
+            case TrajectoryType::Tracking: {
                 if (t >= trajectory.data.rows()) { t = trajectory.data.rows() - 1; }
                 return pack_guidance_setpoint(trajectory.data.row(t).transpose());
             }

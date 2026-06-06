@@ -1,0 +1,8 @@
+{
+    "trajectory_type": "regulation",
+    "linear_quadratic": {
+        "v": [[54.0, 0.0, -0.12]],
+        "w": [[0.0, 0.0, 0.0]],
+        "eul": [[0.0, 0.0, 0.0]]
+    }
+}
