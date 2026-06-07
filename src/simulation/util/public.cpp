@@ -6,7 +6,9 @@
 namespace util {
 
     double clamp(double x, double min_val, double max_val) {
-        if (max_val < min_val) { throw std::runtime_error("util::clamp: max_val must be greater than or equal to min_val"); }
+        if (max_val < min_val) { 
+            throw std::runtime_error("util::clamp: max_val must be greater than or equal to min_val"); 
+        }
         if (max_val == min_val) return min_val;
         if (x > max_val) return max_val;
         if (x < min_val) return min_val;

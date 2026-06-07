@@ -77,7 +77,9 @@ namespace json {
 
     void validate_NEDFrameECEF_initialization(const nlohmann::json& frame_json) {
         const ParsedStepOptions fields = parse_step_options(frame_json);
-        if (!fields.lat.has_value() || !fields.lon.has_value() || !fields.alt.has_value()) { throw std::runtime_error("json::validate_NEDFrameECEF_initialization: lat, lon, alt required"); }
+        if (!fields.lat.has_value() || !fields.lon.has_value() || !fields.alt.has_value()) { 
+            throw std::runtime_error("json::validate_NEDFrameECEF_initialization: lat, lon, alt required"); 
+        }
     }
 
     void validate_FRDFrameECEF_initialization(const nlohmann::json& frame_json) {
@@ -103,10 +105,18 @@ namespace json {
         const bool has_linear_velocity = has_v;
         const bool has_angular_velocity = has_C_dot || has_q_dot || has_w || has_eul_dot || has_wq;
 
-        if (!has_position) { throw std::runtime_error("json::validate_FRDFrameECEF_initialization: one position representation required"); }
-        if (!has_orientation) { throw std::runtime_error("json::validate_FRDFrameECEF_initialization: one orientation representation required"); }
-        if (!has_linear_velocity) { throw std::runtime_error("json::validate_FRDFrameECEF_initialization: v required"); }
-        if (!has_angular_velocity) { throw std::runtime_error("json::validate_FRDFrameECEF_initialization: one angular velocity representation required"); }
+        if (!has_position) { 
+            throw std::runtime_error("json::validate_FRDFrameECEF_initialization: one position representation required"); 
+        }
+        if (!has_orientation) { 
+            throw std::runtime_error("json::validate_FRDFrameECEF_initialization: one orientation representation required"); 
+        }
+        if (!has_linear_velocity) { 
+            throw std::runtime_error("json::validate_FRDFrameECEF_initialization: v required"); 
+        }
+        if (!has_angular_velocity) { 
+            throw std::runtime_error("json::validate_FRDFrameECEF_initialization: one angular velocity representation required"); 
+        }
     }
 
     void validate_FRDFrameNED_initialization(const nlohmann::json& frame_json) {
@@ -128,22 +138,46 @@ namespace json {
         const bool has_linear_velocity = has_v;
         const bool has_angular_velocity = has_C_dot || has_q_dot || has_w || has_eul_dot || has_wq;
 
-        if (!has_position) { throw std::runtime_error("json::validate_FRDFrameNED_initialization: one position representation required"); }
-        if (!has_orientation) { throw std::runtime_error("json::validate_FRDFrameNED_initialization: one orientation representation required"); }
-        if (!has_linear_velocity) { throw std::runtime_error("json::validate_FRDFrameNED_initialization: v required"); }
-        if (!has_angular_velocity) { throw std::runtime_error("json::validate_FRDFrameNED_initialization: one angular velocity representation required"); }
+        if (!has_position) { 
+            throw std::runtime_error("json::validate_FRDFrameNED_initialization: one position representation required"); 
+        }
+        if (!has_orientation) { 
+            throw std::runtime_error("json::validate_FRDFrameNED_initialization: one orientation representation required"); 
+        }
+        if (!has_linear_velocity) { 
+            throw std::runtime_error("json::validate_FRDFrameNED_initialization: v required"); 
+        }
+        if (!has_angular_velocity) { 
+            throw std::runtime_error("json::validate_FRDFrameNED_initialization: one angular velocity representation required"); 
+        }
     }
 
     void validate_initialization_config(const nlohmann::json& config, bool trim_bool) {
-        if (!config.contains("NEDFrameECEF") && !config.contains("FRDFrameECEF")) { throw std::runtime_error("json::validate_initialization_config: One of NEDFrameECEF, FRDFrameECEF required"); }
-        if (!config.contains("FRDFrameECEF") && !config.contains("FRDFrameNED")) { throw std::runtime_error("json::validate_initialization_config: One of FRDFrameECEF, FRDFrameNED required"); }
-        if (config.contains("WINDFrameSTAB")) { throw std::runtime_error("json::validate_initialization_config: WINDFrameSTAB is an aerodynamic frame. User initialization is not allowed"); }
-        if (config.contains("STABFrameFRD")) { throw std::runtime_error("json::validate_initialization_config: STABFrameFRD is an aerodynamic frame. User initialization is not allowed"); }
-        if (trim_bool && !config.contains("FRDFrameNED")) { throw std::runtime_error("json::validate_initialization_config: FRDFrameNED required for trim"); }
+        if (!config.contains("NEDFrameECEF") && !config.contains("FRDFrameECEF")) { 
+            throw std::runtime_error("json::validate_initialization_config: One of NEDFrameECEF, FRDFrameECEF required"); 
+        }
+        if (!config.contains("FRDFrameECEF") && !config.contains("FRDFrameNED")) { 
+            throw std::runtime_error("json::validate_initialization_config: One of FRDFrameECEF, FRDFrameNED required"); 
+        }
+        if (config.contains("WINDFrameSTAB")) { 
+            throw std::runtime_error("json::validate_initialization_config: WINDFrameSTAB is an aerodynamic frame. User initialization is not allowed"); 
+        }
+        if (config.contains("STABFrameFRD")) { 
+            throw std::runtime_error("json::validate_initialization_config: STABFrameFRD is an aerodynamic frame. User initialization is not allowed"); 
+        }
+        if (trim_bool && !config.contains("FRDFrameNED")) { 
+            throw std::runtime_error("json::validate_initialization_config: FRDFrameNED required for trim"); 
+        }
 
-        if (config.contains("NEDFrameECEF")) { validate_NEDFrameECEF_initialization(config.at("NEDFrameECEF")); }
-        if (config.contains("FRDFrameECEF")) { validate_FRDFrameECEF_initialization(config.at("FRDFrameECEF")); }
-        if (config.contains("FRDFrameNED")) { validate_FRDFrameNED_initialization(config.at("FRDFrameNED")); }
+        if (config.contains("NEDFrameECEF")) { 
+            validate_NEDFrameECEF_initialization(config.at("NEDFrameECEF")); 
+        }
+        if (config.contains("FRDFrameECEF")) { 
+            validate_FRDFrameECEF_initialization(config.at("FRDFrameECEF")); 
+        }
+        if (config.contains("FRDFrameNED")) { 
+            validate_FRDFrameNED_initialization(config.at("FRDFrameNED")); 
+        }
     }
 
 }

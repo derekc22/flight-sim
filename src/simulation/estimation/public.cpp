@@ -11,7 +11,9 @@ namespace estimation {
         }
 
         if (!trim_bool) {
-            if (linear_kalman_estimator) { throw std::runtime_error("estimation::EstimationProperties::step LinearKalmanEstimator requires trim"); }
+            if (linear_kalman_estimator) { 
+                throw std::runtime_error("estimation::EstimationProperties::step LinearKalmanEstimator requires trim"); 
+            }
         }
 
         if (trim_bool) {

@@ -12,7 +12,9 @@ namespace control {
 
     Eigen::LDLT<Eigen::MatrixXd> factorize_symmetric(const Eigen::Ref<const Eigen::MatrixXd>& M, const char* name) {
         Eigen::LDLT<Eigen::MatrixXd> ldlt(symmetrize(M));
-        if (ldlt.info() != Eigen::Success) { throw std::runtime_error(std::string("control::") + name + " factorization failed"); }
+        if (ldlt.info() != Eigen::Success) { 
+            throw std::runtime_error(std::string("control::") + name + " factorization failed"); 
+        }
         return ldlt;
     }
 
@@ -36,7 +38,9 @@ namespace control {
         int info = 0;
 
         slicot_solve_care_sb02md(n, A_work.data(), G_work.data(), Q_work.data(), P.data(), &rcond, &info);
-        if (info != 0) { throw std::runtime_error("control::solve_care_sb02md failed with INFO = " + std::to_string(info)); }
+        if (info != 0) { 
+            throw std::runtime_error("control::solve_care_sb02md failed with INFO = " + std::to_string(info)); 
+        }
         P = symmetrize(P);
         return { .P = P, .residual = care_residual(A, G_work, Q, P), .rcond = rcond };
     }
@@ -50,7 +54,9 @@ namespace control {
 
         const Eigen::LDLT<Eigen::MatrixXd> R_ldlt = factorize_symmetric(R, "R");
         const Eigen::MatrixXd G = B * R_ldlt.solve(B.transpose());
-        if (R_ldlt.info() != Eigen::Success || !G.allFinite()) { throw std::runtime_error("control::solve_care failed to form G = B R^{-1} B^T"); }
+        if (R_ldlt.info() != Eigen::Success || !G.allFinite()) { 
+            throw std::runtime_error("control::solve_care failed to form G = B R^{-1} B^T"); 
+        }
         return solve_care_sb02md(A, G, Q);
     }
 
@@ -61,7 +67,9 @@ namespace control {
 
         const Eigen::LDLT<Eigen::MatrixXd> R_ldlt = factorize_symmetric(R, "R");
         const Eigen::MatrixXd K = R_ldlt.solve(B.transpose() * P);
-        if (R_ldlt.info() != Eigen::Success || !K.allFinite()) { throw std::runtime_error("control::lqr_gain failed to solve for K"); }
+        if (R_ldlt.info() != Eigen::Success || !K.allFinite()) { 
+            throw std::runtime_error("control::lqr_gain failed to solve for K"); 
+        }
         return K;
     }
 

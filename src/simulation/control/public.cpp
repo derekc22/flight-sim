@@ -17,7 +17,9 @@ namespace control {
             if (nonlinear_controller) {
                 out = nonlinear_controller(inputs.nonlinear_controller_input);
             }
-            if (linear_quadratic_controller) { throw std::runtime_error("control::ControlProperties::step LinearQuadraticController requires trim"); }
+            if (linear_quadratic_controller) { 
+                throw std::runtime_error("control::ControlProperties::step LinearQuadraticController requires trim"); 
+            }
         }
 
         if (trim_bool) {

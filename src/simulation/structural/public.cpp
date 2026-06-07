@@ -21,7 +21,9 @@ namespace structural {
 
     Geometry& StructuralProperties::get_geometry(const std::string& id) {
         const auto it = geometryIDs.find(id);
-        if (it == geometryIDs.end()) { throw std::runtime_error("structural::StructuralProperties::get_geometry: geometry id not found: " + id); }
+        if (it == geometryIDs.end()) { 
+            throw std::runtime_error("structural::StructuralProperties::get_geometry: geometry id not found: " + id); 
+        }
         return geometries[it->second];
     }
 
@@ -30,7 +32,9 @@ namespace structural {
         for (const Geometry& geom : geometries) {
             m += geom.mass;
         }
-        if (m < constants::eps) { throw std::runtime_error("structural::StructuralProperties::compute_mass: mass must be positive"); }
+        if (m < constants::eps) { 
+            throw std::runtime_error("structural::StructuralProperties::compute_mass: mass must be positive"); 
+        }
         return m;
     }
 
@@ -74,7 +78,9 @@ namespace structural {
         j(2, 1) = j(1, 2);
 
         double detj = j.determinant();
-        if (std::abs(detj) < constants::eps) { throw std::runtime_error("structural::StructuralProperties::compute_JB: Inertia tensor is singular"); }
+        if (std::abs(detj) < constants::eps) { 
+            throw std::runtime_error("structural::StructuralProperties::compute_JB: Inertia tensor is singular"); 
+        }
 
         return j;
     }
@@ -95,7 +101,9 @@ namespace structural {
 
     double StructuralProperties::compute_spin_inertia(const Geometry& geom, const Eigen::Vector3d& axis) {
         Eigen::Vector3d axis_hat = util::norm(axis);
-        if (axis_hat.norm() < constants::eps) { throw std::runtime_error("structural::StructuralProperties::compute_spin_inertia: spin axis cannot be zero"); }
+        if (axis_hat.norm() < constants::eps) { 
+            throw std::runtime_error("structural::StructuralProperties::compute_spin_inertia: spin axis cannot be zero"); 
+        }
         return axis_hat.dot(compute_local_JB(geom) * axis_hat);
     }
 

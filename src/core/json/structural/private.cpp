@@ -9,7 +9,9 @@ namespace json {
 
     structural::StructuralProperties parse_structural_properties(const nlohmann::json& config) {
         const auto& geometries_json = config.at("geometries");
-        if (!geometries_json.is_array()) { throw std::runtime_error("json::parse_structural_config expected 'geometries' to be an array"); }
+        if (!geometries_json.is_array()) { 
+            throw std::runtime_error("json::parse_structural_config expected 'geometries' to be an array"); 
+        }
 
         std::vector<structural::Geometry> geometries;
         geometries.reserve(geometries_json.size());

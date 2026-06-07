@@ -15,7 +15,9 @@ namespace json {
 
     std::tuple<Eigen::MatrixXd, Eigen::MatrixXd, Eigen::MatrixXd> parse_kalman_filter_parameters(const nlohmann::json& estimator_json) {
         const auto& parameters_json = estimator_json.at("parameters");
-        if (!parameters_json.is_object()) { throw std::runtime_error("json::parse_kalman_filter_parameters expected parameters object"); }
+        if (!parameters_json.is_object()) { 
+            throw std::runtime_error("json::parse_kalman_filter_parameters expected parameters object"); 
+        }
         if ( !parameters_json.contains("P0") || !parameters_json.contains("Q") || !parameters_json.contains("R")) {
             throw std::runtime_error("json::parse_kalman_filter_parameters requires P0, Q, and R");
         }

@@ -14,7 +14,7 @@ namespace analysis {
     EigenAnalysis linearization_eigen_analysis(const linearization::LocalLinearization& lin_sol) {
         Eigen::EigenSolver<linearization::StateJacobian> solver(lin_sol.A);
         if (solver.info() != Eigen::Success) {
-            throw std::runtime_error("analysis::linearization_eigen_analysis: eigenvalue computation failed");
+            throw std::runtime_error("analysis::linearization_eigen_analysis: Eigenvalue computation failed");
         }
 
         return EigenAnalysis{

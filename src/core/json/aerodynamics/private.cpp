@@ -43,7 +43,9 @@ namespace json {
     }
     aerodynamics::AerodynamicProperties parse_aerodynamic_properties(const nlohmann::json& config) {
         const auto& surfaces_json = config.at("surfaces");
-        if (!surfaces_json.is_array()) { throw std::runtime_error("json::parse_aerodynamics_config expected 'surfaces' to be an array"); }
+        if (!surfaces_json.is_array()) { 
+            throw std::runtime_error("json::parse_aerodynamics_config expected 'surfaces' to be an array"); 
+        }
 
         std::vector<aerodynamics::Surface> surfaces;
         surfaces.reserve(surfaces_json.size());

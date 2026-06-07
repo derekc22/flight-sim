@@ -71,7 +71,9 @@ namespace autodiff {
 
     template <typename T, std::size_t rows>
     Eigen::Matrix<T, rows, 1> eigen_vector_from_cppad_vector(const CppAD::eigen_vector<T>& x) {
-        if (x.size() != rows) throw std::invalid_argument("autodiff::eigen_vector_from_cppad_vector: vector has incorrect size");
+        if (x.size() != rows) {
+            throw std::invalid_argument("autodiff::eigen_vector_from_cppad_vector: vector has incorrect size");
+        }
 
         Eigen::Matrix<T, rows, 1> out;
         for (std::size_t i = 0; i < rows; ++i) {

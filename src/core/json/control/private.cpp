@@ -17,7 +17,9 @@ namespace json {
 
     control::AxialPIDParameters parse_damper_pid_parameters(const nlohmann::json& controller_json) {
         const auto& parameters_json = controller_json.at("parameters");
-        if (!parameters_json.is_object()) { throw std::runtime_error("json::parse_damper_pid_parameters expected parameters object"); }
+        if (!parameters_json.is_object()) { 
+            throw std::runtime_error("json::parse_damper_pid_parameters expected parameters object"); 
+        }
         if (!parameters_json.contains("Kp_roll") || !parameters_json.contains("Kp_pitch") || !parameters_json.contains("Kp_yaw")) {
             throw std::runtime_error("json::parse_damper_pid_parameters requires Kp_roll, Kp_pitch, Kp_yaw");
         }
@@ -31,7 +33,9 @@ namespace json {
 
     control::AxialPIDParameters parse_axial_pid_parameters(const nlohmann::json& controller_json) {
         const auto& parameters_json = controller_json.at("parameters");
-        if (!parameters_json.is_object()) { throw std::runtime_error("json::parse_axial_pid_parameters expected parameters object"); }
+        if (!parameters_json.is_object()) { 
+            throw std::runtime_error("json::parse_axial_pid_parameters expected parameters object"); 
+        }
         if (
             !parameters_json.contains("Kp_roll") || !parameters_json.contains("Ki_roll") || !parameters_json.contains("Kd_roll") ||
             !parameters_json.contains("Kp_pitch") || !parameters_json.contains("Ki_pitch") || !parameters_json.contains("Kd_pitch") ||
@@ -62,12 +66,18 @@ namespace json {
 
     control::VelocityPIDParameters parse_velocity_pid_parameters(const nlohmann::json& controller_json) {
         const auto& parameters_json = controller_json.at("parameters");
-        if (!parameters_json.is_object()) { throw std::runtime_error("json::parse_velocity_pid_parameters expected parameters object"); }
+        if (!parameters_json.is_object()) { 
+            throw std::runtime_error("json::parse_velocity_pid_parameters expected parameters object"); 
+        }
         if (!parameters_json.contains("Kp") || !parameters_json.contains("Ki") || !parameters_json.contains("Kd")) {
             throw std::runtime_error("json::parse_velocity_pid_parameters requires Kp, Kd, and Ki");
         }
-        if (!parameters_json.contains("tau")) { throw std::runtime_error("json::parse_velocity_pid_parameters requires tau"); }
-        if (parameters_json.at("tau").get<double>() < 0.0) { throw std::runtime_error("json::parse_velocity_pid_parameters requires non-negative tau"); }
+        if (!parameters_json.contains("tau")) { 
+            throw std::runtime_error("json::parse_velocity_pid_parameters requires tau"); 
+        }
+        if (parameters_json.at("tau").get<double>() < 0.0) { 
+            throw std::runtime_error("json::parse_velocity_pid_parameters requires non-negative tau"); 
+        }
 
         control::VelocityPIDParameters params{};
         params.Kp = parameters_json.at("Kp").get<double>();
@@ -79,7 +89,9 @@ namespace json {
 
     control::LinearQuadraticRegulatorParameters parse_linear_quadratic_regulator_parameters(const nlohmann::json& controller_json) {
         const auto& parameters_json = controller_json.at("parameters");
-        if (!parameters_json.is_object()) { throw std::runtime_error("json::parse_linear_quadratic_regulator_parameters expected parameters object"); }
+        if (!parameters_json.is_object()) { 
+            throw std::runtime_error("json::parse_linear_quadratic_regulator_parameters expected parameters object"); 
+        }
         if (!parameters_json.contains("Q") || !parameters_json.contains("R")) {
             throw std::runtime_error("json::parse_linear_quadratic_regulator_parameters requires Q and R");
         }
@@ -92,7 +104,9 @@ namespace json {
 
     control::LinearQuadraticIntegratorParameters parse_linear_quadratic_integrator_parameters(const nlohmann::json& controller_json) {
         const auto& parameters_json = controller_json.at("parameters");
-        if (!parameters_json.is_object()) { throw std::runtime_error("json::parse_linear_quadratic_integrator_parameters expected parameters object"); }
+        if (!parameters_json.is_object()) { 
+            throw std::runtime_error("json::parse_linear_quadratic_integrator_parameters expected parameters object"); 
+        }
         if (!parameters_json.contains("Q") || !parameters_json.contains("Qi") || !parameters_json.contains("R")) {
             throw std::runtime_error("json::parse_linear_quadratic_integrator_parameters requires Q, Qi, and R");
         }
@@ -213,13 +227,23 @@ namespace json {
         bool linear_quadratic_bool = controllers_json.contains("linear_quadratic");
         bool nonlinear_bool = controllers_json.contains("nonlinear");
 
-        if (attitude_bool && linear_quadratic_bool) { throw std::runtime_error("json::validate_controllers: attitude and linear_quadratic control laws cannot both be present"); }
-        if (attitude_bool && nonlinear_bool) { throw std::runtime_error("json::validate_controllers: attitude and nonlinear control laws cannot both be present"); }
+        if (attitude_bool && linear_quadratic_bool) { 
+            throw std::runtime_error("json::validate_controllers: attitude and linear_quadratic control laws cannot both be present"); 
+        }
+        if (attitude_bool && nonlinear_bool) { 
+            throw std::runtime_error("json::validate_controllers: attitude and nonlinear control laws cannot both be present"); 
+        }
 
-        if (linear_quadratic_bool && nonlinear_bool) { throw std::runtime_error("json::validate_controllers: linear_quadratic and nonlinear control laws cannot both be present"); }
+        if (linear_quadratic_bool && nonlinear_bool) { 
+            throw std::runtime_error("json::validate_controllers: linear_quadratic and nonlinear control laws cannot both be present"); 
+        }
 
-        if (velocity_bool && linear_quadratic_bool) { throw std::runtime_error("json::validate_controllers: velocity and linear_quadratic control laws cannot both be present"); }
-        if (velocity_bool && nonlinear_bool) { throw std::runtime_error("json::validate_controllers: velocity and nonlinear control laws cannot both be present"); }
+        if (velocity_bool && linear_quadratic_bool) { 
+            throw std::runtime_error("json::validate_controllers: velocity and linear_quadratic control laws cannot both be present"); 
+        }
+        if (velocity_bool && nonlinear_bool) { 
+            throw std::runtime_error("json::validate_controllers: velocity and nonlinear control laws cannot both be present"); 
+        }
     }
 
     control::ControlProperties parse_control_properties(const nlohmann::json& config) {

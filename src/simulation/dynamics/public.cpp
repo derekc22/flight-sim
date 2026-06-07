@@ -159,7 +159,12 @@ namespace dynamics {
 
     RigidBodyState compute_rigid_body_state(const frames::Frame& F) {
         if (F.parent != nullptr && F.parent->name != "NEDFrameECEF") {
-            throw std::invalid_argument(std::format("dynamics::rigid_body_state: Invalid frame input, the parent of {} must be an inertial frame: ECEFFrame or NEDFrameECEF", F.name));
+            throw std::invalid_argument(
+                std::format(
+                    "dynamics::rigid_body_state: Invalid frame input"
+                    ". The parent of {} must be an inertial frame: ECEFFrame or NEDFrameECEF", F.name
+                )
+            );
         }
         const frames::FrameView fv = F.view();
         return {

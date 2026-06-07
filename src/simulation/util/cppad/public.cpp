@@ -38,7 +38,9 @@ namespace util {
     }
 
     CppAD::AD<double> clamp(const CppAD::AD<double>& x, double min_value, double max_value) {
-        if (max_value < min_value) { throw std::runtime_error("util::clamp: max_value must be greater than or equal to min_value"); }
+        if (max_value < min_value) { 
+            throw std::runtime_error("util::clamp: max_value must be greater than or equal to min_value"); 
+        }
         if (max_value == min_value) return CppAD::AD<double>(min_value);
         const CppAD::AD<double> min_t(min_value);
         const CppAD::AD<double> max_t(max_value);

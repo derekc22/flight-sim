@@ -10,7 +10,9 @@
 namespace json {
 
     void validate_fixed_actuator_inputs_json(const nlohmann::json& fixed_actuator_inputs_json) {
-        if (!fixed_actuator_inputs_json.is_object()) { throw std::runtime_error("json::validate_fixed_actuator_inputs_json: fixed_actuator_inputs must be an object"); }
+        if (!fixed_actuator_inputs_json.is_object()) { 
+            throw std::runtime_error("json::validate_fixed_actuator_inputs_json: fixed_actuator_inputs must be an object"); 
+        }
     }
 
     void validate_fixed_control(double cmd, const actuators::Actuator& actuator, const std::string& key) {
@@ -35,20 +37,30 @@ namespace json {
     void validate_runtime_actuators_json(const nlohmann::json& config) {
         if (config.contains("actuators")) {
             const auto& runtime_actuators_json = config.at("actuators");
-            if (!runtime_actuators_json.is_object()) { throw std::runtime_error("json::parse_runtime_properties actuators must be an object"); }
+            if (!runtime_actuators_json.is_object()) { 
+                throw std::runtime_error("json::parse_runtime_properties actuators must be an object"); 
+            }
             if (runtime_actuators_json.contains("fixed_actuator_inputs")) { 
                 const auto& fixed_actuator_inputs_json = runtime_actuators_json.at("fixed_actuator_inputs");
-                if (!fixed_actuator_inputs_json.is_object()) { throw std::runtime_error("json::validate_fixed_actuator_inputs_json: fixed_actuator_inputs must be an object"); }
+                if (!fixed_actuator_inputs_json.is_object()) { 
+                    throw std::runtime_error("json::validate_fixed_actuator_inputs_json: fixed_actuator_inputs must be an object"); 
+                }
             }
-            else { throw std::runtime_error("json::parse_runtime_properties fixed_actuator_inputs configuration must be specified"); }
+            else { 
+                throw std::runtime_error("json::parse_runtime_properties fixed_actuator_inputs configuration must be specified"); 
+            }
         }
-        else { throw std::runtime_error("json::parse_runtime_properties actuators configuration must be specified"); }
+        else { 
+            throw std::runtime_error("json::parse_runtime_properties actuators configuration must be specified"); 
+        }
     }
 
     void validate_runtime_avionics_json(const nlohmann::json& config) {
         if (config.contains("avionics")) {
             const auto& runtime_avionics_json = config.at("avionics");
-            if (!runtime_avionics_json.is_object()) { throw std::runtime_error("json::parse_runtime_properties avionics must be an object"); }
+            if (!runtime_avionics_json.is_object()) { 
+                throw std::runtime_error("json::parse_runtime_properties avionics must be an object"); 
+            }
             if (!runtime_avionics_json.contains("use_gnss")) { 
                 throw std::runtime_error("json::parse_runtime_properties use_gnss must be specified"); 
             }
@@ -56,7 +68,9 @@ namespace json {
                 throw std::runtime_error("json::parse_runtime_properties use_gnss must be a boolean");
             }
         }
-        else { throw std::runtime_error("json::parse_runtime_properties avionics configuration must be specified"); }
+        else { 
+            throw std::runtime_error("json::parse_runtime_properties avionics configuration must be specified"); 
+        }
     }
 
     runtime::RuntimeProperties parse_runtime_properties(const nlohmann::json& config, const actuators::ActuatorProperties& actuator_properties) {

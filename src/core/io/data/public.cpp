@@ -12,9 +12,15 @@ namespace io {
     DataTable::DataTable(const Eigen::MatrixXd& d) : data(d), n_rows(static_cast<int>(data.rows())), n_cols(static_cast<int>(data.cols())) {}
 
     void DataTable::insert(int t, const Eigen::VectorXd& input) {
-        if (input.cols() > 1) { throw std::runtime_error("DataTable::insert Eigen::Matrix passed for 'input', expected Eigen::Vector"); }
-        if (input.rows() > n_cols - 1) { throw std::runtime_error("DataTable::insert Number of rows in 'input' exceeds number of columns in DataTable"); }
-        if (t > n_rows - 1) { throw std::runtime_error("DataTable::insert Input index 't' exceeds number of rows in DataTable"); }
+        if (input.cols() > 1) { 
+            throw std::runtime_error("DataTable::insert Eigen::Matrix passed for 'input', expected Eigen::Vector"); 
+        }
+        if (input.rows() > n_cols - 1) { 
+            throw std::runtime_error("DataTable::insert Number of rows in 'input' exceeds number of columns in DataTable"); 
+        }
+        if (t > n_rows - 1) { 
+            throw std::runtime_error("DataTable::insert Input index 't' exceeds number of rows in DataTable"); 
+        }
 
         data(t, 0) = t * constants::dt;
         Eigen::Index cols_to_copy = data.cols() - 1;
