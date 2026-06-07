@@ -35,7 +35,7 @@ namespace runner {
         dynamics::RigidBodyState Yt;
         dynamics::RigidBodyState Zt;
         dynamics::Wrench WB_net;
-        atmospheric::StaticAtmosphericState static_atm_state;
+        atmospheric::StaticAtmosphericState static_atm;
         geography::GeographicState geographic_state;
         atmospheric::Wind windB;
         trim::TrimSolution trim_sol;

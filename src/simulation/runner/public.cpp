@@ -103,9 +103,6 @@ namespace runner {
     }
 
     void SimulationRunner::step(int t) {
-        // pack aircraft object
-        vehicles::Aircraft& aircraft = this->aircraft;
-
         // get aircraft properties
         structural::StructuralProperties& structural_properties = aircraft.structural_properties;
         aerodynamics::AerodynamicProperties& aerodynamic_properties = aircraft.aerodynamic_properties;
@@ -114,10 +111,11 @@ namespace runner {
         actuators::ActuatorProperties& actuator_properties = aircraft.actuator_properties;
         operating::OperatingProperties& operating_properties = aircraft.operating_properties;
         guidance::GuidanceProperties& guidance_properties = aircraft.guidance_properties;
+        avionics::AvionicsProperties& avionics_properties = aircraft.avionics_properties;
 
         // extract reuseable quantities
         dynamics::Mass mass = structural_properties.mass;
-        dynamics::InertiaTensor J = structural_properties.J;
+        dynamics::InertiaTensor JB = structural_properties.JB;
         
         actuators::SurfaceActuators& surface_actuators = actuator_properties.surface_actuators;
         actuators::PropulsorActuators& propulsor_actuators = actuator_properties.propulsor_actuators;
@@ -126,13 +124,20 @@ namespace runner {
         dynamics::RigidBodyState Xt = dynamics::compute_rigid_body_state(aircraft.FRDFrameNED);
 
         // compute static atmospheric state at current altitude
-        atmospheric::StaticAtmosphericState static_atm_state_t = atmospheric::compute_static_atmospheric_state(aircraft.FRDFrameECEF);
+        atmospheric::StaticAtmosphericState static_atm_t = atmospheric::compute_static_atmospheric_state(aircraft.FRDFrameECEF);
 
         // fetch windB
         if (options.wind_bool) {
             if (auto out_pkt = udp_out.try_receive()) { 
-                atmospheric::Wind wind = atmospheric::build_wind(out_pkt->wind_heading, out_pkt->wind_speed);
-                windB.data = frames::transform_vec(wind.data, aircraft.NEDFrameECEF, aircraft.FRDFrameNED);
+                atmospheric::Wind wind = atmospheric::build_wind(
+                    out_pkt->wind_heading, 
+                    out_pkt->wind_speed
+                );
+                windB.data = frames::transform_vec(
+                    wind.data, 
+                    aircraft.NEDFrameECEF, 
+                    aircraft.FRDFrameNED
+                );
             }
         }
 
@@ -168,7 +173,11 @@ namespace runner {
                 // overwrite local state with trim state
                 Xt = Xt_trim;
                 WB_net = WB_net_trim;
-                auto [u_surf_trim, u_prop_trim] = trim::update_actuators_from_trim(u_surface_actual_prev, u_propulsor_actual_prev, trim_sol);
+                auto [u_surf_trim, u_prop_trim] = trim::update_actuators_from_trim(
+                    u_surface_actual_prev, 
+                    u_propulsor_actual_prev, 
+                    trim_sol
+                );
                 u_surface_actual_prev = u_surf_trim;
                 u_propulsor_actual_prev = u_prop_trim;
 
@@ -177,7 +186,11 @@ namespace runner {
                 // trim::update_actuators_lag_from_trim(surface_actuators, propulsor_actuators, trim_sol);
 
                 // linearize
-                lin_sol = linearization::linearize_operating_point(aircraft, trim_sol.operating_point, trim_sol.conditions);
+                lin_sol = linearization::linearize_operating_point(
+                    aircraft, 
+                    trim_sol.operating_point, 
+                    trim_sol.conditions
+                );
 
                 // perform eigenanalysis
                 analysis::EigenAnalysis eig_sol = analysis::linearization_eigen_analysis(lin_sol);
@@ -195,14 +208,27 @@ namespace runner {
         dynamics::RigidBodyState Yt = Xt;
 
         // use sensors
-        if (options.sensor_bool){
+        if (options.sensor_bool) {
             geography::GeographicState geo_state_t = geography::compute_geographic_state(aircraft.FRDFrameECEF);
 
             // obtain full state from sensors
             aerodynamics::AerodynamicState aero_state_t = aerodynamics::compute_aerodynamic_state(Xt, windB);
 
+            // obtain ECEF-relative rigid body state
+            dynamics::RigidBodyState XEt = dynamics::compute_rigid_body_state(aircraft.FRDFrameECEF);
+
             // overwrite local measurement state with sensor measurements
-            Yt = avionics::get_state_from_avionics(Xt, aero_state_t, static_atm_state_t, geo_state_t, mass, windB, WB_net, aircraft.avionics_properties);
+            Yt = avionics::get_state_from_avionics(
+                Xt,
+                XEt,
+                aero_state_t,
+                static_atm_t,
+                geo_state_t,
+                mass,
+                windB,
+                WB_net,
+                avionics_properties
+            );
         }
 
         // initialize estimated state to measurements
@@ -215,7 +241,10 @@ namespace runner {
 
             if (estimation_properties.extended_kalman_estimator_type == estimation::EstimatorType::ExtendedKalmanFilter) {
                 dynamics::State_T<double> yt = dynamics::pack_state(Yt);
-                actuators::ActuatorInputs_T<double> actuator_inputs = actuators::pack_actuator_inputs(u_surface_actual_prev, u_propulsor_actual_prev);
+                actuators::ActuatorInputs_T<double> actuator_inputs = actuators::pack_actuator_inputs(
+                    u_surface_actual_prev, 
+                    u_propulsor_actual_prev
+                );
 
                 estimator_operating_point = operating::OperatingPoint {
                     .state = yt,
@@ -223,7 +252,7 @@ namespace runner {
                 };
 
                 estimator_conditions = {
-                    .static_atm_state = static_atm_state_t,
+                    .static_atm = static_atm_t,
                     .windB = windB
                 };
 
@@ -267,10 +296,31 @@ namespace runner {
 
         if (options.control_bool) {
             control::ControllerInputs controller_inputs {
-                .attitude_controller_input = control::AttitudeControllerInput{ .Zt = Zt, .surface_actuators = surface_actuators, .setpoint = guidance::AttitudeSetpoint{ setpoint } },
-                .velocity_controller_input = control::VelocityControllerInput{ .Zt = Zt, .propulsor_actuators = propulsor_actuators, .setpoint = guidance::VelocitySetpoint{ setpoint } },
-                .linear_quadratic_controller_input = control::LinearQuadraticControllerInput{ .Zt = Zt, .u_sol_trim = trim_sol.operating_point.input, .surface_actuators = surface_actuators, .propulsor_actuators = propulsor_actuators, .A = lin_sol.A, .B = lin_sol.B, .setpoint = guidance::LinearQuadraticSetpoint{ setpoint } },
-                .nonlinear_controller_input = control::NonlinearControllerInput{ .Zt = Zt, .surface_actuators = surface_actuators, .propulsor_actuators = propulsor_actuators, .setpoint = guidance::NonlinearSetpoint{ setpoint } }
+                .attitude_controller_input = control::AttitudeControllerInput{ 
+                    .Zt = Zt, 
+                    .surface_actuators = surface_actuators, 
+                    .setpoint = guidance::AttitudeSetpoint{ setpoint } 
+                },
+                .velocity_controller_input = control::VelocityControllerInput{ 
+                    .Zt = Zt, 
+                    .propulsor_actuators = propulsor_actuators, 
+                    .setpoint = guidance::VelocitySetpoint{ setpoint } 
+                },
+                .linear_quadratic_controller_input = control::LinearQuadraticControllerInput{ 
+                    .Zt = Zt, 
+                    .u_sol_trim = trim_sol.operating_point.input, 
+                    .surface_actuators = surface_actuators, 
+                    .propulsor_actuators = propulsor_actuators, 
+                    .A = lin_sol.A, 
+                    .B = lin_sol.B, 
+                    .setpoint = guidance::LinearQuadraticSetpoint{ setpoint } 
+                },
+                .nonlinear_controller_input = control::NonlinearControllerInput{ 
+                    .Zt = Zt, 
+                    .surface_actuators = surface_actuators, 
+                    .propulsor_actuators = propulsor_actuators, 
+                    .setpoint = guidance::NonlinearSetpoint{ setpoint } 
+                }
             };
             u_cmd = control_properties.step(controller_inputs, options.trim_bool);
         }
@@ -287,12 +337,24 @@ namespace runner {
         u_propulsor_actual_prev = u_propulsor_actual;
 
         // compute aerodynamics forces and moments
-        aerodynamics::AerodynamicWrench WB_aero = aerodynamics::step_aero_forces_moments(aerodynamic_properties, structural_properties, Xt, static_atm_state_t, u_surface_actual, windB);
+        aerodynamics::AerodynamicWrench WB_aero = aerodynamics::step_aero_forces_moments(
+            aerodynamic_properties, 
+            structural_properties, 
+            Xt, 
+            static_atm_t, 
+            u_surface_actual, 
+            windB
+        );
         dynamics::Force FB_aero = WB_aero.F;
         dynamics::Moment MB_aero = WB_aero.M;
 
         // compute propulsive forces and momments
-        propulsion::PropulsiveWrench WB_propulsive = propulsion::step_propulsive_forces_moments(propulsor_actuators, Xt, static_atm_state_t, u_propulsor_actual);
+        propulsion::PropulsiveWrench WB_propulsive = propulsion::step_propulsive_forces_moments(
+            propulsor_actuators, 
+            Xt, 
+            static_atm_t, 
+            u_propulsor_actual
+        );
         dynamics::Force FB_propulsive = WB_propulsive.F;
         dynamics::Moment MB_propulsive = WB_propulsive.M;
 
@@ -305,7 +367,7 @@ namespace runner {
         WB_net = dynamics::Wrench{ .F = FB_net, .M = MB_net };
 
         // compute rigid-body dynamics
-        Xt = dynamics::step_rigid_body(Xt, mass, J, WB_net);
+        Xt = dynamics::step_rigid_body(Xt, mass, JB, WB_net);
 
         // declare StepOptions
         vehicles::StepOptions StepOpts;

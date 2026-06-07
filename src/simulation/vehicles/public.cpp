@@ -216,7 +216,7 @@ namespace vehicles {
                 opts.wq.has_value()         ||
                 opts.v.has_value()          ||
                 opts.g.has_value()
-            ){ 
+            ) { 
                 std::string err_msg = "vehicles::Aircraft::_step: Invalid _StepOptions input passed for NEDFrameECEF";
                 throw std::invalid_argument(err_msg);
             }
@@ -252,9 +252,7 @@ namespace vehicles {
         if (!recursive) {
 
             // final guard
-            if (
-                opts.g.has_value()     
-            ){ 
+            if (opts.g.has_value()) { 
                 std::string err_msg = "vehicles::Aircraft::_step: Invalid _StepOptions input passed for FRDFrameECEF";
                 throw std::invalid_argument(err_msg);
             }
@@ -341,9 +339,7 @@ namespace vehicles {
         if (!recursive) {
 
             // final guard
-            if (
-                opts.g.has_value()  
-            ){ 
+            if (opts.g.has_value()) { 
                 std::string err_msg = "vehicles::Aircraft::_step: Invalid _StepOptions input passed for FRDFrameNED";
                 throw std::invalid_argument(err_msg);
             }
@@ -432,7 +428,7 @@ namespace vehicles {
                 opts.wq.has_value()          ||
                 opts.v.has_value()           ||
                 opts.g.has_value()
-            ){ 
+            ) { 
                 std::string err_msg = "vehicles::Aircraft::_step: Invalid _StepOptions input passed for STABFrameFRD";
                 throw std::invalid_argument(err_msg);
             }
@@ -480,7 +476,7 @@ namespace vehicles {
                 opts.wq.has_value()          ||
                 opts.v.has_value()           ||
                 opts.g.has_value()     
-            ){ 
+            ) { 
                 std::string err_msg = "vehicles::Aircraft::_step: Invalid _StepOptions input passed for WINDFrameSTAB";
                 throw std::invalid_argument(err_msg);
             }

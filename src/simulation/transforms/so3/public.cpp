@@ -12,16 +12,16 @@
 
 namespace transforms {
 
-    Eigen::Matrix3d C_from_R(const Eigen::Matrix3d& R){
+    Eigen::Matrix3d C_from_R(const Eigen::Matrix3d& R) {
         return R.transpose();
     }
 
-    Eigen::Matrix3d R_from_C(const Eigen::Matrix3d& C){
+    Eigen::Matrix3d R_from_C(const Eigen::Matrix3d& C) {
         return C.transpose();
     }
 
 
-    Eigen::Matrix3d eul_to_C(double a, double b, double c, const std::string& order, const std::string& type){
+    Eigen::Matrix3d eul_to_C(double a, double b, double c, const std::string& order, const std::string& type) {
         if (type == "extr") return eul_to_C_extr(a, b, c, order);
         if (type == "intr") return eul_to_C_intr(a, b, c, order);
         throw std::invalid_argument("Unsupported type: " + type);
@@ -32,7 +32,7 @@ namespace transforms {
     // That is, this function DOES NOT have a 'type' argument and appropriately ONLY calls `eul_to_R_extr` internally
     // Once again, the 'types' argument is omitted in eul_to_R because including it would imply that active rotation matrices, R, can apply intrinsic rotations
     // Once again, this is not true. Active rotation matrices CANNOT apply intrinsic rotations - they can ONLY apply extrinsic rotations, hence why `eul_to_R` automtically calls eul_to_R_extr and does not support the option to build an `intrinsic` R (which, again, DOES NOT EXIST)
-    Eigen::Matrix3d eul_to_R(double a, double b, double c, const std::string& order){
+    Eigen::Matrix3d eul_to_R(double a, double b, double c, const std::string& order) {
         return eul_to_R_extr(a, b, c, order);
     }
 

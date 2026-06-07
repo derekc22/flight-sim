@@ -115,7 +115,7 @@ namespace json {
         return traj_components;
     }
 
-    void validate_guidance(const nlohmann::json& guidance_json){
+    void validate_guidance(const nlohmann::json& guidance_json) {
         bool attitude_bool = guidance_json.contains("attitude");
         bool velocity_bool = guidance_json.contains("velocity");
         bool linear_quadratic_bool = guidance_json.contains("linear_quadratic");

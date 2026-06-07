@@ -9,7 +9,7 @@ namespace avionics {
     MeasurementCache AvionicsProperties::step(const MeasurementGroundTruth& meas_gt) {
         SensorMeasurements sensor_meas {
             .alpha = sensors.aoa_vane.measure(meas_gt.alpha),
-            .accel = sensors.accelerometer.measure(meas_gt.accelB),
+            .fB = sensors.accelerometer.measure(meas_gt.fB),
             .wB_BI = sensors.gyro.measure(meas_gt.wB_BI),
             .P0 = sensors.pitot_tube.measure(meas_gt.P0),
             .P = sensors.static_port.measure(meas_gt.P),
@@ -23,15 +23,37 @@ namespace avionics {
         StaticAirTemperatureMeasurement curr_T_meas{ atmospheric::T_from_T0(sensor_meas.T0, curr_Mach_meas) };
     
         ComputerMeasurements computer_meas {
-            .pI_BI_ins = hist.computers ? computers.INS.calculate(hist.computers->pI_BI_ins, hist.computers->vB_BI_ins, sensor_meas.accel, hist.computers->qIB) : PositionMeasurement{ meas_gt.pI_BI.data },
-            .vB_BI_ins = hist.computers ? computers.INS.calculate(hist.computers->vB_BI_ins, sensor_meas.accel, hist.computers->pI_BI_ins, hist.computers->qIB, sensor_meas.wB_BI) : TranslationalVelocityMeasurement{ meas_gt.vB_BI.data },
+            .pI_BI_ins = hist.computers ? 
+                         computers.INS.compute(
+                            hist.computers->pI_BI_ins, 
+                            hist.computers->vB_BI_ins, 
+                            sensor_meas.fB, 
+                            meas_gt.gB, 
+                            hist.computers->qIB
+                        ) : PositionMeasurement{ meas_gt.pI_BI.data },
+            .vB_BI_ins = hist.computers ? 
+                         computers.INS.compute(
+                            hist.computers->vB_BI_ins, 
+                            sensor_meas.fB, 
+                            meas_gt.gB, 
+                            sensor_meas.wB_BI
+                        ) : TranslationalVelocityMeasurement{ meas_gt.vB_BI.data },
             .T = curr_T_meas,
             .Mach = curr_Mach_meas,
-            .Vinf = computers.ADC.calculate(curr_Mach_meas, curr_T_meas),
-            .alt_BE = computers.ADC.calculate(sensor_meas.P),
-            .alt_BE_dot = hist.sensors ? computers.ADC.calculate(sensor_meas.P, hist.sensors->P, curr_T_meas) : VerticalSpeedMeasurement{ meas_gt.alt_dot.data },
-            .rho = computers.ADC.calculate(sensor_meas.P, curr_T_meas),
-            .qIB = hist.computers ? computers.AHRS.calculate(hist.computers->qIB, sensor_meas.wB_BI) : OrientationMeasurement{ meas_gt.qIB.data }
+            .Vinf = computers.ADC.compute(curr_Mach_meas, curr_T_meas),
+            .alt_BE = computers.ADC.compute(sensor_meas.P),
+            .alt_BE_dot = hist.sensors ? 
+                          computers.ADC.compute(
+                            sensor_meas.P, 
+                            hist.sensors->P, 
+                            curr_T_meas
+                        ) : VerticalSpeedMeasurement{ meas_gt.alt_BE_dot.data },
+            .rho = computers.ADC.compute(sensor_meas.P, curr_T_meas),
+            .qIB = hist.computers ? 
+                   computers.AHRS.compute(
+                      hist.computers->qIB, 
+                      sensor_meas.wB_BI
+                    ) : OrientationMeasurement{ meas_gt.qIB.data }
         };
 
         cache = MeasurementCache{ .sensors = sensor_meas, .computers = computer_meas };
@@ -43,6 +65,7 @@ namespace avionics {
 
     dynamics::RigidBodyState get_state_from_avionics(
         const dynamics::RigidBodyState& Xt,
+        const dynamics::RigidBodyState& XEt,
         const aerodynamics::AerodynamicState& aero_state_t, 
         const atmospheric::StaticAtmosphericState& static_atm_t, 
         const geography::GeographicState& geo_state_t,
@@ -53,20 +76,23 @@ namespace avionics {
     ) {
 
         atmospheric::MachNumber Mach = atmospheric::mps_to_mach(Xt.v, static_atm_t.T);
-        atmospheric::StagnationAtmosphericState stagnation_atmo_t = atmospheric::static_to_stagnation(static_atm_t, Mach);
-        dynamics::TranslationalVelocity vI_BI{ Xt.q.data.conjugate() * Xt.v.data };
-        double alt_dot = Xt.p.data.normalized().dot(vI_BI.data);
+        atmospheric::StagnationAtmosphericState stagnation_atm_t = atmospheric::static_to_stagnation(static_atm_t, Mach);
+
+        dynamics::TranslationalVelocity vE_BE{ XEt.q.data.conjugate() * XEt.v.data };
+        double alt_BE_dot = vE_BE.data.dot(XEt.p.data.normalized());
+        dynamics::Gravity gB = geography::gB(XEt.p, XEt.q);
 
         dynamics::EulerAngles eul;
         eul.set(Xt.q);
 
         avionics::MeasurementGroundTruth meas_gt = {
             .alpha = aero_state_t.alpha,
-            .accelB = dynamics::TranslationalAcceleration{ WB_net.F.data / mass.data - geography::gB(Xt.p, Xt.q).data },
+            .fB = dynamics::TranslationalAcceleration{ WB_net.F.data / mass.data - gB.data },
+            .gB = gB,
             .wB_BI = Xt.w,
-            .P0 = stagnation_atmo_t.P0,
+            .P0 = stagnation_atm_t.P0,
             .P = static_atm_t.P,
-            .T0 = stagnation_atmo_t.T0,
+            .T0 = stagnation_atm_t.T0,
             .pI_BI = Xt.p,
             .vB_BI = Xt.v,
 
@@ -76,7 +102,7 @@ namespace avionics {
             .qIB = Xt.q,
             .Vinf = aero_state_t.Vinf,
             .alt_BE = geo_state_t.alt,
-            .alt_dot = dynamics::VerticalSpeed{ alt_dot },
+            .alt_BE_dot = dynamics::VerticalSpeed{ alt_BE_dot },
             .rho = static_atm_t.rho,
         };
         

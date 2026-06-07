@@ -11,10 +11,10 @@ namespace io {
         std::filesystem::create_directories(dir_path);
     }
 
-    void save_vector_to_file(const std::vector<int>& data, const std::string& fname){
+    void save_vector_to_file(const std::vector<int>& data, const std::string& fname) {
         std::string file_path = "results/data/" + fname + ".csv";
         std::ofstream file_v(file_path);
-        for (size_t i = 0; i < data.size(); i++){
+        for (size_t i = 0; i < data.size(); i++) {
             file_v << data[i];
             if (i < data.size() - 1) file_v << ",";  // comma delimiter
         }

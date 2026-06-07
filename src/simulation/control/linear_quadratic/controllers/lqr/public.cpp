@@ -10,7 +10,7 @@ namespace control {
         params(params), policy(params)
     {};
 
-    LinearQuadraticPolicyInput LinearQuadraticRegulator::make_linear_quadratic_policy_input(const LinearQuadraticControllerInput& input){
+    LinearQuadraticPolicyInput LinearQuadraticRegulator::make_linear_quadratic_policy_input(const LinearQuadraticControllerInput& input) {
         dynamics::RigidBodyState Zt = input.Zt;
         guidance::LinearQuadraticSetpoint setpoint = input.setpoint;
 
@@ -23,7 +23,7 @@ namespace control {
         };
     }
 
-    ControlOutput LinearQuadraticRegulator::step(const LinearQuadraticControllerInput& input){
+    ControlOutput LinearQuadraticRegulator::step(const LinearQuadraticControllerInput& input) {
         actuators::ActuatorInputsVector_T<double> u_deviation = policy.step(
             make_linear_quadratic_policy_input(input)
         );

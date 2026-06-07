@@ -12,7 +12,8 @@ namespace avionics {
 
     struct MeasurementGroundTruth {
         const aerodynamics::AngleOfAttack& alpha;
-        const dynamics::TranslationalAcceleration& accelB;
+        const dynamics::TranslationalAcceleration& fB;
+        const dynamics::Gravity& gB;
         const dynamics::AngularVelocity& wB_BI;
         const atmospheric::StagnationAirPressure& P0;
         const atmospheric::StaticAirPressure& P;
@@ -26,7 +27,7 @@ namespace avionics {
         const dynamics::OrientationQuaternion& qIB;
         const aerodynamics::FreeStreamVelocity& Vinf;
         const geography::Altitude& alt_BE;
-        const dynamics::VerticalSpeed& alt_dot;
+        const dynamics::VerticalSpeed& alt_BE_dot;
         const atmospheric::AirDensity& rho;
     };
 
@@ -64,12 +65,12 @@ namespace avionics {
         MeasurementCache cache;
 
         MeasurementCache step(const MeasurementGroundTruth& meas_gt);
-
     };
 
 
     dynamics::RigidBodyState get_state_from_avionics(
         const dynamics::RigidBodyState& Xt,
+        const dynamics::RigidBodyState& XEt,
         const aerodynamics::AerodynamicState& aero_state_t,
         const atmospheric::StaticAtmosphericState& static_atm_t,
         const geography::GeographicState& geo_state_t,

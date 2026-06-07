@@ -30,7 +30,7 @@ namespace dynamics {
     /**
     * @brief Returns the body derivative of body-expressed angular velocity
     */
-    Eigen::Vector3d ddtB_wB_BI(const AngularVelocity& wB_BI, const InertiaTensor& J, const Moment& MB_net);
+    Eigen::Vector3d ddtB_wB_BI(const AngularVelocity& wB_BI, const InertiaTensor& JB, const Moment& MB_net);
 
 
     /**
@@ -40,7 +40,7 @@ namespace dynamics {
 
 
     TranslationalVelocity trans_dyn_vel(const TranslationalVelocity& vB_t, const AngularVelocity& wB_BI_t, const Mass& mass, const Force& FB_net_t);
-    AngularVelocity rot_dyn(const AngularVelocity& wB_BI_t, const InertiaTensor& J, const Moment& MB_net_t);
+    AngularVelocity rot_dyn(const AngularVelocity& wB_BI_t, const InertiaTensor& JB, const Moment& MB_net_t);
 
     OrientationQuaternionRate CIB_dot_to_qIB_dot(const OrientationMatrixRate& CIB_dot, const OrientationMatrix& CIB, const OrientationQuaternion& qIB);
     OrientationQuaternionRate wB_BI_to_qIB_dot(const AngularVelocity& wB_BI, const OrientationQuaternion& qIB);

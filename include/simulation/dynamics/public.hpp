@@ -8,17 +8,17 @@ namespace dynamics { struct OrientationQuaternion; struct EulerAngles; struct Or
 namespace dynamics {
 
     struct Position {
-        Eigen::Vector3d data;
+        Eigen::Vector3d data;   // e.g. pI_BI [m]
     };
 
     struct OrientationMatrix {
-        Eigen::Matrix3d data;
+        Eigen::Matrix3d data;   // e.g. CIB [-]
         void set(const OrientationQuaternion& q);
         void set(const EulerAngles& eul);
     };
 
     struct HomogeneousTransformationMatrix {
-        Eigen::Matrix4d data;
+        Eigen::Matrix4d data;   // e.g. HIB
         OrientationMatrix C() const;
         Position p() const;
         void set(const OrientationMatrix& C, const Position& p);
@@ -29,41 +29,43 @@ namespace dynamics {
     };
 
     struct OrientationQuaternion {
-        Eigen::Quaterniond data;
+        Eigen::Quaterniond data;    // e.g. qIB [-]
         void set(const OrientationMatrix& C);
         void set(const EulerAngles& eul);
     };
 
     struct EulerAngles {
-        Eigen::Vector3d data;
-        double psi() const;
-        double theta() const;
-        double phi() const;
+        // "ZYX", intrinsic. Stored as [yaw, pitch, roll]
+        Eigen::Vector3d data;   // e.g. eulIB [rad]
+        double psi() const;     // yaw
+        double theta() const;   // pitch
+        double phi() const;     // roll
         void set(const OrientationMatrix& C);
         void set(const OrientationQuaternion& q);
     };
 
     struct AngularVelocity {
-        Eigen::Vector3d data;
+        Eigen::Vector3d data;   // e.g. wB_BI [rad/s]
         double p() const;
         double q() const;
         double r() const;
     };
 
     struct OrientationMatrixRate {
-        Eigen::Matrix3d data;
+        Eigen::Matrix3d data;   // e.g. CIB_dot [s^-1]
         void set(const OrientationQuaternionRate& q_dot, const OrientationQuaternion& q, const OrientationMatrix& C);
         void set(const OrientationMatrix& C, const AngularVelocity& w);
     };
 
     struct OrientationQuaternionRate {
-        Eigen::Quaterniond data;
+        Eigen::Quaterniond data;    // e.g. qIB_dot [s^-1]
         void set(const OrientationMatrixRate& C_dot, const OrientationMatrix& C, const OrientationQuaternion& q);
         void set(const OrientationQuaternion& q, const AngularVelocity& w);
     };
 
     struct EulerAngleRates {
-        Eigen::Vector3d data;
+        // "ZYX", intrinsic. Stored as [phi_dot, theta_dot, psi_dot]
+        Eigen::Vector3d data;   // e.g. eulIB_dot [rad/s]
         double phi_dot() const;
         double theta_dot() const;
         double psi_dot() const;
@@ -71,70 +73,66 @@ namespace dynamics {
     };
 
     struct AngularVelocityQuaternion {
-        Eigen::Quaterniond data;
+        Eigen::Quaterniond data;    // e.g. wq_BI = [ 0; wB_BI ]
         AngularVelocity w() const;
         void set(const AngularVelocity& w);
     };
 
     struct TranslationalVelocity {
-        Eigen::Vector3d data;
+        Eigen::Vector3d data;   // e.g. vB_BI [m/s]
     };
 
     struct TranslationalAcceleration {
-        Eigen::Vector3d data;
+        Eigen::Vector3d data;   // e.g. vB_BI_dot, aI_BI, or fB [ms^-2]
     };
 
     struct AngularAcceleration {
-        Eigen::Vector3d data;
+        Eigen::Vector3d data;   // e.g. wB_BI_dot [rad/s^2]
     };
 
     struct Force {
-        Eigen::Vector3d data;
+        Eigen::Vector3d data;   // e.g. FB [N]
     };
 
     struct InertiaTensor {
-        Eigen::Matrix3d data;
+        Eigen::Matrix3d data;   // e.g. JB [kg⋅m^2]
     };
 
     struct Mass {
-        double data;
+        double data;    // m [kg]
     };
 
     struct Moment {
-        Eigen::Vector3d data;
+        Eigen::Vector3d data;   // e.g. MB [Nm]
     };
 
     struct RigidBodyState {
-        Position p;
-        TranslationalVelocity v;
-        OrientationQuaternion q;
-        AngularVelocity w;
+        Position p;                 // e.g. pI_BI
+        TranslationalVelocity v;    // e.g. vB_BI
+        OrientationQuaternion q;    // e.g. qIB
+        AngularVelocity w;          // e.g. wB_BI
     };
 
     struct Wrench {
-        Force F;
-        Moment M;
+        Force F;    // e.g. FB [N]
+        Moment M;   // e.g. MB [Nm]
     };
 
     struct VerticalSpeed {
-        double data;
-    };
-
-    struct SpecificForce {
-        Eigen::Vector3d data;
+        double data;    // e.g. alt_BE_dot [m/s]
     };
 
     struct Gravity {
-        Eigen::Vector3d data;
+        Eigen::Vector3d data;   // e.g. gB [ms^-2]
     };
 
     struct CenterOfGravity {
-        Eigen::Vector3d data;
+        Eigen::Vector3d data;   // CG [m]
     };
 
     struct Twist {
-        TranslationalVelocity v;
-        AngularVelocity w;
+        TranslationalVelocity v;    // e.g. vB_BI
+        AngularVelocity w;          // e.g. wB_BI
     };
 
     template <typename T>
@@ -199,7 +197,7 @@ namespace dynamics {
 
     StateVector_T<double> unpack_state(const RigidBodyState& Xt);
 
-    RigidBodyState step_rigid_body(const RigidBodyState& XB_BI_t, const Mass& mass, const InertiaTensor& J, const Wrench& WB_net_t);
+    RigidBodyState step_rigid_body(const RigidBodyState& XB_BI_t, const Mass& mass, const InertiaTensor& JB, const Wrench& WB_net_t);
 
     /** @warning The parent of F must be an inertial frame: ECEFFrame or NEDFrameECEF */
     RigidBodyState compute_rigid_body_state(const frames::Frame& F);

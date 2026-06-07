@@ -9,19 +9,19 @@
 
 namespace transforms {
 
-    Eigen::Matrix3d C_from_H(const Eigen::Matrix4d& H){
+    Eigen::Matrix3d C_from_H(const Eigen::Matrix4d& H) {
         return H.block<3,3>(0,0);
     }
 
-    Eigen::Matrix3d R_from_H(const Eigen::Matrix4d& H){
+    Eigen::Matrix3d R_from_H(const Eigen::Matrix4d& H) {
         return H.block<3,3>(0,0);
     }
 
-    Eigen::Vector3d d_from_H(const Eigen::Matrix4d& H){
+    Eigen::Vector3d d_from_H(const Eigen::Matrix4d& H) {
         return H.block<3,1>(0,3);
     }
 
-    Eigen::Vector3d p_from_H(const Eigen::Matrix4d& H){
+    Eigen::Vector3d p_from_H(const Eigen::Matrix4d& H) {
         Eigen::Vector3d Cd = -H.block<3,1>(0,3);
         Eigen::Matrix3d C = H.block<3,3>(0,0);
         return C.transpose() * Cd;

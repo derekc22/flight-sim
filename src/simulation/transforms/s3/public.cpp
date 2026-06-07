@@ -18,13 +18,13 @@ namespace transforms {
         return q;
     }
 
-    Eigen::Quaterniond eul_to_quatR(double a, double b, double c, const std::string& order, const std::string& type){
+    Eigen::Quaterniond eul_to_quatR(double a, double b, double c, const std::string& order, const std::string& type) {
         if (type == "extr") return eul_to_quatR_extr(a, b, c, order);
         if (type == "intr") return eul_to_quatR_intr(a, b, c, order);
         throw std::invalid_argument("Unsupported type: " + type);
     }
 
-    Eigen::Quaterniond eul_to_quatC(double a, double b, double c, const std::string& order, const std::string& type){
+    Eigen::Quaterniond eul_to_quatC(double a, double b, double c, const std::string& order, const std::string& type) {
         if (type == "extr") return eul_to_quatC_extr(a, b, c, order);
         if (type == "intr") return eul_to_quatC_intr(a, b, c, order);
         throw std::invalid_argument("Unsupported type: " + type);

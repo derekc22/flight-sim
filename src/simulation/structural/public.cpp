@@ -15,7 +15,7 @@ namespace structural {
     StructuralProperties::StructuralProperties(const std::vector<Geometry>& g) : geometries(g) {
         mass = dynamics::Mass{ compute_mass() };
         CG = dynamics::CenterOfGravity{ compute_CG() };
-        J = dynamics::InertiaTensor{ compute_J() };
+        JB = dynamics::InertiaTensor{ compute_JB() };
         geometryIDs = build_IDs();
     }
 
@@ -45,12 +45,12 @@ namespace structural {
         return cg;
     }
 
-    Eigen::Matrix3d StructuralProperties::compute_J() {
+    Eigen::Matrix3d StructuralProperties::compute_JB() {
         Eigen::Matrix3d j = constants::Zero3x3;
 
         for (const Geometry& geom : geometries) {
             double m = geom.mass;
-            Eigen::Matrix3d j_local = compute_local_J(geom);
+            Eigen::Matrix3d j_local = compute_local_JB(geom);
 
             // Distance from geometry CG to system CG
             double dx = geom.x_loc - CG.data(0);
@@ -74,12 +74,12 @@ namespace structural {
         j(2, 1) = j(1, 2);
 
         double detj = j.determinant();
-        if (std::abs(detj) < constants::eps) { throw std::runtime_error("structural::StructuralProperties::compute_j: Inertia tensor is singular"); }
+        if (std::abs(detj) < constants::eps) { throw std::runtime_error("structural::StructuralProperties::compute_JB: Inertia tensor is singular"); }
 
         return j;
     }
 
-    Eigen::Matrix3d StructuralProperties::compute_local_J(const Geometry& geom) {
+    Eigen::Matrix3d StructuralProperties::compute_local_JB(const Geometry& geom) {
         double m = geom.mass;
         double lx = geom.x_size;
         double ly = geom.y_size;
@@ -96,12 +96,12 @@ namespace structural {
     double StructuralProperties::compute_spin_inertia(const Geometry& geom, const Eigen::Vector3d& axis) {
         Eigen::Vector3d axis_hat = util::norm(axis);
         if (axis_hat.norm() < constants::eps) { throw std::runtime_error("structural::StructuralProperties::compute_spin_inertia: spin axis cannot be zero"); }
-        return axis_hat.dot(compute_local_J(geom) * axis_hat);
+        return axis_hat.dot(compute_local_JB(geom) * axis_hat);
     }
 
     std::unordered_map<std::string, size_t> StructuralProperties::build_IDs() {
         std::unordered_map<std::string, size_t> m;
-        for (size_t i = 0; i < geometries.size(); ++i){
+        for (size_t i = 0; i < geometries.size(); ++i) {
             m[geometries[i].id] = i;
         }
         return m;

@@ -26,7 +26,7 @@ namespace geography {
         return { lat, lon, alt };
     }
 
-    dynamics::Gravity gE(const dynamics::Position& pE){ 
+    dynamics::Gravity gE(const dynamics::Position& pE) { 
         return { -constants::g_earth * pE.data.normalized() }; 
     }
 

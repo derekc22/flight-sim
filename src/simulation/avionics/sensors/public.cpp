@@ -65,8 +65,8 @@ namespace avionics {
         return { step(alpha.data, prev_alpha_lag) };
     }
 
-    TranslationalAccelerationMeasurement Accelerometer::measure(const dynamics::TranslationalAcceleration& accelB) {
-        return { step(accelB.data, prev_accel_lag) };
+    TranslationalAccelerationMeasurement Accelerometer::measure(const dynamics::TranslationalAcceleration& fB) {
+        return { step(fB.data, prev_fB_lag) };
     }
 
     AngularVelocityMeasurement Gyroscope::measure(const dynamics::AngularVelocity& wB_BI) {

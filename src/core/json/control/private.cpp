@@ -182,7 +182,7 @@ namespace json {
         throw std::runtime_error("json::map_controller_type unknown control type: " + controller_type_str);
     }
 
-    control::ControllerType fetch_controller_type(const nlohmann::json& controller_json){
+    control::ControllerType fetch_controller_type(const nlohmann::json& controller_json) {
         std::string controller_type_str = controller_json.at("controller_type").get<std::string>();
         return map_controller_type(controller_type_str);
     }
@@ -207,7 +207,7 @@ namespace json {
         controller = make_nonlinear_controller(controller_type, controller_json);
     }
 
-    void validate_controllers(const nlohmann::json& controllers_json){
+    void validate_controllers(const nlohmann::json& controllers_json) {
         bool attitude_bool = controllers_json.contains("attitude");
         bool velocity_bool = controllers_json.contains("velocity");
         bool linear_quadratic_bool = controllers_json.contains("linear_quadratic");

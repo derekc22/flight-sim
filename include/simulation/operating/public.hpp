@@ -11,7 +11,7 @@ namespace operating {
     using StateInputVector_T = Eigen::Matrix<T, constants::state_input_dim, 1>;
 
     struct OperatingConditions {
-        atmospheric::StaticAtmosphericState static_atm_state;
+        atmospheric::StaticAtmosphericState static_atm;
         atmospheric::Wind windB{ constants::Zero3 };
     };
 

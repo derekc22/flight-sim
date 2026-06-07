@@ -7,7 +7,7 @@ namespace frames {
     Eigen::Matrix3d CRF(const Frame& F) {
         Eigen::Matrix3d C = Eigen::Matrix3d::Identity();
         const Frame* pF = &F;
-        while (pF != nullptr){
+        while (pF != nullptr) {
             C *= pF->view().H->C().data;
             pF = pF->parent;
         }

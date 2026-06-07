@@ -194,7 +194,7 @@ namespace transforms {
         return Rz;
     };
 
-    Eigen::Matrix3d eul_to_R_extr(double a, double b, double c, const std::string& order){
+    Eigen::Matrix3d eul_to_R_extr(double a, double b, double c, const std::string& order) {
         if (order == "ZYX") return Rx(c) * Ry(b) * Rz(a);
         if (order == "ZXY") return Ry(c) * Rx(b) * Rz(a);
 
@@ -220,15 +220,15 @@ namespace transforms {
     // That is, the concept of an "intrinsic" vector rotation is not defined
     // So the function 'eul_to_R_intr' does not technically make sense
     // However, for consistency with the extrinsic case, it is still implemented since transposing the result of this function indeed gives the correct result for an intrinsic frame rotation/coordinate transformation
-    Eigen::Matrix3d eul_to_R_intr(double a, double b, double c, const std::string& order){
+    Eigen::Matrix3d eul_to_R_intr(double a, double b, double c, const std::string& order) {
         return eul_to_R_extr(-a, -b, -c, order).transpose();
     }
 
-    Eigen::Matrix3d eul_to_C_extr(double a, double b, double c, const std::string& order){
+    Eigen::Matrix3d eul_to_C_extr(double a, double b, double c, const std::string& order) {
        return eul_to_R_extr(a, b, c, order).transpose();
     };
 
-    Eigen::Matrix3d eul_to_C_intr(double a, double b, double c, const std::string& order){
+    Eigen::Matrix3d eul_to_C_intr(double a, double b, double c, const std::string& order) {
         return eul_to_R_intr(a, b, c, order).transpose();
     };
 
@@ -241,7 +241,7 @@ namespace transforms {
     // Given the orientation (of the frame/vector) obtained via the nth rotation, how is the n+1 rotation applied
     Eigen::Matrix3d chain_rot_post(const std::vector<Eigen::Matrix3d>& rot_list) {
         Eigen::Matrix3d rot_tot = constants::I3;
-        for (const auto& rot : rot_list){
+        for (const auto& rot : rot_list) {
             rot_tot *= rot;
         }
         return rot_tot;

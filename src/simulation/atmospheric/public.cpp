@@ -12,7 +12,7 @@ namespace atmospheric {
 
     StaticAtmosphericState compute_static_atmospheric_state(const frames::Frame& F) {
         if (F.parent != nullptr) {
-            throw std::invalid_argument(std::format("atmospheric::static_atm_state: Invalid frame input, the parent of {} must be ECEFFrame", F.name));
+            throw std::invalid_argument(std::format("atmospheric::static_atm: Invalid frame input, the parent of {} must be ECEFFrame", F.name));
         }
         return atmospheric::std_atmosphere(geography::compute_geographic_state(F).alt);
     }
@@ -22,28 +22,28 @@ namespace atmospheric {
         return { T };
     };
 
-    MachNumber mps_to_mach(const dynamics::TranslationalVelocity& v, const StaticAirTemperature& T){
+    MachNumber mps_to_mach(const dynamics::TranslationalVelocity& v, const StaticAirTemperature& T) {
         double a = util::sqrt(constants::gamma_air * constants::R_air * T.data);
         double M = util::vector_norm(v.data)/a;
         return { M };
     }
 
-    StagnationAtmosphericState static_to_stagnation(const StaticAtmosphericState& static_atm_state, const MachNumber& M) {
-        AirDensity rho = static_atm_state.rho;
-        DynamicViscosity mu = static_atm_state.mu;
+    StagnationAtmosphericState static_to_stagnation(const StaticAtmosphericState& static_atm, const MachNumber& M) {
+        AirDensity rho = static_atm.rho;
+        DynamicViscosity mu = static_atm.mu;
 
-        StagnationAirTemperature T0 = T0_from_T(static_atm_state.T, M);
-        StagnationAirPressure P0 = P0_from_P(static_atm_state.P, M);
+        StagnationAirTemperature T0 = T0_from_T(static_atm.T, M);
+        StagnationAirPressure P0 = P0_from_P(static_atm.P, M);
 
         return { T0, P0, rho, mu };
     };
 
-    MachNumber compute_mach(const StagnationAirPressure& P0, const StaticAirPressure& P){
+    MachNumber compute_mach(const StagnationAirPressure& P0, const StaticAirPressure& P) {
         double M = util::sqrt( (2.0 / (constants::gamma_air - 1.0)) * (std::pow( P0.data / P.data, (constants::gamma_air - 1.0) / constants::gamma_air ) - 1.0) ); 
         return { M };
     }
 
-    Wind build_wind(double heading_deg, double spd_kts){
+    Wind build_wind(double heading_deg, double spd_kts) {
         double psi_wind = util::deg_to_rad(heading_deg);
         double V_wind = util::kts_to_mps(spd_kts);
 

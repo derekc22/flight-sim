@@ -43,34 +43,34 @@ namespace frames {
         return { &HSW, &qSW, &eulSW, &CSW_dot, &qSW_dot, &wW_WS, &eulSW_dot, &wq_WS, &vW_WS, &gW };
     }
 
-    void Frame::_set(const dynamics::HomogeneousTransformationMatrix& H){
+    void Frame::_set(const dynamics::HomogeneousTransformationMatrix& H) {
         _set(H.C());
         _set(H.p());
     }
-    void Frame::_set(const dynamics::OrientationMatrix& C){
+    void Frame::_set(const dynamics::OrientationMatrix& C) {
         MutableFrameView mfv = view();
         mfv.H->set(C);
         mfv.q->set(C);
         mfv.eul->set(C);
     }
-    void Frame::_set(const dynamics::Position& p){
+    void Frame::_set(const dynamics::Position& p) {
         MutableFrameView mfv = view();
         mfv.H->set(p);
     }
-    void Frame::_set(const dynamics::OrientationQuaternion& q){
+    void Frame::_set(const dynamics::OrientationQuaternion& q) {
         MutableFrameView mfv = view();
         dynamics::OrientationQuaternion q_{ transforms::normalize_and_canonicalize(q.data) };
         *mfv.q = q_;
         mfv.H->set(q_);
         mfv.eul->set(q_);
     }
-    void Frame::_set(const dynamics::EulerAngles& eul){
+    void Frame::_set(const dynamics::EulerAngles& eul) {
         MutableFrameView mfv = view();
         mfv.H->set(eul);
         mfv.q->set(eul);
         *mfv.eul = eul;
     }
-    void Frame::_set(const dynamics::OrientationMatrixRate& C_dot){
+    void Frame::_set(const dynamics::OrientationMatrixRate& C_dot) {
         MutableFrameView mfv = view();
         *mfv.C_dot = C_dot;
         dynamics::AngularVelocity w = dynamics::CIB_dot_to_wB_BI(*mfv.C_dot, mfv.H->C());
@@ -79,7 +79,7 @@ namespace frames {
         mfv.eul_dot->set(w, *mfv.eul);
         mfv.wq->set(w);
     }
-    void Frame::_set(const dynamics::OrientationQuaternionRate& q_dot){
+    void Frame::_set(const dynamics::OrientationQuaternionRate& q_dot) {
         MutableFrameView mfv = view();
         mfv.C_dot->set(q_dot, *mfv.q, mfv.H->C());
         *mfv.q_dot = q_dot;
@@ -88,7 +88,7 @@ namespace frames {
         mfv.eul_dot->set(w, *mfv.eul);
         mfv.wq->set(w);
     }
-    void Frame::_set(const dynamics::AngularVelocity& w){
+    void Frame::_set(const dynamics::AngularVelocity& w) {
         MutableFrameView mfv = view();
         mfv.C_dot->set(mfv.H->C(), w);
         mfv.q_dot->set(*mfv.q, w);
@@ -96,7 +96,7 @@ namespace frames {
         mfv.eul_dot->set(w, *mfv.eul);
         mfv.wq->set(w);
     }
-    void Frame::_set(const dynamics::EulerAngleRates& eul_dot){
+    void Frame::_set(const dynamics::EulerAngleRates& eul_dot) {
         MutableFrameView mfv = view();
         dynamics::AngularVelocity w = dynamics::eul_dot_to_wB_BI(eul_dot, *mfv.eul);
         mfv.C_dot->set(mfv.H->C(), w);
@@ -105,7 +105,7 @@ namespace frames {
         *mfv.eul_dot = eul_dot;
         mfv.wq->set(w);
     }
-    void Frame::_set(const dynamics::AngularVelocityQuaternion& wq){
+    void Frame::_set(const dynamics::AngularVelocityQuaternion& wq) {
         MutableFrameView mfv = view();
         dynamics::AngularVelocity w = wq.w();
         mfv.C_dot->set(mfv.H->C(), w);
@@ -114,11 +114,11 @@ namespace frames {
         mfv.eul_dot->set(w, *mfv.eul);
         *mfv.wq = wq;
     }
-    void Frame::_set(const dynamics::TranslationalVelocity& v){
+    void Frame::_set(const dynamics::TranslationalVelocity& v) {
         MutableFrameView mfv = view();
         *mfv.v = v;
     }
-    void Frame::_set(const dynamics::Gravity& g){
+    void Frame::_set(const dynamics::Gravity& g) {
         MutableFrameView mfv = view();
         *mfv.g = g;
     }
@@ -157,7 +157,7 @@ namespace frames {
     WINDFrameSTAB::WINDFrameSTAB(STABFrameFRD* pSTABFrameFRD) : Frame("WINDFrameSTAB", pSTABFrameFRD) {};
 
 
-    void Frame::set(const SetOptions& opts){
+    void Frame::set(const SetOptions& opts) {
         if (opts.H.has_value())         { _set(*opts.H); }
         if (opts.C.has_value())         { _set(*opts.C); }
         if (opts.p.has_value())         { _set(*opts.p); }

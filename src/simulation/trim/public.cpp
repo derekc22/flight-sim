@@ -36,7 +36,7 @@ namespace trim {
                 .psi_dot = aircraft.FRDFrameNED.eulNB_dot.psi_dot()
             },
             .conditions = operating::OperatingConditions{
-                .static_atm_state = atmospheric::compute_static_atmospheric_state(aircraft.FRDFrameECEF),
+                .static_atm = atmospheric::compute_static_atmospheric_state(aircraft.FRDFrameECEF),
                 .windB = wind,
             },
             .state_guess = dynamics::State_T<double>{
@@ -183,7 +183,7 @@ namespace trim {
         return { Xt_trim, aero_state_t_trim };
     }
 
-    control::ControlOutput set_control_inputs_from_trim(const TrimSolution& trim_sol){
+    control::ControlOutput set_control_inputs_from_trim(const TrimSolution& trim_sol) {
         actuators::SurfaceActuatorInputs_T<double> surface_actuator_cmd_trim{
             .aileron_cmd = trim_sol.operating_point.input.aileron_cmd,
             .elevator_cmd = trim_sol.operating_point.input.elevator_cmd,

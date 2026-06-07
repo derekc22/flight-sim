@@ -38,10 +38,10 @@ namespace autodiff {
     template <typename T>
     dynamics::Wrench_T<T> compute_net_wrench_T(const dynamics::State_T<T>& x, const dynamics::Twist_T<T>& twist, const actuators::ActuatorInputs_T<T>& u, const AutoDiffModel& model, const operating::OperatingConditions& conditions) {
         const actuators::SurfaceActuatorInputs_T<T> surface_actuator_inputs = pack_surface_actuator_inputs_T(u, model.fixed_actuator_inputs);
-        const dynamics::Wrench_T<T> aero_wrench = aerodynamics::step_aero_forces_moments_T<T>(model.aerodynamic, model.structural, twist, conditions.static_atm_state, surface_actuator_inputs, conditions.windB);
+        const dynamics::Wrench_T<T> aero_wrench = aerodynamics::step_aero_forces_moments_T<T>(model.aerodynamic, model.structural, twist, conditions.static_atm, surface_actuator_inputs, conditions.windB);
 
         const actuators::PropulsorActuatorInputs_T<T> propulsor_actuator_inputs = pack_propulsor_actuator_inputs_T(u);
-        const dynamics::Wrench_T<T> prop_wrench = propulsion::step_propulsive_forces_moments_T<T>(model.propulsor_actuators, twist, conditions.static_atm_state, propulsor_actuator_inputs, propulsion::PropulsorOmegaDot_T<T>{});
+        const dynamics::Wrench_T<T> prop_wrench = propulsion::step_propulsive_forces_moments_T<T>(model.propulsor_actuators, twist, conditions.static_atm, propulsor_actuator_inputs, propulsion::PropulsorOmegaDot_T<T>{});
 
         return {
             .F = aero_wrench.F + prop_wrench.F + T(model.structural.mass.data) * geography::gB_T(x.phi, x.theta),
@@ -54,7 +54,7 @@ namespace autodiff {
         const dynamics::Twist_T<T> twist = dynamics::build_twist_from_state_T(x);
         const dynamics::Wrench_T<T> net_wrench = compute_net_wrench_T<T>(x, twist, u, model, conditions);
         const constants::Vector3_T<T> v_dot = dynamics::ddtB_vB_BI_T<T>(twist.v, twist.w, model.structural.mass.data, net_wrench.F);
-        const constants::Vector3_T<T> w_dot = dynamics::ddtB_wB_BI_T<T>(twist.w, model.structural.J.data, net_wrench.M);
+        const constants::Vector3_T<T> w_dot = dynamics::ddtB_wB_BI_T<T>(twist.w, model.structural.JB.data, net_wrench.M);
         const constants::Vector3_T<T> eul_dot = dynamics::wB_BI_to_eul_dot_T<T>(twist.w, x.theta, x.phi);
 
         return {

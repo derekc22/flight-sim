@@ -82,7 +82,7 @@ namespace transforms {
 
 
     /** @deprecated */
-    // Eigen::Matrix3d quat_to_rot(const Eigen::Quaterniond& q_in){
+    // Eigen::Matrix3d quat_to_rot(const Eigen::Quaterniond& q_in) {
     //     Eigen::Quaterniond q = normalize_and_canonicalize(q_in);
 
     //     double w = q.w();
@@ -112,22 +112,22 @@ namespace transforms {
     // }
 
 
-    Eigen::Vector3d quatR_to_eul_intr(const Eigen::Quaterniond& q, const std::string& order){
+    Eigen::Vector3d quatR_to_eul_intr(const Eigen::Quaterniond& q, const std::string& order) {
         Eigen::Matrix3d R = quat_to_rot(q);
         return R_to_eul_intr(R, order);
     }
 
-    Eigen::Vector3d quatC_to_eul_intr(const Eigen::Quaterniond& q, const std::string& order){
+    Eigen::Vector3d quatC_to_eul_intr(const Eigen::Quaterniond& q, const std::string& order) {
         Eigen::Matrix3d C = quat_to_rot(q);
         return C_to_eul_intr(C, order);
     }
 
-    Eigen::Vector3d quatR_to_eul_extr(const Eigen::Quaterniond& q, const std::string& order){
+    Eigen::Vector3d quatR_to_eul_extr(const Eigen::Quaterniond& q, const std::string& order) {
         Eigen::Matrix3d R = quat_to_rot(q);
         return R_to_eul_extr(R, order);
     }
 
-    Eigen::Vector3d quatC_to_eul_extr(const Eigen::Quaterniond& q, const std::string& order){
+    Eigen::Vector3d quatC_to_eul_extr(const Eigen::Quaterniond& q, const std::string& order) {
         Eigen::Matrix3d C = quat_to_rot(q);
         return C_to_eul_extr(C, order);
     }
@@ -140,7 +140,7 @@ namespace transforms {
     // That is, the concept of an "intrinsic" vector rotation is not defined
     Eigen::Quaterniond chain_quat_post(const std::vector<Eigen::Quaterniond>& q_list) {
         Eigen::Quaterniond qtot = constants::qI;
-        for (const auto& q : q_list){
+        for (const auto& q : q_list) {
             qtot *= normalize_and_canonicalize(q);
         }
         return normalize_and_canonicalize(qtot);

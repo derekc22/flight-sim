@@ -34,7 +34,7 @@ namespace control {
         )
     {};
 
-    PIDPolicyInput AxialPID::make_pid_policy_input(const AttitudeControllerInput& input, ControlAxis axis){
+    PIDPolicyInput AxialPID::make_pid_policy_input(const AttitudeControllerInput& input, ControlAxis axis) {
         dynamics::RigidBodyState Zt = input.Zt;
         actuators::SurfaceActuators surface_actuators = input.surface_actuators;
         guidance::AttitudeSetpoint setpoint = input.setpoint;
@@ -75,7 +75,7 @@ namespace control {
         }
     }
 
-    ControlOutput AxialPID::step(const AttitudeControllerInput& input){
+    ControlOutput AxialPID::step(const AttitudeControllerInput& input) {
         actuators::SurfaceActuatorInputs_T<double> u_surface{};
         actuators::PropulsorActuatorInputs_T<double> u_propulsor{};
 

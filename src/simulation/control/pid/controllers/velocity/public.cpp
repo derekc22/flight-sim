@@ -47,7 +47,7 @@ namespace control {
         return { T_front, T_left, T_right };
     }
 
-    PIDPolicyInput VelocityPID::make_pid_policy_input(const VelocityControllerInput& input){
+    PIDPolicyInput VelocityPID::make_pid_policy_input(const VelocityControllerInput& input) {
         dynamics::RigidBodyState Zt = input.Zt;
         actuators::PropulsorActuators propulsor_actuators = input.propulsor_actuators;
         guidance::VelocitySetpoint setpoint = input.setpoint;

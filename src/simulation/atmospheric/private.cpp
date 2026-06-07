@@ -6,7 +6,7 @@
 
 namespace atmospheric {
 
-    StaticAtmosphericState std_atmosphere(const geography::Altitude& altitude){
+    StaticAtmosphericState std_atmosphere(const geography::Altitude& altitude) {
 
         double h = altitude.data;
 

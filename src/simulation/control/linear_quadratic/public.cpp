@@ -10,7 +10,7 @@ namespace control {
 
     actuators::ActuatorInputsVector_T<double> LinearQuadraticPolicy::step(const LinearQuadraticPolicyInput& input) {
 
-        if (!params.K.has_value()){
+        if (!params.K.has_value()) {
             const CareSolution care_sol = control::solve_care(input.A, input.B, params.Q, params.R);
             params.K = lqr_gain(input.B, params.R, care_sol.P);
         }

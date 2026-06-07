@@ -125,7 +125,9 @@ namespace dynamics {
         data = dynamics::wB_BI_to_eul_dot(w, eul).data; 
     }
 
-    AngularVelocity AngularVelocityQuaternion::w() const { return AngularVelocity{ data.vec() }; }
+    AngularVelocity AngularVelocityQuaternion::w() const { 
+        return AngularVelocity{ data.vec() }; 
+    }
     void AngularVelocityQuaternion::set(const AngularVelocity& w) {
         Eigen::Quaterniond q;
         q.w() = 0;
@@ -202,7 +204,7 @@ namespace dynamics {
         return unpack_state_T(pack_state(Xt));
     }
 
-    RigidBodyState step_rigid_body(const RigidBodyState& XB_BI_t, const Mass& mass, const InertiaTensor& J, const Wrench& WB_net_t) {
+    RigidBodyState step_rigid_body(const RigidBodyState& XB_BI_t, const Mass& mass, const InertiaTensor& JB, const Wrench& WB_net_t) {
 
         // ddtB_vB_BI_t is the body derivative of body-expressed velocity, 
         // ddtI_vB_BI_t is the inertial derivative of body-expressed velocity, 
@@ -223,7 +225,7 @@ namespace dynamics {
         const TranslationalAcceleration aB_BI_t { ddtI_vB_BI_t }; // since pI_BI_t1 and vI_BI_t are inertial, aB_BI_t needs to be an inertial derivative
 
         // Rotational dynamics in body coordinates
-        const AngularVelocity wB_BI_t1 = rot_dyn(XB_BI_t.w, J, MB_net_t);
+        const AngularVelocity wB_BI_t1 = rot_dyn(XB_BI_t.w, JB, MB_net_t);
 
         // Quaternion rotational kinematics
         const OrientationQuaternion qIB_t1 = quat_kin(XB_BI_t.q, XB_BI_t.w);

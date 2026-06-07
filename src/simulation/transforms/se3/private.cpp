@@ -50,7 +50,7 @@ namespace transforms {
     // Given the orientation (of the frame/vector) obtained via the nth transformation, how is the n+1 transformation applied
     Eigen::Matrix4d chain_hom_post(const std::vector<Eigen::Matrix4d>& H_list) {
         Eigen::Matrix4d Htot = constants::HI;
-        for (const auto& H : H_list){
+        for (const auto& H : H_list) {
             Htot *= H;
         }
         return Htot;

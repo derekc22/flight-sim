@@ -39,13 +39,13 @@ namespace json {
         if (limit_min < 0.0) { throw std::runtime_error("json::validate_propulsor_actuator_json: propulsor limit_min must be non-negative"); }
 
         Eigen::Vector3d prop_pos = parse_Vector3d(propulsor_actuator_json.at("pB_prop_cg"));
-        if (key == "front_propulsor"){
+        if (key == "front_propulsor") {
             if (prop_pos(1) != 0.0) { throw std::runtime_error("json::validate_propulsor_actuator_json: front propulsor must have pB_prop_cg[1] = 0"); }
         }
-        if (key == "left_propulsor"){
+        if (key == "left_propulsor") {
             if (prop_pos(1) > 0.0) { throw std::runtime_error("json::validate_propulsor_actuator_json: left propulsor must have pB_prop_cg[1] <= 0"); }
         }
-        if (key == "right_propulsor"){
+        if (key == "right_propulsor") {
             if (prop_pos(1) < 0.0) { throw std::runtime_error("json::validate_propulsor_actuator_json: right propulsor must have pB_prop_cg[1] >= 0"); }
         }
     }

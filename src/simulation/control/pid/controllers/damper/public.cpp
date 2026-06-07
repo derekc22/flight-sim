@@ -7,7 +7,7 @@
 
 namespace control {
 
-    PIDPolicyInput DamperPID::make_pid_policy_input(const AttitudeControllerInput& input, ControlAxis axis){
+    PIDPolicyInput DamperPID::make_pid_policy_input(const AttitudeControllerInput& input, ControlAxis axis) {
         dynamics::RigidBodyState Zt = input.Zt;
         actuators::SurfaceActuators surface_actuators = input.surface_actuators;
 

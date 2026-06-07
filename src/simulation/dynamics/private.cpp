@@ -25,7 +25,7 @@ namespace dynamics {
     }
 
     OrientationMatrixRate ddt_CIB(const OrientationMatrix& CIB, const AngularVelocity& wB_BI) {
-        const Eigen::Matrix3d CIB_dot = -util::hat(wB_BI.data) * CIB.data;
+        const Eigen::Matrix3d CIB_dot = -util::hat(wB_BI.data) * CIB.data;  // minus for qIB convention
 
         return { CIB_dot };
     }
@@ -56,7 +56,7 @@ namespace dynamics {
     OrientationQuaternionRate quat_kin_vel(const OrientationQuaternion& qIB, const AngularVelocity& wB_BI) {
         Eigen::Quaterniond wq_BI;
         wq_BI.w() = 0.0;
-        wq_BI.vec() = - wB_BI.data;                  // minus for qIB convention
+        wq_BI.vec() = - wB_BI.data; // minus for qIB convention
         Eigen::Quaterniond qIB_dot = wq_BI * qIB.data;
         qIB_dot.coeffs() *= 0.5;
         return { qIB_dot };  // do NOT canonicalize qIB_dot
@@ -89,12 +89,12 @@ namespace dynamics {
     // Rotational Dynamics, body rates expressed in body coordinates
     // J * w_dot + w x (J*w) = M
     // w_dot = J^{-1} * (M - w x (J*w))
-    Eigen::Vector3d ddtB_wB_BI(const AngularVelocity& wB_BI, const InertiaTensor& J, const Moment& MB_net) {
-        return ddtB_wB_BI_T<double>(wB_BI.data, J.data, MB_net.data);
+    Eigen::Vector3d ddtB_wB_BI(const AngularVelocity& wB_BI, const InertiaTensor& JB, const Moment& MB_net) {
+        return ddtB_wB_BI_T<double>(wB_BI.data, JB.data, MB_net.data);
     }
 
-    AngularVelocity rot_dyn(const AngularVelocity& wB_BI_t, const InertiaTensor& J, const Moment& MB_net_t) {
-        const Eigen::Vector3d wB_BI_dot_t = ddtB_wB_BI(wB_BI_t, J, MB_net_t);
+    AngularVelocity rot_dyn(const AngularVelocity& wB_BI_t, const InertiaTensor& JB, const Moment& MB_net_t) {
+        const Eigen::Vector3d wB_BI_dot_t = ddtB_wB_BI(wB_BI_t, JB, MB_net_t);
 
         const Eigen::Vector3d wB_BI_t1 = wB_BI_t.data + wB_BI_dot_t * constants::dt;
         return { wB_BI_t1 };
