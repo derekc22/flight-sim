@@ -58,7 +58,7 @@ Update the following JSON configuration file paths in `config/run.json`:
 - `control_config`: Control properties
 - `estimation_config`: Estimation properties
 - `guidance_config`: Guidance properties
-- `operating_config`: Operating properties
+- `runtime_config`: Runtime properties
 
 Update the JSON configuration file paths in `config/analyze.json`
   

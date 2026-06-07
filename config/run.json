@@ -7,5 +7,5 @@
     "guidance_config": "simulation/guidance/interpolated/lqr_level.json",
     "avionics_config": "simulation/avionics/default.json",
     "actuator_config": "simulation/actuators/c172p/default.json",
-    "operating_config": "simulation/operating/c172p/default.json"
+    "runtime_config": "simulation/runtime/c172p/default.json"
 }

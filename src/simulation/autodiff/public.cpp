@@ -3,7 +3,7 @@
 #include "simulation/actuators/public.hpp"
 #include "simulation/autodiff/public.hpp"
 #include "simulation/vehicles/public.hpp"
-#include "simulation/operating/public.hpp"
+#include "simulation/runtime/public.hpp"
 
 
 namespace autodiff {
@@ -18,8 +18,8 @@ namespace autodiff {
             .propulsor_actuators = propulsor_actuators,
             .actuator_limits = actuator_limits,
             .fixed_actuator_inputs = actuators::FixedActuatorInputs{
-                .flap = aircraft.operating_properties.fixed_actuator_inputs.flap,
-                .spoiler = aircraft.operating_properties.fixed_actuator_inputs.spoiler,
+                .flap = aircraft.runtime_properties.runtime_actuator_properties.fixed_actuator_inputs.flap,
+                .spoiler = aircraft.runtime_properties.runtime_actuator_properties.fixed_actuator_inputs.spoiler,
             }
         };
     }

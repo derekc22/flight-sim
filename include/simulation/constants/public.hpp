@@ -7,7 +7,7 @@ namespace constants {
     // Constants
     inline constexpr double r_earth = 6.371e6;      // [m]
     inline constexpr double g_earth = 9.80665;      // [ms^-2]
-    inline constexpr double pi = 3.1415926535897932384626433832795028841971693993751;
+    inline constexpr double pi = 3.14159265358979;
     inline constexpr double eps = 1e-9;
     inline constexpr double eps_strict = 1e-12;
     inline constexpr double dt = 0.01;              // [s]

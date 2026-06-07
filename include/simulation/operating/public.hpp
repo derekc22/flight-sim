@@ -20,10 +20,6 @@ namespace operating {
         actuators::ActuatorInputs_T<double> input;
     };
 
-    struct OperatingProperties {
-        actuators::FixedActuatorInputs fixed_actuator_inputs{};
-    };
-
     template <typename T>
     StateInputVector_T<T> unpack_state_input_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u);
 

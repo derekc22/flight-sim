@@ -3,15 +3,6 @@
 #include <string>
 #include <Eigen/Dense>
 #include <nlohmann/json.hpp>
-#include "core/json/actuators/public.hpp"
-#include "core/json/aerodynamics/public.hpp"
-#include "core/json/avionics/public.hpp"
-#include "core/json/control/public.hpp"
-#include "core/json/estimation/public.hpp"
-#include "core/json/guidance/public.hpp"
-#include "core/json/initialization/public.hpp"
-#include "core/json/operating/public.hpp"
-#include "core/json/structural/public.hpp"
 
 namespace json {
 

@@ -1,0 +1,11 @@
+{
+    "actuators": {
+        "fixed_actuator_inputs": {
+            "flap": 25.0,
+            "spoiler": 0.0
+        }
+    },
+    "avionics": {
+        "use_gnss": false
+    }
+}

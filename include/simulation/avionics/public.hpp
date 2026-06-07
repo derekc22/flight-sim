@@ -7,28 +7,29 @@
 #include "simulation/geography/public.hpp"
 #include "simulation/avionics/sensors/public.hpp"
 #include "simulation/avionics/computers/public.hpp"
+#include "simulation/runtime/public.hpp"
 
 namespace avionics {
 
     struct MeasurementGroundTruth {
-        const aerodynamics::AngleOfAttack& alpha;
-        const dynamics::TranslationalAcceleration& fB;
-        const dynamics::Gravity& gB;
-        const dynamics::AngularVelocity& wB_BI;
-        const atmospheric::StagnationAirPressure& P0;
-        const atmospheric::StaticAirPressure& P;
-        const atmospheric::StagnationAirTemperature& T0;
-        const dynamics::Position& pI_BI;
-        const dynamics::TranslationalVelocity& vB_BI;
+        const aerodynamics::AngleOfAttack alpha;
+        const dynamics::TranslationalAcceleration fB;
+        const dynamics::Gravity gB;
+        const dynamics::AngularVelocity wB_BI;
+        const atmospheric::StagnationAirPressure P0;
+        const atmospheric::StaticAirPressure P;
+        const atmospheric::StagnationAirTemperature T0;
+        const dynamics::Position pI_BI;
+        const dynamics::TranslationalVelocity vB_BI;
 
-        const atmospheric::StaticAirTemperature& T;
-        const atmospheric::MachNumber& Mach;
-        const geography::Heading& heading;
-        const dynamics::OrientationQuaternion& qIB;
-        const aerodynamics::FreeStreamVelocity& Vinf;
-        const geography::Altitude& alt_BE;
-        const dynamics::VerticalSpeed& alt_BE_dot;
-        const atmospheric::AirDensity& rho;
+        const atmospheric::StaticAirTemperature T;
+        const atmospheric::MachNumber Mach;
+        const geography::Heading heading;
+        const dynamics::OrientationQuaternion qIB;
+        const aerodynamics::FreeStreamVelocity Vinf;
+        const geography::Altitude alt_BE;
+        const dynamics::VerticalSpeed alt_BE_dot;
+        const atmospheric::AirDensity rho;
     };
 
     struct MeasurementCache {
@@ -67,17 +68,16 @@ namespace avionics {
         MeasurementCache step(const MeasurementGroundTruth& meas_gt);
     };
 
-
-    dynamics::RigidBodyState get_state_from_avionics(
+    MeasurementGroundTruth build_measurement_gt(
         const dynamics::RigidBodyState& Xt,
         const dynamics::RigidBodyState& XEt,
-        const aerodynamics::AerodynamicState& aero_state_t,
-        const atmospheric::StaticAtmosphericState& static_atm_t,
+        const aerodynamics::AerodynamicState& aero_state_t, 
+        const atmospheric::StaticAtmosphericState& static_atm_t, 
         const geography::GeographicState& geo_state_t,
         const dynamics::Mass& mass,
         const atmospheric::Wind & wind,
-        const dynamics::Wrench& WB_net,
-        AvionicsProperties& avionics_properties
+        const dynamics::Wrench& WB_net
     );
 
+    dynamics::RigidBodyState get_state_from_avionics(const MeasurementCache& cache, const runtime::RuntimeAvionicsProperties& runtime_avionics_properties);
 }

@@ -21,6 +21,7 @@
 #include "simulation/structural/public.hpp"
 #include "simulation/trim/public.hpp"
 #include "simulation/vehicles/public.hpp"
+#include "simulation/runtime/public.hpp"
 #include "core/connection/public.hpp"
 #include "core/json/actuators/public.hpp"
 #include "core/json/aerodynamics/public.hpp"
@@ -29,7 +30,7 @@
 #include "core/json/estimation/public.hpp"
 #include "core/json/guidance/public.hpp"
 #include "core/json/initialization/public.hpp"
-#include "core/json/operating/public.hpp"
+#include "core/json/runtime/public.hpp"
 #include "core/json/public.hpp"
 #include "core/json/structural/public.hpp"
 #include "core/messages/public.hpp"
@@ -50,7 +51,7 @@ namespace runner {
             actuator_properties,
             control_properties,
             json::parse_avionics_config(),
-            json::parse_operating_config(actuator_properties),
+            json::parse_runtime_config(actuator_properties),
             json::parse_guidance_config(control_properties),
             json::parse_estimation_config()
         };
@@ -109,7 +110,7 @@ namespace runner {
         control::ControlProperties& control_properties = aircraft.control_properties;
         estimation::EstimationProperties& estimation_properties = aircraft.estimation_properties;
         actuators::ActuatorProperties& actuator_properties = aircraft.actuator_properties;
-        operating::OperatingProperties& operating_properties = aircraft.operating_properties;
+        runtime::RuntimeProperties& runtime_properties = aircraft.runtime_properties;
         guidance::GuidanceProperties& guidance_properties = aircraft.guidance_properties;
         avionics::AvionicsProperties& avionics_properties = aircraft.avionics_properties;
 
@@ -217,8 +218,8 @@ namespace runner {
             // obtain ECEF-relative rigid body state
             dynamics::RigidBodyState XEt = dynamics::compute_rigid_body_state(aircraft.FRDFrameECEF);
 
-            // overwrite local measurement state with sensor measurements
-            Yt = avionics::get_state_from_avionics(
+            // aggregate ground truth data
+            avionics::MeasurementGroundTruth meas_gt = avionics::build_measurement_gt(
                 Xt,
                 XEt,
                 aero_state_t,
@@ -226,9 +227,14 @@ namespace runner {
                 geo_state_t,
                 mass,
                 windB,
-                WB_net,
-                avionics_properties
+                WB_net
             );
+
+            // step avionics
+            avionics::MeasurementCache meas = avionics_properties.step(meas_gt);
+
+            // overwrite local measurement state with sensor measurements
+            Yt = avionics::get_state_from_avionics(meas, runtime_properties.runtime_avionics_properties);
         }
 
         // initialize estimated state to measurements
@@ -325,8 +331,8 @@ namespace runner {
             u_cmd = control_properties.step(controller_inputs, options.trim_bool);
         }
 
-        u_cmd.surface_inputs.flap_cmd = operating_properties.fixed_actuator_inputs.flap;
-        u_cmd.surface_inputs.spoiler_cmd = operating_properties.fixed_actuator_inputs.spoiler;
+        u_cmd.surface_inputs.flap_cmd = runtime_properties.runtime_actuator_properties.fixed_actuator_inputs.flap;
+        u_cmd.surface_inputs.spoiler_cmd = runtime_properties.runtime_actuator_properties.fixed_actuator_inputs.spoiler;
 
         // apply surface actuator dynamics
         actuators::SurfaceActuatorInputs_T<double> u_surface_actual = actuator_properties.step(u_cmd.surface_inputs);

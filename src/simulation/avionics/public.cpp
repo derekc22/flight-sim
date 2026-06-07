@@ -62,8 +62,7 @@ namespace avionics {
         return cache;
     }
 
-
-    dynamics::RigidBodyState get_state_from_avionics(
+    MeasurementGroundTruth build_measurement_gt(
         const dynamics::RigidBodyState& Xt,
         const dynamics::RigidBodyState& XEt,
         const aerodynamics::AerodynamicState& aero_state_t, 
@@ -71,8 +70,7 @@ namespace avionics {
         const geography::GeographicState& geo_state_t,
         const dynamics::Mass& mass,
         const atmospheric::Wind & wind,
-        const dynamics::Wrench& WB_net,
-        AvionicsProperties& avionics_properties
+        const dynamics::Wrench& WB_net
     ) {
 
         atmospheric::MachNumber Mach = atmospheric::mps_to_mach(Xt.v, static_atm_t.T);
@@ -105,12 +103,15 @@ namespace avionics {
             .alt_BE_dot = dynamics::VerticalSpeed{ alt_BE_dot },
             .rho = static_atm_t.rho,
         };
-        
-        MeasurementCache cache = avionics_properties.step(meas_gt);
+
+        return meas_gt;
+    }
+
+    dynamics::RigidBodyState get_state_from_avionics(const MeasurementCache& cache, const runtime::RuntimeAvionicsProperties& runtime_avionics_properties) {
 
         dynamics::RigidBodyState Yt = {
-            .p = cache.sensors.pI_BI_gnss,
-            .v = cache.sensors.vB_BI_gnss,
+            .p = runtime_avionics_properties.use_gnss ? cache.sensors.pI_BI_gnss : cache.computers.pI_BI_ins,
+            .v = runtime_avionics_properties.use_gnss ? cache.sensors.vB_BI_gnss : cache.computers.vB_BI_ins,
             .q = cache.computers.qIB,
             .w = cache.sensors.wB_BI
         };

@@ -623,7 +623,7 @@ namespace vehicles {
         const actuators::ActuatorProperties& actuator_properties,
         const control::ControlProperties& control_properties,
         const avionics::AvionicsProperties& avionics_properties,
-        const operating::OperatingProperties& operating_properties,
+        const runtime::RuntimeProperties& runtime_properties,
         const guidance::GuidanceProperties& guidance_properties,
         const estimation::EstimationProperties& estimation_properties
     ) :
@@ -638,7 +638,7 @@ namespace vehicles {
         actuator_properties(actuator_properties),
         control_properties(control_properties),
         avionics_properties(avionics_properties),
-        operating_properties(operating_properties),
+        runtime_properties(runtime_properties),
         guidance_properties(guidance_properties),
         estimation_properties(estimation_properties)
     {
