@@ -79,5 +79,5 @@ namespace avionics {
         const dynamics::Wrench& WB_net
     );
 
-    dynamics::RigidBodyState get_state_from_avionics(const MeasurementCache& cache, const runtime::RuntimeAvionicsProperties& runtime_avionics_properties);
+    dynamics::RigidBodyState get_state_from_avionics(const MeasurementCache& cache, const runtime::RuntimeAvionicsSettings& runtime_avionics_settings);
 }

@@ -30,18 +30,6 @@ namespace runner {
         bool analysis_bool;
     };
 
-    struct SimulationContext {
-        dynamics::RigidBodyState Xt;
-        dynamics::RigidBodyState Yt;
-        dynamics::RigidBodyState Zt;
-        dynamics::Wrench WB_net;
-        atmospheric::StaticAtmosphericState static_atm;
-        geography::GeographicState geographic_state;
-        atmospheric::Wind windB;
-        trim::TrimSolution trim_sol;
-        linearization::LocalLinearization lin_sol;
-    };
-
     vehicles::Aircraft load(const std::string& aircraft_id, bool trim_bool);
 
     struct SimulationRunner {

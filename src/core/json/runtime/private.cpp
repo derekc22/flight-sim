@@ -21,14 +21,14 @@ namespace json {
         }
     }
 
-    void validate_runtime_actuator_properties(const runtime::RuntimeActuatorProperties& runtime_actuator_properties, const actuators::ActuatorProperties& actuator_properties) {
+    void validate_runtime_actuator_settings(const runtime::RuntimeActuatorSettings& runtime_actuator_settings, const actuators::ActuatorProperties& actuator_properties) {
         validate_fixed_control(
-            runtime_actuator_properties.fixed_actuator_inputs.flap, 
+            runtime_actuator_settings.fixed_actuator_inputs.flap, 
             actuator_properties.surface_actuators.flap, 
             "flap"
         );
         validate_fixed_control(
-            runtime_actuator_properties.fixed_actuator_inputs.spoiler, 
+            runtime_actuator_settings.fixed_actuator_inputs.spoiler, 
             actuator_properties.surface_actuators.spoiler, 
             "spoiler"
         );
@@ -80,21 +80,21 @@ namespace json {
         const auto& runtime_actuators_json = config.at("actuators");
         const auto& fixed_actuator_inputs_json = runtime_actuators_json.at("fixed_actuator_inputs");
         if (fixed_actuator_inputs_json.contains("flap")) {
-            runtime_properties.runtime_actuator_properties.fixed_actuator_inputs.flap = util::deg_to_rad(
+            runtime_properties.runtime_actuator_settings.fixed_actuator_inputs.flap = util::deg_to_rad(
                 fixed_actuator_inputs_json.at("flap").get<double>()
             );
         }
         if (fixed_actuator_inputs_json.contains("spoiler")) {
-            runtime_properties.runtime_actuator_properties.fixed_actuator_inputs.spoiler = util::deg_to_rad(
+            runtime_properties.runtime_actuator_settings.fixed_actuator_inputs.spoiler = util::deg_to_rad(
                 fixed_actuator_inputs_json.at("spoiler").get<double>()
             );
         }
-        validate_runtime_actuator_properties(runtime_properties.runtime_actuator_properties, actuator_properties);
+        validate_runtime_actuator_settings(runtime_properties.runtime_actuator_settings, actuator_properties);
 
 
         validate_runtime_avionics_json(config);
         const auto& runtime_avionics_json = config.at("avionics");
-        runtime_properties.runtime_avionics_properties.use_gnss = runtime_avionics_json.at("use_gnss").get<bool>();
+        runtime_properties.runtime_avionics_settings.use_gnss = runtime_avionics_json.at("use_gnss").get<bool>();
 
         return runtime_properties;
     }

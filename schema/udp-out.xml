@@ -18,6 +18,12 @@
                <format>%.6f</format>
                <node>/environment/wind-speed-kt</node>
             </chunk>
+            <chunk>
+                <name>/position/ground-elev-ft</name>
+                <type>float</type>
+                <format>%.6f</format>
+                <node>/position/ground-elev-ft</node>
+            </chunk>
         </output>
     </generic>
 </PropertyList>
