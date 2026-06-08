@@ -18,8 +18,8 @@ namespace autodiff {
             .propulsor_actuators = propulsor_actuators,
             .actuator_limits = actuator_limits,
             .fixed_actuator_inputs = actuators::FixedActuatorInputs{
-                .flap = aircraft.runtime_properties.runtime_actuator_properties.fixed_actuator_inputs.flap,
-                .spoiler = aircraft.runtime_properties.runtime_actuator_properties.fixed_actuator_inputs.spoiler,
+                .flap = aircraft.runtime_properties.runtime_actuator_settings.fixed_actuator_inputs.flap,
+                .spoiler = aircraft.runtime_properties.runtime_actuator_settings.fixed_actuator_inputs.spoiler,
             }
         };
     }

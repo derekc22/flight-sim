@@ -121,25 +121,26 @@ namespace runner {
         actuators::SurfaceActuators& surface_actuators = actuator_properties.surface_actuators;
         actuators::PropulsorActuators& propulsor_actuators = actuator_properties.propulsor_actuators;
 
-        // get rigid body state
+        // get rigid body states
         dynamics::RigidBodyState Xt = dynamics::compute_rigid_body_state(aircraft.FRDFrameNED);
+        dynamics::RigidBodyState XEt = dynamics::compute_rigid_body_state(aircraft.FRDFrameECEF);
 
         // compute static atmospheric state at current altitude
         atmospheric::StaticAtmosphericState static_atm_t = atmospheric::compute_static_atmospheric_state(aircraft.FRDFrameECEF);
 
-        // fetch windB
+        // fetch from FlightGear
+        messages::ProcessedFlightGearMessageOut processed_msg_out{};
+        if (auto out_pkt = udp_out.try_receive()) { 
+            processed_msg_out = messages::process_out_pkt(out_pkt);
+        }
+
+        // apply wind
         if (options.wind_bool) {
-            if (auto out_pkt = udp_out.try_receive()) { 
-                atmospheric::Wind wind = atmospheric::build_wind(
-                    out_pkt->wind_heading, 
-                    out_pkt->wind_speed
-                );
-                windB.data = frames::transform_vec(
-                    wind.data, 
-                    aircraft.NEDFrameECEF, 
-                    aircraft.FRDFrameNED
-                );
-            }
+            windB.data = frames::transform_vec(
+                processed_msg_out.wind.data, 
+                aircraft.NEDFrameECEF, 
+                aircraft.FRDFrameNED
+            );
         }
 
         // trim and linearization
@@ -164,7 +165,7 @@ namespace runner {
                 vehicles::StepOptions TrimStepOptions;
 
                 // overwrite state with trim state
-                TrimStepOptions.FRDFrameNEDStepOpts = vehicles::FRDFrameNEDStepOptions { .rbs_BN = Xt_trim };
+                TrimStepOptions.FRDFrameNEDStepOpts = vehicles::FRDFrameNEDStepOptions{ .rbs_BN = Xt_trim };
                 TrimStepOptions.STABFrameFRDStepOpts = vehicles::STABFrameFRDStepOptions{ .ads = aero_state_t_trim };
                 TrimStepOptions.WINDFrameSTABStepOpts = vehicles::WINDFrameSTABStepOptions{ .ads = aero_state_t_trim };
 
@@ -215,9 +216,6 @@ namespace runner {
             // obtain full state from sensors
             aerodynamics::AerodynamicState aero_state_t = aerodynamics::compute_aerodynamic_state(Xt, windB);
 
-            // obtain ECEF-relative rigid body state
-            dynamics::RigidBodyState XEt = dynamics::compute_rigid_body_state(aircraft.FRDFrameECEF);
-
             // aggregate ground truth data
             avionics::MeasurementGroundTruth meas_gt = avionics::build_measurement_gt(
                 Xt,
@@ -234,7 +232,7 @@ namespace runner {
             avionics::MeasurementCache meas = avionics_properties.step(meas_gt);
 
             // overwrite local measurement state with sensor measurements
-            Yt = avionics::get_state_from_avionics(meas, runtime_properties.runtime_avionics_properties);
+            Yt = avionics::get_state_from_avionics(meas, runtime_properties.runtime_avionics_settings);
         }
 
         // initialize estimated state to measurements
@@ -331,8 +329,8 @@ namespace runner {
             u_cmd = control_properties.step(controller_inputs, options.trim_bool);
         }
 
-        u_cmd.surface_inputs.flap_cmd = runtime_properties.runtime_actuator_properties.fixed_actuator_inputs.flap;
-        u_cmd.surface_inputs.spoiler_cmd = runtime_properties.runtime_actuator_properties.fixed_actuator_inputs.spoiler;
+        u_cmd.surface_inputs.flap_cmd = runtime_properties.runtime_actuator_settings.fixed_actuator_inputs.flap;
+        u_cmd.surface_inputs.spoiler_cmd = runtime_properties.runtime_actuator_settings.fixed_actuator_inputs.spoiler;
 
         // apply surface actuator dynamics
         actuators::SurfaceActuatorInputs_T<double> u_surface_actual = actuator_properties.step(u_cmd.surface_inputs);
@@ -403,6 +401,13 @@ namespace runner {
 
         // step data manager
         data_manager.step(t, data_context);
+
+        // check for runtime failures
+        runtime::RuntimeFailureInputs failure_input {
+            .ground_elev = processed_msg_out.ground_elev,
+            .altitude = Xt.p.data.z()
+        };
+        runtime_properties.check_runtime_failures(failure_input);
 
         // generate in_pkt from the simulation state
         messages::FlightGearMessageIn in_pkt = messages::process_in_pkt(

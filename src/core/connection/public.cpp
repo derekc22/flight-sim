@@ -22,19 +22,19 @@ namespace connection {
         if (fd_ >= 0) ::close(fd_);
     }
 
-    bool UDPIn::send(const messages::FlightGearMessageIn& msg) {
+    bool UDPIn::send(const messages::FlightGearMessageIn& in_msg) {
         if (fd_ < 0) return false;
 
         char buffer[256];
         const int n = std::snprintf(
             buffer, sizeof(buffer),
             "%.6f,%.6f,%.6f,%.6f,%.6f,%.6f\n",
-            msg.altitude,
-            msg.latitude,
-            msg.longitude,
-            msg.roll,
-            msg.pitch,
-            msg.heading
+            in_msg.altitude_ft,
+            in_msg.latitude_deg,
+            in_msg.longitude_deg,
+            in_msg.roll_deg,
+            in_msg.pitch_deg,
+            in_msg.heading_deg
         );
 
         if (n <= 0) return false;
@@ -93,11 +93,18 @@ namespace connection {
 
         buffer[n] = '\0';
 
-        messages::FlightGearMessageOut msg{};
-        if (std::sscanf(buffer, "%f,%f", &msg.wind_heading, &msg.wind_speed) != 2) {
+        messages::FlightGearMessageOut out_msg{};
+        if (
+            std::sscanf(
+                buffer,
+                "%f,%f,%f",
+                &out_msg.wind_heading_deg,
+                &out_msg.wind_speed_kt,
+                &out_msg.ground_elev_ft
+            ) != 3) {
             return std::nullopt;
         }
 
-        return msg;
+        return out_msg;
     }
 }

@@ -3,17 +3,24 @@
 
 namespace runtime {
 
-	struct RuntimeActuatorProperties {
+	struct RuntimeActuatorSettings {
         actuators::FixedActuatorInputs fixed_actuator_inputs{};
 	};
 
-	struct RuntimeAvionicsProperties {
+	struct RuntimeAvionicsSettings {
         bool use_gnss = false;
 	};
 
+    struct RuntimeFailureInputs {
+        double ground_elev;
+        double altitude;
+    };
+
     struct RuntimeProperties {
-        RuntimeActuatorProperties runtime_actuator_properties;
-        RuntimeAvionicsProperties runtime_avionics_properties;
+        RuntimeActuatorSettings runtime_actuator_settings;
+        RuntimeAvionicsSettings runtime_avionics_settings;
+
+        void check_runtime_failures(const RuntimeFailureInputs& failure_inputs);
     };
 
 }
