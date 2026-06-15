@@ -12,20 +12,20 @@ namespace linearization {
     using InputJacobian = Eigen::Matrix<double, constants::state_dim, constants::input_dim>;
 
     using OutputJacobian = Eigen::Matrix<double, constants::state_dim, constants::state_dim>;
-    using FeedthroughJacobian = Eigen::Matrix<double, constants::state_dim, constants::input_dim>;
+    using DirectFeedthroughJacobian = Eigen::Matrix<double, constants::state_dim, constants::input_dim>;
 
     struct LocalLinearization {
         StateJacobian A = StateJacobian::Zero();
         InputJacobian B = InputJacobian::Zero();
         OutputJacobian C = OutputJacobian::Identity();
-        FeedthroughJacobian D = FeedthroughJacobian::Zero();
+        DirectFeedthroughJacobian D = DirectFeedthroughJacobian::Zero();
     };
 
     struct DiscretizedLocalLinearization {
         StateJacobian A = StateJacobian::Zero();
         InputJacobian B = InputJacobian::Zero();
         OutputJacobian C = OutputJacobian::Identity();
-        FeedthroughJacobian D = FeedthroughJacobian::Zero();
+        DirectFeedthroughJacobian D = DirectFeedthroughJacobian::Zero();
     };
 
     DiscretizedLocalLinearization discretize(const linearization::LocalLinearization& lin_sol);

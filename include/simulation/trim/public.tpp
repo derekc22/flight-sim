@@ -16,7 +16,7 @@ namespace trim {
     T get_control_from_solver_space_T(const T& u_solver, double limit_min, double limit_max) {
         const T mid = T(0.5 * (limit_max + limit_min));
         const T half_range = T(0.5 * (limit_max - limit_min));
-        return mid + half_range * (u_solver / util::sqrt(T(1) + u_solver * u_solver));
+        return mid + half_range * (u_solver / util::sqrt(T(1.0) + u_solver * u_solver));
     }
 
 

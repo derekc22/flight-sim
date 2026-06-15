@@ -23,11 +23,11 @@ namespace actuators {
 
     template <typename T>
     struct SurfaceActuatorInputs_T {
-        T elevator_cmd = T(0);
-        T aileron_cmd = T(0);
-        T rudder_cmd = T(0);
-        T flap_cmd = T(0);
-        T spoiler_cmd = T(0);
+        T elevator_cmd = T(0.0);
+        T aileron_cmd = T(0.0);
+        T rudder_cmd = T(0.0);
+        T flap_cmd = T(0.0);
+        T spoiler_cmd = T(0.0);
     };
 
     template <typename T>

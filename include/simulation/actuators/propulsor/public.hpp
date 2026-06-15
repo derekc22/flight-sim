@@ -40,9 +40,9 @@ namespace actuators {
 
     template <typename T>
     struct PropulsorActuatorInputs_T {
-        T front_propulsor_cmd = T(0);
-        T left_propulsor_cmd = T(0);
-        T right_propulsor_cmd = T(0);
+        T front_propulsor_cmd = T(0.0);
+        T left_propulsor_cmd = T(0.0);
+        T right_propulsor_cmd = T(0.0);
     };
 
     template <typename T>

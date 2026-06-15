@@ -25,15 +25,15 @@ namespace json {
             }
         }
 
-        if (controller_type == control::ControllerType::AxialPID) {
+        if (controller_type == control::ControllerType::AttitudePID) {
             if (guidance_json.contains("v")) { 
-                throw std::runtime_error("json::validate_attitude_control_setpoint: AxialPID does not require v"); 
+                throw std::runtime_error("json::validate_attitude_control_setpoint: AttitudePID does not require v"); 
             }
             if (!guidance_json.contains("w")) { 
-                throw std::runtime_error("json::validate_attitude_control_setpoint: AxialPID requires w"); 
+                throw std::runtime_error("json::validate_attitude_control_setpoint: AttitudePID requires w"); 
             }
             if (!guidance_json.contains("eul")) { 
-                throw std::runtime_error("json::validate_attitude_control_setpoint: AxialPID requires eul"); 
+                throw std::runtime_error("json::validate_attitude_control_setpoint: AttitudePID requires eul"); 
             }
         }
     }
@@ -45,7 +45,7 @@ namespace json {
             traj_components.n_rows = 1;
         }
 
-        if (controller_type == control::ControllerType::AxialPID) {
+        if (controller_type == control::ControllerType::AttitudePID) {
             traj_components.w_traj = parse_MatrixXd(guidance_json.at("w"));
             traj_components.eul_traj = parse_MatrixXd(guidance_json.at("eul"));
             traj_components.n_rows = traj_components.w_traj.rows();

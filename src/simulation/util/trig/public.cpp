@@ -12,16 +12,16 @@ namespace util {
         return rad * (180.0 / constants::pi);
     }
 
-    double sec(double theta) {
-        return 1.0 / std::cos(theta);
+    double csc(double x) {
+        return 1.0 / std::sin(x);
     }
 
-    double csc(double theta) {
-        return 1.0 / std::sin(theta);
+    double sec(double x) {
+        return 1.0 / std::cos(x);
     }
 
-    double cot(double theta) {
-        return 1.0 / std::tan(theta);
+    double cot(double x) {
+        return 1.0 / std::tan(x);
     }
 
     double sin(double x) {

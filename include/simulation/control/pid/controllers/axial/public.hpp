@@ -4,7 +4,7 @@
 
 namespace control {
 
-    struct AxialPIDParameters {
+    struct AttitudePIDParameters {
         double Kp_roll = 0.0;
         double Ki_roll = 0.0;
         double Kd_roll = 0.0;
@@ -20,14 +20,14 @@ namespace control {
         double tau = 0.0;
     };
 
-    struct AxialPID {
+    struct AttitudePID {
         enum ControlAxis { Longitudinal, Lateral, Vertical };
-        AxialPIDParameters params;
+        AttitudePIDParameters params;
         PIDPolicy lateral_policy;
         PIDPolicy longitudinal_policy;
         PIDPolicy vertical_policy;
 
-        AxialPID(const AxialPIDParameters& params);
+        AttitudePID(const AttitudePIDParameters& params);
         ControlOutput step(const AttitudeControllerInput& input);
 
         virtual PIDPolicyInput make_pid_policy_input(const AttitudeControllerInput& input, ControlAxis axis);

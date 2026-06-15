@@ -20,12 +20,12 @@ namespace actuators {
 
     template <typename T>
     struct ActuatorInputs_T {
-        T elevator_cmd = T(0);
-        T aileron_cmd = T(0);
-        T rudder_cmd = T(0);
-        T front_propulsor_cmd = T(0);
-        T left_propulsor_cmd = T(0);
-        T right_propulsor_cmd = T(0);
+        T elevator_cmd = T(0.0);
+        T aileron_cmd = T(0.0);
+        T rudder_cmd = T(0.0);
+        T front_propulsor_cmd = T(0.0);
+        T left_propulsor_cmd = T(0.0);
+        T right_propulsor_cmd = T(0.0);
     };
 
     template <typename T>

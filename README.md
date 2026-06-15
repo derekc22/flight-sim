@@ -22,10 +22,10 @@ conda activate ame532
 Install C++ dependencies:
 ```bash
 # Ubuntu
-sudo apt install libeigen3-dev libcppad-dev nlohmann-json3-dev libslicot-dev gfortran libgtest-dev
+sudo apt install cmake pkgconf libeigen3-dev libcppad-dev nlohmann-json3-dev libslicot-dev gfortran libgtest-dev
 
 # macOS
-brew install eigen cppad nlohmann-json slicot gcc googletest
+brew install cmake pkgconf eigen cppad nlohmann-json slicot gcc googletest
 ```
 Install MATLAB Runtime:
 ```
@@ -82,9 +82,9 @@ To run the simulation:
 - `-m ANALYSIS`: Enable post-run analysis 
   
 ## Example
-Run a 60-second simulation of the C172 with control and avionics enabled. Data, plots, and reports are saved to `results/data/c172_test`, `results/figures/c172_test`, and `results/reports/c172_test`, respectively:
+Run a 60-second simulation of the C172 with trim, control, and avionics enabled. Data, plots, and reports are saved to `results/data/c172_test`, `results/figures/c172_test`, and `results/reports/c172_test`, respectively:
 ```bash
-./scripts/bin/run.sh -a c172p -t 60 -c -s -d -p -o c172_test
+./scripts/bin/run.sh -a c172p -t 60 -r -c -s -d -p -o c172_test
 ```
 
 ## Plotting

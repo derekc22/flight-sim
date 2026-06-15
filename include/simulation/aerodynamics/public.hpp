@@ -60,19 +60,19 @@ namespace aerodynamics {
     struct SurfaceKinematics_T {
         constants::Vector3_T<T> rB_ac = constants::Zero3_T<T>;
         constants::Vector3_T<T> vB_rel = constants::Zero3_T<T>;
-        T V = T(0);
-        T qbar = T(0);
-        T alpha = T(0);
-        T p_hat = T(0);
-        T q_hat = T(0);
-        T r_hat = T(0);
+        T V = T(0.0);
+        T qbar = T(0.0);
+        T alpha = T(0.0);
+        T p_hat = T(0.0);
+        T q_hat = T(0.0);
+        T r_hat = T(0.0);
     };
 
     template <typename T>
     struct SurfaceCoefficients_T {
-        T CL = T(0);
-        T CD = T(0);
-        T CM = T(0);
+        T CL = T(0.0);
+        T CD = T(0.0);
+        T CM = T(0.0);
     };
 
     struct AerodynamicProperties {
@@ -106,9 +106,9 @@ namespace aerodynamics {
 
     template <typename T>
     struct AerodynamicState_T {
-        T Vinf = T(0);
-        T alpha = T(0);
-        T beta = T(0);
+        T Vinf = T(0.0);
+        T alpha = T(0.0);
+        T beta = T(0.0);
     };
 
     template <typename T>

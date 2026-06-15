@@ -21,20 +21,20 @@ namespace trim {
 
     template <typename T>
     struct TrimResidual_T {
-        T vx_dot = T(0);
-        T vy_dot = T(0);
-        T vz_dot = T(0);
-        T p_dot = T(0);
-        T q_dot = T(0);
-        T r_dot = T(0);
-        T phi_dot = T(0);
-        T theta_dot = T(0);
-        T beta_err = T(0);
-        T phi_err = T(0);
-        T theta_err = T(0);
-        T vx_err = T(0);
-        T vz_err = T(0);
-        T psi_dot_err = T(0);
+        T vx_dot = T(0.0);
+        T vy_dot = T(0.0);
+        T vz_dot = T(0.0);
+        T p_dot = T(0.0);
+        T q_dot = T(0.0);
+        T r_dot = T(0.0);
+        T phi_dot = T(0.0);
+        T theta_dot = T(0.0);
+        T beta_err = T(0.0);
+        T phi_err = T(0.0);
+        T theta_err = T(0.0);
+        T vx_err = T(0.0);
+        T vz_err = T(0.0);
+        T psi_dot_err = T(0.0);
     };
 
     struct TrimSolution {

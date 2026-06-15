@@ -13,7 +13,7 @@ int main(int argc, char* argv[]) {
 
     double time_sec;
     try { time_sec = std::stod(argv[2]); }
-    catch (const std::exception&) {std::cerr << "invalid TIME_SEC: " << argv[1] << std::endl; return 1; }
+    catch (const std::exception&) { std::cerr << "invalid TIME_SEC: " << argv[1] << std::endl; return 1; }
     if (!std::isfinite(time_sec) || time_sec <= 0.0) { std::cerr << "TIME_SEC must be finite and non-negative" << std::endl; return 1; }
 
     bool trim_bool = std::stoi(argv[3]) == 1;

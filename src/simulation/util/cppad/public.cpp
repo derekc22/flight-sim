@@ -4,6 +4,18 @@
 
 namespace util {
 
+    CppAD::AD<double> csc(CppAD::AD<double> x) {
+        return CppAD::AD<double>(1.0) / CppAD::sin(x);
+    }
+
+    CppAD::AD<double> sec(CppAD::AD<double> x) {
+        return CppAD::AD<double>(1.0) / CppAD::cos(x);
+    }
+
+    CppAD::AD<double> cot(CppAD::AD<double> x) {
+        return CppAD::AD<double>(1.0) / CppAD::tan(x);
+    }
+
     CppAD::AD<double> sin(const CppAD::AD<double>& x) {
         return CppAD::sin(x);
     }
@@ -17,6 +29,10 @@ namespace util {
     }
 
     CppAD::AD<double> asin(const CppAD::AD<double>& x) {
+        return CppAD::asin(x);
+    }
+
+    CppAD::AD<double> acos(const CppAD::AD<double>& x) {
         return CppAD::asin(x);
     }
 

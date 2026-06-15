@@ -15,8 +15,8 @@ namespace json {
     template <typename Controller, typename ControllerClass, typename ControllerParameters, typename ControllerClassInput>
     ControllerClass make_stateful_controller(const ControllerParameters& params);
 
-    control::AxialPIDParameters parse_damper_pid_parameters(const nlohmann::json& controller_json);
-    control::AxialPIDParameters parse_axial_pid_parameters(const nlohmann::json& controller_json);
+    control::AttitudePIDParameters parse_damper_pid_parameters(const nlohmann::json& controller_json);
+    control::AttitudePIDParameters parse_attitude_pid_parameters(const nlohmann::json& controller_json);
     control::VelocityPIDParameters parse_velocity_pid_parameters(const nlohmann::json& controller_json);
     control::LinearQuadraticRegulatorParameters parse_linear_quadratic_regulator_parameters(const nlohmann::json& controller_json);
     control::LinearQuadraticIntegratorParameters parse_linear_quadratic_integrator_parameters(const nlohmann::json& controller_json);

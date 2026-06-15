@@ -58,11 +58,10 @@ namespace dynamics {
 
     template <typename T>
     constants::Matrix3_T<T> wB_BI_to_eul_dot_mat_T(const T& theta, const T& phi) {
-        const T sec_theta = T(1) / util::cos(theta);
         constants::Matrix3_T<T> T_mat;
-        T_mat << T(1), util::sin(phi) * util::tan(theta), util::cos(phi) * util::tan(theta),
-                 T(0), util::cos(phi),                      -util::sin(phi),
-                 T(0), util::sin(phi) * sec_theta,          util::cos(phi) * sec_theta;
+        T_mat << T(1.0), util::sin(phi) * util::tan(theta), util::cos(phi) * util::tan(theta),
+                 T(0.0), util::cos(phi),                                      -util::sin(phi),
+                 T(0.0), util::sin(phi) * util::sec(theta), util::cos(phi) * util::sec(theta);
         return T_mat;
     }
 

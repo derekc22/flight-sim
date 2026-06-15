@@ -5,11 +5,16 @@
 
 namespace util {
 
+    CppAD::AD<double> csc(CppAD::AD<double> x);
+    CppAD::AD<double> sec(CppAD::AD<double> x);
+    CppAD::AD<double> cot(CppAD::AD<double> x);
     CppAD::AD<double> sin(const CppAD::AD<double>& x);
     CppAD::AD<double> cos(const CppAD::AD<double>& x);
     CppAD::AD<double> tan(const CppAD::AD<double>& x);
     CppAD::AD<double> asin(const CppAD::AD<double>& x);
+    CppAD::AD<double> acos(const CppAD::AD<double>& x);
     CppAD::AD<double> atan2(const CppAD::AD<double>& y, const CppAD::AD<double>& x);
+
     CppAD::AD<double> sqrt(const CppAD::AD<double>& x);
     CppAD::AD<double> abs(const CppAD::AD<double>& x);
     CppAD::AD<double> smooth_abs(const CppAD::AD<double>& x);

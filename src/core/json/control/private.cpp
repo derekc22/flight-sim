@@ -15,7 +15,7 @@
 
 namespace json {
 
-    control::AxialPIDParameters parse_damper_pid_parameters(const nlohmann::json& controller_json) {
+    control::AttitudePIDParameters parse_damper_pid_parameters(const nlohmann::json& controller_json) {
         const auto& parameters_json = controller_json.at("parameters");
         if (!parameters_json.is_object()) { 
             throw std::runtime_error("json::parse_damper_pid_parameters expected parameters object"); 
@@ -24,33 +24,33 @@ namespace json {
             throw std::runtime_error("json::parse_damper_pid_parameters requires Kp_roll, Kp_pitch, Kp_yaw");
         }
 
-        control::AxialPIDParameters params{};
+        control::AttitudePIDParameters params{};
         params.Kp_roll = parameters_json.at("Kp_roll").get<double>();
         params.Kp_pitch = parameters_json.at("Kp_pitch").get<double>();
         params.Kp_yaw = parameters_json.at("Kp_yaw").get<double>();
         return params;
     }
 
-    control::AxialPIDParameters parse_axial_pid_parameters(const nlohmann::json& controller_json) {
+    control::AttitudePIDParameters parse_attitude_pid_parameters(const nlohmann::json& controller_json) {
         const auto& parameters_json = controller_json.at("parameters");
         if (!parameters_json.is_object()) { 
-            throw std::runtime_error("json::parse_axial_pid_parameters expected parameters object"); 
+            throw std::runtime_error("json::parse_attitude_pid_parameters expected parameters object"); 
         }
         if (
             !parameters_json.contains("Kp_roll") || !parameters_json.contains("Ki_roll") || !parameters_json.contains("Kd_roll") ||
             !parameters_json.contains("Kp_pitch") || !parameters_json.contains("Ki_pitch") || !parameters_json.contains("Kd_pitch") ||
             !parameters_json.contains("Kp_yaw") || !parameters_json.contains("Ki_yaw") || !parameters_json.contains("Kd_yaw")
         ) {
-            throw std::runtime_error("json::parse_axial_pid_parameters requires Kp, Ki, and Kd for the lateral, longitudinal, and vertical axes");
+            throw std::runtime_error("json::parse_attitude_pid_parameters requires Kp, Ki, and Kd for the lateral, longitudinal, and vertical axes");
         }
         if (!parameters_json.contains("tau")) {
-            throw std::runtime_error("json::parse_axial_pid_parameters requires tau");
+            throw std::runtime_error("json::parse_attitude_pid_parameters requires tau");
         }
         if (parameters_json.at("tau").get<double>() < 0.0) {
-            throw std::runtime_error("json::parse_axial_pid_parameters requires non-negative tau");
+            throw std::runtime_error("json::parse_attitude_pid_parameters requires non-negative tau");
         }
 
-        control::AxialPIDParameters params{};
+        control::AttitudePIDParameters params{};
         params.Kp_roll = parameters_json.at("Kp_roll").get<double>();
         params.Ki_roll = parameters_json.at("Ki_roll").get<double>();
         params.Kd_roll = parameters_json.at("Kd_roll").get<double>();
@@ -120,14 +120,14 @@ namespace json {
 
     control::AttitudeController make_attitude_controller(control::ControllerType controller_type, const nlohmann::json& controller_json) {
         switch (controller_type) {
-            case control::ControllerType::AxialPID: {
-                control::AxialPIDParameters params = parse_axial_pid_parameters(controller_json);
-                return make_stateful_controller<struct control::AxialPID, control::AttitudeController, control::AxialPIDParameters, control::AttitudeControllerInput>(params);
+            case control::ControllerType::AttitudePID: {
+                control::AttitudePIDParameters params = parse_attitude_pid_parameters(controller_json);
+                return make_stateful_controller<struct control::AttitudePID, control::AttitudeController, control::AttitudePIDParameters, control::AttitudeControllerInput>(params);
             }
 
             case control::ControllerType::DamperPID: {
-                control::AxialPIDParameters params = parse_damper_pid_parameters(controller_json);
-                return make_stateful_controller<struct control::DamperPID, control::AttitudeController, control::AxialPIDParameters, control::AttitudeControllerInput>(params);
+                control::AttitudePIDParameters params = parse_damper_pid_parameters(controller_json);
+                return make_stateful_controller<struct control::DamperPID, control::AttitudeController, control::AttitudePIDParameters, control::AttitudeControllerInput>(params);
             }
 
             default:
@@ -184,7 +184,7 @@ namespace json {
     }
 
     control::ControllerType map_controller_type(const std::string& controller_type_str) {
-        if (controller_type_str == "AxialPID") { return control::ControllerType::AxialPID; }
+        if (controller_type_str == "AttitudePID") { return control::ControllerType::AttitudePID; }
         if (controller_type_str == "DamperPID") { return control::ControllerType::DamperPID; }
         if (controller_type_str == "VelocityPID") { return control::ControllerType::VelocityPID; }
         if (controller_type_str == "LinearQuadraticRegulator") { return control::ControllerType::LinearQuadraticRegulator; }

@@ -7,7 +7,7 @@ namespace control {
     enum class ControllerType {
         None,
         // Attitude
-        AxialPID,
+        AttitudePID,
         DamperPID,
         // Velocity
         VelocityPID,

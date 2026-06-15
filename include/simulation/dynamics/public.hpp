@@ -73,7 +73,7 @@ namespace dynamics {
     };
 
     struct AngularVelocityQuaternion {
-        Eigen::Quaterniond data;    // e.g. wq_BI = [ 0; wB_BI ]
+        Eigen::Quaterniond data;    // e.g. wq_BI = [ 0; -wB_BI ]. minus for qIB convention
         AngularVelocity w() const;
         void set(const AngularVelocity& w);
     };
@@ -143,30 +143,30 @@ namespace dynamics {
 
     template <typename T>
     struct State_T {
-        T vx = T(0);
-        T vy = T(0);
-        T vz = T(0);
+        T vx = T(0.0);
+        T vy = T(0.0);
+        T vz = T(0.0);
 
-        T p = T(0);
-        T q = T(0);
-        T r = T(0);
+        T p = T(0.0);
+        T q = T(0.0);
+        T r = T(0.0);
 
-        T phi = T(0);
-        T theta = T(0);
+        T phi = T(0.0);
+        T theta = T(0.0);
     };
 
     template <typename T>
     struct StateDot_T {
-        T vx_dot = T(0);
-        T vy_dot = T(0);
-        T vz_dot = T(0);
+        T vx_dot = T(0.0);
+        T vy_dot = T(0.0);
+        T vz_dot = T(0.0);
 
-        T p_dot = T(0);
-        T q_dot = T(0);
-        T r_dot = T(0);
+        T p_dot = T(0.0);
+        T q_dot = T(0.0);
+        T r_dot = T(0.0);
 
-        T phi_dot = T(0);
-        T theta_dot = T(0);
+        T phi_dot = T(0.0);
+        T theta_dot = T(0.0);
     };
 
     template <typename T>
