@@ -29,7 +29,7 @@ namespace propulsion {
         const constants::Vector3_T<T>& wB_BI = twist.w;
 
         const constants::Vector3_T<T> n_prop = propulsor.n_prop.cast<T>();
-        const constants::Vector3_T<T> r_prop = propulsor.pB_prop_cg.cast<T>();
+        const constants::Vector3_T<T> r_prop = propulsor.p_propulsor_cg.cast<T>();
         const atmospheric::AirDensity& rho = static_atm.rho;
 
         out.F = n_prop * thrust;

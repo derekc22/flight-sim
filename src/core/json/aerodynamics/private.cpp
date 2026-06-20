@@ -54,7 +54,7 @@ namespace json {
                 .id = surface_json.at("id").get<std::string>(),
                 .chord = surface_json.at("chord").get<double>(),
                 .span = surface_json.at("span").get<double>(),
-                .p_ref = parse_Vector3d(surface_json.at("p_ref")),
+                .p_ac = parse_Vector3d(surface_json.at("p_ac")),
                 .n = parse_Vector3d(surface_json.at("n")),
                 .CL0 = surface_json.at("CL0").get<double>(),
                 .e = surface_json.at("e").get<double>(),
@@ -64,8 +64,8 @@ namespace json {
                 .a0 = surface_json.at("a0").get<double>(),
                 .CM0 = surface_json.at("CM0").get<double>(),
                 .CMa = surface_json.at("CMa").get<double>(),
-                .dyn = surface_json.contains("dyn") ? parse_dynamic_derivatives(surface_json.at("dyn")) : aerodynamics::DynamicDerivatives{},
-                .ctrl = surface_json.contains("ctrl") ? parse_control_derivatives(surface_json.at("ctrl")) : aerodynamics::ControlDerivatives{},
+                .dyn = surface_json.contains("dynamic_derivatives") ? parse_dynamic_derivatives(surface_json.at("dynamic_derivatives")) : aerodynamics::DynamicDerivatives{},
+                .ctrl = surface_json.contains("control_derivatives") ? parse_control_derivatives(surface_json.at("control_derivatives")) : aerodynamics::ControlDerivatives{},
             });
         }
         return { surfaces };

@@ -15,17 +15,15 @@ namespace structural {
         double x_size;
         double y_size;
         double z_size;
-        double x_loc;
-        double y_loc;
-        double z_loc;
+        Eigen::Vector3d p_ref;
     };
 
     struct StructuralProperties {
         std::vector<Geometry> geometries;
-        std::unordered_map<std::string, size_t> geometryIDs;
+        std::unordered_map<std::string, size_t> geometry_id_map;
 
         dynamics::Mass mass;
-        dynamics::CenterOfGravity CG;
+        dynamics::CenterOfGravity p_cg;
         dynamics::InertiaTensor JB;
 
         StructuralProperties(const std::vector<Geometry>& g);
@@ -36,7 +34,7 @@ namespace structural {
         Eigen::Matrix3d compute_JB();
         Eigen::Matrix3d compute_local_JB(const Geometry& geom);
         double compute_spin_inertia(const Geometry& geom, const Eigen::Vector3d& axis);
-        std::unordered_map<std::string, size_t> build_IDs();
+        std::unordered_map<std::string, size_t> build_geometry_id_map();
 
     };
 

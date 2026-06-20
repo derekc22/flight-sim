@@ -11,15 +11,15 @@ namespace aerodynamics {
     template <typename T>
     SurfaceKinematics_T<T> compute_surface_kinematics_T(const Surface& s, const structural::StructuralProperties& structural_properties, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& static_atm, const atmospheric::Wind& windB) {
         SurfaceKinematics_T<T> out;
-        out.rB_ac = s.p_ac.template cast<T>() - structural_properties.CG.data.template cast<T>();
-        out.vB_rel = (twist.v - windB.data.template cast<T>()) + twist.w.cross(out.rB_ac);
+        out.p_ac_cg = s.p_ac.cast<T>() - structural_properties.p_cg.data.cast<T>();
+        out.vB_rel = (twist.v - windB.data.cast<T>()) + twist.w.cross(out.p_ac_cg);
         out.V = util::vector_norm(out.vB_rel);
 
         if (out.V < T(constants::eps)) {
             return out;
         }
 
-        const constants::Vector3_T<T> n_B = s.n.template cast<T>();
+        const constants::Vector3_T<T> n_B = s.n.cast<T>();
         const constants::Vector3_T<T> n_hat = util::norm(n_B);
         const T arg = util::clamp_to_1(out.vB_rel.dot(n_hat) / out.V);
 
@@ -64,7 +64,7 @@ namespace aerodynamics {
             return out;
         }
 
-        const constants::Vector3_T<T> n_B = s.n.template cast<T>();
+        const constants::Vector3_T<T> n_B = s.n.cast<T>();
         const constants::Vector3_T<T> n_hat = util::norm(n_B);
         const constants::Vector3_T<T> d_hat = -sk.vB_rel / sk.V;
         const constants::Vector3_T<T> lift_axis = n_hat - n_hat.dot(d_hat) * d_hat;
@@ -77,7 +77,7 @@ namespace aerodynamics {
         const T Mmag = sk.qbar * T(s.area * s.chord) * sc.CM;
 
         out.F = L * l_hat + D * d_hat;
-        out.M = sk.rB_ac.cross(out.F) + Mmag * m_hat;
+        out.M = sk.p_ac_cg.cross(out.F) + Mmag * m_hat;
         return out;
     }
 
@@ -97,7 +97,7 @@ namespace aerodynamics {
     template <typename T>
     AerodynamicState_T<T> compute_aerodynamic_state_T(const dynamics::Twist_T<T>& twist, const atmospheric::Wind& windB) {
         AerodynamicState_T<T> out;
-        const constants::Vector3_T<T> vB_rel = twist.v - windB.data.template cast<T>();
+        const constants::Vector3_T<T> vB_rel = twist.v - windB.data.cast<T>();
         out.Vinf = util::vector_norm(vB_rel);
 
         if (out.Vinf > T(constants::eps)) {

@@ -14,14 +14,14 @@ namespace structural {
 
     StructuralProperties::StructuralProperties(const std::vector<Geometry>& g) : geometries(g) {
         mass = dynamics::Mass{ compute_mass() };
-        CG = dynamics::CenterOfGravity{ compute_CG() };
+        p_cg = dynamics::CenterOfGravity{ compute_CG() };
         JB = dynamics::InertiaTensor{ compute_JB() };
-        geometryIDs = build_IDs();
+        geometry_id_map = build_geometry_id_map();
     }
 
     Geometry& StructuralProperties::get_geometry(const std::string& id) {
-        const auto it = geometryIDs.find(id);
-        if (it == geometryIDs.end()) { 
+        const auto it = geometry_id_map.find(id);
+        if (it == geometry_id_map.end()) { 
             throw std::runtime_error("structural::StructuralProperties::get_geometry: geometry id not found: " + id); 
         }
         return geometries[it->second];
@@ -39,14 +39,12 @@ namespace structural {
     }
 
     Eigen::Vector3d StructuralProperties::compute_CG() {
-        Eigen::Vector3d cg = constants::Zero3;
+        Eigen::Vector3d p_cg = constants::Zero3;
         for (const Geometry& geom : geometries) {
-            cg(0) += geom.mass * geom.x_loc;
-            cg(1) += geom.mass * geom.y_loc;
-            cg(2) += geom.mass * geom.z_loc;
+            p_cg += geom.mass * geom.p_ref;
         }
-        cg /= mass.data;
-        return cg;
+        p_cg /= mass.data;
+        return p_cg;
     }
 
     Eigen::Matrix3d StructuralProperties::compute_JB() {
@@ -57,9 +55,9 @@ namespace structural {
             Eigen::Matrix3d j_local = compute_local_JB(geom);
 
             // Distance from geometry CG to system CG
-            double dx = geom.x_loc - CG.data(0);
-            double dy = geom.y_loc - CG.data(1);
-            double dz = geom.z_loc - CG.data(2);
+            double dx = geom.p_ref(0) - p_cg.data(0);
+            double dy = geom.p_ref(1) - p_cg.data(1);
+            double dz = geom.p_ref(2) - p_cg.data(2);
 
             // Parallel axis theorem
             j(0, 0) += j_local(0, 0) + m * (dy * dy + dz * dz);   // Jxx
@@ -107,7 +105,7 @@ namespace structural {
         return axis_hat.dot(compute_local_JB(geom) * axis_hat);
     }
 
-    std::unordered_map<std::string, size_t> StructuralProperties::build_IDs() {
+    std::unordered_map<std::string, size_t> StructuralProperties::build_geometry_id_map() {
         std::unordered_map<std::string, size_t> m;
         for (size_t i = 0; i < geometries.size(); ++i) {
             m[geometries[i].id] = i;

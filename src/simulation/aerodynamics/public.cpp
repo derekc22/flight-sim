@@ -18,24 +18,14 @@
 namespace aerodynamics {
 
     AerodynamicProperties::AerodynamicProperties(std::vector<Surface> s) : surfaces(std::move(s)) {
-        compute_aero_properties();
-        surfaceIDs = build_IDs();
+        compute_surface_geometry();
     }
 
-    void AerodynamicProperties::compute_aero_properties() {
+    void AerodynamicProperties::compute_surface_geometry() {
         for (Surface& s : surfaces) {
             s.area = s.chord * s.span;
             s.AR   = s.span / s.chord;
-            s.p_ac = s.p_ref;   // quarter-chord assumed already in p_ref
         }
-    }
-
-    std::unordered_map<std::string, size_t> AerodynamicProperties::build_IDs() {
-        std::unordered_map<std::string, size_t> m;
-        for (size_t i = 0; i < surfaces.size(); ++i) {
-            m[surfaces[i].id] = i;
-        }
-        return m;
     }
 
     AerodynamicState aerodynamic_state(const frames::Frame& F, const atmospheric::Wind& windB) {

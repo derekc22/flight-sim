@@ -41,35 +41,36 @@ namespace json {
 
     void validate_propulsor_actuator_json(const nlohmann::json& propulsor_actuator_json, const std::string& key) {
         validate_actuator_json(propulsor_actuator_json);
+        if (!propulsor_actuator_json.contains("geometry_id")) { 
+            throw std::runtime_error("json::validate_propulsor_actuator_json: propulsor geometry_id not present"); 
+        }
         if (!propulsor_actuator_json.contains("inclination_angle")) { 
             throw std::runtime_error("json::validate_propulsor_actuator_json: propulsor inclination_angle not present"); 
         }
         if (!propulsor_actuator_json.contains("toe_angle")) { 
             throw std::runtime_error("json::validate_propulsor_actuator_json: propulsor toe_angle not present"); 
         }
-        if (!propulsor_actuator_json.contains("pB_prop_cg")) { 
-            throw std::runtime_error("json::validate_propulsor_actuator_json: propulsor pB_prop_cg not present"); 
-        }
         
         double limit_min = propulsor_actuator_json.at("limit_min").get<double>();
         if (limit_min < 0.0) { 
             throw std::runtime_error("json::validate_propulsor_actuator_json: propulsor limit_min must be non-negative"); 
         }
+    }
 
-        Eigen::Vector3d prop_pos = parse_Vector3d(propulsor_actuator_json.at("pB_prop_cg"));
+    void validate_propulsor_actuator_placement(const Eigen::Vector3d& p_propulsor, const std::string& key) {
         if (key == "front_propulsor") {
-            if (prop_pos(1) != 0.0) { 
-                throw std::runtime_error("json::validate_propulsor_actuator_json: front propulsor must have pB_prop_cg[1] = 0"); 
+            if (p_propulsor(1) != 0.0) { 
+                throw std::runtime_error("json::validate_propulsor_actuator_placement: front propulsor must have p_propulsor[1] = 0"); 
             }
         }
         if (key == "left_propulsor") {
-            if (prop_pos(1) > 0.0) { 
-                throw std::runtime_error("json::validate_propulsor_actuator_json: left propulsor must have pB_prop_cg[1] <= 0"); 
+            if (p_propulsor(1) > 0.0) { 
+                throw std::runtime_error("json::validate_propulsor_actuator_placement: left propulsor must have p_propulsor[1] <= 0"); 
             }
         }
         if (key == "right_propulsor") {
-            if (prop_pos(1) < 0.0) { 
-                throw std::runtime_error("json::validate_propulsor_actuator_json: right propulsor must have pB_prop_cg[1] >= 0"); 
+            if (p_propulsor(1) < 0.0) { 
+                throw std::runtime_error("json::validate_propulsor_actuator_placement: right propulsor must have p_propulsor[1] >= 0"); 
             }
         }
     }
@@ -119,8 +120,8 @@ namespace json {
 
         for (const std::string& geometry_id : geometry_ids) {
             const structural::Geometry& geom = structural_properties.get_geometry(geometry_id);
-            y_min = std::min(y_min, geom.y_loc - 0.5 * geom.y_size);
-            y_max = std::max(y_max, geom.y_loc + 0.5 * geom.y_size);
+            y_min = std::min(y_min, geom.p_ref(1) - 0.5 * geom.y_size);
+            y_max = std::max(y_max, geom.p_ref(1) + 0.5 * geom.y_size);
             spin_inertia += structural_properties.compute_spin_inertia(geom, n_prop);
         }
 

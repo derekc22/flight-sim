@@ -127,7 +127,7 @@ namespace dynamics {
     };
 
     struct CenterOfGravity {
-        Eigen::Vector3d data;   // CG [m]
+        Eigen::Vector3d data;   // p_cg [m]
     };
 
     struct Twist {

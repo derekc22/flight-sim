@@ -3,6 +3,7 @@
 #include <vector>
 #include <nlohmann/json.hpp>
 #include "core/json/structural/private.hpp"
+#include "core/json/public.hpp"
 #include "simulation/structural/public.hpp"
 
 namespace json {
@@ -22,9 +23,7 @@ namespace json {
                 .x_size = geom_json.at("x_size").get<double>(),
                 .y_size = geom_json.at("y_size").get<double>(),
                 .z_size = geom_json.at("z_size").get<double>(),
-                .x_loc = geom_json.at("x_loc").get<double>(),
-                .y_loc = geom_json.at("y_loc").get<double>(),
-                .z_loc = geom_json.at("z_loc").get<double>(),
+                .p_ref = parse_Vector3d(geom_json.at("p_ref")),
             });
         }
 

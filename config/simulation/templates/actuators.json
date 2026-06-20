@@ -32,24 +32,21 @@
             "limit_min": 0.0,
             "tau": 0.001,
             "inclination_angle": 0,
-            "toe_angle": 0,
-            "pB_prop_cg": [1, 0, 0]
+            "toe_angle": 0
         },
         "left_propulsor": {
             "limit_max": 0.0,
             "limit_min": 0.0,
             "tau": 0.001,
             "inclination_angle": 0,
-            "toe_angle": 0,
-            "pB_prop_cg": [1, 0, 0]
+            "toe_angle": 0
         },
         "right_propulsor": {
             "limit_max": 0.0,
             "limit_min": 0.0,
             "tau": 0.001,
             "inclination_angle": 0,
-            "toe_angle": 0,
-            "pB_prop_cg": [1, 0, 0]
+            "toe_angle": 0
         }
     }
 }

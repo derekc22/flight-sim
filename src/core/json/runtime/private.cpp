@@ -5,7 +5,6 @@
 #include "simulation/actuators/actuator/public.hpp"
 #include "simulation/actuators/public.hpp"
 #include "simulation/runtime/public.hpp"
-#include "simulation/util/public.hpp"
 
 namespace json {
 
@@ -80,14 +79,12 @@ namespace json {
         const auto& runtime_actuators_json = config.at("actuators");
         const auto& fixed_actuator_inputs_json = runtime_actuators_json.at("fixed_actuator_inputs");
         if (fixed_actuator_inputs_json.contains("flap")) {
-            runtime_properties.runtime_actuator_settings.fixed_actuator_inputs.flap = util::deg_to_rad(
-                fixed_actuator_inputs_json.at("flap").get<double>()
-            );
+            runtime_properties.runtime_actuator_settings.fixed_actuator_inputs.flap =
+                fixed_actuator_inputs_json.at("flap").get<double>();
         }
         if (fixed_actuator_inputs_json.contains("spoiler")) {
-            runtime_properties.runtime_actuator_settings.fixed_actuator_inputs.spoiler = util::deg_to_rad(
-                fixed_actuator_inputs_json.at("spoiler").get<double>()
-            );
+            runtime_properties.runtime_actuator_settings.fixed_actuator_inputs.spoiler =
+                fixed_actuator_inputs_json.at("spoiler").get<double>();
         }
         validate_runtime_actuator_settings(runtime_properties.runtime_actuator_settings, actuator_properties);
 

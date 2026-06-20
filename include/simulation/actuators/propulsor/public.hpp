@@ -21,11 +21,11 @@ namespace actuators {
     struct PropulsorActuator : Actuator {
         double inclination_angle;
         double toe_angle;
-        Eigen::Vector3d pB_prop_cg;
+        Eigen::Vector3d p_propulsor_cg;
         Eigen::Vector3d n_prop;
         std::optional<PropellerAssembly> propellers;
 
-        PropulsorActuator(double limit_max, double limit_min, double tau, double inclination_angle, double toe_angle, const Eigen::Vector3d& pB_prop_cg, std::optional<PropellerAssembly> propellers = std::nullopt);
+        PropulsorActuator(double limit_max, double limit_min, double tau, double inclination_angle, double toe_angle, const Eigen::Vector3d& p_propulsor_cg, std::optional<PropellerAssembly> propellers = std::nullopt);
     };
 
     struct FrontPropulsor : PropulsorActuator { using PropulsorActuator::PropulsorActuator; };

@@ -2,7 +2,6 @@
 #include <cstddef>
 #include <Eigen/Dense>
 #include <string>
-#include <unordered_map>
 #include <vector>
 #include "simulation/actuators/surface/public.hpp"
 #include "simulation/atmospheric/public.hpp"
@@ -48,7 +47,8 @@ namespace aerodynamics {
         double span;
         double area;
         double AR;
-        Eigen::Vector3d p_ref;
+        // For a thin airfoil in incompressible subsonic flow, 
+        // the aerodynamic center is approximately at the quarter chord
         Eigen::Vector3d p_ac;
         Eigen::Vector3d n;
         double CL0, e, i, CD0, CDa, a0, CM0, CMa;
@@ -58,7 +58,7 @@ namespace aerodynamics {
 
     template <typename T>
     struct SurfaceKinematics_T {
-        constants::Vector3_T<T> rB_ac = constants::Zero3_T<T>;
+        constants::Vector3_T<T> p_ac_cg = constants::Zero3_T<T>;
         constants::Vector3_T<T> vB_rel = constants::Zero3_T<T>;
         T V = T(0.0);
         T qbar = T(0.0);
@@ -77,11 +77,9 @@ namespace aerodynamics {
 
     struct AerodynamicProperties {
         std::vector<Surface> surfaces;
-        std::unordered_map<std::string, size_t> surfaceIDs;
 
         AerodynamicProperties(std::vector<Surface> s);
-        void compute_aero_properties();
-        std::unordered_map<std::string, size_t> build_IDs();
+        void compute_surface_geometry();
     };
 
     struct FreeStreamVelocity {

@@ -1,75 +1,45 @@
 {
 	"surfaces": {
 		"elevator": {
-			"limit_max": 23.0,
-			"limit_min": -28.0,
+			"limit_max": 0.401426,
+			"limit_min": -0.488692,
 			"tau": 0.1
 		},
 		"aileron": {
-			"limit_max": 15.0,
-			"limit_min": -20.0,
+			"limit_max": 0.261799,
+			"limit_min": -0.349066,
 			"tau": 0.05
 		},
 		"rudder": {
-			"limit_max": 16.0,
-			"limit_min": -16.0,
+			"limit_max": 0.279253,
+			"limit_min": -0.279253,
 			"tau": 0.05
 		},
 		"flap": {
-			"limit_max": 30.0,
+			"limit_max": 0.523599,
 			"limit_min": 0.0,
 			"tau": 1.3333333333333333
 		},
-		"spoiler": {
-			"limit_max": 0.0,
-			"limit_min": 0.0,
-			"tau": 0.0
-		}
+		"spoiler": null
 	},
 	"propulsors": {
 		"front_propulsor": {
+			"geometry_id": "propeller",
 			"limit_max": 2250.0,
 			"limit_min": 290.0,
 			"tau": 1.0,
 			"inclination_angle": 0.0,
 			"toe_angle": 0.0,
-			"pB_prop_cg": [
-				1.949704,
-				0.0,
-				-0.10922
-			],
 			"propellers": {
 				"geometry_ids": [
-				"prop"
+					"propeller"
 				],
 				"spin_sign": 1,
 				"thrust_coeff": 0.1,
 				"torque_coeff": 0.01
 			}
 		},
-		"left_propulsor": {
-			"limit_max": 0.0,
-			"limit_min": 0.0,
-			"tau": 0.0,
-			"inclination_angle": 0.0,
-			"toe_angle": 0.0,
-			"pB_prop_cg": [
-				0.0,
-				0.0,
-				0.0
-			]
-		},
-		"right_propulsor": {
-			"limit_max": 0.0,
-			"limit_min": 0.0,
-			"tau": 0.0,
-			"inclination_angle": 0.0,
-			"toe_angle": 0.0,
-			"pB_prop_cg": [
-				0.0,
-				0.0,
-				0.0
-			]
-		}
+		"left_propulsor": null,
+		"right_propulsor": null
 	}
 }
