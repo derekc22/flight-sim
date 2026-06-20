@@ -45,15 +45,16 @@ namespace runner {
         trim::TrimSolution trim_sol;
         linearization::LocalLinearization lin_sol;
 
-        // initialize net force and moment
-        dynamics::Force FB_net;
-        dynamics::Moment MB_net;
-        dynamics::Wrench WB_net;
+        // initialize prior-step net wrench
+        dynamics::Wrench WB_net_t_1{ 
+            .F = dynamics::Force { constants::Zero3 }, 
+            .M = dynamics::Moment{ constants::Zero3 } 
+        };
 
-        // initialize windB
-        atmospheric::Wind windB;
+        // initialize udp out cache
+        messages::ProcessedFlightGearMessageOut cached_msg_out{};
 
-        connection::UDPOut udp_out;
+       connection::UDPOut udp_out;
         connection::UDPIn udp_in;
         std::chrono::steady_clock::time_point next;
 
@@ -64,4 +65,13 @@ namespace runner {
         void run();
         void step(int t);
     };
+
+    void print_state(
+        int t, 
+        const dynamics::RigidBodyState& Xt,
+        const geography::GeographicState& geo_state,
+        const aerodynamics::AerodynamicState& aero_state,
+        const atmospheric::Wind& windB
+    );
+
 }
