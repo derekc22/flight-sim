@@ -1,10 +1,12 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <Eigen/Dense>
 #include <nlohmann/json.hpp>
 #include "core/json/aerodynamics/private.hpp"
 #include "core/json/public.hpp"
 #include "simulation/aerodynamics/public.hpp"
+#include "simulation/util/validate/public.hpp"
 
 namespace json {
 
@@ -41,7 +43,8 @@ namespace json {
             .dCD_ds = ctrl_json.value("dCD_ds", 0.0),
         };
     }
-    aerodynamics::AerodynamicProperties parse_aerodynamic_properties(const nlohmann::json& config) {
+
+    aerodynamics::AerodynamicProperties parse_aerodynamic_properties(const nlohmann::json& config, const structural::StructuralProperties& structural_properties) {
         const auto& surfaces_json = config.at("surfaces");
         if (!surfaces_json.is_array()) { 
             throw std::runtime_error("json::parse_aerodynamics_config expected 'surfaces' to be an array"); 
@@ -50,12 +53,17 @@ namespace json {
         std::vector<aerodynamics::Surface> surfaces;
         surfaces.reserve(surfaces_json.size());
         for (const auto& surface_json : surfaces_json) {
+            std::string id = surface_json.at("id").get<std::string>();
+            Eigen::Vector3d p_ac = parse_Vector3d(surface_json.at("p_ac"));
+            Eigen::Vector3d n = parse_Vector3d(surface_json.at("n"));
+            util::validate_unit(n, "json::parse_aerodynamic_properties", id + " surface normal");
+
             surfaces.push_back(aerodynamics::Surface{
-                .id = surface_json.at("id").get<std::string>(),
+                .id = id,
                 .chord = surface_json.at("chord").get<double>(),
                 .span = surface_json.at("span").get<double>(),
-                .p_ac = parse_Vector3d(surface_json.at("p_ac")),
-                .n = parse_Vector3d(surface_json.at("n")),
+                .p_ac_cg = p_ac - structural_properties.p_cg.data,
+                .n = n,
                 .CL0 = surface_json.at("CL0").get<double>(),
                 .e = surface_json.at("e").get<double>(),
                 .i = surface_json.at("i").get<double>(),

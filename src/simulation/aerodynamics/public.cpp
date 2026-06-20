@@ -12,7 +12,6 @@
 #include "simulation/atmospheric/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/frames/public.hpp"
-#include "simulation/structural/public.hpp"
 #include "simulation/util/public.hpp"
 
 namespace aerodynamics {
@@ -35,13 +34,13 @@ namespace aerodynamics {
         return aerodynamics::compute_aerodynamic_state(dynamics::compute_rigid_body_state(F), windB);
     }
 
-    AerodynamicWrench step_aero_forces_moments(const AerodynamicProperties& aerodynamic_properties, const structural::StructuralProperties& structural_properties, const dynamics::RigidBodyState& X, const atmospheric::StaticAtmosphericState& static_atm, const actuators::SurfaceActuatorInputs_T<double>& u, const atmospheric::Wind& windB) {
+    AerodynamicWrench step_aero_forces_moments(const AerodynamicProperties& aerodynamic_properties, const dynamics::RigidBodyState& X, const atmospheric::StaticAtmosphericState& static_atm, const actuators::SurfaceActuatorInputs_T<double>& u, const atmospheric::Wind& windB) {
         const dynamics::Twist_T<double> twist{
             .v = X.v.data,
             .w = X.w.data,
         };
 
-        const dynamics::Wrench_T<double> loads = step_aero_forces_moments_T<double>(aerodynamic_properties, structural_properties, twist, static_atm, u, windB);
+        const dynamics::Wrench_T<double> loads = step_aero_forces_moments_T<double>(aerodynamic_properties, twist, static_atm, u, windB);
 
         return { dynamics::Force{ loads.F }, dynamics::Moment{ loads.M } };
     }

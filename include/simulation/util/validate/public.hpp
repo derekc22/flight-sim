@@ -13,6 +13,9 @@ namespace util {
     void validate_square(const Eigen::DenseBase<T>& M, const std::string& context, const std::string& name);
 
     template <typename T>
+    void validate_unit(const Eigen::MatrixBase<T>& v, const std::string& context, const std::string& name);
+
+    template <typename T>
     void validate_value(T a, T b, const std::string& context, const std::string& name_a, const std::string& name_b);
 
 }

@@ -6,6 +6,8 @@ namespace actuators {
 
     Actuator::Actuator(double limit_max, double limit_min, double tau) : limit_max(limit_max), limit_min(limit_min), tau(tau) {}
 
+    Actuator::Actuator() : Actuator(0.0, 0.0, 0.0) {};
+
     double Actuator::step(double cmd, std::optional<double>& lag_state) {
         double cmd_clamped = util::clamp(cmd, limit_min, limit_max);
         double init_lag_state = util::clamp(0.0, limit_min, limit_max);

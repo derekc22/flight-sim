@@ -47,7 +47,7 @@ namespace runner {
         vehicles::Aircraft aircraft {
             aircraft_id,
             structural_properties,
-            json::parse_aerodynamics_config(),
+            json::parse_aerodynamics_config(structural_properties),
             actuator_properties,
             control_properties,
             json::parse_avionics_config(),
@@ -343,7 +343,6 @@ namespace runner {
         // compute aerodynamics forces and moments
         aerodynamics::AerodynamicWrench WB_aero = aerodynamics::step_aero_forces_moments(
             aerodynamic_properties, 
-            structural_properties, 
             Xt, 
             static_atm_t, 
             u_surface_actual, 

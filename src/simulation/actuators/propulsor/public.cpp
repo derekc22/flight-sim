@@ -14,9 +14,11 @@ namespace actuators {
         p_propulsor_cg(p_propulsor_cg),
         propellers(propellers)
     {
-        Eigen::Matrix3d RBP = transforms::eul_to_R(toe_angle, inclination_angle, 0, "ZYX");
+        Eigen::Matrix3d RBP = transforms::eul_to_R(toe_angle, inclination_angle, 0.0, "ZYX");
         n_prop = RBP * constants::ei;
     }
+
+    PropulsorActuator::PropulsorActuator() : PropulsorActuator(0.0, 0.0, 0.0, 0.0, 0.0, constants::Zero3) {}
 
     PropulsorActuatorInputsVector_T<double> unpack_propulsor_actuator_inputs(const PropulsorActuatorInputs_T<double>& u_propulsor) {
         PropulsorActuatorInputsVector_T<double> out;
