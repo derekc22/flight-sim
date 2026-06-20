@@ -1,7 +1,9 @@
 #pragma once
+#include <cmath>
 #include <stdexcept>
 #include <string>
 #include <Eigen/Dense>
+#include "simulation/constants/public.hpp"
 #include "simulation/util/validate/public.hpp"
 
 namespace util {
@@ -24,6 +26,17 @@ namespace util {
                 "util::validate_square: " + context + ": " + name +
                 " must be square. Got (" +
                 std::to_string(M.rows()) + " x " + std::to_string(M.cols()) + ")"
+            );
+        }
+    }
+
+    template <typename T>
+    void validate_unit(const Eigen::MatrixBase<T>& v, const std::string& context, const std::string& name) {
+        const double n = v.norm();
+        if (std::abs(n - 1.0) > constants::eps) {
+            throw std::invalid_argument(
+                "util::validate_unit: " + context + ": " + name +
+                " must have unit norm. Got norm = " + std::to_string(n)
             );
         }
     }

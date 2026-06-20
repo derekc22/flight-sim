@@ -10,6 +10,7 @@
 #include "simulation/constants/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/operating/public.hpp"
+#include "simulation/structural/public.hpp"
 
 namespace vehicles { struct Aircraft; } // forward declare
 

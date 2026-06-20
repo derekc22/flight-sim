@@ -28,7 +28,6 @@ namespace aerodynamics {
     };
 
     struct SurfaceKinematics {
-        Eigen::Vector3d p_ac_cg = constants::Zero3;
         Eigen::Vector3d vB_rel = constants::Zero3;
         double V = 0.0;
         double qbar = 0.0;

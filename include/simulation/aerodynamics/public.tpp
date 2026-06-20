@@ -3,24 +3,22 @@
 #include "simulation/atmospheric/public.hpp"
 #include "simulation/constants/public.hpp"
 #include "simulation/dynamics/public.hpp"
-#include "simulation/structural/public.hpp"
 #include "simulation/util/public.hpp"
 
 namespace aerodynamics {
 
     template <typename T>
-    SurfaceKinematics_T<T> compute_surface_kinematics_T(const Surface& s, const structural::StructuralProperties& structural_properties, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& static_atm, const atmospheric::Wind& windB) {
+    SurfaceKinematics_T<T> compute_surface_kinematics_T(const Surface& s, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& static_atm, const atmospheric::Wind& windB) {
         SurfaceKinematics_T<T> out;
-        out.p_ac_cg = s.p_ac.cast<T>() - structural_properties.p_cg.data.cast<T>();
-        out.vB_rel = (twist.v - windB.data.cast<T>()) + twist.w.cross(out.p_ac_cg);
+        const constants::Vector3_T<T> p_ac_cg = s.p_ac_cg.cast<T>();
+        out.vB_rel = (twist.v - windB.data.cast<T>()) + twist.w.cross(p_ac_cg);
         out.V = util::vector_norm(out.vB_rel);
 
         if (out.V < T(constants::eps)) {
             return out;
         }
 
-        const constants::Vector3_T<T> n_B = s.n.cast<T>();
-        const constants::Vector3_T<T> n_hat = util::norm(n_B);
+        const constants::Vector3_T<T> n_hat = s.n.cast<T>();
         const T arg = util::clamp_to_1(out.vB_rel.dot(n_hat) / out.V);
 
         out.alpha = T(s.i) - util::asin(arg);
@@ -64,8 +62,7 @@ namespace aerodynamics {
             return out;
         }
 
-        const constants::Vector3_T<T> n_B = s.n.cast<T>();
-        const constants::Vector3_T<T> n_hat = util::norm(n_B);
+        const constants::Vector3_T<T> n_hat = s.n.cast<T>();
         const constants::Vector3_T<T> d_hat = -sk.vB_rel / sk.V;
         const constants::Vector3_T<T> lift_axis = n_hat - n_hat.dot(d_hat) * d_hat;
         const constants::Vector3_T<T> l_hat = util::norm(lift_axis);
@@ -77,15 +74,16 @@ namespace aerodynamics {
         const T Mmag = sk.qbar * T(s.area * s.chord) * sc.CM;
 
         out.F = L * l_hat + D * d_hat;
-        out.M = sk.p_ac_cg.cross(out.F) + Mmag * m_hat;
+        const constants::Vector3_T<T> p_ac_cg = s.p_ac_cg.cast<T>();
+        out.M = p_ac_cg.cross(out.F) + Mmag * m_hat;
         return out;
     }
 
     template <typename T>
-    dynamics::Wrench_T<T> step_aero_forces_moments_T(const AerodynamicProperties& aerodynamic_properties, const structural::StructuralProperties& structural_properties, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& static_atm, const actuators::SurfaceActuatorInputs_T<T>& u, const atmospheric::Wind& windB) {
+    dynamics::Wrench_T<T> step_aero_forces_moments_T(const AerodynamicProperties& aerodynamic_properties, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& static_atm, const actuators::SurfaceActuatorInputs_T<T>& u, const atmospheric::Wind& windB) {
         dynamics::Wrench_T<T> total;
         for (const Surface& s : aerodynamic_properties.surfaces) {
-            const SurfaceKinematics_T<T> sk = compute_surface_kinematics_T<T>(s, structural_properties, twist, static_atm, windB);
+            const SurfaceKinematics_T<T> sk = compute_surface_kinematics_T<T>(s, twist, static_atm, windB);
             const SurfaceCoefficients_T<T> sc = compute_surface_coefficients_T<T>(s, sk, u);
             const dynamics::Wrench_T<T> loads = compute_surface_loads_T<T>(s, sk, sc);
             total.F += loads.F;

@@ -13,7 +13,7 @@ namespace geography {
 
     GeographicState compute_geographic_state(const frames::Frame& F) {
         if (F.parent != nullptr) {
-            throw std::invalid_argument(std::format("geography::geographic_state: Invalid frame input, the parent of {} must be ECEFFrame", F.name));
+            throw std::invalid_argument(std::format("geography::compute_geographic_state: Invalid frame input, the parent of {} must be ECEFFrame", F.name));
         }
         const frames::FrameView fv = F.view();
         return geography::lat_lon_alt_from_pE(fv.H->p());
@@ -29,10 +29,10 @@ namespace geography {
         return { CEN };
     };
 
-    dynamics::Position pE_from_lat_lon_alt(const geography::GeographicState& geographic_state) {
-        double lat = geographic_state.lat.data;
-        double lon = geographic_state.lon.data;
-        double alt = geographic_state.alt.data;
+    dynamics::Position pE_from_lat_lon_alt(const geography::GeographicState& geo_state) {
+        double lat = geo_state.lat.data;
+        double lon = geo_state.lon.data;
+        double alt = geo_state.alt.data;
 
         double r = constants::r_earth + alt;
 

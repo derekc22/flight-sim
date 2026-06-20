@@ -31,7 +31,7 @@ namespace geography {
     GeographicState compute_geographic_state(const frames::Frame& F);
 
     dynamics::OrientationMatrix CEN_from_lat_lon(const geography::Latitude& lat, const geography::Longitude& lon);
-    dynamics::Position pE_from_lat_lon_alt(const geography::GeographicState& geographic_state);
+    dynamics::Position pE_from_lat_lon_alt(const geography::GeographicState& geo_state);
 
     dynamics::Gravity gN();
 

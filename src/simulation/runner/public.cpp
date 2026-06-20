@@ -1,7 +1,7 @@
 #include <chrono>
 #include <string>
 #include <thread>
-#include <optional>
+#include <iostream>
 #include <Eigen/Dense>
 #include "simulation/runner/public.hpp"
 #include "simulation/actuators/public.hpp"
@@ -47,7 +47,7 @@ namespace runner {
         vehicles::Aircraft aircraft {
             aircraft_id,
             structural_properties,
-            json::parse_aerodynamics_config(),
+            json::parse_aerodynamics_config(structural_properties),
             actuator_properties,
             control_properties,
             json::parse_avionics_config(),
@@ -70,10 +70,6 @@ namespace runner {
         data_manager(options.tf, options.data_bool, options.control_bool, options.sensor_bool, options.estimation_bool, options.wind_bool),
         // create analysis manager
         analysis_manager(options.data_bool, options.analysis_bool, options.trim_bool),
-        FB_net{ constants::Zero3 },
-        MB_net{ constants::Zero3 },
-        WB_net{ .F = FB_net, .M = MB_net },
-        windB{ constants::Zero3 },
         // initialize udp connections
         udp_out(5510),
         udp_in("127.0.0.1", 5511),
@@ -114,6 +110,21 @@ namespace runner {
         guidance::GuidanceProperties& guidance_properties = aircraft.guidance_properties;
         avionics::AvionicsProperties& avionics_properties = aircraft.avionics_properties;
 
+        // fetch from FlightGear
+        if (auto out_pkt = udp_out.try_receive()) { 
+            cached_msg_out = messages::process_out_pkt(out_pkt.value());
+        }
+
+        // apply wind
+        atmospheric::Wind windB { constants::Zero3 };
+        if (options.wind_bool) {
+            windB.data = frames::transform_vec(
+                cached_msg_out.wind.data,
+                aircraft.NEDFrameECEF, 
+                aircraft.FRDFrameNED
+            );
+        }
+
         // extract reuseable quantities
         dynamics::Mass mass = structural_properties.mass;
         dynamics::InertiaTensor JB = structural_properties.JB;
@@ -121,27 +132,18 @@ namespace runner {
         actuators::SurfaceActuators& surface_actuators = actuator_properties.surface_actuators;
         actuators::PropulsorActuators& propulsor_actuators = actuator_properties.propulsor_actuators;
 
-        // get rigid body states
+        // compute rigid body states
         dynamics::RigidBodyState Xt = dynamics::compute_rigid_body_state(aircraft.FRDFrameNED);
         dynamics::RigidBodyState XEt = dynamics::compute_rigid_body_state(aircraft.FRDFrameECEF);
 
-        // compute static atmospheric state at current altitude
+        // compute aerodynamic state
+        aerodynamics::AerodynamicState aero_state_t = aerodynamics::compute_aerodynamic_state(Xt, windB);
+
+        // compute geographic state
+        geography::GeographicState geo_state_t = geography::compute_geographic_state(aircraft.FRDFrameECEF);
+
+        // compute static atmospheric state
         atmospheric::StaticAtmosphericState static_atm_t = atmospheric::compute_static_atmospheric_state(aircraft.FRDFrameECEF);
-
-        // fetch from FlightGear
-        messages::ProcessedFlightGearMessageOut processed_msg_out{};
-        if (auto out_pkt = udp_out.try_receive()) { 
-            processed_msg_out = messages::process_out_pkt(out_pkt);
-        }
-
-        // apply wind
-        if (options.wind_bool) {
-            windB.data = frames::transform_vec(
-                processed_msg_out.wind.data, 
-                aircraft.NEDFrameECEF, 
-                aircraft.FRDFrameNED
-            );
-        }
 
         // trim and linearization
         if (options.trim_bool && !trim_sol.attempted) {
@@ -174,14 +176,20 @@ namespace runner {
 
                 // overwrite local state with trim state
                 Xt = Xt_trim;
-                WB_net = WB_net_trim;
-                auto [u_surf_trim, u_prop_trim] = trim::update_actuators_from_trim(
+                XEt = dynamics::compute_rigid_body_state(aircraft.FRDFrameECEF);
+                aero_state_t = aerodynamics::compute_aerodynamic_state(Xt, windB);
+                geo_state_t = geography::compute_geographic_state(aircraft.FRDFrameECEF);
+                static_atm_t = atmospheric::compute_static_atmospheric_state(aircraft.FRDFrameECEF);
+
+                // overwrite internal state with trim state
+                WB_net_t_1 = WB_net_trim;
+                auto [u_surface_trim, u_propulsor_trim] = trim::update_actuators_from_trim(
                     u_surface_actual_prev, 
                     u_propulsor_actual_prev, 
                     trim_sol
                 );
-                u_surface_actual_prev = u_surf_trim;
-                u_propulsor_actual_prev = u_prop_trim;
+                u_surface_actual_prev = u_surface_trim;
+                u_propulsor_actual_prev = u_propulsor_trim;
 
                 /** @deprecated */
                 // overwrite actuator lag state with trim controls
@@ -211,10 +219,6 @@ namespace runner {
 
         // use sensors
         if (options.sensor_bool) {
-            geography::GeographicState geo_state_t = geography::compute_geographic_state(aircraft.FRDFrameECEF);
-
-            // obtain full state from sensors
-            aerodynamics::AerodynamicState aero_state_t = aerodynamics::compute_aerodynamic_state(Xt, windB);
 
             // aggregate ground truth data
             avionics::MeasurementGroundTruth meas_gt = avionics::build_measurement_gt(
@@ -225,7 +229,7 @@ namespace runner {
                 geo_state_t,
                 mass,
                 windB,
-                WB_net
+                WB_net_t_1
             );
 
             // step avionics
@@ -343,7 +347,6 @@ namespace runner {
         // compute aerodynamics forces and moments
         aerodynamics::AerodynamicWrench WB_aero = aerodynamics::step_aero_forces_moments(
             aerodynamic_properties, 
-            structural_properties, 
             Xt, 
             static_atm_t, 
             u_surface_actual, 
@@ -366,24 +369,9 @@ namespace runner {
         Eigen::Vector3d FB_g = mass.data * aircraft.FRDFrameNED.gB.data;
 
         // compute net forces and moments
-        FB_net = dynamics::Force{ FB_g + FB_aero.data + FB_propulsive.data };
-        MB_net = dynamics::Moment{ MB_aero.data + MB_propulsive.data };
-        WB_net = dynamics::Wrench{ .F = FB_net, .M = MB_net };
-
-        // compute rigid-body dynamics
-        Xt = dynamics::step_rigid_body(Xt, mass, JB, WB_net);
-
-        // declare StepOptions
-        vehicles::StepOptions StepOpts;
-
-        // set step options
-        StepOpts.FRDFrameNEDStepOpts = vehicles::FRDFrameNEDStepOptions{ .rbs_BN = Xt };
-        aerodynamics::AerodynamicState aero_state_t = aerodynamics::compute_aerodynamic_state(Xt, windB);
-        StepOpts.STABFrameFRDStepOpts = vehicles::STABFrameFRDStepOptions{ .ads = aero_state_t };
-        StepOpts.WINDFrameSTABStepOpts = vehicles::WINDFrameSTABStepOptions{ .ads = aero_state_t };
-
-        // step frames
-        aircraft.step(StepOpts);
+        dynamics::Force FB_net{ FB_g + FB_aero.data + FB_propulsive.data };
+        dynamics::Moment MB_net{ MB_aero.data + MB_propulsive.data };
+        dynamics::Wrench WB_net{ .F = FB_net, .M = MB_net };
 
         // update data context
         io::DataContext data_context{
@@ -402,12 +390,35 @@ namespace runner {
         // step data manager
         data_manager.step(t, data_context);
 
+        // print state
+        if (options.verbose_bool) { 
+            print_state(t, Xt, geo_state_t, aero_state_t, windB);
+        }
+
+        // compute next-step rigid-body dynamics
+        dynamics::RigidBodyState Xt1{ dynamics::step_rigid_body(Xt, mass, JB, WB_net) };
+
         // check for runtime failures
         runtime::RuntimeFailureInputs failure_input {
-            .ground_elev = processed_msg_out.ground_elev,
-            .altitude = Xt.p.data.z()
+            .ground_elev = cached_msg_out.ground_elev,
+            .altitude = Xt1.p.data.z()
         };
         runtime_properties.check_runtime_failures(failure_input);
+
+        // declare StepOptions
+        vehicles::StepOptions StepOpts;
+
+        // set step options
+        StepOpts.FRDFrameNEDStepOpts = vehicles::FRDFrameNEDStepOptions{ .rbs_BN = Xt1 };
+        aerodynamics::AerodynamicState aero_state_t1 = aerodynamics::compute_aerodynamic_state(Xt1, windB);
+        StepOpts.STABFrameFRDStepOpts = vehicles::STABFrameFRDStepOptions{ .ads = aero_state_t1 };
+        StepOpts.WINDFrameSTABStepOpts = vehicles::WINDFrameSTABStepOptions{ .ads = aero_state_t1 };
+
+        // step frames
+        aircraft.step(StepOpts);
+
+        // advance internal state
+        WB_net_t_1 = WB_net;
 
         // generate in_pkt from the simulation state
         messages::FlightGearMessageIn in_pkt = messages::process_in_pkt(
@@ -418,13 +429,42 @@ namespace runner {
         // send packet
         udp_in.send(in_pkt);
 
-        // print state
-        if (options.verbose_bool) { aircraft.print_state(t, windB); }
-
         // step timer by dt
-        next += std::chrono::duration_cast<std::chrono::steady_clock::duration>(std::chrono::duration<double>(constants::dt));
+        next += std::chrono::duration_cast<std::chrono::steady_clock::duration>(
+            std::chrono::duration<double>(constants::dt)
+        );
 
         // sleep to maintain frequency dictated by dt
         std::this_thread::sleep_until(next);
     }
+
+
+    void print_state(
+        int t, 
+        const dynamics::RigidBodyState& Xt,
+        const geography::GeographicState& geo_state,
+        const aerodynamics::AerodynamicState& aero_state,
+        const atmospheric::Wind& windB
+    ) {
+        const Eigen::Vector3d& p = Xt.p.data;
+        dynamics::EulerAngles eul;
+        eul.set(Xt.q);
+        const Eigen::Vector3d& v = Xt.v.data;
+        const Eigen::Vector3d& w = Xt.w.data;
+        const Eigen::Vector3d& g = geography::gB(Xt.q).data;
+        const Eigen::Vector3d& wind = windB.data;
+
+        std::cout
+            << "t: " << t * constants::dt << " [s]" << "\n\n"
+            << "p: " << p.x() << ", " << p.y() << ", " << p.z() << " [m]" << "\n\n"
+            << "eul: " << util::rad_to_deg(eul.psi()) << ", " << util::rad_to_deg(eul.theta()) << ", " << util::rad_to_deg(eul.phi()) << " [deg]" << "\n\n"
+            << "v: " << v.x() << ", " << v.y() << ", " << v.z() << " [ms^-1]" << "\n\n"
+            << "w: " << util::rad_to_deg(w.x()) << ", " << util::rad_to_deg(w.y()) << ", " << util::rad_to_deg(w.z()) << " [deg/s]" << "\n\n"
+            << "g: " << g.x() << ", " << g.y() << ", " << g.z() << " [ms^-2]" << "\n\n"
+            << "lat: " << util::rad_to_deg(geo_state.lat.data) << ", lon: " << util::rad_to_deg(geo_state.lon.data) << " [deg]" << ", alt: " << geo_state.alt.data << " [m]" << "\n\n"
+            << "alpha: " <<  util::rad_to_deg(aero_state.alpha.data) << ", beta: " <<  util::rad_to_deg(aero_state.beta.data) << " [deg]" << "\n\n"
+            << "wind: " << wind.x() << ", " << wind.y() << ", " << wind.z() << " [m/s]" << "\n\n"
+            << "-------------------------------------------------------------------------------" << "\n\n";
+    }
+
 }

@@ -26,6 +26,7 @@ namespace actuators {
         std::optional<PropellerAssembly> propellers;
 
         PropulsorActuator(double limit_max, double limit_min, double tau, double inclination_angle, double toe_angle, const Eigen::Vector3d& p_propulsor_cg, std::optional<PropellerAssembly> propellers = std::nullopt);
+        PropulsorActuator();
     };
 
     struct FrontPropulsor : PropulsorActuator { using PropulsorActuator::PropulsorActuator; };

@@ -11,10 +11,7 @@ namespace json {
     template <typename SurfaceActuatorType>
     SurfaceActuatorType parse_surface_actuator(const nlohmann::json& config, const std::string& key) {
         if (config.at(key).is_null()) {
-            SurfaceActuatorType null_surface(
-                0.0, 0.0, 0.0
-            );
-            return null_surface;
+            return SurfaceActuatorType{};
         }
 
         const auto& surface_actuator_json = config.at(key);
@@ -30,11 +27,7 @@ namespace json {
     template <typename PropulsorActuatorType>
     PropulsorActuatorType parse_propulsor_actuator(const nlohmann::json& config, const std::string& key, structural::StructuralProperties& structural_properties) {
         if (config.at(key).is_null()) {
-            PropulsorActuatorType null_propulsor(
-                0.0, 0.0, 0.0, 0.0, 0.0,
-                Eigen::Vector3d(0, 0, 0)
-            );
-            return null_propulsor;
+            return PropulsorActuatorType{};
         }
 
         const auto& propulsor_actuator_json = config.at(key);

@@ -223,7 +223,6 @@ namespace vehicles {
         void step_dependent(frames::Frame& F);
         void step_gravity();
         void init_frames();
-        void print_state(int t, const atmospheric::Wind& windB);
     };
 
 }

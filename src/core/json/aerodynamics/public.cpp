@@ -6,10 +6,10 @@
 
 namespace json {
 
-    aerodynamics::AerodynamicProperties parse_aerodynamics_config() {
+    aerodynamics::AerodynamicProperties parse_aerodynamics_config(const structural::StructuralProperties& structural_properties) {
         const auto config_path = resolve_run_config_entry_path("aerodynamics_config");
         const auto config = read_json_file(config_path);
-        return parse_aerodynamic_properties(config);
+        return parse_aerodynamic_properties(config, structural_properties);
     }
 
 }

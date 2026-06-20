@@ -11,6 +11,7 @@ namespace actuators {
         double step(double cmd, std::optional<double>& lag_state);
 
         Actuator(double limit_max, double limit_min, double tau);
+        Actuator();
     };
 
 }
