@@ -18,29 +18,29 @@ namespace operating {
     }
 
     template <typename T>
-    dynamics::State_T<T> pack_state_T(const StateInputVector_T<T>& z) {
+    dynamics::State_T<T> pack_state_T(const StateInputVector_T<T>& xu) {
         return {
-            .vx = z(0),
-            .vy = z(1),
-            .vz = z(2),
-            .p = z(3),
-            .q = z(4),
-            .r = z(5),
-            .phi = z(6),
-            .theta = z(7),
+            .vx = xu(0),
+            .vy = xu(1),
+            .vz = xu(2),
+            .p = xu(3),
+            .q = xu(4),
+            .r = xu(5),
+            .phi = xu(6),
+            .theta = xu(7),
         };
     }
 
     template <typename T>
-    actuators::ActuatorInputs_T<T> pack_actuator_inputs_T(const StateInputVector_T<T>& z) {
+    actuators::ActuatorInputs_T<T> pack_actuator_inputs_T(const StateInputVector_T<T>& xu) {
         return {
-            .elevator_cmd = z(8),
-            .aileron_cmd = z(9),
-            .rudder_cmd = z(10),
+            .elevator_cmd = xu(8),
+            .aileron_cmd = xu(9),
+            .rudder_cmd = xu(10),
 
-            .front_propulsor_cmd = z(11),
-            .left_propulsor_cmd = z(12),
-            .right_propulsor_cmd = z(13),
+            .front_propulsor_cmd = xu(11),
+            .left_propulsor_cmd = xu(12),
+            .right_propulsor_cmd = xu(13),
         };
     }
 

@@ -15,22 +15,22 @@ namespace estimation {
     std::tuple<KalmanState, linearization::OutputJacobian> ExtendedKalmanPolicy::predict(const ExtendedKalmanPolicyInput& input) {
         KalmanState prev = state.value();
 
-        dynamics::State_T<double> xt = dynamics::pack_state_T(prev.zt_vec);
-        actuators::ActuatorInputs_T<double> u = actuators::pack_actuator_inputs_T<double>(input.ut_1_vec);
+        dynamics::State_T<double> zt_1 = dynamics::pack_state_T(prev.zt);
+        actuators::ActuatorInputs_T<double> ut_1 = actuators::pack_actuator_inputs_T<double>(input.ut_1);
         autodiff::AutoDiffModel model = autodiff::build_autodiff_model(input.aircraft);
 
-        // A @ zt_bar + B @ ut_1 -> f(zt_bar, ut_1)
-        dynamics::StateDot_T<double> xt_dot = autodiff::compute_state_dot_T(xt, u, model, input.conditions);
-        dynamics::StateVector_T<double> zt_vec_bar = prev.zt_vec + dynamics::unpack_state_dot_T(xt_dot) * constants::dt;
+        // A @ zt_1 + B @ ut_1 -> f(zt_1, ut_1)
+        dynamics::StateDot_T<double> zt_1_dot = autodiff::compute_state_dot_T(zt_1, ut_1, model, input.conditions);
+        dynamics::StateVector_T<double> zt_bar = prev.zt + dynamics::unpack_state_dot_T(zt_1_dot) * constants::dt;
 
         // A -> Ft
-        operating::OperatingPoint operating_point{ .state = xt, .input = u };
+        operating::OperatingPoint operating_point{ .state = zt_1, .input = ut_1 };
         linearization::LocalLinearization lin_sol = linearization::linearize_operating_point(input.aircraft, operating_point, input.conditions);
         linearization::StateJacobian Ft = linearization::discretize_euler(lin_sol).A;
 
         Eigen::MatrixXd Pt_bar = Ft * prev.P * Ft.transpose() + params.R;
 
-        return { { .zt_vec = zt_vec_bar, .P = Pt_bar }, lin_sol.C };
+        return { { .zt = zt_bar, .P = Pt_bar }, lin_sol.C };
     }
 
     KalmanState ExtendedKalmanPolicy::correct(const ExtendedKalmanPolicyInput& input, const linearization::OutputJacobian& C) {
@@ -42,25 +42,25 @@ namespace estimation {
         Eigen::MatrixXd Kt = pred.P * Ht.transpose() * (Ht * pred.P * Ht.transpose() + params.Q).inverse(); // Kalman gain
 
         // C @ zt_bar = I @ zt_bar -> h(zt_bar) = zt_bar
-        dynamics::StateVector_T<double> Lt = input.yt_vec - pred.zt_vec; // Innovation
+        dynamics::StateVector_T<double> Lt = input.yt - pred.zt; // Innovation
 
-        dynamics::StateVector_T<double> zt_vec = pred.zt_vec + Kt * Lt;
+        dynamics::StateVector_T<double> zt = pred.zt + Kt * Lt;
 
         Eigen::MatrixXd I = Eigen::MatrixXd::Identity(pred.P.rows(), pred.P.cols());
 
         Eigen::MatrixXd Pt = (I - Kt * Ht) * pred.P * (I - Kt * Ht).transpose() + Kt * params.Q * Kt.transpose();
 
-        return { .zt_vec = zt_vec, .P = Pt };
+        return { .zt = zt, .P = Pt };
     }
 
     KalmanState ExtendedKalmanPolicy::step(const ExtendedKalmanPolicyInput& input) {
         if (!state.has_value()) {
-            state = KalmanState{ .zt_vec = input.yt_vec, .P = params.P0 };
+            state = KalmanState{ .zt = input.yt, .P = params.P0 };
             return state.value();
         }
 
-        auto [temp, C] = predict(input);
-        state = temp;
+        auto [temporary, C] = predict(input);
+        state = temporary;
         state = correct(input, C);
 
         return state.value();

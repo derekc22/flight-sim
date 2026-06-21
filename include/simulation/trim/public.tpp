@@ -21,30 +21,30 @@ namespace trim {
 
 
     template <typename T>
-    actuators::ActuatorInputs_T<T> pack_trim_actuator_inputs_T(const operating::StateInputVector_T<T>& z, const actuators::ActuatorLimits_T<double>& actuator_limits) {
+    actuators::ActuatorInputs_T<T> pack_trim_actuator_inputs_T(const operating::StateInputVector_T<T>& xu, const actuators::ActuatorLimits_T<double>& actuator_limits) {
         return {
             .elevator_cmd = get_control_from_solver_space_T<T>(
-                z(constants::state_dim + 0), 
+                xu(constants::state_dim + 0),
                 actuator_limits.limit_min.elevator_cmd, actuator_limits.limit_max.elevator_cmd
             ),
             .aileron_cmd = get_control_from_solver_space_T<T>(
-                z(constants::state_dim + 1), 
+                xu(constants::state_dim + 1),
                 actuator_limits.limit_min.aileron_cmd, actuator_limits.limit_max.aileron_cmd
             ),
             .rudder_cmd = get_control_from_solver_space_T<T>(
-                z(constants::state_dim + 2), 
+                xu(constants::state_dim + 2),
                 actuator_limits.limit_min.rudder_cmd, actuator_limits.limit_max.rudder_cmd
             ),
             .front_propulsor_cmd = get_control_from_solver_space_T<T>(
-                z(constants::state_dim + 3), 
+                xu(constants::state_dim + 3),
                 actuator_limits.limit_min.front_propulsor_cmd, actuator_limits.limit_max.front_propulsor_cmd
             ),
             .left_propulsor_cmd = get_control_from_solver_space_T<T>(
-                z(constants::state_dim + 4), 
+                xu(constants::state_dim + 4),
                 actuator_limits.limit_min.left_propulsor_cmd, actuator_limits.limit_max.left_propulsor_cmd
             ),
             .right_propulsor_cmd = get_control_from_solver_space_T<T>(
-                z(constants::state_dim + 5), 
+                xu(constants::state_dim + 5),
                 actuator_limits.limit_min.right_propulsor_cmd, actuator_limits.limit_max.right_propulsor_cmd
             ),
         };

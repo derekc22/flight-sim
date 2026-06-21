@@ -14,10 +14,10 @@ namespace control {
         dynamics::RigidBodyState Zt = input.Zt;
         guidance::LinearQuadraticSetpoint setpoint = input.setpoint;
 
-        dynamics::StateVector_T<double> zt_vec_deviation = dynamics::unpack_state(Zt) - unpack_state(setpoint);
+        dynamics::StateVector_T<double> zt_deviation = dynamics::unpack_state(Zt) - unpack_state(setpoint);
 
         return {
-            .zt_vec = zt_vec_deviation,
+            .zt = zt_deviation,
             .A = input.A,
             .B = input.B
         };

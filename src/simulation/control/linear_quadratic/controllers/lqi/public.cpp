@@ -25,11 +25,11 @@ namespace control {
         });
     };
 
-    IntegratedStateVector LinearQuadraticIntegrator::integrate_state_err(const dynamics::StateVector_T<double>& zt_vec, const dynamics::StateVector_T<double>& zt_vec_des) {
-        IntegratedStateVector zt_vec_pqr = zt_vec.segment<integrated_state_dim>(3);  // grab p, q, r
-        IntegratedStateVector zt_vec_des_pqr = zt_vec_des.segment<integrated_state_dim>(3);
+    IntegratedStateVector LinearQuadraticIntegrator::integrate_state_err(const dynamics::StateVector_T<double>& zt, const dynamics::StateVector_T<double>& zt_des) {
+        IntegratedStateVector zt_pqr = zt.segment<integrated_state_dim>(3);  // grab p, q, r
+        IntegratedStateVector zt_des_pqr = zt_des.segment<integrated_state_dim>(3);
 
-        return integral + (zt_vec_des_pqr - zt_vec_pqr) * constants::dt;     // integrate
+        return integral + (zt_des_pqr - zt_pqr) * constants::dt;     // integrate
     }
 
 
@@ -49,19 +49,19 @@ namespace control {
         Eigen::MatrixXd B_aug = Eigen::MatrixXd::Zero(n + i, m);
         B_aug.block(0, 0, n, m) = input.B;
 
-        dynamics::StateVector_T<double> zt_vec = dynamics::unpack_state(input.Zt);
-        dynamics::StateVector_T<double> zt_vec_des = unpack_state(input.setpoint);
+        dynamics::StateVector_T<double> zt = dynamics::unpack_state(input.Zt);
+        dynamics::StateVector_T<double> zt_des = unpack_state(input.setpoint);
 
-        AugmentedStateVector zt_vec_aug;
-        zt_vec_aug << zt_vec, integral_new;
+        AugmentedStateVector zt_aug;
+        zt_aug << zt, integral_new;
 
-        AugmentedStateVector zt_vec_des_aug;
-        zt_vec_des_aug << zt_vec_des, IntegratedStateVector::Zero();
+        AugmentedStateVector zt_des_aug;
+        zt_des_aug << zt_des, IntegratedStateVector::Zero();
 
-        AugmentedStateVector zt_vec_aug_deviation = zt_vec_aug - zt_vec_des_aug;
+        AugmentedStateVector zt_aug_deviation = zt_aug - zt_des_aug;
 
         return {
-            .zt_vec = zt_vec_aug_deviation,
+            .zt = zt_aug_deviation,
             .A = A_aug,
             .B = B_aug
         };

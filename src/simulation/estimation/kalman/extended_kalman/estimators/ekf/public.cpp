@@ -9,25 +9,24 @@ namespace estimation {
     {};
 
     ExtendedKalmanPolicyInput ExtendedKalmanFilter::make_extended_kalman_policy_input(const ExtendedKalmanEstimatorInput& input) {
-        dynamics::StateVector_T<double> yt_vec = dynamics::unpack_state(input.Yt);
+        dynamics::StateVector_T<double> yt = dynamics::unpack_state(input.Yt);
 
-        actuators::ActuatorInputsVector_T<double> ut_1_vec = actuators::unpack_actuator_inputs(
+        actuators::ActuatorInputsVector_T<double> ut_1 = actuators::unpack_actuator_inputs(
             input.u_surface_actual_prev, 
             input.u_propulsor_actual_prev
         );
 
         return { 
-            .yt_vec = yt_vec,
-            .ut_1_vec = ut_1_vec,
+            .yt = yt,
+            .ut_1 = ut_1,
             .conditions = input.conditions,
             .aircraft = input.aircraft,
         };
     }
 
-    dynamics::RigidBodyState ExtendedKalmanFilter::make_ekf_state_estimate(const ExtendedKalmanEstimatorInput& input, const dynamics::StateVector_T<double>& zt_vec_pred) {
-        dynamics::StateVector_T<double> zt_vec = zt_vec_pred;  // EKF predicts full state, so do not add back trim state
-
-        return make_kalman_state_estimate(input.Yt, zt_vec);
+    dynamics::RigidBodyState ExtendedKalmanFilter::make_ekf_state_estimate(const ExtendedKalmanEstimatorInput& input, const dynamics::StateVector_T<double>& zt) {
+        // EKF predicts full state, so do not add back trim state
+        return make_kalman_state_estimate(input.Yt, zt);
     }
 
     EstimationOutput ExtendedKalmanFilter::step(const ExtendedKalmanEstimatorInput& input) {
@@ -35,7 +34,7 @@ namespace estimation {
             make_extended_kalman_policy_input(input)
         );
 
-        dynamics::RigidBodyState Zt = make_ekf_state_estimate(input, kalman_state.zt_vec);
+        dynamics::RigidBodyState Zt = make_ekf_state_estimate(input, kalman_state.zt);
 
         return { .Zt = Zt };
     }

@@ -16,7 +16,7 @@ namespace control {
         }
 
         actuators::ActuatorInputsVector_T<double> u_deviation;
-        u_deviation = -params.K.value() * input.zt_vec;
+        u_deviation = -params.K.value() * input.zt;
 
         return u_deviation;
     }
