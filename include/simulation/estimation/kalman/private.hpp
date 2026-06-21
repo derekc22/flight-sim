@@ -6,7 +6,7 @@ namespace estimation {
 
     struct KalmanState {
         dynamics::StateVector_T<double> zt;  // state estimate
-        Eigen::MatrixXd P;  // state estimate error covariance matrix
+        Eigen::MatrixXd Pt;  // state estimate error covariance matrix
     };
 
     struct KalmanPolicyParameters {

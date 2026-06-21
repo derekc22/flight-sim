@@ -108,7 +108,7 @@ namespace aerodynamics {
     };
 
     template <typename T>
-    SurfaceKinematics_T<T> compute_surface_kinematics_T(const Surface& s, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& static_atm, const atmospheric::Wind& windB);
+    SurfaceKinematics_T<T> compute_surface_kinematics_T(const Surface& s, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& atm, const atmospheric::Wind& windB);
 
     template <typename T>
     SurfaceCoefficients_T<T> compute_surface_coefficients_T(const Surface& s, const SurfaceKinematics_T<T>& sk, const actuators::SurfaceActuatorInputs_T<T>& u);
@@ -120,12 +120,12 @@ namespace aerodynamics {
     AerodynamicState aerodynamic_state(const frames::Frame& F, const atmospheric::Wind& windB);
 
     template <typename T>
-    dynamics::Wrench_T<T> step_aero_forces_moments_T(const AerodynamicProperties& aerodynamic_properties, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& static_atm, const actuators::SurfaceActuatorInputs_T<T>& u, const atmospheric::Wind& windB);
+    dynamics::Wrench_T<T> step_aero_forces_moments_T(const AerodynamicProperties& aerodynamic_properties, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& atm, const actuators::SurfaceActuatorInputs_T<T>& u, const atmospheric::Wind& windB);
 
     template <typename T>
     AerodynamicState_T<T> compute_aerodynamic_state_T(const dynamics::Twist_T<T>& twist, const atmospheric::Wind& windB);
 
-    AerodynamicWrench step_aero_forces_moments(const AerodynamicProperties& aerodynamic_properties, const dynamics::RigidBodyState& X, const atmospheric::StaticAtmosphericState& static_atm, const actuators::SurfaceActuatorInputs_T<double>& u, const atmospheric::Wind& windB);
+    AerodynamicWrench step_aero_forces_moments(const AerodynamicProperties& aerodynamic_properties, const dynamics::RigidBodyState& X, const atmospheric::StaticAtmosphericState& atm, const actuators::SurfaceActuatorInputs_T<double>& u, const atmospheric::Wind& windB);
     AerodynamicState compute_aerodynamic_state(const dynamics::RigidBodyState& X, const atmospheric::Wind& windB);
 
     dynamics::OrientationMatrix CBS(const aerodynamics::AngleOfAttack& alpha);

@@ -12,7 +12,7 @@ namespace atmospheric {
 
     StaticAtmosphericState compute_static_atmospheric_state(const frames::Frame& F) {
         if (F.parent != nullptr) {
-            throw std::invalid_argument(std::format("atmospheric::static_atm: Invalid frame input, the parent of {} must be ECEFFrame", F.name));
+            throw std::invalid_argument(std::format("atmospheric::compute_static_atmospheric_state: Invalid frame input, the parent of {} must be ECEFFrame", F.name));
         }
         return atmospheric::std_atmosphere(geography::compute_geographic_state(F).alt);
     }
@@ -28,12 +28,12 @@ namespace atmospheric {
         return { M };
     }
 
-    StagnationAtmosphericState static_to_stagnation(const StaticAtmosphericState& static_atm, const MachNumber& M) {
-        AirDensity rho = static_atm.rho;
-        DynamicViscosity mu = static_atm.mu;
+    StagnationAtmosphericState static_to_stagnation(const StaticAtmosphericState& atm, const MachNumber& M) {
+        AirDensity rho = atm.rho;
+        DynamicViscosity mu = atm.mu;
 
-        StagnationAirTemperature T0 = T0_from_T(static_atm.T, M);
-        StagnationAirPressure P0 = P0_from_P(static_atm.P, M);
+        StagnationAirTemperature T0 = T0_from_T(atm.T, M);
+        StagnationAirPressure P0 = P0_from_P(atm.P, M);
 
         return { T0, P0, rho, mu };
     };

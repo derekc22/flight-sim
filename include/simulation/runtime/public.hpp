@@ -1,5 +1,6 @@
 #pragma once
 #include "simulation/actuators/public.hpp"
+#include "simulation/geography/public.hpp"
 
 namespace runtime {
 
@@ -12,15 +13,14 @@ namespace runtime {
 	};
 
     struct RuntimeFailureInputs {
-        double ground_elev;
-        double altitude;
+        geography::HeightAGL height_agl;
     };
 
     struct RuntimeProperties {
         RuntimeActuatorSettings runtime_actuator_settings;
         RuntimeAvionicsSettings runtime_avionics_settings;
 
-        void check_runtime_failures(const RuntimeFailureInputs& failure_inputs);
+        void check_runtime_failures(const RuntimeFailureInputs& input);
     };
 
 }

@@ -8,7 +8,7 @@
 namespace aerodynamics {
 
     template <typename T>
-    SurfaceKinematics_T<T> compute_surface_kinematics_T(const Surface& s, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& static_atm, const atmospheric::Wind& windB) {
+    SurfaceKinematics_T<T> compute_surface_kinematics_T(const Surface& s, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& atm, const atmospheric::Wind& windB) {
         SurfaceKinematics_T<T> out;
         const constants::Vector3_T<T> p_ac_cg = s.p_ac_cg.cast<T>();
         out.vB_rel = (twist.v - windB.data.cast<T>()) + twist.w.cross(p_ac_cg);
@@ -22,7 +22,7 @@ namespace aerodynamics {
         const T arg = util::clamp_to_1(out.vB_rel.dot(n_hat) / out.V);
 
         out.alpha = T(s.i) - util::asin(arg);
-        out.qbar = T(0.5 * static_atm.rho.data) * out.V * out.V;
+        out.qbar = T(0.5 * atm.rho.data) * out.V * out.V;
         out.p_hat = twist.w.x() * T(s.span / 2.0) / out.V;
         out.q_hat = twist.w.y() * T(s.chord / 2.0) / out.V;
         out.r_hat = twist.w.z() * T(s.span / 2.0) / out.V;
@@ -80,10 +80,10 @@ namespace aerodynamics {
     }
 
     template <typename T>
-    dynamics::Wrench_T<T> step_aero_forces_moments_T(const AerodynamicProperties& aerodynamic_properties, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& static_atm, const actuators::SurfaceActuatorInputs_T<T>& u, const atmospheric::Wind& windB) {
+    dynamics::Wrench_T<T> step_aero_forces_moments_T(const AerodynamicProperties& aerodynamic_properties, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& atm, const actuators::SurfaceActuatorInputs_T<T>& u, const atmospheric::Wind& windB) {
         dynamics::Wrench_T<T> total;
         for (const Surface& s : aerodynamic_properties.surfaces) {
-            const SurfaceKinematics_T<T> sk = compute_surface_kinematics_T<T>(s, twist, static_atm, windB);
+            const SurfaceKinematics_T<T> sk = compute_surface_kinematics_T<T>(s, twist, atm, windB);
             const SurfaceCoefficients_T<T> sc = compute_surface_coefficients_T<T>(s, sk, u);
             const dynamics::Wrench_T<T> loads = compute_surface_loads_T<T>(s, sk, sc);
             total.F += loads.F;

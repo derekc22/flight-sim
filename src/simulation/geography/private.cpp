@@ -21,7 +21,7 @@ namespace geography {
         Latitude lat{ util::atan2(z, p) };
 
         // Altitude above the spherical Earth (meters)
-        Altitude alt{ r - constants::r_earth };
+        GeometricAltitude alt{ r - constants::r_earth };
 
         return { lat, lon, alt };
     }

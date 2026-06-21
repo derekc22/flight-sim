@@ -43,8 +43,8 @@ namespace vehicles {
         // std::optional<dynamics::Gravity> gN;
         std::optional<geography::Latitude> lat_NE;
         std::optional<geography::Longitude> lon_NE;
-        std::optional<geography::Altitude> alt_NE;
-        std::optional<geography::GeographicState> gps_NE; // container
+        std::optional<geography::GeometricAltitude> alt_NE;
+        std::optional<geography::GeographicState> geo_NE; // container
     };
 
     struct FRDFrameECEFStepOptions {
@@ -71,9 +71,9 @@ namespace vehicles {
         // std::optional<dynamics::Gravity> gB;
         std::optional<geography::Latitude> lat_BE;
         std::optional<geography::Longitude> lon_BE;
-        std::optional<geography::Altitude> alt_BE;
-        std::optional<dynamics::RigidBodyState> rbs_BE; // container
-        std::optional<geography::GeographicState> gps_BE; // container
+        std::optional<geography::GeometricAltitude> alt_BE;
+        std::optional<dynamics::RigidBodyState> X_BE; // container
+        std::optional<geography::GeographicState> geo_BE; // container
     };
 
     struct FRDFrameNEDStepOptions {
@@ -98,7 +98,7 @@ namespace vehicles {
         std::optional<dynamics::AngularVelocityQuaternion> wq_BN;
         std::optional<dynamics::TranslationalVelocity> vB_BN;
         // std::optional<dynamics::Gravity> gB;
-        std::optional<dynamics::RigidBodyState> rbs_BN; // container
+        std::optional<dynamics::RigidBodyState> X_BN; // container
     };
 
     struct STABFrameFRDStepOptions {
@@ -125,7 +125,7 @@ namespace vehicles {
         // std::optional<dynamics::TranslationalVelocity> vS_SB;
         // std::optional<dynamics::Gravity> gS;
         std::optional<aerodynamics::AngleOfAttack> alpha;
-        std::optional<aerodynamics::AerodynamicState> ads; // container
+        std::optional<aerodynamics::AerodynamicState> aero; // container
     };
 
     struct WINDFrameSTABStepOptions {
@@ -152,7 +152,7 @@ namespace vehicles {
         // std::optional<dynamics::TranslationalVelocity> vW_WS;
         // std::optional<dynamics::Gravity> gW;
         std::optional<aerodynamics::SideslipAngle> beta;
-        std::optional<aerodynamics::AerodynamicState> ads; // container
+        std::optional<aerodynamics::AerodynamicState> aero; // container
     };
 
     struct StepOptions {
@@ -169,16 +169,16 @@ namespace vehicles {
         // Geometric
         std::optional<geography::Latitude> lat;
         std::optional<geography::Longitude> lon;
-        std::optional<geography::Altitude> alt;
+        std::optional<geography::GeometricAltitude> alt;
 
         // Aerodynamic
         std::optional<aerodynamics::AngleOfAttack> alpha;
         std::optional<aerodynamics::SideslipAngle> beta;
 
         // Containers
-        std::optional<dynamics::RigidBodyState> rbs;
-        std::optional<geography::GeographicState> gps;
-        std::optional<aerodynamics::AerodynamicState> ads;
+        std::optional<dynamics::RigidBodyState> X;
+        std::optional<geography::GeographicState> geo;
+        std::optional<aerodynamics::AerodynamicState> aero;
 
         static void validate(const frames::Frame& F, const _StepOptions& opts);
         explicit operator bool() const;

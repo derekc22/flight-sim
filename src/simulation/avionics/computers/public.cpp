@@ -12,9 +12,9 @@ namespace avionics {
         return { Vinf };
     }
 
-    AltitudeMeasurement AirDataComputer::compute(const StaticAirPressureMeasurement& P) {
-        double alt = (constants::T_SL / std::abs(constants::lapse_rate)) * (1.0 - std::pow(P.data / constants::P_SL, (constants::R_air * std::abs(constants::lapse_rate)) / constants::g_earth));
-        return { alt };
+    PressureAltitudeMeasurement AirDataComputer::compute(const StaticAirPressureMeasurement& P) {
+        double pressure_alt = (constants::T_SL / std::abs(constants::lapse_rate)) * (1.0 - std::pow(P.data / constants::P_SL, (constants::R_air * std::abs(constants::lapse_rate)) / constants::g_earth));
+        return { pressure_alt };
     }
 
     VerticalSpeedMeasurement AirDataComputer::compute(const StaticAirPressureMeasurement& P, const StaticAirPressureMeasurement& prev_P, const StaticAirTemperatureMeasurement& T) {

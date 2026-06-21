@@ -6,9 +6,9 @@
 
 namespace atmospheric {
 
-    StaticAtmosphericState std_atmosphere(const geography::Altitude& altitude) {
+    StaticAtmosphericState std_atmosphere(const geography::GeometricAltitude& altitude) {
 
-        double h = altitude.data;
+        double alt = altitude.data;
 
         // Values at 11 km (tropopause in this simplified model)
         const double temperature_11 = constants::T_SL + constants::lapse_rate * 11000.0;
@@ -19,14 +19,14 @@ namespace atmospheric {
         double rho = 0.0;   // Air density, ρ [kg/m^3]
 
         // Gradient region
-        if (h <= 11000.0) {
-            T = constants::T_SL + constants::lapse_rate * h;
+        if (alt <= 11000.0) {
+            T = constants::T_SL + constants::lapse_rate * alt;
             rho = constants::rho_SL * std::pow(T / constants::T_SL, -((constants::g_earth / (constants::lapse_rate * constants::R_air)) + 1.0));
         }
         // Isothermal region
         else {
             T = temperature_11;
-            rho = density_11 * std::exp(-constants::g_earth * ((h - 11000.0) / (constants::R_air * temperature_11)));
+            rho = density_11 * std::exp(-constants::g_earth * ((alt - 11000.0) / (constants::R_air * temperature_11)));
         }
 
         // Viscosity
@@ -52,12 +52,12 @@ namespace atmospheric {
         return { P };
     };
 
-    StaticAtmosphericState stagnation_to_static(const StagnationAtmosphericState& stag_atm, const MachNumber& M) {
-        AirDensity rho = stag_atm.rho;
-        DynamicViscosity mu = stag_atm.mu;
+    StaticAtmosphericState stagnation_to_static(const StagnationAtmosphericState& atm0, const MachNumber& M) {
+        AirDensity rho = atm0.rho;
+        DynamicViscosity mu = atm0.mu;
 
-        StaticAirTemperature T = T_from_T0(stag_atm.T0, M);
-        StaticAirPressure P = P_from_P0(stag_atm.P0, M);
+        StaticAirTemperature T = T_from_T0(atm0.T0, M);
+        StaticAirPressure P = P_from_P0(atm0.P0, M);
 
         return { T, P, rho, mu };
     };

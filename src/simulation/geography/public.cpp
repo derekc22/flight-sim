@@ -29,10 +29,10 @@ namespace geography {
         return { CEN };
     };
 
-    dynamics::Position pE_from_lat_lon_alt(const geography::GeographicState& geo_state) {
-        double lat = geo_state.lat.data;
-        double lon = geo_state.lon.data;
-        double alt = geo_state.alt.data;
+    dynamics::Position pE_from_lat_lon_alt(const geography::GeographicState& geo) {
+        double lat = geo.lat.data;
+        double lon = geo.lon.data;
+        double alt = geo.alt.data;
 
         double r = constants::r_earth + alt;
 

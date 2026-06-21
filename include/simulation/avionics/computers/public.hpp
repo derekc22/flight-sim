@@ -18,7 +18,7 @@ namespace avionics {
 
     struct FreeStreamVelocityMeasurement : aerodynamics::FreeStreamVelocity {};
 
-    struct AltitudeMeasurement : geography::Altitude {};
+    struct PressureAltitudeMeasurement : geography::PressureAltitude {};
 
     struct VerticalSpeedMeasurement : dynamics::VerticalSpeed {};
 
@@ -32,14 +32,14 @@ namespace avionics {
         MachNumberMeasurement Mach;
         OrientationMeasurement qIB;
         FreeStreamVelocityMeasurement Vinf;
-        AltitudeMeasurement alt_BE;
+        PressureAltitudeMeasurement pressure_alt_BE;
         VerticalSpeedMeasurement alt_BE_dot;
         AirDensityMeasurement rho;
     };
 
     struct AirDataComputer {
         FreeStreamVelocityMeasurement compute(const MachNumberMeasurement& Mach, const StaticAirTemperatureMeasurement& T);
-        AltitudeMeasurement compute(const StaticAirPressureMeasurement& P);
+        PressureAltitudeMeasurement compute(const StaticAirPressureMeasurement& P);
         VerticalSpeedMeasurement compute(const StaticAirPressureMeasurement& P, const StaticAirPressureMeasurement& prev_P, const StaticAirTemperatureMeasurement& T);
         AirDensityMeasurement compute(const StaticAirPressureMeasurement& P, const StaticAirTemperatureMeasurement& T);
     };

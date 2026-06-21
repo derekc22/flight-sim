@@ -66,12 +66,4 @@ namespace runner {
         void step(int t);
     };
 
-    void print_state(
-        int t, 
-        const dynamics::RigidBodyState& Xt,
-        const geography::GeographicState& geo_state,
-        const aerodynamics::AerodynamicState& aero_state,
-        const atmospheric::Wind& windB
-    );
-
 }
