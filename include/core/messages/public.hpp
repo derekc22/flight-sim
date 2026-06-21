@@ -24,10 +24,10 @@ namespace messages {
 
     struct ProcessedFlightGearMessageOut {
         atmospheric::Wind wind{ constants::Zero3 };
-        double ground_elev = 0;
+        geography::GroundElevation ground_elevation{ 0.0 };
     };
 
-    FlightGearMessageIn process_in_pkt(const geography::GeographicState& geo_state, const dynamics::EulerAngles& attitude);
+    FlightGearMessageIn process_in_pkt(const geography::GeographicState& geo, const dynamics::EulerAngles& attitude);
     ProcessedFlightGearMessageOut process_out_pkt(const FlightGearMessageOut& out_pkt);
 
 }

@@ -34,13 +34,13 @@ namespace aerodynamics {
         return aerodynamics::compute_aerodynamic_state(dynamics::compute_rigid_body_state(F), windB);
     }
 
-    AerodynamicWrench step_aero_forces_moments(const AerodynamicProperties& aerodynamic_properties, const dynamics::RigidBodyState& X, const atmospheric::StaticAtmosphericState& static_atm, const actuators::SurfaceActuatorInputs_T<double>& u, const atmospheric::Wind& windB) {
+    AerodynamicWrench step_aero_forces_moments(const AerodynamicProperties& aerodynamic_properties, const dynamics::RigidBodyState& X, const atmospheric::StaticAtmosphericState& atm, const actuators::SurfaceActuatorInputs_T<double>& u, const atmospheric::Wind& windB) {
         const dynamics::Twist_T<double> twist{
             .v = X.v.data,
             .w = X.w.data,
         };
 
-        const dynamics::Wrench_T<double> loads = step_aero_forces_moments_T<double>(aerodynamic_properties, twist, static_atm, u, windB);
+        const dynamics::Wrench_T<double> loads = step_aero_forces_moments_T<double>(aerodynamic_properties, twist, atm, u, windB);
 
         return { dynamics::Force{ loads.F }, dynamics::Moment{ loads.M } };
     }
@@ -48,9 +48,9 @@ namespace aerodynamics {
     AerodynamicState compute_aerodynamic_state(const dynamics::RigidBodyState& X, const atmospheric::Wind& windB) {
         const dynamics::Twist_T<double> twist{ .v = X.v.data, .w = X.w.data };
 
-        const AerodynamicState_T<double> aero_state = compute_aerodynamic_state_T<double>(twist, windB);
+        const AerodynamicState_T<double> aero = compute_aerodynamic_state_T<double>(twist, windB);
 
-        return { FreeStreamVelocity{ aero_state.Vinf }, AngleOfAttack{ aero_state.alpha }, SideslipAngle{ aero_state.beta } };
+        return { FreeStreamVelocity{ aero.Vinf }, AngleOfAttack{ aero.alpha }, SideslipAngle{ aero.beta } };
     }
 
     dynamics::OrientationMatrix CBS(const aerodynamics::AngleOfAttack& alpha) {

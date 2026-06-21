@@ -13,10 +13,31 @@ namespace geography {
         double data;
     };
 
-    struct Altitude {
+    struct GeometricAltitude {
+        // current: radial height from Earth center minus spherical Earth radius
+        // planned: geodetic/ellipsoidal height above WGS84
         double data;
     };
 
+    struct LocalHeight {
+        // positive-up height relative to local NED origin, i.e. -pN_BN.z()
+        double data;
+    };
+
+    struct PressureAltitude {
+        // altitude inferred from static pressure
+        double data;
+    };
+
+    struct GroundElevation {
+        // terrain/ground height relative to the global vertical reference
+        double data;
+    };
+
+    struct HeightAGL {
+        // height above the terrain/ground
+        double data;
+    };
     struct Heading {
         double data;
     };
@@ -24,14 +45,14 @@ namespace geography {
     struct GeographicState {
         Latitude lat;
         Longitude lon;
-        Altitude alt;
+        GeometricAltitude alt;
     };
 
     /** @warning The parent of F must the ECEFFrame */
     GeographicState compute_geographic_state(const frames::Frame& F);
 
     dynamics::OrientationMatrix CEN_from_lat_lon(const geography::Latitude& lat, const geography::Longitude& lon);
-    dynamics::Position pE_from_lat_lon_alt(const geography::GeographicState& geo_state);
+    dynamics::Position pE_from_lat_lon_alt(const geography::GeographicState& geo);
 
     dynamics::Gravity gN();
 

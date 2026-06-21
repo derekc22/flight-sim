@@ -27,7 +27,7 @@ namespace avionics {
         const geography::Heading heading;
         const dynamics::OrientationQuaternion qIB;
         const aerodynamics::FreeStreamVelocity Vinf;
-        const geography::Altitude alt_BE;
+        const geography::GeometricAltitude alt_BE;
         const dynamics::VerticalSpeed alt_BE_dot;
         const atmospheric::AirDensity rho;
     };
@@ -71,9 +71,9 @@ namespace avionics {
     MeasurementGroundTruth build_measurement_gt(
         const dynamics::RigidBodyState& Xt,
         const dynamics::RigidBodyState& XEt,
-        const aerodynamics::AerodynamicState& aero_state_t, 
-        const atmospheric::StaticAtmosphericState& static_atm_t, 
-        const geography::GeographicState& geo_state_t,
+        const aerodynamics::AerodynamicState& aero_t,
+        const atmospheric::StaticAtmosphericState& atm_t,
+        const geography::GeographicState& geo_t,
         const dynamics::Mass& mass,
         const atmospheric::Wind & wind,
         const dynamics::Wrench& WB_net

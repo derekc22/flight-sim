@@ -28,9 +28,9 @@ namespace estimation {
         linearization::LocalLinearization lin_sol = linearization::linearize_operating_point(input.aircraft, operating_point, input.conditions);
         linearization::StateJacobian Ft = linearization::discretize_euler(lin_sol).A;
 
-        Eigen::MatrixXd Pt_bar = Ft * prev.P * Ft.transpose() + params.R;
+        Eigen::MatrixXd Pt_bar = Ft * prev.Pt * Ft.transpose() + params.R;
 
-        return { { .zt = zt_bar, .P = Pt_bar }, lin_sol.C };
+        return { { .zt = zt_bar, .Pt = Pt_bar }, lin_sol.C };
     }
 
     KalmanState ExtendedKalmanPolicy::correct(const ExtendedKalmanPolicyInput& input, const linearization::OutputJacobian& C) {
@@ -39,23 +39,23 @@ namespace estimation {
         // C = I -> Ht = I
         linearization::OutputJacobian Ht = C;
 
-        Eigen::MatrixXd Kt = pred.P * Ht.transpose() * (Ht * pred.P * Ht.transpose() + params.Q).inverse(); // Kalman gain
+        Eigen::MatrixXd Kt = pred.Pt * Ht.transpose() * (Ht * pred.Pt * Ht.transpose() + params.Q).inverse(); // Kalman gain
 
         // C @ zt_bar = I @ zt_bar -> h(zt_bar) = zt_bar
         dynamics::StateVector_T<double> Lt = input.yt - pred.zt; // Innovation
 
         dynamics::StateVector_T<double> zt = pred.zt + Kt * Lt;
 
-        Eigen::MatrixXd I = Eigen::MatrixXd::Identity(pred.P.rows(), pred.P.cols());
+        Eigen::MatrixXd I = Eigen::MatrixXd::Identity(pred.Pt.rows(), pred.Pt.cols());
 
-        Eigen::MatrixXd Pt = (I - Kt * Ht) * pred.P * (I - Kt * Ht).transpose() + Kt * params.Q * Kt.transpose();
+        Eigen::MatrixXd Pt = (I - Kt * Ht) * pred.Pt * (I - Kt * Ht).transpose() + Kt * params.Q * Kt.transpose();
 
-        return { .zt = zt, .P = Pt };
+        return { .zt = zt, .Pt = Pt };
     }
 
     KalmanState ExtendedKalmanPolicy::step(const ExtendedKalmanPolicyInput& input) {
         if (!state.has_value()) {
-            state = KalmanState{ .zt = input.yt, .P = params.P0 };
+            state = KalmanState{ .zt = input.yt, .Pt = params.P0 };
             return state.value();
         }
 

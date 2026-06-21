@@ -13,7 +13,7 @@ namespace json {
     struct ParsedStepOptions : frames::StandardFrameFieldsOptional {
         std::optional<geography::Latitude> lat;
         std::optional<geography::Longitude> lon;
-        std::optional<geography::Altitude> alt;
+        std::optional<geography::GeometricAltitude> alt;
         std::optional<aerodynamics::AngleOfAttack> alpha;
         std::optional<aerodynamics::SideslipAngle> beta;
     };

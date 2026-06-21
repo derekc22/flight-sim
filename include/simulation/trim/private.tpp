@@ -17,7 +17,7 @@ namespace trim {
     TrimResidual_T<T> compute_trim_residual_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u, const autodiff::AutoDiffModel& model, const TrimTarget& target, const operating::OperatingConditions& conditions) {
         const dynamics::StateDot_T<T> trim_state_dot = autodiff::compute_state_dot_T<T>(x, u, model, conditions);
         const dynamics::Twist_T<T> twist = dynamics::build_twist_from_state_T(x);
-        const aerodynamics::AerodynamicState_T<T> aero_state = aerodynamics::compute_aerodynamic_state_T<T>(twist, conditions.windB);
+        const aerodynamics::AerodynamicState_T<T> aero = aerodynamics::compute_aerodynamic_state_T<T>(twist, conditions.windB);
         const constants::Vector3_T<T> eul_dot = dynamics::wB_BI_to_eul_dot_T<T>(twist.w, x.theta, x.phi);
 
         return {
@@ -29,7 +29,7 @@ namespace trim {
             .r_dot = trim_state_dot.r_dot,
             .phi_dot = trim_state_dot.phi_dot,
             .theta_dot = trim_state_dot.theta_dot,
-            .beta_err = aero_state.beta - T(target.beta),
+            .beta_err = aero.beta - T(target.beta),
             .phi_err = x.phi - T(target.phi),
             .theta_err = x.theta - T(target.theta),
             .vx_err = x.vx - T(target.vx),
