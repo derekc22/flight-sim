@@ -47,9 +47,9 @@ TEST(transforms_s3, EulerToQuatToEulerToQuatRoundTripExtrinsic) {
         const auto qC2 = transforms::eul_to_quatC(eulC.x(), eulC.y(), eulC.z(), order, "extr");
         expect_same_rotation(qC1, qC2);
 
-        const auto qR1 = transforms::eul_to_quatR(a, b, c, order, "extr");
+        const auto qR1 = transforms::eul_to_quatR(a, b, c, order);
         const auto eulR = transforms::quatR_to_eul_extr(qR1, order);
-        const auto qR2 = transforms::eul_to_quatR(eulR.x(), eulR.y(), eulR.z(), order, "extr");
+        const auto qR2 = transforms::eul_to_quatR(eulR.x(), eulR.y(), eulR.z(), order);
         expect_same_rotation(qR1, qR2);
     }
 }
@@ -67,9 +67,9 @@ TEST(transforms_s3, EulerToQuatToEulerToQuatRoundTripIntrinsic) {
         const auto qC2 = transforms::eul_to_quatC(eulC.x(), eulC.y(), eulC.z(), order, "intr");
         expect_same_rotation(qC1, qC2);
 
-        const auto qR1 = transforms::eul_to_quatR(a, b, c, order, "intr");
+        const auto qR1 = transforms::eul_to_quatR(a, b, c, order);
         const auto eulR = transforms::quatR_to_eul_intr(qR1, order);
-        const auto qR2 = transforms::eul_to_quatR(eulR.x(), eulR.y(), eulR.z(), order, "intr");
+        const auto qR2 = transforms::eul_to_quatR(eulR.x(), eulR.y(), eulR.z(), order);
         expect_same_rotation(qR1, qR2);
     }
 }
@@ -88,21 +88,21 @@ TEST(transforms_s3, QuatCIsConjugateOfQuatR) {
     constexpr double b = -0.4;
     constexpr double c = 0.7;
 
-    const auto qR_extr = transforms::eul_to_quatR(a, b, c, "ZYX", "extr");
+    const auto qR_extr = transforms::eul_to_quatR(a, b, c, "ZYX");
     const auto qC_extr = transforms::eul_to_quatC(a, b, c, "ZYX", "extr");
     expect_quat_near(qC_extr, transforms::normalize_and_canonicalize(qR_extr.conjugate()));
 
-    const auto qR_intr = transforms::eul_to_quatR(a, b, c, "ZYX", "intr");
+    const auto qR_intr = transforms::eul_to_quatR(a, b, c, "ZYX");
     const auto qC_intr = transforms::eul_to_quatC(a, b, c, "ZYX", "intr");
     expect_quat_near(qC_intr, transforms::normalize_and_canonicalize(qR_intr.conjugate()));
 }
 
 TEST(transforms_s3, QuatToRotNormalizesInput) {
-    auto qR_extr = transforms::eul_to_quatR(0.3, -0.2, 0.5, "ZYX", "extr");
+    auto qR_extr = transforms::eul_to_quatR(0.3, -0.2, 0.5, "ZYX");
     qR_extr.coeffs() *= 3.0;
     expect_valid_rotation_matrix(transforms::quat_to_rot(qR_extr));
 
-    auto qR_intr = transforms::eul_to_quatR(0.3, -0.2, 0.5, "ZYX", "intr");
+    auto qR_intr = transforms::eul_to_quatR(0.3, -0.2, 0.5, "ZYX");
     qR_intr.coeffs() *= 3.0;
     expect_valid_rotation_matrix(transforms::quat_to_rot(qR_intr));
 
@@ -120,21 +120,21 @@ TEST(transforms_s3, IntrinsicAndExtrinsicWrappersDispatch) {
     constexpr double b = 0.2;
     constexpr double c = -0.3;
 
-    expect_quat_near(transforms::eul_to_quatR(a, b, c, "XYZ", "extr"), transforms::eul_to_quatR_extr(a, b, c, "XYZ"));
-    expect_quat_near(transforms::eul_to_quatR(a, b, c, "XYZ", "intr"), transforms::eul_to_quatR_intr(a, b, c, "XYZ"));
+    expect_quat_near(transforms::eul_to_quatR(a, b, c, "XYZ"), transforms::eul_to_quatR_extr(a, b, c, "XYZ"));
+    expect_quat_near(transforms::eul_to_quatR(a, b, c, "XYZ"), transforms::eul_to_quatR_intr(a, b, c, "XYZ"));
     expect_quat_near(transforms::eul_to_quatC(a, b, c, "XYZ", "extr"), transforms::eul_to_quatC_extr(a, b, c, "XYZ"));
     expect_quat_near(transforms::eul_to_quatC(a, b, c, "XYZ", "intr"), transforms::eul_to_quatC_intr(a, b, c, "XYZ"));
 }
 
 TEST(transforms_s3, RejectsInvalidTypeArgument) {
-    EXPECT_THROW(transforms::eul_to_quatR(0.0, 0.0, 0.0, "ZYX", "bad"), std::invalid_argument);
+    EXPECT_THROW(transforms::eul_to_quatR(0.0, 0.0, 0.0, "ZYX"), std::invalid_argument);
     EXPECT_THROW(transforms::eul_to_quatC(0.0, 0.0, 0.0, "ZYX", "bad"), std::invalid_argument);
     EXPECT_THROW(transforms::quatC_to_eul(Eigen::Quaterniond::Identity(), "ZYX", "bad"), std::invalid_argument);
 }
 
 TEST(transforms_s3, RejectsInvalidEulerOrderArgument) {
-    EXPECT_THROW(transforms::eul_to_quatR(0.0, 0.0, 0.0, "BAD", "extr"), std::invalid_argument);
-    EXPECT_THROW(transforms::eul_to_quatR(0.0, 0.0, 0.0, "BAD", "intr"), std::invalid_argument);
+    EXPECT_THROW(transforms::eul_to_quatR(0.0, 0.0, 0.0, "BAD"), std::invalid_argument);
+    EXPECT_THROW(transforms::eul_to_quatR(0.0, 0.0, 0.0, "BAD"), std::invalid_argument);
     EXPECT_THROW(transforms::eul_to_quatC(0.0, 0.0, 0.0, "BAD", "extr"), std::invalid_argument);
     EXPECT_THROW(transforms::eul_to_quatC(0.0, 0.0, 0.0, "BAD", "intr"), std::invalid_argument);
 }

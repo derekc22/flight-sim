@@ -1,0 +1,94 @@
+#include <algorithm>
+#include <cstddef>
+#include <string>
+#include <vector>
+#include <Eigen/Dense>
+#include <rerun.hpp>
+#include "core/io/rerun/private.hpp"
+#include "simulation/dynamics/public.hpp"
+#include "simulation/transforms/public.hpp"
+
+namespace io {
+
+    const std::vector<std::string> xyz_labels{"x", "y", "z"};
+    const std::vector<std::string> eul_labels{"psi", "theta", "phi"};
+    const std::vector<std::string> angular_rate_labels{"p", "q", "r"};
+    const std::vector<std::string> velocity_labels{"vx", "vy", "vz"};
+    const std::vector<std::string> surface_labels{"elevator", "aileron", "rudder", "flap", "spoiler"};
+    const std::vector<std::string> propulsor_labels{"front", "left", "right"};
+
+    void log_scalar(rerun::RecordingStream& rec, const std::string& path, double value) {
+        rec.log(path, rerun::Scalars(value));
+    }
+
+    void log_vector(rerun::RecordingStream& rec, const std::string& prefix, const Eigen::Ref<const Eigen::VectorXd>& data, const std::vector<std::string>& labels) {
+        Eigen::Index n = std::min<Eigen::Index>(data.size(), static_cast<Eigen::Index>(labels.size()));
+        for (Eigen::Index i = 0; i < n; ++i) {
+            log_scalar(rec, prefix + "/" + labels[static_cast<std::size_t>(i)], data(i));
+        }
+    }
+
+    rerun::Vector3D scaled_vector(const Eigen::Vector3d& data, double scale) {
+        return rerun::Vector3D(
+            static_cast<float>(scale * data.x()), 
+            static_cast<float>(scale * data.y()), 
+            static_cast<float>(scale * data.z())
+        );
+    }
+
+    void log_vehicle_transform(rerun::RecordingStream& rec, const dynamics::RigidBodyState& Xt) {
+        const Eigen::Quaterniond& q_conj = Xt.q.data.conjugate();
+        rec.log(
+            "world/vehicle",
+            rerun::Transform3D::from_translation_rotation(
+                rerun::components::Translation3D(
+                    static_cast<float>(Xt.p.data.x()), 
+                    static_cast<float>(Xt.p.data.y()), 
+                    static_cast<float>(Xt.p.data.z())
+                ),
+                rerun::datatypes::Quaternion::from_xyzw(
+                    static_cast<float>(q_conj.x()), 
+                    static_cast<float>(q_conj.y()), 
+                    static_cast<float>(q_conj.z()), 
+                    static_cast<float>(q_conj.w())
+                )
+            ),
+            rerun::TransformAxes3D(5.0)
+        );
+    }
+
+    void log_body_arrow(rerun::RecordingStream& rec, const std::string& path, const Eigen::Vector3d& data, double scale, const rerun::Color& color, const std::string& label) {
+        rec.log(
+            path,
+            rerun::Arrows3D::from_vectors({scaled_vector(data, scale)})
+                .with_origins({rerun::Position3D(0.0f, 0.0f, 0.0f)})
+                .with_colors({color})
+                .with_radii({rerun::Radius::ui_points(2.0f)})
+                // .with_labels({label})
+        );
+    }
+
+    void log_vehicle_model(rerun::RecordingStream& rec) {
+        Eigen::Quaterniond q_model_to_body = transforms::eul_to_quatR(
+            -constants::pi/2, constants::pi/2, 0.0, "ZYX"
+        );
+
+        rec.log_static(
+            "world/vehicle/model_frame",
+            rerun::Transform3D::from_translation_rotation(
+                rerun::components::Translation3D(0.0f, 0.0f, 0.0f),
+                rerun::datatypes::Quaternion::from_xyzw(
+                    static_cast<float>(q_model_to_body.x()),
+                    static_cast<float>(q_model_to_body.y()),
+                    static_cast<float>(q_model_to_body.z()),
+                    static_cast<float>(q_model_to_body.w())
+                )
+            )
+        );
+
+        rec.log_static(
+            "world/vehicle/model_frame/model",
+            rerun::Asset3D::from_file_path("assets/cessna172.glb").value
+        );
+    }
+}

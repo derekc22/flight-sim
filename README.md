@@ -66,7 +66,7 @@ Update the JSON configuration file paths in `config/analyze.json`
 
 To run the simulation:
   ```bash
-  ./scripts/bin/run.sh -a <AIRCRAFT> -t <TIME_SEC> [-r TRIM] [-s SENSOR] [-c CONTROL] [-e ESTIMATION] [-w WIND] [-v VERBOSE] [-d DATA] [-p PLOT] -o <OUT_DIR> [-m ANALYSIS]
+  ./scripts/bin/run.sh -a <AIRCRAFT> -t <TIME_SEC> [-r TRIM] [-s SENSOR] [-c CONTROL] [-e ESTIMATION] [-w WIND] [-V VERBOSE] [-D DATA] [-R RERUN] [-P PLOT] -O <OUT_DIR> [-M ANALYSIS]
   ```
 - `-a AIRCRAFT`: Aircraft to simulate (e.g. ASW28, c172p)
 - `-t TIME_SEC`: Simulation time in seconds
@@ -75,26 +75,27 @@ To run the simulation:
 - `-c CONTROL`: Enable control system
 - `-e ESTIMATION`: Enable state estimation
 - `-w WIND`: Enable wind
-- `-v VERBOSE`: Enable verbose output
-- `-d DATA`: Enable data logging
-- `-p PLOT`: Enable plotting
-- `-o OUT_DIR`: Output directory name
-- `-m ANALYSIS`: Enable post-run analysis 
+- `-V VERBOSE`: Enable verbose output
+- `-D DATA`: Enable data logging
+- `-R RERUN`: Enable Rerun streaming
+- `-P PLOT`: Enable plotting
+- `-O OUT_DIR`: Output directory name
+- `-M ANALYSIS`: Enable post-run analysis 
   
 ## Example
 Run a 60-second simulation of the C172 with trim, control, and avionics enabled. Data, plots, and reports are saved to `results/data/c172_test`, `results/figures/c172_test`, and `results/reports/c172_test`, respectively:
 ```bash
-./scripts/bin/run.sh -a c172p -t 60 -r -c -s -d -p -o c172_test
+./scripts/bin/run.sh -a c172p -t 60 -r -c -s -D -P -O c172_test
 ```
 
 ## Plotting
-To generate plots from logged data, use the `-p` flag with `run.sh` or run:
+To generate plots from logged data, use the `-P` flag with `run.sh` or run:
 ```bash
 ./scripts/bin/plot.sh <OUT_DIR>
 ```
 
 ## Analysis
-Post-run analysis is implemented with MATLAB and configured via `config/analyze.json`. To run the analysis on logged data, use the `-m` flag with `run.sh` or run:
+Post-run analysis is implemented with MATLAB and configured via `config/analyze.json`. To run the analysis on logged data, use the `-M` flag with `run.sh` or run:
 
 ```bash
 scripts/bin/analyze.sh <OUT_DIR>

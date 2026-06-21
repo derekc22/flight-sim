@@ -25,7 +25,6 @@ namespace transforms {
     // }
 
 
-
     Eigen::Quaterniond qx(double phi) {
         double h = 0.5 * phi;
         return Eigen::Quaterniond(util::cos(h), util::sin(h), 0.0, 0.0); // (w,x,y,z)
@@ -79,38 +78,6 @@ namespace transforms {
     Eigen::Quaterniond eul_to_quatC_intr(double a, double b, double c, const std::string& order) {
         return normalize_and_canonicalize(eul_to_quatR_intr(a,b,c,order).conjugate());
     }
-
-
-    /** @deprecated */
-    // Eigen::Matrix3d quat_to_rot(const Eigen::Quaterniond& q_in) {
-    //     Eigen::Quaterniond q = normalize_and_canonicalize(q_in);
-
-    //     double w = q.w();
-    //     double x = q.x();
-    //     double y = q.y();
-    //     double z = q.z();
-
-    //     Eigen::Matrix3d R;
-
-    //     double xx = x*x, yy = y*y, zz = z*z;
-    //     double xy = x*y, xz = x*z, yz = y*z;
-    //     double wx = w*x, wy = w*y, wz = w*z;
-
-    //     R(0,0) = 1.0 - 2.0*(yy + zz);
-    //     R(0,1) = 2.0*(xy - wz);
-    //     R(0,2) = 2.0*(xz + wy);
-
-    //     R(1,0) = 2.0*(xy + wz);
-    //     R(1,1) = 1.0 - 2.0*(xx + zz);
-    //     R(1,2) = 2.0*(yz - wx);
-
-    //     R(2,0) = 2.0*(xz - wy);
-    //     R(2,1) = 2.0*(yz + wx);
-    //     R(2,2) = 1.0 - 2.0*(xx + yy);
-
-    //     return R;
-    // }
-
 
     Eigen::Vector3d quatR_to_eul_intr(const Eigen::Quaterniond& q, const std::string& order) {
         Eigen::Matrix3d R = quat_to_rot(q);

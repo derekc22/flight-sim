@@ -67,6 +67,7 @@ namespace runner {
         aircraft(load(options.aircraft_id, options.trim_bool)),
         // create data manager
         data_manager(options.tf, options.data_bool, options.control_bool, options.sensor_bool, options.estimation_bool, options.wind_bool),
+        rerun_manager(options.rerun_bool, options.control_bool, options.sensor_bool, options.estimation_bool, options.wind_bool),
         // create analysis manager
         analysis_manager(options.data_bool, options.analysis_bool, options.trim_bool),
         // initialize udp connections
@@ -287,7 +288,7 @@ namespace runner {
                 }
             };
 
-            // overwrite local estimation state with estimator estimates
+            // overwrite local estimated state with estimator result
             Zt = estimation_properties.step(estimator_inputs, options.trim_bool).Zt;
         }
 
@@ -343,7 +344,7 @@ namespace runner {
         u_surface_actual_prev = u_surface_actual;
         u_propulsor_actual_prev = u_propulsor_actual;
 
-        // compute aerodynamics forces and moments
+        // compute aerodynamic forces and moments
         aerodynamics::AerodynamicWrench WB_aero = aerodynamics::step_aero_forces_moments(
             aerodynamic_properties,
             Xt,
@@ -385,6 +386,8 @@ namespace runner {
             .setpoint=setpoint,
             .windB=windB
         };
+
+        rerun_manager.step(t, data_context);
 
         // step data manager
         data_manager.step(t, data_context);

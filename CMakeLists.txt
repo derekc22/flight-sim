@@ -15,6 +15,11 @@ pkg_check_modules(CPPAD REQUIRED IMPORTED_TARGET cppad)
 # Find nlohmann_json
 find_package(nlohmann_json CONFIG REQUIRED)
 
+# Fetch Rerun SDK
+include(FetchContent)
+FetchContent_Declare(rerun_sdk URL https://github.com/rerun-io/rerun/releases/latest/download/rerun_cpp_sdk.zip DOWNLOAD_EXTRACT_TIMESTAMP TRUE PATCH_COMMAND patch -p1 -i ${CMAKE_SOURCE_DIR}/cmake/patches/rerun_sdk_arrow_patch_command.patch)
+FetchContent_MakeAvailable(rerun_sdk)
+
 # Find GoogleTest
 find_package(GTest CONFIG REQUIRED)
 include(GoogleTest)
@@ -52,30 +57,21 @@ target_include_directories(control_care PUBLIC ${CMAKE_SOURCE_DIR}/include)
 target_link_libraries(control_care PUBLIC Eigen3::Eigen ${SLICOT_LIB} ${GFORTRAN_LIB} ${QUADMATH_LIB})
 
 # Create the executable
-add_executable(${PROJECT_NAME} ${SOURCES})
+add_library(flight_sim_core STATIC ${TESTED_SOURCES})
+add_executable(${PROJECT_NAME} src/main.cpp)
 
 # Add include directory
+target_include_directories(flight_sim_core PRIVATE ${CMAKE_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include)
+target_link_libraries(flight_sim_core PRIVATE control_care Eigen3::Eigen PkgConfig::CPPAD nlohmann_json::nlohmann_json rerun_sdk)
 
 # Link Eigen, CppAD/Ipopt, and nlohmann_json to the executable
-target_link_libraries(${PROJECT_NAME} 
-    control_care
-    Eigen3::Eigen
-    PkgConfig::CPPAD
-    nlohmann_json::nlohmann_json
-)
+target_link_libraries(${PROJECT_NAME} flight_sim_core control_care Eigen3::Eigen PkgConfig::CPPAD nlohmann_json::nlohmann_json rerun_sdk)
 
 # Test executable
-add_executable(flight_sim_tests ${TEST_SOURCES} ${TESTED_SOURCES})
+add_executable(flight_sim_tests ${TEST_SOURCES})
 target_include_directories(flight_sim_tests SYSTEM BEFORE PRIVATE ${GTEST_INCLUDE_DIRS})
 target_include_directories(flight_sim_tests PRIVATE ${CMAKE_SOURCE_DIR}/include)
-target_link_libraries(flight_sim_tests PRIVATE
-    control_care
-    Eigen3::Eigen
-    PkgConfig::CPPAD
-    nlohmann_json::nlohmann_json
-    GTest::gtest
-    GTest::gtest_main
-)
+target_link_libraries(flight_sim_tests PRIVATE flight_sim_core control_care Eigen3::Eigen PkgConfig::CPPAD nlohmann_json::nlohmann_json rerun_sdk GTest::gtest GTest::gtest_main)
 set_target_properties(flight_sim_tests PROPERTIES BUILD_RPATH "$<TARGET_FILE_DIR:GTest::gtest>;$<TARGET_FILE_DIR:GTest::gtest_main>")
 gtest_discover_tests(flight_sim_tests)

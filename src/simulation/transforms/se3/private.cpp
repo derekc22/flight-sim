@@ -25,18 +25,18 @@ namespace transforms {
         return H;
     };
 
-    Eigen::Matrix4d make_HC_rotate_first(const Eigen::Matrix3d& C, const Eigen::Vector3d& d) {
-        Eigen::Matrix4d H = Eigen::Matrix4d::Zero();
-        H.block<3,3>(0,0) = C;
-        H.block<3,1>(0,3) = -d;
-        H(3,3) = 1.0;
-        return H;
-    }
-
     Eigen::Matrix4d make_HC_translate_first(const Eigen::Matrix3d& C, const Eigen::Vector3d& d) {
         Eigen::Matrix4d H = Eigen::Matrix4d::Zero();
         H.block<3,3>(0,0) = C;
         H.block<3,1>(0,3) = -C*d;
+        H(3,3) = 1.0;
+        return H;
+    }
+
+    Eigen::Matrix4d make_HC_rotate_first(const Eigen::Matrix3d& C, const Eigen::Vector3d& d) {
+        Eigen::Matrix4d H = Eigen::Matrix4d::Zero();
+        H.block<3,3>(0,0) = C;
+        H.block<3,1>(0,3) = -d;
         H(3,3) = 1.0;
         return H;
     }
