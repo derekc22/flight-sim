@@ -4,6 +4,7 @@
 #include "core/connection/public.hpp"
 #include "core/io/analysis/public.hpp"
 #include "core/io/data/public.hpp"
+#include "core/io/rerun/public.hpp"
 #include "simulation/actuators/propulsor/public.hpp"
 #include "simulation/actuators/surface/public.hpp"
 #include "simulation/atmospheric/public.hpp"
@@ -25,6 +26,7 @@ namespace runner {
         bool wind_bool;
         bool verbose_bool;
         bool data_bool;
+        bool rerun_bool;
         std::string data_dir_path;
         std::string report_dir_path;
         bool analysis_bool;
@@ -36,6 +38,7 @@ namespace runner {
         SimulationOptions options;
         vehicles::Aircraft aircraft;
         io::DataManager data_manager;
+        io::RerunManager rerun_manager;
         io::AnalysisManager analysis_manager;
 
         actuators::SurfaceActuatorInputs_T<double> u_surface_actual_prev{};

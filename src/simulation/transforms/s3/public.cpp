@@ -11,23 +11,24 @@
 
 namespace transforms {
 
-    Eigen::Quaterniond normalize_and_canonicalize(Eigen::Quaterniond q) {
-        q.normalize();
-        // Canonicalize sign: q and -q represent the same rotation
-        if (q.w() < 0.0) q.coeffs() *= -1.0; // coeffs() is (x,y,z,w)
-        return q;
-    }
 
-    Eigen::Quaterniond eul_to_quatR(double a, double b, double c, const std::string& order, const std::string& type) {
-        if (type == "extr") return eul_to_quatR_extr(a, b, c, order);
-        if (type == "intr") return eul_to_quatR_intr(a, b, c, order);
-        throw std::invalid_argument("Unsupported type: " + type);
+    // Recall that the premise of an "intrinsic" vector rotation (as opposed to an intrinsic frame rotations/coordinate transformations) is rejected
+    // Thus, the "intr" branch of `eul_to_quatR` and `quatquatR_to_eul` do not exist
+    // That is, this function DOES NOT have a 'type' argument and appropriately ONLY calls `eul_to_quatR_extr` internally
+    // Once again, the 'types' argument is omitted in eul_to_quatR and quatR_to_eul because including it would imply that active rotation matrices, R, can apply intrinsic rotations
+    // This is not true. Active rotation matrices CANNOT apply intrinsic rotations - they can ONLY apply extrinsic rotations, hence why `eul_to_quatR` automtically calls eul_to_quatR_extr and does not support the option to build an `intrinsic` R (which, again, DOES NOT EXIST)
+    Eigen::Quaterniond eul_to_quatR(double a, double b, double c, const std::string& order) {
+        return eul_to_quatR_extr(a, b, c, order);
     }
 
     Eigen::Quaterniond eul_to_quatC(double a, double b, double c, const std::string& order, const std::string& type) {
         if (type == "extr") return eul_to_quatC_extr(a, b, c, order);
         if (type == "intr") return eul_to_quatC_intr(a, b, c, order);
         throw std::invalid_argument("Unsupported type: " + type);
+    }
+
+    Eigen::Vector3d quatR_to_eul(const Eigen::Quaterniond& qR, const std::string& order) {
+        return quatC_to_eul_extr(qR, order);
     }
 
     Eigen::Vector3d quatC_to_eul(const Eigen::Quaterniond& qC, const std::string& order, const std::string& type) {
@@ -40,6 +41,10 @@ namespace transforms {
         return Eigen::Matrix3d(transforms::normalize_and_canonicalize(q));
     }
 
-
-
+    Eigen::Quaterniond normalize_and_canonicalize(Eigen::Quaterniond q) {
+        q.normalize();
+        // Canonicalize sign: q and -q represent the same rotation
+        if (q.w() < 0.0) q.coeffs() *= -1.0; // coeffs() is (x,y,z,w)
+        return q;
+    }
 }

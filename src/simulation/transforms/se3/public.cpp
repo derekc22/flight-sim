@@ -41,7 +41,6 @@ namespace transforms {
         throw std::invalid_argument("Unsupported argument value: " + first);
     }
 
-
     Eigen::Matrix4d make_Hinv(const Eigen::Matrix4d& H) {
         Eigen::Matrix4d H_inv = Eigen::Matrix4d::Zero();
         Eigen::Matrix3d R = H.block<3,3>(0,0);

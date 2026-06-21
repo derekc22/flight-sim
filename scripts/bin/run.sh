@@ -14,18 +14,19 @@ USAGE: $0
   [-c CONTROL_BOOL]
   [-e ESTIMATION_BOOL]
   [-w WIND_BOOL]
-  [-v VERBOSE_BOOL]
-  [-d DATA_BOOL]
-  [-p PLOT_BOOL]
-  -o <OUT_DIR>
-  [-m ANALYSIS_BOOL]
-  [-z HEADLESS_BOOL]
-  [-q QUICK_BOOL]
+  [-V VERBOSE_BOOL]
+  [-D DATA_BOOL]
+  [-R RERUN_BOOL]
+  [-P PLOT_BOOL]
+  -O <OUT_DIR>
+  [-M ANALYSIS_BOOL]
+  [-X HEADLESS_BOOL]
+  [-Q QUICK_BOOL]
 EOF
 	exit "$exit_code"
 }
 
-while getopts "a:t:rscewvdpo:mzqh" opt; do
+while getopts "a:t:rscewVDRPO:MXQh" opt; do
 	case "$opt" in
 		a) AIRCRAFT="$OPTARG" ;;
 		t) TIME_SEC="$OPTARG" ;;
@@ -34,13 +35,14 @@ while getopts "a:t:rscewvdpo:mzqh" opt; do
 		c) CONTROL_BOOL=1 ;;
 		e) ESTIMATION_BOOL=1 ;;
 		w) WIND_BOOL=1 ;;
-		v) VERBOSE_BOOL=1 ;;
-		d) DATA_BOOL=1 ;;
-		p) PLOT_BOOL=1 ;;
-		o) OUT_DIR="$OPTARG" ;;
-		m) ANALYSIS_BOOL=1 ;;
-		z) HEADLESS_BOOL=1 ;;
-		q) QUICK_BOOL=1 ;;
+		V) VERBOSE_BOOL=1 ;;
+		D) DATA_BOOL=1 ;;
+		R) RERUN_BOOL=1 ;;
+		P) PLOT_BOOL=1 ;;
+		O) OUT_DIR="$OPTARG" ;;
+		M) ANALYSIS_BOOL=1 ;;
+		X) HEADLESS_BOOL=1 ;;
+		Q) QUICK_BOOL=1 ;;
 			h) usage 0 ;;
 			?) usage 1 ;;
 	esac
@@ -54,6 +56,7 @@ done
 : "${WIND_BOOL:=0}"
 : "${VERBOSE_BOOL:=0}"
 : "${DATA_BOOL:=0}"
+: "${RERUN_BOOL:=0}"
 : "${PLOT_BOOL:=0}"
 : "${OUT_DIR:=$(date +"%Y%b%d_%H-%M-%S")}"
 : "${ANALYSIS_BOOL:=0}"
@@ -113,6 +116,7 @@ cmake --build "$PROJ_PATH/build"
 	"$WIND_BOOL" \
 	"$VERBOSE_BOOL" \
 	"$DATA_BOOL" \
+	"$RERUN_BOOL" \
 	"$DATA_DIR_PATH" \
 	"$REPORT_DIR_PATH" \
 	"$ANALYSIS_BOOL"
@@ -128,6 +132,7 @@ if [ "$DATA_BOOL" -eq 1 ]; then
 		WIND_BOOL="$WIND_BOOL" \
 		VERBOSE_BOOL="$VERBOSE_BOOL" \
 		DATA_BOOL="$DATA_BOOL" \
+		RERUN_BOOL="$RERUN_BOOL" \
 		PLOT_BOOL="$PLOT_BOOL" \
 		OUT_DIR="$OUT_DIR" \
 		ANALYSIS_BOOL="$ANALYSIS_BOOL" \
