@@ -185,7 +185,7 @@ namespace dynamics {
     StateVector_T<T> unpack_state_T(const State_T<T>& x);
 
     template <typename T>
-    State_T<T> pack_state_T(const StateVector_T<T>& z_vec);
+    State_T<T> pack_state_T(const StateVector_T<T>& x);
 
     template <typename T>
     StateDotVector_T<T> unpack_state_dot_T(const StateDot_T<T>& x_dot);

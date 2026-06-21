@@ -9,10 +9,10 @@ namespace estimation {
     {};
 
     LinearKalmanPolicyInput LinearKalmanFilter::make_linear_kalman_policy_input(const LinearKalmanEstimatorInput& input) {
-        dynamics::StateVector_T<double> yt_vec_deviation = dynamics::unpack_state(
+        dynamics::StateVector_T<double> yt_deviation = dynamics::unpack_state(
             input.Yt) - dynamics::unpack_state_T(input.operating_point.state);
 
-        actuators::ActuatorInputsVector_T<double> ut_1_vec_deviation = actuators::unpack_actuator_inputs(
+        actuators::ActuatorInputsVector_T<double> ut_1_deviation = actuators::unpack_actuator_inputs(
             input.u_surface_actual_prev, input.u_propulsor_actual_prev) - 
             actuators::unpack_actuator_inputs_T(input.operating_point.input);
 
@@ -22,16 +22,16 @@ namespace estimation {
             .A = lin_sol_k.A,
             .B = lin_sol_k.B,
             .C = lin_sol_k.C,
-            .yt_vec = yt_vec_deviation,
-            .ut_1_vec = ut_1_vec_deviation,
+            .yt = yt_deviation,
+            .ut_1 = ut_1_deviation,
         };
     }
 
-    dynamics::RigidBodyState LinearKalmanFilter::make_lkf_state_estimate(const LinearKalmanEstimatorInput& input, const dynamics::StateVector_T<double>& zt_vec_pred) {
-        dynamics::StateVector_T<double> zt_vec_trim = dynamics::unpack_state_T(input.operating_point.state);
-        dynamics::StateVector_T<double> zt_vec = zt_vec_pred + zt_vec_trim;  // LKF predicts deviation state, so trim state is added back
+    dynamics::RigidBodyState LinearKalmanFilter::make_lkf_state_estimate(const LinearKalmanEstimatorInput& input, const dynamics::StateVector_T<double>& zt) {
+        dynamics::StateVector_T<double> x_trim = dynamics::unpack_state_T(input.operating_point.state);
+        dynamics::StateVector_T<double> zt_full = zt + x_trim;  // LKF predicts deviation state, so trim state is added back
 
-        return make_kalman_state_estimate(input.Yt, zt_vec);
+        return make_kalman_state_estimate(input.Yt, zt_full);
     }
 
     EstimationOutput LinearKalmanFilter::step(const LinearKalmanEstimatorInput& input) {
@@ -39,7 +39,7 @@ namespace estimation {
             make_linear_kalman_policy_input(input)
         );
 
-        dynamics::RigidBodyState Zt = make_lkf_state_estimate(input, kalman_state.zt_vec);
+        dynamics::RigidBodyState Zt = make_lkf_state_estimate(input, kalman_state.zt);
 
         return { .Zt = Zt };
     }

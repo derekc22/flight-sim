@@ -5,7 +5,7 @@
 namespace estimation {
 
     struct KalmanState {
-        dynamics::StateVector_T<double> zt_vec;  // state estimate
+        dynamics::StateVector_T<double> zt;  // state estimate
         Eigen::MatrixXd P;  // state estimate error covariance matrix
     };
 
@@ -15,6 +15,6 @@ namespace estimation {
         Eigen::MatrixXd R;  // process noise covariance matrix
     };
 
-    dynamics::RigidBodyState make_kalman_state_estimate(const dynamics::RigidBodyState& Yt, const dynamics::StateVector_T<double>& zt_vec);
+    dynamics::RigidBodyState make_kalman_state_estimate(const dynamics::RigidBodyState& Yt, const dynamics::StateVector_T<double>& zt);
 
 }

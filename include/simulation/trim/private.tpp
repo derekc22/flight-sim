@@ -59,12 +59,12 @@ namespace trim {
     }
 
     template <typename T>
-    TrimResidualVector_T<T> compute_trim_residual_vector_T(const operating::StateInputVector_T<T>& z, const autodiff::AutoDiffModel& model, const TrimTarget& target, const operating::OperatingConditions& conditions, bool use_physical_controls) {
-        const dynamics::State_T<T> x = operating::pack_state_T<T>(z);
+    TrimResidualVector_T<T> compute_trim_residual_vector_T(const operating::StateInputVector_T<T>& xu, const autodiff::AutoDiffModel& model, const TrimTarget& target, const operating::OperatingConditions& conditions, bool use_physical_controls) {
+        const dynamics::State_T<T> x = operating::pack_state_T<T>(xu);
 
         actuators::ActuatorInputs_T<T> u;
-        if (use_physical_controls) u = operating::pack_actuator_inputs_T<T>(z);
-        else u = pack_trim_actuator_inputs_T<T>(z, model.actuator_limits);
+        if (use_physical_controls) u = operating::pack_actuator_inputs_T<T>(xu);
+        else u = pack_trim_actuator_inputs_T<T>(xu, model.actuator_limits);
 
         const TrimResidual_T<T> residual = compute_trim_residual_T<T>(x, u, model, target, conditions);
         return unpack_trim_residual_T(residual);

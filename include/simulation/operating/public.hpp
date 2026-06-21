@@ -24,10 +24,10 @@ namespace operating {
     StateInputVector_T<T> unpack_state_input_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u);
 
     template <typename T>
-    dynamics::State_T<T> pack_state_T(const StateInputVector_T<T>& z);
+    dynamics::State_T<T> pack_state_T(const StateInputVector_T<T>& xu);
 
     template <typename T>
-    actuators::ActuatorInputs_T<T> pack_actuator_inputs_T(const StateInputVector_T<T>& z);
+    actuators::ActuatorInputs_T<T> pack_actuator_inputs_T(const StateInputVector_T<T>& xu);
 }
 
 #include "simulation/operating/public.tpp"

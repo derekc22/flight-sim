@@ -13,8 +13,8 @@ namespace vehicles { struct Aircraft; } // forward declare
 namespace estimation {
 
     struct ExtendedKalmanPolicyInput {
-        dynamics::StateVector_T<double> yt_vec;
-        actuators::ActuatorInputsVector_T<double> ut_1_vec;
+        dynamics::StateVector_T<double> yt;
+        actuators::ActuatorInputsVector_T<double> ut_1;
         operating::OperatingConditions conditions;
         vehicles::Aircraft& aircraft;
     };

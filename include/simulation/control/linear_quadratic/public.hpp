@@ -6,7 +6,7 @@
 namespace control {
 
     struct LinearQuadraticPolicyInput {
-        Eigen::VectorXd zt_vec;
+        Eigen::VectorXd zt;
         Eigen::MatrixXd A;
         Eigen::Matrix<double, Eigen::Dynamic, constants::input_dim> B;
     };

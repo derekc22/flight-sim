@@ -4,16 +4,16 @@
 namespace dynamics {
 
     template <typename T>
-    State_T<T> pack_state_T(const StateVector_T<T>& z_vec) {
+    State_T<T> pack_state_T(const StateVector_T<T>& x) {
         return {
-            .vx = z_vec(0),
-            .vy = z_vec(1),
-            .vz = z_vec(2),
-            .p = z_vec(3),
-            .q = z_vec(4),
-            .r = z_vec(5),
-            .phi = z_vec(6),
-            .theta = z_vec(7)
+            .vx = x(0),
+            .vy = x(1),
+            .vz = x(2),
+            .p = x(3),
+            .q = x(4),
+            .r = x(5),
+            .phi = x(6),
+            .theta = x(7)
         };
     }
 
