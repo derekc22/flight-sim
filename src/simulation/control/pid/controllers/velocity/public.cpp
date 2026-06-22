@@ -56,8 +56,8 @@ namespace control {
         double limit_min_overall = propulsor_actuators.front_propulsor.limit_min + propulsor_actuators.left_propulsor.limit_min + propulsor_actuators.right_propulsor.limit_min;
 
         return {
-            .meas = Zt.v.data(0),
-            .meas_des = setpoint.vB_BI.data(0),
+            .x = Zt.v.data(0),
+            .x_des = setpoint.vB_BI.data(0),
             .limit_max = limit_max_overall,
             .limit_min = limit_min_overall
         };

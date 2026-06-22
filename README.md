@@ -94,6 +94,12 @@ To generate plots from logged data, use the `-P` flag with `run.sh` or run:
 ./scripts/bin/plot.sh <OUT_DIR>
 ```
 
+## Rerun
+To enable Rerun streaming, use the `-R` flag with `run.sh`. If the Rerun viewer fails to automatically display, launch it manually with:
+```bash
+rerun --port 9876
+```
+
 ## Analysis
 Post-run analysis is implemented with MATLAB and configured via `config/analyze.json`. To run the analysis on logged data, use the `-M` flag with `run.sh` or run:
 

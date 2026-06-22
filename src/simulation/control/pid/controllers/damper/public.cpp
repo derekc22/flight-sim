@@ -14,27 +14,27 @@ namespace control {
         switch (axis) {
             case ControlAxis::Lateral:
                 return {
-                    .meas = Zt.w.p(),
-                    .meas_des = input.setpoint.wB_BI.p(),
-                    .meas_dot = 0.0,
+                    .x = Zt.w.p(),
+                    .x_des = input.setpoint.wB_BI.p(),
+                    .x_dot = 0.0,
                     .limit_min = surface_actuators.aileron.limit_min,
                     .limit_max = surface_actuators.aileron.limit_max
                 };
 
             case ControlAxis::Longitudinal:
                 return {
-                    .meas = Zt.w.q(),
-                    .meas_des = input.setpoint.wB_BI.q(),
-                    .meas_dot = 0.0,
+                    .x = Zt.w.q(),
+                    .x_des = input.setpoint.wB_BI.q(),
+                    .x_dot = 0.0,
                     .limit_min = surface_actuators.elevator.limit_min,
                     .limit_max = surface_actuators.elevator.limit_max
                 };
 
             case ControlAxis::Vertical:
                 return {
-                    .meas = Zt.w.r(),
-                    .meas_des = input.setpoint.wB_BI.r(),
-                    .meas_dot = 0.0,
+                    .x = Zt.w.r(),
+                    .x_des = input.setpoint.wB_BI.r(),
+                    .x_dot = 0.0,
                     .limit_min = surface_actuators.rudder.limit_min,
                     .limit_max = surface_actuators.rudder.limit_max
                 };

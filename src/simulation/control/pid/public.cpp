@@ -7,11 +7,11 @@ namespace control {
     PIDPolicy::PIDPolicy(const PIDPolicyParameters& params) : params(params) {}
 
     double PIDPolicy::step(const PIDPolicyInput& input) {
-        double err = input.meas_des - input.meas;
+        double err = input.x_des - input.x;
 
-        double d_term = input.meas_dot.has_value()
-                        ? input.meas_dot.value()         // PI-D
-                        : (prev_err - err) / constants::dt;         // PID
+        double d_term = input.x_dot.has_value()
+                        ? input.x_dot.value()   // PI-D
+                        : (prev_err - err) / constants::dt; // PID
 
         // filtered deriative
         d_filtered = util::first_order_lag(d_term, d_filtered, params.tau);

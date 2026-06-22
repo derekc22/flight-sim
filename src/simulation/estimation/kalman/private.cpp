@@ -9,6 +9,7 @@ namespace estimation {
 
         dynamics::EulerAngles eul_meas;
         eul_meas.set(Yt.q);
+
         dynamics::EulerAngles eul_est{ Eigen::Vector3d(eul_meas.psi(), zt(7), zt(6)) };
         dynamics::OrientationQuaternion q_est;
         q_est.set(eul_est);

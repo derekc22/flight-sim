@@ -30,7 +30,7 @@ namespace geography {
     };
 
     struct GroundElevation {
-        // terrain/ground height relative to the global vertical reference
+        // terrain/ground height relative to the Earth surface
         double data;
     };
 

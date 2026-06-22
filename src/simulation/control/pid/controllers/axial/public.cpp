@@ -39,33 +39,33 @@ namespace control {
         actuators::SurfaceActuators surface_actuators = input.surface_actuators;
         guidance::AttitudeSetpoint setpoint = input.setpoint;
 
-        dynamics::EulerAngles eul_meas_t;
-        eul_meas_t.set(Zt.q);
+        dynamics::EulerAngles eul_est_t;
+        eul_est_t.set(Zt.q);
 
         switch (axis) {
             case ControlAxis::Lateral:
                 return {
-                    .meas = eul_meas_t.phi(),
-                    .meas_des = setpoint.eulIB.phi(),
-                    .meas_dot = Zt.w.p(),
+                    .x = eul_est_t.phi(),
+                    .x_des = setpoint.eulIB.phi(),
+                    .x_dot = Zt.w.p(),
                     .limit_min = surface_actuators.aileron.limit_min,
                     .limit_max = surface_actuators.aileron.limit_max
                 };
 
             case ControlAxis::Longitudinal:
                 return {
-                    .meas = eul_meas_t.theta(),
-                    .meas_des = setpoint.eulIB.theta(),
-                    .meas_dot = Zt.w.q(),
+                    .x = eul_est_t.theta(),
+                    .x_des = setpoint.eulIB.theta(),
+                    .x_dot = Zt.w.q(),
                     .limit_min = surface_actuators.elevator.limit_min,
                     .limit_max = surface_actuators.elevator.limit_max
                 };
 
             case ControlAxis::Vertical:
                 return {
-                    .meas = eul_meas_t.psi(),
-                    .meas_des = setpoint.eulIB.psi(),
-                    .meas_dot = Zt.w.r(),
+                    .x = eul_est_t.psi(),
+                    .x_des = setpoint.eulIB.psi(),
+                    .x_dot = Zt.w.r(),
                     .limit_min = surface_actuators.rudder.limit_min,
                     .limit_max = surface_actuators.rudder.limit_max
                 };

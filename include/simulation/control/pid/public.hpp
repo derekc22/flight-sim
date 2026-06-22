@@ -4,9 +4,9 @@
 namespace control {
 
     struct PIDPolicyInput {
-        double meas;
-        double meas_des;
-        std::optional<double> meas_dot;
+        double x;
+        double x_des;
+        std::optional<double> x_dot;
         double limit_max;
         double limit_min;
     };
