@@ -37,7 +37,7 @@ namespace io {
     }
 
     void log_vehicle_transform(rerun::RecordingStream& rec, const dynamics::RigidBodyState& Xt) {
-        const Eigen::Quaterniond& q_conj = Xt.q.data.conjugate();
+        const Eigen::Quaterniond q_conj = Xt.q.data.conjugate();  // Rerun expects qBI, not qIB
         rec.log(
             "world/vehicle",
             rerun::Transform3D::from_translation_rotation(
@@ -91,4 +91,18 @@ namespace io {
             rerun::Asset3D::from_file_path("assets/cessna172.glb").value
         );
     }
+
+    void log_vehicle_trajectory(rerun::RecordingStream& rec, const std::vector<rerun::Vec3D>& trajectory) {
+        if (trajectory.size() < 2) { return; }
+
+        rerun::LineStrip3D strip(trajectory);
+
+        rec.log(
+            "world/trajectory/line",
+            rerun::LineStrips3D(strip)
+                .with_radii(rerun::Radius::ui_points(0.5f))
+                .with_colors(rerun::Color(255, 255, 0))
+        );
+    }
+
 }

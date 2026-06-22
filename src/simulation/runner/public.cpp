@@ -61,7 +61,7 @@ namespace runner {
         return aircraft;
     }
 
-    SimulationRunner::SimulationRunner(SimulationOptions options) :
+    RunManager::RunManager(SimulationOptions options) :
         options(options),
         // load vehicle
         aircraft(load(options.aircraft_id, options.trim_bool)),
@@ -76,9 +76,9 @@ namespace runner {
         // start timer
         next(std::chrono::steady_clock::now()) {}
 
-    SimulationRunner::~SimulationRunner() = default;
+    RunManager::~RunManager() = default;
 
-    void SimulationRunner::cleanup() {
+    void RunManager::cleanup() {
         std::string data_dir_path = options.data_dir_path;
         std::string report_dir_path = options.report_dir_path;
 
@@ -90,7 +90,7 @@ namespace runner {
         json::dump_configs(data_dir_path);
     }
 
-    void SimulationRunner::run() {
+    void RunManager::run() {
         for (int t = 0; t < options.tf; ++t) {
             step(t);
         }
@@ -99,7 +99,7 @@ namespace runner {
         cleanup();
     }
 
-    void SimulationRunner::step(int t) {
+    void RunManager::step(int t) {
         // get aircraft properties
         structural::StructuralProperties& structural_properties = aircraft.structural_properties;
         aerodynamics::AerodynamicProperties& aerodynamic_properties = aircraft.aerodynamic_properties;

@@ -12,8 +12,8 @@ namespace io {
     {
         if (rerun_bool) {
             rec.spawn().exit_on_failure();
-            log_vehicle_model(rec);
             rec.log_static("/", rerun::ViewCoordinates::FRD);
+            log_vehicle_model(rec);
         }
     }
 
@@ -25,10 +25,21 @@ namespace io {
         rec.set_time_sequence("step", t);
         rec.set_time_duration_secs("sim_time", t * constants::dt);
 
-        dynamics::EulerAngles eul_t;
-        eul_t.set(context.Xt.q);
-
         log_vehicle_transform(rec, context.Xt);
+
+        trajectory.emplace_back(
+            static_cast<float>(context.Xt.p.data.x()),
+            static_cast<float>(context.Xt.p.data.y()),
+            static_cast<float>(context.Xt.p.data.z())
+        );
+        
+        int max_traj_points = static_cast<int>(60.0/constants::dt); // 60 seconds
+        if (trajectory.size() > max_traj_points) {
+            trajectory.erase(trajectory.begin());
+        }
+
+        log_vehicle_trajectory(rec, trajectory);
+
         log_body_arrow(rec, "world/vehicle/vectors/velocity", context.Xt.v.data, 1.0, rerun::Color(0, 180, 255), "velocity");
 
         log_body_arrow(rec, "world/vehicle/vectors/force_net", context.WB_net.F.data, 0.01, rerun::Color(255, 80, 80), "force_net");
@@ -39,6 +50,8 @@ namespace io {
         log_body_arrow(rec, "world/vehicle/vectors/moment_aero", context.WB_aero.M.data, 0.01, rerun::Color(255, 220, 80), "moment_aero");
         log_body_arrow(rec, "world/vehicle/vectors/moment_propulsive", context.WB_propulsive.M.data, 0.01, rerun::Color(120, 255, 210), "moment_prop");
 
+        dynamics::EulerAngles eul_t;
+        eul_t.set(context.Xt.q);
         log_vector(rec, "state/p", context.Xt.p.data, xyz_labels);
         log_vector(rec, "state/eul", eul_t.data, eul_labels);
         log_vector(rec, "state/w", context.Xt.w.data, angular_rate_labels);

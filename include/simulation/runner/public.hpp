@@ -34,7 +34,7 @@ namespace runner {
 
     vehicles::Aircraft load(const std::string& aircraft_id, bool trim_bool);
 
-    struct SimulationRunner {
+    struct RunManager {
         SimulationOptions options;
         vehicles::Aircraft aircraft;
         io::DataManager data_manager;
@@ -61,8 +61,8 @@ namespace runner {
         connection::UDPIn udp_in;
         std::chrono::steady_clock::time_point next;
 
-        SimulationRunner(SimulationOptions options);
-        ~SimulationRunner();
+        RunManager(SimulationOptions options);
+        ~RunManager();
 
         void cleanup();
         void run();
