@@ -21,4 +21,5 @@ namespace io {
     void log_vehicle_transform(rerun::RecordingStream& rec, const dynamics::RigidBodyState& Xt);
     void log_body_arrow(rerun::RecordingStream& rec, const std::string& path, const Eigen::Vector3d& data, double scale, const rerun::Color& color, const std::string& label);
     void log_vehicle_model(rerun::RecordingStream& rec);
+    void log_vehicle_trajectory(rerun::RecordingStream& rec, const std::vector<rerun::Vec3D>& trajectory);
 }

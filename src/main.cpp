@@ -49,8 +49,8 @@ int main(int argc, char* argv[]) {
     };
 
     // run case
-    runner::SimulationRunner sim_runner{sim_options};
-    sim_runner.run();
+    runner::RunManager run_manager{sim_options};
+    run_manager.run();
 
     return 0;
 }
