@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include "core/io/rerun/public.hpp"
 #include "core/io/rerun/private.hpp"
 #include "simulation/actuators/propulsor/public.hpp"
@@ -11,7 +12,9 @@ namespace io {
         : rerun_bool(rerun_bool), control_bool(control_bool), sensor_bool(sensor_bool), estimation_bool(estimation_bool), wind_bool(wind_bool), rec("flight_sim")
     {
         if (rerun_bool) {
-            rec.spawn().exit_on_failure();
+            auto server_uri = rec.serve_grpc("0.0.0.0", 9876, "1GiB").value;
+            std::system("rerun assets/default.rbl --connect rerun+http://127.0.0.1:9876/proxy &");
+
             rec.log_static("/", rerun::ViewCoordinates::FRD);
             log_vehicle_model(rec);
         }

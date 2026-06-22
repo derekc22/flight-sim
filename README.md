@@ -95,13 +95,13 @@ To generate plots from logged data, use the `-P` flag with `run.sh` or run:
 ```
 
 ## Rerun
-To enable Rerun streaming, use the `-R` flag with `run.sh`. If the Rerun viewer fails to automatically display, run:
+To enable Rerun streaming, use the `-R` flag with `run.sh`. If the Rerun viewer fails to automatically launch, run:
 ```bash
-rerun --port 9876
+rerun --connect rerun+http://127.0.0.1:9876/proxy
 ```
-To use Rerun with the recommended blueprint, drag and drop `assets/default.rbl` into the Rerun viewer or run:
+To use the recommended blueprint, drag and drop `assets/default.rbl` into the Rerun viewer or run:
 ```bash
-rerun assets/default.rbl --port 9876
+rerun --connect rerun+http://127.0.0.1:9876/proxy assets/default.rbl
 ```
 
 ## Analysis
