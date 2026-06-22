@@ -33,11 +33,10 @@ namespace io {
             static_cast<float>(context.Xt.p.data.z())
         );
         
-        int max_traj_points = static_cast<int>(60.0/constants::dt); // 60 seconds
+        const std::size_t max_traj_points = static_cast<std::size_t>(60.0/constants::dt); // 60 seconds
         if (trajectory.size() > max_traj_points) {
             trajectory.erase(trajectory.begin());
         }
-
         log_vehicle_trajectory(rec, trajectory);
 
         log_body_arrow(rec, "world/vehicle/vectors/velocity", context.Xt.v.data, 1.0, rerun::Color(0, 180, 255), "velocity");
