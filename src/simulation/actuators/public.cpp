@@ -64,4 +64,11 @@ namespace actuators {
         return { unpack_actuator_inputs_T(max_min_limits.limit_min), unpack_actuator_inputs_T(max_min_limits.limit_max) };
     }
 
+    FixedActuatorInputs Settings::get_fixed_actuator_inputs() {
+        return {
+            .flap = fixed_actuator_inputs.flap,
+            .spoiler = fixed_actuator_inputs.spoiler,
+        };
+    }
+
 }

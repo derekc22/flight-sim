@@ -20,7 +20,8 @@
 #include "simulation/structural/public.hpp"
 #include "simulation/trim/public.hpp"
 #include "simulation/vehicles/public.hpp"
-#include "simulation/runtime/public.hpp"
+#include "simulation/failures/public.hpp"
+#include "simulation/settings/public.hpp"
 #include "core/connection/public.hpp"
 #include "core/json/actuators/public.hpp"
 #include "core/json/aerodynamics/public.hpp"
@@ -29,7 +30,7 @@
 #include "core/json/estimation/public.hpp"
 #include "core/json/guidance/public.hpp"
 #include "core/json/initialization/public.hpp"
-#include "core/json/runtime/public.hpp"
+#include "core/json/settings/public.hpp"
 #include "core/json/public.hpp"
 #include "core/json/structural/public.hpp"
 #include "core/messages/public.hpp"
@@ -50,13 +51,18 @@ namespace runner {
             actuator_properties,
             control_properties,
             json::parse_avionics_config(),
-            json::parse_runtime_config(actuator_properties),
             json::parse_guidance_config(control_properties),
             json::parse_estimation_config()
         };
 
         // set initial conditions from config
         aircraft.step(json::parse_initialization_config(trim_bool));
+
+        // parse settings
+        settings::SettingsManager settings_manager = json::parse_settings_config(actuator_properties);
+
+        // apply settings
+        aircraft = settings_manager.populate(aircraft);
 
         return aircraft;
     }
@@ -106,7 +112,6 @@ namespace runner {
         control::ControlProperties& control_properties = aircraft.control_properties;
         estimation::EstimationProperties& estimation_properties = aircraft.estimation_properties;
         actuators::ActuatorProperties& actuator_properties = aircraft.actuator_properties;
-        runtime::RuntimeProperties& runtime_properties = aircraft.runtime_properties;
         guidance::GuidanceProperties& guidance_properties = aircraft.guidance_properties;
         avionics::AvionicsProperties& avionics_properties = aircraft.avionics_properties;
 
@@ -236,7 +241,7 @@ namespace runner {
             avionics::MeasurementCache meas = avionics_properties.step(meas_gt);
 
             // overwrite local measurement state with sensor measurements
-            Yt = avionics::get_state_from_avionics(meas, runtime_properties.runtime_avionics_settings);
+            Yt = avionics::get_state_from_avionics(meas, avionics_properties.settings);
         }
 
         // initialize estimated state to measurements
@@ -333,8 +338,10 @@ namespace runner {
             u_cmd = control_properties.step(controller_inputs, options.trim_bool);
         }
 
-        u_cmd.surface_inputs.flap_cmd = runtime_properties.runtime_actuator_settings.fixed_actuator_inputs.flap;
-        u_cmd.surface_inputs.spoiler_cmd = runtime_properties.runtime_actuator_settings.fixed_actuator_inputs.spoiler;
+        // apply fixed actuator inputs
+        actuators::FixedActuatorInputs fixed_inputs = actuator_properties.settings.get_fixed_actuator_inputs();
+        u_cmd.surface_inputs.flap_cmd = fixed_inputs.flap;
+        u_cmd.surface_inputs.spoiler_cmd = fixed_inputs.spoiler;
 
         // apply surface actuator dynamics
         actuators::SurfaceActuatorInputs_T<double> u_surface_actual = actuator_properties.step(u_cmd.surface_inputs);
@@ -420,10 +427,10 @@ namespace runner {
 
         // check for runtime failures
         geography::HeightAGL height_agl{ geo_t1.alt.data - cached_msg_out.ground_elevation.data };
-        runtime::RuntimeFailureInputs failure_input {
+        failures::FailureInputs failure_inputs {
             .height_agl = height_agl
         };
-        runtime_properties.check_runtime_failures(failure_input);
+        failure_manager.check_runtime_failures(failure_inputs);
 
         // generate in_pkt from the simulation state
         messages::FlightGearMessageIn in_pkt = messages::process_in_pkt(

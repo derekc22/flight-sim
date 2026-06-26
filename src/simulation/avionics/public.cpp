@@ -107,11 +107,12 @@ namespace avionics {
         return meas_gt;
     }
 
-    dynamics::RigidBodyState get_state_from_avionics(const MeasurementCache& cache, const runtime::RuntimeAvionicsSettings& runtime_avionics_settings) {
+    dynamics::RigidBodyState get_state_from_avionics(const MeasurementCache& cache, const Settings& avionics_settings) {
+        bool use_gnss = avionics_settings.use_gnss;
 
         dynamics::RigidBodyState Yt = {
-            .p = runtime_avionics_settings.use_gnss ? cache.sensors.pI_BI_gnss : cache.computers.pI_BI_ins,
-            .v = runtime_avionics_settings.use_gnss ? cache.sensors.vB_BI_gnss : cache.computers.vB_BI_ins,
+            .p = use_gnss ? cache.sensors.pI_BI_gnss : cache.computers.pI_BI_ins,
+            .v = use_gnss ? cache.sensors.vB_BI_gnss : cache.computers.vB_BI_ins,
             .q = cache.computers.qIB,
             .w = cache.sensors.wB_BI
         };

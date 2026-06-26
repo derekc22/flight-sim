@@ -13,6 +13,7 @@
 #include "simulation/linearization/public.hpp"
 #include "simulation/trim/public.hpp"
 #include "simulation/vehicles/public.hpp"
+#include "simulation/failures/public.hpp"
 
 namespace runner {
 
@@ -40,6 +41,7 @@ namespace runner {
         io::DataManager data_manager;
         io::RerunManager rerun_manager;
         io::AnalysisManager analysis_manager;
+        failures::FailureManager failure_manager;
 
         actuators::SurfaceActuatorInputs_T<double> u_surface_actual_prev{};
         actuators::PropulsorActuatorInputs_T<double> u_propulsor_actual_prev{};
