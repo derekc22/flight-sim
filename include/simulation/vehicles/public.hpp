@@ -9,7 +9,6 @@
 #include "simulation/control/public.hpp"
 #include "simulation/estimation/public.hpp"
 #include "simulation/actuators/public.hpp"
-#include "simulation/runtime/public.hpp"
 #include "simulation/geography/public.hpp"
 #include "simulation/atmospheric/public.hpp"
 #include "simulation/avionics/public.hpp"
@@ -197,7 +196,6 @@ namespace vehicles {
         actuators::ActuatorProperties actuator_properties;
         control::ControlProperties control_properties;
         avionics::AvionicsProperties avionics_properties;
-        runtime::RuntimeProperties runtime_properties;
         guidance::GuidanceProperties guidance_properties;
         estimation::EstimationProperties estimation_properties;
 
@@ -208,7 +206,6 @@ namespace vehicles {
             const actuators::ActuatorProperties& actuator_properties,
             const control::ControlProperties& control_properties,
             const avionics::AvionicsProperties& avionics_properties,
-            const runtime::RuntimeProperties& runtime_properties,
             const guidance::GuidanceProperties& guidance_properties,
             const estimation::EstimationProperties& estimation_properties
         );

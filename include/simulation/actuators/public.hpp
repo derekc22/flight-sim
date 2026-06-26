@@ -54,12 +54,19 @@ namespace actuators {
 
     std::pair<ActuatorInputsVector_T<double>, ActuatorInputsVector_T<double>> unpack_actuator_limits(const SurfaceActuators& surface_actuators, const PropulsorActuators& propulsor_actuators);
 
+	struct Settings {  
+        FixedActuatorInputs fixed_actuator_inputs{};
+        FixedActuatorInputs get_fixed_actuator_inputs();
+	};
+
     struct ActuatorProperties {
         SurfaceActuators surface_actuators;
         SurfaceActuatorInputs_T<double> step(const SurfaceActuatorInputs_T<double>& u_cmd);
 
         PropulsorActuators propulsor_actuators;
         PropulsorActuatorInputs_T<double> step(const PropulsorActuatorInputs_T<double>& u_cmd);
+
+        Settings settings;
     };
 
 }

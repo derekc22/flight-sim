@@ -7,7 +7,6 @@
 #include "simulation/geography/public.hpp"
 #include "simulation/avionics/sensors/public.hpp"
 #include "simulation/avionics/computers/public.hpp"
-#include "simulation/runtime/public.hpp"
 
 namespace avionics {
 
@@ -59,6 +58,10 @@ namespace avionics {
         InertialNavigationSystem INS;
     };
 
+	struct Settings {
+        bool use_gnss = false;
+	};
+
     struct AvionicsProperties {
         AvionicsSensors sensors;
         AvionicsComputers computers;
@@ -66,6 +69,8 @@ namespace avionics {
         MeasurementCache cache;
 
         MeasurementCache step(const MeasurementGroundTruth& meas_gt);
+
+        Settings settings;
     };
 
     MeasurementGroundTruth build_measurement_gt(
@@ -79,5 +84,5 @@ namespace avionics {
         const dynamics::Wrench& WB_net
     );
 
-    dynamics::RigidBodyState get_state_from_avionics(const MeasurementCache& cache, const runtime::RuntimeAvionicsSettings& runtime_avionics_settings);
+    dynamics::RigidBodyState get_state_from_avionics(const MeasurementCache& cache, const Settings& avionics_settings);
 }
