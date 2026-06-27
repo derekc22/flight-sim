@@ -7,5 +7,6 @@
     "guidance_config": "simulation/guidance/regulation/lqr_roll.json",
     "avionics_config": "simulation/avionics/default.json",
     "actuator_config": "simulation/actuators/c172p/default.json",
-    "settings_config": "simulation/settings/c172p/default.json"
+    "settings_config": "simulation/settings/c172p/default.json",
+    "runner_config": "simulation/runner/default.json"
 }

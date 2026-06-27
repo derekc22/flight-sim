@@ -38,7 +38,7 @@
 
 namespace runner {
 
-    vehicles::Aircraft load(const std::string& aircraft_id, bool trim_bool) {
+    vehicles::Aircraft load_vehicle(const std::string& aircraft_id, bool trim_bool) {
         structural::StructuralProperties structural_properties = json::parse_structural_config();
         actuators::ActuatorProperties actuator_properties = json::parse_actuator_config(structural_properties);
         control::ControlProperties control_properties = json::parse_control_config();
@@ -67,15 +67,16 @@ namespace runner {
         return aircraft;
     }
 
-    RunManager::RunManager(SimulationOptions options) :
-        options(options),
+    RunManager::RunManager(CLIOptions cli_options, JSONOptions json_options) :
+        cli_options(cli_options),
+        json_options(json_options),
         // load vehicle
-        aircraft(load(options.aircraft_id, options.trim_bool)),
+        aircraft(load_vehicle(cli_options.aircraft_id, json_options.trim_bool)),
         // create data manager
-        data_manager(options.tf, options.data_bool, options.control_bool, options.sensor_bool, options.estimation_bool, options.wind_bool),
-        rerun_manager(options.rerun_bool, options.control_bool, options.sensor_bool, options.estimation_bool, options.wind_bool),
+        data_manager(json_options.tf, cli_options.data_bool, json_options.control_bool, json_options.avionics_bool, json_options.estimation_bool, json_options.wind_bool),
+        rerun_manager(json_options.rerun_bool, json_options.control_bool, json_options.avionics_bool, json_options.estimation_bool, json_options.wind_bool),
         // create analysis manager
-        analysis_manager(options.data_bool, options.analysis_bool, options.trim_bool),
+        analysis_manager(cli_options.data_bool, cli_options.analysis_bool, json_options.trim_bool),
         // initialize udp connections
         udp_out(5510),
         udp_in("127.0.0.1", 5511),
@@ -85,19 +86,20 @@ namespace runner {
     RunManager::~RunManager() = default;
 
     void RunManager::cleanup() {
-        std::string data_dir_path = options.data_dir_path;
-        std::string report_dir_path = options.report_dir_path;
+        std::string data_dir_path = cli_options.data_dir_path;
+        std::string log_dir_path = cli_options.log_dir_path;
+        std::string report_dir_path = cli_options.report_dir_path;
 
         // save data
         data_manager.save(data_dir_path);
         analysis_manager.save(data_dir_path, report_dir_path);
 
         // dump configs
-        json::dump_configs(data_dir_path);
+        json::dump_configs(log_dir_path);
     }
 
     void RunManager::run() {
-        for (int t = 0; t < options.tf; ++t) {
+        for (int t = 0; t < json_options.tf; ++t) {
             step(t);
         }
 
@@ -114,6 +116,7 @@ namespace runner {
         actuators::ActuatorProperties& actuator_properties = aircraft.actuator_properties;
         guidance::GuidanceProperties& guidance_properties = aircraft.guidance_properties;
         avionics::AvionicsProperties& avionics_properties = aircraft.avionics_properties;
+        JSONOptions& options = json_options; 
 
         // fetch from FlightGear
         if (auto out_pkt = udp_out.try_receive()) {
@@ -223,7 +226,7 @@ namespace runner {
         dynamics::RigidBodyState Yt = Xt;
 
         // use sensors
-        if (options.sensor_bool) {
+        if (options.avionics_bool) {
 
             // aggregate ground truth data
             avionics::MeasurementGroundTruth meas_gt = avionics::build_measurement_gt(

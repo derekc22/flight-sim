@@ -10,8 +10,8 @@
 
 namespace io {
 
-    RerunManager::RerunManager(bool rerun_bool, bool control_bool, bool sensor_bool, bool estimation_bool, bool wind_bool)
-        : rerun_bool(rerun_bool), control_bool(control_bool), sensor_bool(sensor_bool), estimation_bool(estimation_bool), wind_bool(wind_bool), rec("flight_sim")
+    RerunManager::RerunManager(bool rerun_bool, bool control_bool, bool avionics_bool, bool estimation_bool, bool wind_bool)
+        : rerun_bool(rerun_bool), control_bool(control_bool), avionics_bool(avionics_bool), estimation_bool(estimation_bool), wind_bool(wind_bool), rec("flight_sim")
     {
         if (rerun_bool) {
             auto server_uri = rec.serve_grpc("0.0.0.0", 9876, "1GiB").value;
@@ -79,7 +79,7 @@ namespace io {
             stream_vector(rec, "setpoint/v", context.setpoint.vB_BI.data, velocity_labels);
         }
 
-        if (sensor_bool) {
+        if (avionics_bool) {
             dynamics::EulerAngles eul_meas_t;
             eul_meas_t.set(context.Yt.q);
             stream_vector(rec, "measured/p", context.Yt.p.data, xyz_labels);

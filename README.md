@@ -55,7 +55,8 @@ Update the following JSON configuration file paths in `config/run.json`:
 - `control_config`: Control properties
 - `estimation_config`: Estimation properties
 - `guidance_config`: Guidance properties
-- `runtime_config`: Runtime properties
+- `settings_config`: Module settings
+- `runner_config`: Runner options
 
 Update the JSON configuration file paths in `config/analyze.json`
   
@@ -63,36 +64,28 @@ Update the JSON configuration file paths in `config/analyze.json`
 
 To run the simulation:
   ```bash
-  ./scripts/bin/run.sh -a <AIRCRAFT> -t <TIME_SEC> [-r TRIM] [-s SENSOR] [-c CONTROL] [-e ESTIMATION] [-w WIND] [-V VERBOSE] [-D DATA] [-R RERUN] [-P PLOT] -O <OUT_DIR> [-M ANALYSIS]
+  ./scripts/bin/run.sh -a <AIRCRAFT> [-d DATA] [-p PLOT] [-m ANALYSIS] -o <OUT_DIR>
   ```
 - `-a AIRCRAFT`: Aircraft to simulate (e.g. ASW28, c172p)
-- `-t TIME_SEC`: Simulation time in seconds
-- `-r TRIM`: Enable trim, linearization, and eigenanalysis
-- `-s SENSOR`: Enable sensors and avionics
-- `-c CONTROL`: Enable control system
-- `-e ESTIMATION`: Enable state estimation
-- `-w WIND`: Enable wind
-- `-V VERBOSE`: Enable verbose output
-- `-D DATA`: Enable data logging
-- `-R RERUN`: Enable Rerun streaming
-- `-P PLOT`: Enable plotting
-- `-O OUT_DIR`: Output directory name
-- `-M ANALYSIS`: Enable post-run analysis 
+- `-d DATA`: Enable data saving
+- `-p PLOT`: Enable plotting
+- `-m ANALYSIS`: Enable post-run analysis 
+- `-o OUT_DIR`: Output directory name
   
 ## Example
-Run a 60-second simulation of the C172 with trim, control, and avionics enabled. Data, plots, and reports are saved to `results/data/c172_test`, `results/figures/c172_test`, and `results/reports/c172_test`, respectively:
+Run a simulation of the C172 with logs, data, plots, and reports saved to `results/logs/c172`, `results/data/c172`, `results/figures/c172`, and `results/reports/c172`, respectively:
 ```bash
-./scripts/bin/run.sh -a c172p -t 60 -r -c -s -D -P -O c172_test
+./scripts/bin/run.sh -a c172p -d -p -m -o c172
 ```
 
 ## Plotting
-To generate plots from logged data, use the `-P` flag with `run.sh` or run:
+To generate plots from logged data, use the `-p` flag with `run.sh` or run:
 ```bash
 ./scripts/bin/plot.sh <OUT_DIR>
 ```
 
 ## Rerun
-To enable Rerun streaming, use the `-R` flag with `run.sh`. If the Rerun viewer fails to automatically launch, run:
+To enable Rerun streaming, set `enable.rerun` to `true` in the `runner_config`. If the Rerun viewer fails to automatically launch, run:
 ```bash
 rerun --connect rerun+http://127.0.0.1:9876/proxy
 ```
@@ -102,7 +95,7 @@ rerun --connect rerun+http://127.0.0.1:9876/proxy assets/default.rbl
 ```
 
 ## Analysis
-Post-run analysis is implemented with MATLAB and configured via `config/analyze.json`. To run the analysis on logged data, use the `-M` flag with `run.sh` or run:
+Post-run analysis is implemented with MATLAB and configured via `config/analyze.json`. To run the analysis on logged data, use the `-m` flag with `run.sh` or run:
 
 ```bash
 scripts/bin/analyze.sh <OUT_DIR>

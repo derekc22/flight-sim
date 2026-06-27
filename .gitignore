@@ -1,9 +1,7 @@
 .vscode/
 .DS_Store
 build/
-results/data/
-results/figures/
-results/reports/
+results/
 .idea/
 **/archive/**
 AGENTS.md

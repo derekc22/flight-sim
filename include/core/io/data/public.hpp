@@ -35,7 +35,7 @@ namespace io {
     struct DataManager {
         bool data_bool;
         bool control_bool;
-        bool sensor_bool;
+        bool avionics_bool;
         bool estimation_bool;
         bool wind_bool;
 
@@ -66,7 +66,7 @@ namespace io {
 
         void step(int t, const DataContext& context);
         void save(const std::string& data_dir_path);
-        DataManager(int tf, bool data_bool, bool control_bool, bool sensor_bool, bool estimation_bool, bool wind_bool);
+        DataManager(int tf, bool data_bool, bool control_bool, bool avionics_bool, bool estimation_bool, bool wind_bool);
 
     };
 }

@@ -44,11 +44,15 @@ namespace json {
         };
     }
 
+    void validate_surfaces_json(const nlohmann::json& surfaces_json) {
+        if (!surfaces_json.is_array()) { 
+            throw std::runtime_error("json::parse_aerodynamic_properties expected 'surfaces' to be an array"); 
+        }
+    }
+
     aerodynamics::AerodynamicProperties parse_aerodynamic_properties(const nlohmann::json& config, const structural::StructuralProperties& structural_properties) {
         const auto& surfaces_json = config.at("surfaces");
-        if (!surfaces_json.is_array()) { 
-            throw std::runtime_error("json::parse_aerodynamics_config expected 'surfaces' to be an array"); 
-        }
+        validate_surfaces_json(surfaces_json);
 
         std::vector<aerodynamics::Surface> surfaces;
         surfaces.reserve(surfaces_json.size());
@@ -72,8 +76,12 @@ namespace json {
                 .a0 = surface_json.at("a0").get<double>(),
                 .CM0 = surface_json.at("CM0").get<double>(),
                 .CMa = surface_json.at("CMa").get<double>(),
-                .dyn = surface_json.contains("dynamic_derivatives") ? parse_dynamic_derivatives(surface_json.at("dynamic_derivatives")) : aerodynamics::DynamicDerivatives{},
-                .ctrl = surface_json.contains("control_derivatives") ? parse_control_derivatives(surface_json.at("control_derivatives")) : aerodynamics::ControlDerivatives{},
+                .dyn = surface_json.contains("dynamic_derivatives") ? 
+                       parse_dynamic_derivatives(surface_json.at("dynamic_derivatives")) : 
+                       aerodynamics::DynamicDerivatives{},
+                .ctrl = surface_json.contains("control_derivatives") ? 
+                        parse_control_derivatives(surface_json.at("control_derivatives")) : 
+                        aerodynamics::ControlDerivatives{},
             });
         }
         return { surfaces };

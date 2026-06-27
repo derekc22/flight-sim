@@ -17,7 +17,10 @@ find_package(nlohmann_json CONFIG REQUIRED)
 
 # Fetch Rerun SDK
 include(FetchContent)
-FetchContent_Declare(rerun_sdk URL https://github.com/rerun-io/rerun/releases/latest/download/rerun_cpp_sdk.zip DOWNLOAD_EXTRACT_TIMESTAMP TRUE PATCH_COMMAND patch -p1 -i ${CMAKE_SOURCE_DIR}/cmake/patches/rerun_sdk_arrow_patch_command.patch)
+FetchContent_Declare(rerun_sdk
+    URL https://github.com/rerun-io/rerun/releases/latest/download/rerun_cpp_sdk.zip
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+)
 FetchContent_MakeAvailable(rerun_sdk)
 
 # Find GoogleTest

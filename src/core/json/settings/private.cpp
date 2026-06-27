@@ -37,7 +37,7 @@ namespace json {
         if (config.contains("actuators")) {
             const auto& actuator_settings_json = config.at("actuators");
             if (!actuator_settings_json.is_object()) { 
-                throw std::runtime_error("json::parse_settings_manager actuators must be an object"); 
+                throw std::runtime_error("json::validate_actuator_settings_json actuators must be an object"); 
             }
             if (actuator_settings_json.contains("fixed_actuator_inputs")) { 
                 const auto& fixed_actuator_inputs_json = actuator_settings_json.at("fixed_actuator_inputs");
@@ -46,11 +46,11 @@ namespace json {
                 }
             }
             else { 
-                throw std::runtime_error("json::parse_settings_manager fixed_actuator_inputs configuration must be specified"); 
+                throw std::runtime_error("json::validate_actuator_settings_json fixed_actuator_inputs configuration must be specified"); 
             }
         }
         else { 
-            throw std::runtime_error("json::parse_settings_manager actuators configuration must be specified"); 
+            throw std::runtime_error("json::validate_actuator_settings_json actuators configuration must be specified"); 
         }
     }
 
@@ -58,17 +58,17 @@ namespace json {
         if (config.contains("avionics")) {
             const auto& avionics_settings_json = config.at("avionics");
             if (!avionics_settings_json.is_object()) { 
-                throw std::runtime_error("json::parse_settings_manager avionics must be an object"); 
+                throw std::runtime_error("json::validate_avionics_settings_json avionics must be an object"); 
             }
             if (!avionics_settings_json.contains("use_gnss")) { 
-                throw std::runtime_error("json::parse_settings_manager use_gnss must be specified"); 
+                throw std::runtime_error("json::validate_avionics_settings_json use_gnss must be specified"); 
             }
             if (!avionics_settings_json.at("use_gnss").is_boolean()) {
-                throw std::runtime_error("json::parse_settings_manager use_gnss must be a boolean");
+                throw std::runtime_error("json::validate_avionics_settings_json use_gnss must be a boolean");
             }
         }
         else { 
-            throw std::runtime_error("json::parse_settings_manager avionics configuration must be specified"); 
+            throw std::runtime_error("json::validate_avionics_settings_json avionics configuration must be specified"); 
         }
     }
 
