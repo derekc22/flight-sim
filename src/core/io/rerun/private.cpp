@@ -7,6 +7,7 @@
 #include "core/io/rerun/private.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/transforms/public.hpp"
+#include <opencv2/opencv.hpp>
 
 namespace io {
 
@@ -17,14 +18,14 @@ namespace io {
     const std::vector<std::string> surface_labels{"elevator", "aileron", "rudder", "flap", "spoiler"};
     const std::vector<std::string> propulsor_labels{"front", "left", "right"};
 
-    void log_scalar(rerun::RecordingStream& rec, const std::string& path, double value) {
+    void stream_scalar(rerun::RecordingStream& rec, const std::string& path, double value) {
         rec.log(path, rerun::Scalars(value));
     }
 
-    void log_vector(rerun::RecordingStream& rec, const std::string& prefix, const Eigen::Ref<const Eigen::VectorXd>& data, const std::vector<std::string>& labels) {
+    void stream_vector(rerun::RecordingStream& rec, const std::string& prefix, const Eigen::Ref<const Eigen::VectorXd>& data, const std::vector<std::string>& labels) {
         Eigen::Index n = std::min<Eigen::Index>(data.size(), static_cast<Eigen::Index>(labels.size()));
         for (Eigen::Index i = 0; i < n; ++i) {
-            log_scalar(rec, prefix + "/" + labels[static_cast<std::size_t>(i)], data(i));
+            stream_scalar(rec, prefix + "/" + labels[static_cast<std::size_t>(i)], data(i));
         }
     }
 
@@ -36,7 +37,7 @@ namespace io {
         );
     }
 
-    void log_vehicle_transform(rerun::RecordingStream& rec, const dynamics::RigidBodyState& Xt) {
+    void stream_vehicle_transform(rerun::RecordingStream& rec, const dynamics::RigidBodyState& Xt) {
         const Eigen::Quaterniond q_conj = Xt.q.data.conjugate();  // Rerun expects qBI, not qIB
         rec.log(
             "world/vehicle",
@@ -57,7 +58,7 @@ namespace io {
         );
     }
 
-    void log_body_arrow(rerun::RecordingStream& rec, const std::string& path, const Eigen::Vector3d& data, double scale, const rerun::Color& color, const std::string& label) {
+    void stream_body_arrow(rerun::RecordingStream& rec, const std::string& path, const Eigen::Vector3d& data, double scale, const rerun::Color& color, const std::string& label) {
         rec.log(
             path,
             rerun::Arrows3D::from_vectors({scaled_vector(data, scale)})
@@ -68,7 +69,7 @@ namespace io {
         );
     }
 
-    void log_vehicle_model(rerun::RecordingStream& rec) {
+    void stream_vehicle_model(rerun::RecordingStream& rec) {
         Eigen::Quaterniond q_model_to_body = transforms::eul_to_quatR(
             -constants::pi/2, constants::pi/2, 0.0, "ZYX"
         );
@@ -92,7 +93,7 @@ namespace io {
         );
     }
 
-    void log_vehicle_trajectory(rerun::RecordingStream& rec, const std::vector<rerun::Vec3D>& trajectory) {
+    void stream_vehicle_trajectory(rerun::RecordingStream& rec, const std::vector<rerun::Vec3D>& trajectory) {
         if (trajectory.size() < 2) { return; }
 
         rerun::LineStrip3D strip(trajectory);
@@ -102,6 +103,30 @@ namespace io {
             rerun::LineStrips3D(strip)
                 .with_radii(rerun::Radius::ui_points(0.5f))
                 .with_colors(rerun::Color(255, 255, 0))
+        );
+    }
+
+    void stream_flightgear_camera(rerun::RecordingStream& rec, const cv::Mat& frame) {
+        if (frame.empty()) {
+            throw std::runtime_error("stream_flightgear_camera: empty frame");
+        }
+
+        if (frame.type() != CV_8UC3) {
+            throw std::runtime_error("stream_flightgear_camera: expected CV_8UC3 BGR image");
+        }
+
+        const cv::Mat img = frame.isContinuous() ? frame : frame.clone();
+
+        rec.log(
+            "flightgear/camera",
+            rerun::Image(
+                rerun::borrow(img.data, img.total() * img.elemSize()),
+                rerun::WidthHeight(
+                    static_cast<uint32_t>(img.cols),
+                    static_cast<uint32_t>(img.rows)
+                ),
+                rerun::ColorModel::BGR
+            )
         );
     }
 

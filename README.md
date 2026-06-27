@@ -21,11 +21,8 @@ conda activate ame532
 
 Install C++ dependencies:
 ```bash
-# Ubuntu
-sudo apt install cmake pkgconf libeigen3-dev libcppad-dev nlohmann-json3-dev libslicot-dev gfortran libgtest-dev
-
 # macOS
-brew install cmake pkgconf eigen cppad nlohmann-json slicot gcc googletest
+brew install cmake pkgconf eigen cppad nlohmann-json slicot gcc googletest rerun-sdk opencv
 ```
 Install MATLAB Runtime:
 ```
