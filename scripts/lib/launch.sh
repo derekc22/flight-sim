@@ -17,4 +17,5 @@ exec "$FG_PATH" \
 --prop:/sim/current-view/view-number-raw=1 \
 --disable-real-weather-fetch \
 --geometry=800x700 \
---prop:/engines/engine[0]/rpm=2300
+--prop:/engines/engine[0]/rpm=2300 \
+--httpd=8080

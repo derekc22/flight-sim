@@ -32,9 +32,22 @@ find_program(GFORTRAN_EXECUTABLE NAMES gfortran REQUIRED)
 find_library(GFORTRAN_LIB NAMES gfortran HINTS /opt/homebrew/opt/gcc/lib/gcc/current /usr/local/opt/gcc/lib/gcc/current REQUIRED)
 find_library(QUADMATH_LIB NAMES quadmath HINTS /opt/homebrew/opt/gcc/lib/gcc/current /usr/local/opt/gcc/lib/gcc/current REQUIRED)
 
+# Find OpenCV
+if(NOT OpenCV_DIR)
+    foreach(OPENCV_PREFIX /opt/homebrew/opt/opencv /usr/local/opt/opencv)
+        if(EXISTS "${OPENCV_PREFIX}/lib/cmake/opencv4/OpenCVConfig.cmake")
+            set(OpenCV_DIR "${OPENCV_PREFIX}/lib/cmake/opencv4")
+            break()
+        endif()
+    endforeach()
+endif()
+find_package(OpenCV REQUIRED)
+
 # Collect all source files
-file(GLOB_RECURSE SOURCES "src/*.cpp")
+file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.cpp")
+file(GLOB_RECURSE IO_CV2_SOURCES CONFIGURE_DEPENDS "src/core/io/camera/*.cpp")
 list(FILTER SOURCES EXCLUDE REGEX "src/simulation/control/linear_quadratic/slicot_care\\.cpp$")
+list(REMOVE_ITEM SOURCES ${IO_CV2_SOURCES})
 set(TESTED_SOURCES ${SOURCES})
 list(FILTER TESTED_SOURCES EXCLUDE REGEX "src/main\\.cpp$")
 file(GLOB_RECURSE TEST_SOURCES CONFIGURE_DEPENDS "tests/*.cpp")
@@ -58,15 +71,18 @@ target_link_libraries(control_care PUBLIC Eigen3::Eigen ${SLICOT_LIB} ${GFORTRAN
 
 # Create the executable
 add_library(flight_sim_core STATIC ${TESTED_SOURCES})
+add_library(flight_sim_cv2 STATIC ${IO_CV2_SOURCES})
 add_executable(${PROJECT_NAME} src/main.cpp)
 
 # Add include directory
-target_include_directories(flight_sim_core PRIVATE ${CMAKE_SOURCE_DIR}/include)
+target_include_directories(flight_sim_core PRIVATE ${CMAKE_SOURCE_DIR}/include ${OpenCV_INCLUDE_DIRS})
+target_include_directories(flight_sim_cv2 PRIVATE ${CMAKE_SOURCE_DIR}/include ${OpenCV_INCLUDE_DIRS})
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include)
-target_link_libraries(flight_sim_core PRIVATE control_care Eigen3::Eigen PkgConfig::CPPAD nlohmann_json::nlohmann_json rerun_sdk)
+target_link_libraries(flight_sim_core PRIVATE control_care Eigen3::Eigen PkgConfig::CPPAD nlohmann_json::nlohmann_json rerun_sdk ${OpenCV_LIBS})
+target_link_libraries(flight_sim_cv2 PRIVATE ${OpenCV_LIBS})
 
 # Link Eigen, CppAD/Ipopt, and nlohmann_json to the executable
-target_link_libraries(${PROJECT_NAME} flight_sim_core control_care Eigen3::Eigen PkgConfig::CPPAD nlohmann_json::nlohmann_json rerun_sdk)
+target_link_libraries(${PROJECT_NAME} flight_sim_core flight_sim_cv2 control_care Eigen3::Eigen PkgConfig::CPPAD nlohmann_json::nlohmann_json rerun_sdk)
 
 # Test executable
 add_executable(flight_sim_tests ${TEST_SOURCES})
