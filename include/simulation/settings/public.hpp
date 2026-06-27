@@ -5,8 +5,6 @@
 
 namespace settings {
 
-
-
 	struct SettingsManager {
 
 		actuators::Settings actuator_settings;
@@ -15,6 +13,5 @@ namespace settings {
 		vehicles::Aircraft& populate(vehicles::Aircraft& aircraft);
 
 	};
-
 
 }

@@ -1,0 +1,17 @@
+{
+	"time_sec": 60.0,
+	"hz": {
+		"avionics": 60.0,
+		"estimation": 60.0,
+		"control": 100.0
+	},
+	"enable": {
+		"trim": true,
+		"avionics": true,
+		"estimation": true,
+		"control": true,
+		"wind": true,
+		"verbose": true,
+		"rerun": true
+	}
+}

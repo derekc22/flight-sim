@@ -17,26 +17,34 @@
 
 namespace runner {
 
-    struct SimulationOptions {
+    struct CLIOptions {
         std::string aircraft_id;
+        bool data_bool;
+        bool analysis_bool;
+        std::string log_dir_path;
+        std::string data_dir_path;
+        std::string report_dir_path;
+    };
+
+    struct JSONOptions {
         int tf;
+        double avionics_hz;
+        double estimation_hz;
+        double control_hz;
         bool trim_bool;
-        bool sensor_bool;
+        bool avionics_bool;
         bool control_bool;
         bool estimation_bool;
         bool wind_bool;
         bool verbose_bool;
-        bool data_bool;
         bool rerun_bool;
-        std::string data_dir_path;
-        std::string report_dir_path;
-        bool analysis_bool;
     };
 
-    vehicles::Aircraft load(const std::string& aircraft_id, bool trim_bool);
+    vehicles::Aircraft load_vehicle(const std::string& aircraft_id, bool trim_bool);
 
     struct RunManager {
-        SimulationOptions options;
+        CLIOptions cli_options;
+        JSONOptions json_options;
         vehicles::Aircraft aircraft;
         io::DataManager data_manager;
         io::RerunManager rerun_manager;
@@ -63,7 +71,7 @@ namespace runner {
         connection::UDPIn udp_in;
         std::chrono::steady_clock::time_point next;
 
-        RunManager(SimulationOptions options);
+        RunManager(CLIOptions cli_options, JSONOptions json_options);
         ~RunManager();
 
         void cleanup();
