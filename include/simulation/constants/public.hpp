@@ -10,7 +10,8 @@ namespace constants {
     inline constexpr double pi = 3.14159265358979;
     inline constexpr double eps = 1e-9;
     inline constexpr double eps_strict = 1e-12;
-    inline constexpr double dt = 0.01;                  // [s]
+    inline constexpr double hz = 500;                   // [hz]
+    inline constexpr double dt = 1.0/hz;                // [s]
     inline constexpr double gamma_air = 1.4;            // [-]
     inline constexpr double R_air = 287.052874247;      // [J·kg^-1·K^-1]
     inline constexpr double lapse_rate = -0.0065;       // [K/m]

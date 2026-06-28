@@ -102,10 +102,10 @@ namespace io {
             stream_vector(rec, "wind/body", context.windB.data, xyz_labels);
         }
 
-        bool video_bool =  true;
-        if (video_bool && t % 100 == 0) {
-            cv::Mat frame = get_flightgear_camera();
-            stream_flightgear_camera(rec, frame);
-        }
+        // bool video_bool =  true;
+        // if (video_bool && t % 100 == 0) {
+        //     cv::Mat frame = get_flightgear_camera();
+        //     stream_flightgear_camera(rec, frame);
+        // }
     }
 }

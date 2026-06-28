@@ -67,6 +67,13 @@ namespace runner {
         return aircraft;
     }
 
+    void MultiRateAccumulator::step(const JSONOptions& json_options) {
+        avionics_acc += json_options.avionics_hz;
+        estimation_acc += json_options.estimation_hz;
+        guidance_acc += json_options.guidance_hz;
+        control_acc += json_options.control_hz;
+    }
+
     RunManager::RunManager(CLIOptions cli_options, JSONOptions json_options) :
         cli_options(cli_options),
         json_options(json_options),
@@ -76,7 +83,7 @@ namespace runner {
         data_manager(json_options.tf, cli_options.data_bool, json_options.control_bool, json_options.avionics_bool, json_options.estimation_bool, json_options.wind_bool),
         rerun_manager(json_options.rerun_bool, json_options.control_bool, json_options.avionics_bool, json_options.estimation_bool, json_options.wind_bool),
         // create analysis manager
-        analysis_manager(cli_options.data_bool, cli_options.analysis_bool, json_options.trim_bool),
+        analysis_manager{.data_bool=cli_options.data_bool, .analysis_bool=cli_options.analysis_bool, .trim_bool=json_options.trim_bool},
         // initialize udp connections
         udp_out(5510),
         udp_in("127.0.0.1", 5511),
@@ -227,81 +234,101 @@ namespace runner {
 
         // use sensors
         if (options.avionics_bool) {
+            if (acc.avionics_acc >= constants::hz) {
+                // aggregate ground truth data
+                avionics::MeasurementGroundTruth meas_gt = avionics::build_measurement_gt(
+                    Xt,
+                    XEt,
+                    aero_t,
+                    atm_t,
+                    geo_t,
+                    mass,
+                    windB,
+                    WB_net_t_1
+                );
 
-            // aggregate ground truth data
-            avionics::MeasurementGroundTruth meas_gt = avionics::build_measurement_gt(
-                Xt,
-                XEt,
-                aero_t,
-                atm_t,
-                geo_t,
-                mass,
-                windB,
-                WB_net_t_1
-            );
+                // step avionics
+                avionics::MeasurementCache meas = avionics_properties.step(meas_gt);
 
-            // step avionics
-            avionics::MeasurementCache meas = avionics_properties.step(meas_gt);
+                // overwrite local measurement state with sensor measurements
+                Yt = avionics::get_state_from_avionics(meas, avionics_properties.settings);
+                Yt_1 = Yt;
 
-            // overwrite local measurement state with sensor measurements
-            Yt = avionics::get_state_from_avionics(meas, avionics_properties.settings);
+                acc.avionics_acc -= constants::hz;
+            }
+            else Yt = Yt_1; // perform ZOH
         }
 
         // initialize estimated state to measurements
         dynamics::RigidBodyState Zt = Yt;
 
         if (options.estimation_bool) {
-            linearization::LocalLinearization estimator_lin_sol;
-            operating::OperatingPoint estimator_operating_point;
-            operating::OperatingConditions estimator_conditions;
+            if (acc.estimation_acc >= constants::hz) {
+                linearization::LocalLinearization estimator_lin_sol;
+                operating::OperatingPoint estimator_operating_point;
+                operating::OperatingConditions estimator_conditions;
 
-            if (estimation_properties.extended_kalman_estimator_type == estimation::EstimatorType::ExtendedKalmanFilter) {
-                dynamics::State_T<double> yt = dynamics::pack_state(Yt);
-                actuators::ActuatorInputs_T<double> actuator_inputs = actuators::pack_actuator_inputs(
-                    u_surface_actual_prev,
-                    u_propulsor_actual_prev
-                );
+                if (estimation_properties.extended_kalman_estimator_type == estimation::EstimatorType::ExtendedKalmanFilter) {
+                    dynamics::State_T<double> yt = dynamics::pack_state(Yt);
+                    actuators::ActuatorInputs_T<double> actuator_inputs = actuators::pack_actuator_inputs(
+                        u_surface_actual_prev,
+                        u_propulsor_actual_prev
+                    );
 
-                estimator_operating_point = operating::OperatingPoint {
-                    .state = yt,
-                    .input = actuator_inputs
-                };
+                    estimator_operating_point = operating::OperatingPoint {
+                        .state = yt,
+                        .input = actuator_inputs
+                    };
 
-                estimator_conditions = {
-                    .atm = atm_t,
-                    .windB = windB
-                };
+                    estimator_conditions = {
+                        .atm = atm_t,
+                        .windB = windB
+                    };
 
-            } else if (estimation_properties.linear_kalman_estimator_type == estimation::EstimatorType::LinearKalmanFilter) {
-                estimator_lin_sol = lin_sol;
-                estimator_operating_point = trim_sol.operating_point;
-            }
-
-            estimation::EstimatorInputs estimator_inputs {
-                .Yt = Yt,
-                .linear_kalman_estimator_input = estimation::LinearKalmanEstimatorInput {
-                    .Yt = Yt,
-                    .operating_point = estimator_operating_point,
-                    .lin_sol = estimator_lin_sol,
-                    .u_surface_actual_prev = u_surface_actual_prev,
-                    .u_propulsor_actual_prev = u_propulsor_actual_prev,
-                },
-                .extended_kalman_estimator_input = estimation::ExtendedKalmanEstimatorInput {
-                    .Yt = Yt,
-                    .operating_point = estimator_operating_point,
-                    .u_surface_actual_prev = u_surface_actual_prev,
-                    .u_propulsor_actual_prev = u_propulsor_actual_prev,
-                    .aircraft = aircraft,
-                    .conditions = estimator_conditions
+                } else if (estimation_properties.linear_kalman_estimator_type == estimation::EstimatorType::LinearKalmanFilter) {
+                    estimator_lin_sol = lin_sol;
+                    estimator_operating_point = trim_sol.operating_point;
                 }
-            };
 
-            // overwrite local estimated state with estimator result
-            Zt = estimation_properties.step(estimator_inputs, options.trim_bool).Zt;
+                estimation::EstimatorInputs estimator_inputs {
+                    .Yt = Yt,
+                    .linear_kalman_estimator_input = estimation::LinearKalmanEstimatorInput {
+                        .Yt = Yt,
+                        .operating_point = estimator_operating_point,
+                        .lin_sol = estimator_lin_sol,
+                        .u_surface_actual_prev = u_surface_actual_prev,
+                        .u_propulsor_actual_prev = u_propulsor_actual_prev,
+                    },
+                    .extended_kalman_estimator_input = estimation::ExtendedKalmanEstimatorInput {
+                        .Yt = Yt,
+                        .operating_point = estimator_operating_point,
+                        .u_surface_actual_prev = u_surface_actual_prev,
+                        .u_propulsor_actual_prev = u_propulsor_actual_prev,
+                        .aircraft = aircraft,
+                        .conditions = estimator_conditions
+                    }
+                };
+
+                // overwrite local estimated state with estimator result
+                Zt = estimation_properties.step(estimator_inputs, options.trim_bool).Zt;
+                Zt_1 = Zt;
+
+                acc.estimation_acc -= constants::hz;
+            }
+            else Zt = Zt_1; // peform ZOH
         }
 
         // specify guidance setpoint
-        guidance::GuidanceSetpoint setpoint = guidance_properties.step(t, options.tf);
+        guidance::GuidanceSetpoint setpoint{};
+        if (options.control_bool) {
+            if (acc.guidance_acc >= constants::hz) {
+                setpoint = guidance_properties.step(options.tf);
+                setpoint_t_1 = setpoint;
+
+                acc.guidance_acc -= constants::hz;
+            }
+            else setpoint = setpoint_t_1; // perform ZOH
+        }
 
         // specify control commands
         control::ControlOutput u_cmd{};
@@ -311,34 +338,40 @@ namespace runner {
         }
 
         if (options.control_bool) {
-            control::ControllerInputs controller_inputs {
-                .attitude_controller_input = control::AttitudeControllerInput{
-                    .Zt = Zt,
-                    .surface_actuators = surface_actuators,
-                    .setpoint = guidance::AttitudeSetpoint{ setpoint }
-                },
-                .velocity_controller_input = control::VelocityControllerInput{
-                    .Zt = Zt,
-                    .propulsor_actuators = propulsor_actuators,
-                    .setpoint = guidance::VelocitySetpoint{ setpoint }
-                },
-                .linear_quadratic_controller_input = control::LinearQuadraticControllerInput{
-                    .Zt = Zt,
-                    .u_sol_trim = trim_sol.operating_point.input,
-                    .surface_actuators = surface_actuators,
-                    .propulsor_actuators = propulsor_actuators,
-                    .A = lin_sol.A,
-                    .B = lin_sol.B,
-                    .setpoint = guidance::LinearQuadraticSetpoint{ setpoint }
-                },
-                .nonlinear_controller_input = control::NonlinearControllerInput{
-                    .Zt = Zt,
-                    .surface_actuators = surface_actuators,
-                    .propulsor_actuators = propulsor_actuators,
-                    .setpoint = guidance::NonlinearSetpoint{ setpoint }
-                }
-            };
-            u_cmd = control_properties.step(controller_inputs, options.trim_bool);
+            if (acc.control_acc >= constants::hz) {
+                control::ControllerInputs controller_inputs {
+                    .attitude_controller_input = control::AttitudeControllerInput{
+                        .Zt = Zt,
+                        .surface_actuators = surface_actuators,
+                        .setpoint = guidance::AttitudeSetpoint{ setpoint }
+                    },
+                    .velocity_controller_input = control::VelocityControllerInput{
+                        .Zt = Zt,
+                        .propulsor_actuators = propulsor_actuators,
+                        .setpoint = guidance::VelocitySetpoint{ setpoint }
+                    },
+                    .linear_quadratic_controller_input = control::LinearQuadraticControllerInput{
+                        .Zt = Zt,
+                        .u_sol_trim = trim_sol.operating_point.input,
+                        .surface_actuators = surface_actuators,
+                        .propulsor_actuators = propulsor_actuators,
+                        .A = lin_sol.A,
+                        .B = lin_sol.B,
+                        .setpoint = guidance::LinearQuadraticSetpoint{ setpoint }
+                    },
+                    .nonlinear_controller_input = control::NonlinearControllerInput{
+                        .Zt = Zt,
+                        .surface_actuators = surface_actuators,
+                        .propulsor_actuators = propulsor_actuators,
+                        .setpoint = guidance::NonlinearSetpoint{ setpoint }
+                    }
+                };
+                u_cmd = control_properties.step(controller_inputs, options.trim_bool);
+                u_cmd_t_1 = u_cmd;
+
+                acc.control_acc -= constants::hz;
+            }
+            else u_cmd = u_cmd_t_1; // perform ZOH
         }
 
         // apply fixed actuator inputs
@@ -397,6 +430,7 @@ namespace runner {
             .windB=windB
         };
 
+        // step rerun manager
         rerun_manager.step(t, data_context);
 
         // step data manager
@@ -443,6 +477,9 @@ namespace runner {
 
         // send packet
         udp_in.send(in_pkt);
+
+        // step accumulator
+        acc.step(options);
 
         // step timer by dt
         next += std::chrono::duration_cast<std::chrono::steady_clock::duration>(

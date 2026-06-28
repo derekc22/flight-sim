@@ -22,7 +22,7 @@ conda activate ame532
 Install C++ dependencies:
 ```bash
 # macOS
-brew install cmake pkgconf eigen cppad nlohmann-json slicot gcc googletest rerun-sdk opencv
+brew install pkgconf eigen cppad nlohmann-json slicot gcc googletest opencv
 ```
 Install MATLAB Runtime:
 ```
