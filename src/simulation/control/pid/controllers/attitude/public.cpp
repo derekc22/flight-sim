@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include "simulation/actuators/propulsor/public.hpp"
 #include "simulation/actuators/surface/public.hpp"
-#include "simulation/control/pid/controllers/axial/public.hpp"
+#include "simulation/control/pid/controllers/attitude/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/guidance/public.hpp"
 

@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "simulation/control/pid/controllers/axial/public.hpp"
+#include "simulation/control/pid/controllers/attitude/public.hpp"
 
 namespace control {
 

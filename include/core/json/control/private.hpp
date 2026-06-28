@@ -6,7 +6,7 @@
 #include "simulation/control/linear_quadratic/controllers/lqi/public.hpp"
 #include "simulation/control/linear_quadratic/controllers/lqr/public.hpp"
 #include "simulation/control/linear_quadratic/controllers/lqt/public.hpp"
-#include "simulation/control/pid/controllers/axial/public.hpp"
+#include "simulation/control/pid/controllers/attitude/public.hpp"
 #include "simulation/control/pid/controllers/damper/public.hpp"
 #include "simulation/control/pid/controllers/velocity/public.hpp"
 
