@@ -2,13 +2,13 @@
 #include <random>
 #include "simulation/aerodynamics/public.hpp"
 #include "simulation/atmospheric/public.hpp"
-#include "simulation/avionics/sensors/public.hpp"
+#include "simulation/sensors/private.hpp"
 #include "simulation/constants/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/geography/public.hpp"
 #include "simulation/util/public.hpp"
 
-namespace avionics {
+namespace sensors {
 
     Sensor::Sensor(double mean, double stddev, double bias, const Eigen::Vector3d& bias3d, double tau) : mean(mean), stddev(stddev), bias(bias), bias_3d(bias3d), dist(mean, stddev), tau(tau) {}
 

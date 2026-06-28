@@ -6,6 +6,6 @@
         }
     },
     "avionics": {
-        "use_gnss": false
+        "use_ins": true
     }
 }

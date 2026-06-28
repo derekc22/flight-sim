@@ -60,11 +60,11 @@ namespace json {
             if (!avionics_settings_json.is_object()) { 
                 throw std::runtime_error("json::validate_avionics_settings_json avionics must be an object"); 
             }
-            if (!avionics_settings_json.contains("use_gnss")) { 
-                throw std::runtime_error("json::validate_avionics_settings_json use_gnss must be specified"); 
+            if (!avionics_settings_json.contains("use_ins")) { 
+                throw std::runtime_error("json::validate_avionics_settings_json use_ins must be specified"); 
             }
-            if (!avionics_settings_json.at("use_gnss").is_boolean()) {
-                throw std::runtime_error("json::validate_avionics_settings_json use_gnss must be a boolean");
+            if (!avionics_settings_json.at("use_ins").is_boolean()) {
+                throw std::runtime_error("json::validate_avionics_settings_json use_ins must be a boolean");
             }
         }
         else { 
@@ -91,7 +91,7 @@ namespace json {
 
         validate_avionics_settings_json(config);
         const auto& avionics_settings_json = config.at("avionics");
-        settings_manager.avionics_settings.use_gnss = avionics_settings_json.at("use_gnss").get<bool>();
+        settings_manager.avionics_settings.use_ins = avionics_settings_json.at("use_ins").get<bool>();
 
         return settings_manager;
     }

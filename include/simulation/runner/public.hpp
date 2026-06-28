@@ -15,6 +15,11 @@
 #include "simulation/vehicles/public.hpp"
 #include "simulation/failures/public.hpp"
 #include "simulation/constants/public.hpp"
+#include "simulation/sensors/public.hpp"
+#include "simulation/avionics/public.hpp"
+#include "simulation/guidance/public.hpp"
+#include "simulation/control/public.hpp"
+#include "core/messages/public.hpp"
 
 namespace runner {
 
@@ -29,6 +34,7 @@ namespace runner {
 
     struct JSONOptions {
         int tf;
+        double sensor_hz;
         double avionics_hz;
         double estimation_hz;
         double guidance_hz;
@@ -44,6 +50,7 @@ namespace runner {
     };
 
     struct MultiRateAccumulator {
+        double sensor_acc = constants::hz;
         double avionics_acc = constants::hz;
         double estimation_acc = constants::hz;
         double guidance_acc = constants::hz;
@@ -76,6 +83,7 @@ namespace runner {
         };
 
         // initialize prior-tick values to perform ZOH
+        sensors::SensorMeasurements sensor_meas_t_1;
         dynamics::RigidBodyState Yt_1;
         dynamics::RigidBodyState Zt_1;
         guidance::GuidanceSetpoint setpoint_t_1;

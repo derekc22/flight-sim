@@ -19,6 +19,12 @@ namespace json {
 		}
 
 		if (enable_config.at("avionics").get<bool>()) {
+			if (!hz_config.contains("sensors")) {
+	            throw std::runtime_error("json::validate_hz_json avionics requires sensors hz to be specified"); 
+			}
+			if (hz_config.at("sensors").get<double>() > constants::hz) {
+	            throw std::runtime_error(std::format("json::validate_hz_json sensors hz cannot exceed simulation hz: {} hz", constants::hz)); 
+			}
 			if (!hz_config.contains("avionics")) {
 	            throw std::runtime_error("json::validate_hz_json avionics requires avionics hz to be specified"); 
 			}
@@ -37,17 +43,17 @@ namespace json {
 		}
 
 		if (enable_config.at("control").get<bool>()) {
+			if (!hz_config.contains("guidance")) {
+	            throw std::runtime_error("json::validate_hz_json control requires guidance hz to be specified"); 
+			}
+			if (hz_config.at("guidance").get<double>() > constants::hz) {
+	            throw std::runtime_error(std::format("json::validate_hz_json guidance hz cannot exceed simulation hz: {} hz", constants::hz)); 
+			}
 			if (!hz_config.contains("control")) {
 	            throw std::runtime_error("json::validate_hz_json control requires control hz to be specified"); 
 			}
 			if (hz_config.at("control").get<double>() > constants::hz) {
 	            throw std::runtime_error(std::format("json::validate_hz_json control hz cannot exceed simulation hz: {} hz", constants::hz)); 
-			}
-			if (!hz_config.contains("guidance")) {
-	            throw std::runtime_error("json::validate_hz_json guidance requires guidance hz to be specified"); 
-			}
-			if (hz_config.at("guidance").get<double>() > constants::hz) {
-	            throw std::runtime_error(std::format("json::validate_hz_json guidance hz cannot exceed simulation hz: {} hz", constants::hz)); 
 			}
 		}
 	}
@@ -77,6 +83,7 @@ namespace json {
 
 		return {
 			.tf=tf,
+			.sensor_hz = hz_json.at("sensors").get<double>(),
 			.avionics_hz = hz_json.at("avionics").get<double>(),
 			.estimation_hz = hz_json.at("estimation").get<double>(),
 			.guidance_hz = hz_json.at("guidance").get<double>(),
