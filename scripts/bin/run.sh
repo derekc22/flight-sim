@@ -12,21 +12,21 @@ USAGE: $0
   [-p PLOT_BOOL]
   [-m ANALYSIS_BOOL]
   -o <OUT_DIR>
-  [-X HEADLESS_BOOL]
-  [-Q QUICK_BOOL]
+  [-x HEADLESS_BOOL]
+  [-q QUICK_BOOL]
 EOF
 	exit "$exit_code"
 }
 
-while getopts "a:dpo:mXQh" opt; do
+while getopts "a:dpo:mxqh" opt; do
 	case "$opt" in
 		a) AIRCRAFT="$OPTARG" ;;
 		d) DATA_BOOL=1 ;;
 		p) PLOT_BOOL=1 ;;
 		o) OUT_DIR="$OPTARG" ;;
 		m) ANALYSIS_BOOL=1 ;;
-		X) HEADLESS_BOOL=1 ;;
-		Q) QUICK_BOOL=1 ;;
+		x) HEADLESS_BOOL=1 ;;
+		q) QUICK_BOOL=1 ;;
 			h) usage 0 ;;
 			?) usage 1 ;;
 	esac
@@ -68,9 +68,6 @@ cd "$PROJ_PATH" || exit 1
 	"$REPORT_DIR_PATH"
 
 if [ "$HEADLESS_BOOL" -eq 0 ]; then
-	"$PROJ_PATH/scripts/lib/write_in_xml.sh"
-	"$PROJ_PATH/scripts/lib/write_out_xml.sh"
-
 	"$PROJ_PATH/scripts/lib/launch.sh" "$AIRCRAFT" &
 	FG_PID=$!
 

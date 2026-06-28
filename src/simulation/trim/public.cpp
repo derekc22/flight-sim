@@ -185,8 +185,8 @@ namespace trim {
 
     control::ControlOutput set_control_inputs_from_trim(const TrimSolution& trim_sol) {
         actuators::SurfaceActuatorInputs_T<double> surface_actuator_cmd_trim{
-            .aileron_cmd = trim_sol.operating_point.input.aileron_cmd,
             .elevator_cmd = trim_sol.operating_point.input.elevator_cmd,
+            .aileron_cmd = trim_sol.operating_point.input.aileron_cmd,
             .rudder_cmd = trim_sol.operating_point.input.rudder_cmd,
         };
         actuators::PropulsorActuatorInputs_T<double> propulsor_actuator_cmd_trim{

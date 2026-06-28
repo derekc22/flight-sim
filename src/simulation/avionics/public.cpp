@@ -35,6 +35,11 @@ namespace avionics {
                         ) : sensors::TranslationalVelocityMeasurement{ sensor_gt.vB_BI.data },
             .T = curr_T_meas,
             .Mach = curr_Mach_meas,
+            .qIB = hist ?
+                   avionics.AHRS.compute(
+                      hist->qIB,
+                      sensor_meas.wB_BI
+                    ) : OrientationMeasurement{ avionics_gt.qIB.data },
             .Vinf = avionics.ADC.compute(curr_Mach_meas, curr_T_meas),
             .pressure_alt_BE = avionics.ADC.compute(sensor_meas.P),
             .alt_BE_dot = sensor_hist ?
@@ -43,12 +48,7 @@ namespace avionics {
                             sensor_hist->P,
                             curr_T_meas
                         ) : VerticalSpeedMeasurement{ avionics_gt.alt_BE_dot.data },
-            .rho = avionics.ADC.compute(sensor_meas.P, curr_T_meas),
-            .qIB = hist ?
-                   avionics.AHRS.compute(
-                      hist->qIB,
-                      sensor_meas.wB_BI
-                    ) : OrientationMeasurement{ avionics_gt.qIB.data }
+            .rho = avionics.ADC.compute(sensor_meas.P, curr_T_meas)
         };
 
         hist = avionics_meas;

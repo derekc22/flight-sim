@@ -6,3 +6,4 @@ dependencies:
   - numpy
   - matplotlib
   - cmake[version='<4']
+  - rerun-sdk

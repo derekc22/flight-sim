@@ -18,4 +18,5 @@ exec "$FG_PATH" \
 --disable-real-weather-fetch \
 --geometry=800x700 \
 --prop:/engines/engine[0]/rpm=2300 \
---httpd=8080
+--httpd=8080 \
+--data="$PROJ_PATH"/schema
