@@ -7,9 +7,9 @@
 namespace guidance {
 
     struct GuidanceSetpoint {
-        const dynamics::TranslationalVelocity vB_BI;
-        const dynamics::AngularVelocity wB_BI;
-        const dynamics::EulerAngles eulIB;
+        dynamics::TranslationalVelocity vB_BI;
+        dynamics::AngularVelocity wB_BI;
+        dynamics::EulerAngles eulIB;
     };
 
     struct AttitudeSetpoint : GuidanceSetpoint {};
@@ -45,7 +45,8 @@ namespace guidance {
     struct GuidanceProperties {
         TrajectoryType trajectory_type;
         Trajectory trajectory;
-        GuidanceSetpoint step(int t, int tf);
+        int k;
+        GuidanceSetpoint step(int tf);
     };
 
     GuidanceSetpointVector unpack_guidance_setpoint(const dynamics::RigidBodyState& Xt);

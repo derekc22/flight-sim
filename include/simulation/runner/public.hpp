@@ -14,6 +14,7 @@
 #include "simulation/trim/public.hpp"
 #include "simulation/vehicles/public.hpp"
 #include "simulation/failures/public.hpp"
+#include "simulation/constants/public.hpp"
 
 namespace runner {
 
@@ -30,7 +31,9 @@ namespace runner {
         int tf;
         double avionics_hz;
         double estimation_hz;
+        double guidance_hz;
         double control_hz;
+
         bool trim_bool;
         bool avionics_bool;
         bool control_bool;
@@ -38,6 +41,14 @@ namespace runner {
         bool wind_bool;
         bool verbose_bool;
         bool rerun_bool;
+    };
+
+    struct MultiRateAccumulator {
+        double avionics_acc = constants::hz;
+        double estimation_acc = constants::hz;
+        double guidance_acc = constants::hz;
+        double control_acc = constants::hz;
+        void step(const JSONOptions& json_options);
     };
 
     vehicles::Aircraft load_vehicle(const std::string& aircraft_id, bool trim_bool);
@@ -64,12 +75,21 @@ namespace runner {
             .M = dynamics::Moment{ constants::Zero3 } 
         };
 
+        // initialize prior-tick values to perform ZOH
+        dynamics::RigidBodyState Yt_1;
+        dynamics::RigidBodyState Zt_1;
+        guidance::GuidanceSetpoint setpoint_t_1;
+        control::ControlOutput u_cmd_t_1;
+
         // initialize udp out cache
         messages::ProcessedFlightGearMessageOut cached_msg_out{};
 
-       connection::UDPOut udp_out;
+        connection::UDPOut udp_out;
         connection::UDPIn udp_in;
         std::chrono::steady_clock::time_point next;
+
+        // initialize accumulator
+        MultiRateAccumulator acc{};
 
         RunManager(CLIOptions cli_options, JSONOptions json_options);
         ~RunManager();

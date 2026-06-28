@@ -18,16 +18,17 @@ namespace guidance {
         return out;
     }
 
-    GuidanceSetpoint GuidanceProperties::step(int t, int tf) {
+    GuidanceSetpoint GuidanceProperties::step(int tf) {
+        GuidanceSetpoint out;
         switch (trajectory_type) {
             case TrajectoryType::Regulation: {
-                return pack_guidance_setpoint(trajectory.data.row(0).transpose());
+                out = pack_guidance_setpoint(trajectory.data.row(0).transpose());
             }
             break;
 
             case TrajectoryType::Tracking: {
-                if (t >= trajectory.data.rows()) { t = trajectory.data.rows() - 1; }
-                return pack_guidance_setpoint(trajectory.data.row(t).transpose());
+                if (k >= trajectory.data.rows()) { k = trajectory.data.rows() - 1; }
+                out = pack_guidance_setpoint(trajectory.data.row(k).transpose());
             }
             break;
 
@@ -35,14 +36,18 @@ namespace guidance {
                 if (tf <= 1) { 
                     throw std::runtime_error("GuidanceProperties::step: tf <= 1 for interpolated trajectory"); 
                 }
-                GuidanceSetpointVector setpoint_t = ((trajectory.data.row(1) - trajectory.data.row(0)) * (static_cast<double>(t) / (tf - 1)) + trajectory.data.row(0)).transpose();
-                return pack_guidance_setpoint(setpoint_t);
+                GuidanceSetpointVector setpoint_t = ((trajectory.data.row(1) - trajectory.data.row(0)) * 
+                                                    (static_cast<double>(k) / (tf - 1)) + 
+                                                    trajectory.data.row(0)).transpose();
+                out = pack_guidance_setpoint(setpoint_t);
             }
             break;
 
             default:
                 throw std::runtime_error("control::step invalid trajectory type");
         }
+        ++k;
+        return out;
     }
 
 }

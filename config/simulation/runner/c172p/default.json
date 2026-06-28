@@ -3,6 +3,7 @@
 	"hz": {
 		"avionics": 60.0,
 		"estimation": 60.0,
+		"guidance": 20.0,
 		"control": 100.0
 	},
 	"enable": {

@@ -10,10 +10,6 @@
 
 namespace io {
 
-    AnalysisManager::AnalysisManager(bool data_bool, bool analysis_bool, bool trim_bool)
-        : data_bool(data_bool), analysis_bool(analysis_bool), trim_bool(trim_bool) {}
-
-
     void AnalysisManager::step(const AnalysisContext& context) {
         if (data_bool && analysis_bool) {
             aircraft_id = context.aircraft_id;

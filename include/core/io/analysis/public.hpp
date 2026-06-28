@@ -25,7 +25,5 @@ namespace io {
 
         void step(const AnalysisContext& context);
         void save(const std::string& data_dir_path, const std::string& report_dir_path);
-        AnalysisManager(bool data_bool, bool analysis_bool, bool trim_bool);
-
     };
 }
