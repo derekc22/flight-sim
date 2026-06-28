@@ -58,8 +58,8 @@ namespace control {
         return {
             .x = Zt.v.data(0),
             .x_des = setpoint.vB_BI.data(0),
-            .limit_max = limit_max_overall,
-            .limit_min = limit_min_overall
+            .limit_min = limit_min_overall,
+            .limit_max = limit_max_overall
         };
     }
 

@@ -21,9 +21,13 @@ conda activate ame532
 
 Install C++ dependencies:
 ```bash
+# Ubuntu
+sudo apt install pkg-config libeigen3-dev cppad nlohmann-json3-dev libslicot-dev gcc g++ libgtest-dev libopencv-dev
+
 # macOS
 brew install pkgconf eigen cppad nlohmann-json slicot gcc googletest opencv
 ```
+
 Install MATLAB Runtime:
 ```
 https://www.mathworks.com/products/compiler/matlab-runtime.html
@@ -42,7 +46,6 @@ https://www.mathworks.com/products/compiler/matlab-runtime.html
 
 Update the following environment variables in `.env` with the corresponding paths on your machine:
 - `PROJ_PATH`: Project root
-- `PRTCL_PATH`: FlightGear `Protocol` directory
 - `FG_PATH`: FlightGear executable
 - `MATLAB_PATH`: MATLAB executable
   

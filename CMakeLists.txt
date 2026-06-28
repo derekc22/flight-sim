@@ -65,7 +65,7 @@ file(GLOB_RECURSE TEST_SOURCES CONFIGURE_DEPENDS "tests/*.cpp")
 set(SLICOT_CARE_WRAPPER_OBJ ${CMAKE_CURRENT_BINARY_DIR}/slicot_care_wrapper.o)
 add_custom_command(
     OUTPUT ${SLICOT_CARE_WRAPPER_OBJ}
-    COMMAND ${GFORTRAN_EXECUTABLE} -c ${CMAKE_SOURCE_DIR}/src/simulation/control/linear_quadratic/slicot_care_wrapper.f90 -o ${SLICOT_CARE_WRAPPER_OBJ}
+    COMMAND ${GFORTRAN_EXECUTABLE} -ffree-line-length-none -c ${CMAKE_SOURCE_DIR}/src/simulation/control/linear_quadratic/slicot_care_wrapper.f90 -o ${SLICOT_CARE_WRAPPER_OBJ}
     DEPENDS ${CMAKE_SOURCE_DIR}/src/simulation/control/linear_quadratic/slicot_care_wrapper.f90
     VERBATIM
 )
