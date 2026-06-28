@@ -3,7 +3,7 @@
 #include <Eigen/Dense>
 #include <nlohmann/json.hpp>
 #include "core/json/public.hpp"
-#include "simulation/avionics/public.hpp"
+#include "simulation/sensors/public.hpp"
 #include "simulation/constants/public.hpp"
 
 namespace json {
@@ -17,7 +17,7 @@ namespace json {
         double bias = has_vector_bias ? 0.0 : sensor_json.at("bias").get<double>();
         Eigen::Vector3d bias_3d = has_vector_bias ? parse_Vector3d(sensor_json.at("bias")) : constants::Zero3;
 
-        SensorType sensor{ avionics::Sensor(
+        SensorType sensor{ sensors::Sensor(
             sensor_json.at("mean").get<double>(),
             sensor_json.at("stddev").get<double>(),
             bias,

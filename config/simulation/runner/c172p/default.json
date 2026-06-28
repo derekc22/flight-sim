@@ -1,8 +1,9 @@
 {
 	"time_sec": 60.0,
 	"hz": {
-		"avionics": 60.0,
-		"estimation": 60.0,
+		"sensors": 500.0,
+		"avionics": 100.0,
+		"estimation": 100.0,
 		"guidance": 20.0,
 		"control": 100.0
 	},

@@ -25,7 +25,7 @@
 #include "core/connection/public.hpp"
 #include "core/json/actuators/public.hpp"
 #include "core/json/aerodynamics/public.hpp"
-#include "core/json/avionics/public.hpp"
+#include "core/json/sensors/public.hpp"
 #include "core/json/control/public.hpp"
 #include "core/json/estimation/public.hpp"
 #include "core/json/guidance/public.hpp"
@@ -50,7 +50,8 @@ namespace runner {
             json::parse_aerodynamics_config(structural_properties),
             actuator_properties,
             control_properties,
-            json::parse_avionics_config(),
+            json::parse_sensors_config(),
+            avionics::AvionicsProperties{},
             json::parse_guidance_config(control_properties),
             json::parse_estimation_config()
         };
@@ -68,6 +69,7 @@ namespace runner {
     }
 
     void MultiRateAccumulator::step(const JSONOptions& json_options) {
+        sensor_acc += json_options.sensor_hz;
         avionics_acc += json_options.avionics_hz;
         estimation_acc += json_options.estimation_hz;
         guidance_acc += json_options.guidance_hz;
@@ -122,6 +124,7 @@ namespace runner {
         estimation::EstimationProperties& estimation_properties = aircraft.estimation_properties;
         actuators::ActuatorProperties& actuator_properties = aircraft.actuator_properties;
         guidance::GuidanceProperties& guidance_properties = aircraft.guidance_properties;
+        sensors::SensorProperties& sensor_properties = aircraft.sensor_properties;
         avionics::AvionicsProperties& avionics_properties = aircraft.avionics_properties;
         JSONOptions& options = json_options; 
 
@@ -232,26 +235,52 @@ namespace runner {
         // initialize measurements to ground truth
         dynamics::RigidBodyState Yt = Xt;
 
-        // use sensors
+        // aggregate ground truth sensor data
+        sensors::SensorGroundTruth sensor_gt = sensors::build_sensor_gt(
+            Xt,
+            XEt,
+            aero_t,
+            atm_t,
+            mass,
+            WB_net_t_1
+        );
+
+        // use sensors and avionics
+        sensors::SensorMeasurements sensor_meas;
+
+        if (options.avionics_bool) {
+            if (acc.sensor_acc >= constants::hz) {
+
+                // step sensors
+                sensor_meas = sensor_properties.step(sensor_gt);
+                sensor_meas_t_1 = sensor_meas;
+
+                acc.sensor_acc -= constants::hz;
+            }
+            else sensor_meas = sensor_meas_t_1; // perform ZOH
+        }
+
         if (options.avionics_bool) {
             if (acc.avionics_acc >= constants::hz) {
-                // aggregate ground truth data
-                avionics::MeasurementGroundTruth meas_gt = avionics::build_measurement_gt(
+                // aggregate ground truth avionics data
+                avionics::AvionicsGroundTruth avionics_gt = avionics::build_avionics_gt(
                     Xt,
                     XEt,
                     aero_t,
                     atm_t,
-                    geo_t,
-                    mass,
-                    windB,
-                    WB_net_t_1
+                    geo_t
                 );
 
                 // step avionics
-                avionics::MeasurementCache meas = avionics_properties.step(meas_gt);
+                avionics::AvionicsMeasurements avionics_meas = avionics_properties.step(
+                    sensor_meas, 
+                    sensor_properties.hist,
+                    sensor_gt,
+                    avionics_gt
+                );
 
                 // overwrite local measurement state with sensor measurements
-                Yt = avionics::get_state_from_avionics(meas, avionics_properties.settings);
+                Yt = avionics::get_state_from_avionics(sensor_meas, avionics_meas, avionics_properties.settings);
                 Yt_1 = Yt;
 
                 acc.avionics_acc -= constants::hz;

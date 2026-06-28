@@ -7,7 +7,7 @@
 #include "simulation/dynamics/public.hpp"
 #include "simulation/geography/public.hpp"
 
-namespace avionics {
+namespace sensors {
 
     // directly measured
     struct AngleOfAttackMeasurement : aerodynamics::AngleOfAttack {};
@@ -29,17 +29,7 @@ namespace avionics {
     struct HeadingMeasurement : geography::Heading {};
 
 
-    struct SensorMeasurements {
-        AngleOfAttackMeasurement alpha;
-        TranslationalAccelerationMeasurement fB;
-        AngularVelocityMeasurement wB_BI;
-        StagnationAirPressureMeasurement P0;
-        StaticAirPressureMeasurement P;
-        StagnationAirTemperatureMeasurement T0;
-        PositionMeasurement pI_BI_gnss;
-        TranslationalVelocityMeasurement vB_BI_gnss;
-        HeadingMeasurement heading_BE;
-    };
+
 
     /** @note For simplicity, the internal dynamics of some sensors will remain unmodelled 
         Instead, these sensors will simply output a noised, lagged version of the corresponding ground-truth quantity

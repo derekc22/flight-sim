@@ -1,7 +1,7 @@
 #include <stdexcept>
 #include <nlohmann/json.hpp>
-#include "core/json/avionics/private.hpp"
-#include "simulation/avionics/public.hpp"
+#include "core/json/sensors/private.hpp"
+#include "simulation/sensors/public.hpp"
 
 namespace json {
 
@@ -30,16 +30,16 @@ namespace json {
         }
     }
 
-    avionics::AvionicsProperties parse_avionics_properties(const nlohmann::json& config) {
-        avionics::AvionicsSensors sensors = {
-            .aoa_vane = parse_sensor<avionics::AngleOfAttackVane>(config, "angle_of_attack_vane"),
-            .accelerometer = parse_sensor<avionics::Accelerometer>(config, "accelerometer"),
-            .gyro = parse_sensor<avionics::Gyroscope>(config, "gyroscope"),
-            .pitot_tube = parse_sensor<avionics::PitotTube>(config, "pitot_tube"),
-            .static_port = parse_sensor<avionics::StaticPort>(config, "static_port"),
-            .tat_probe = parse_sensor<avionics::TotalAirTemperatureProbe>(config, "total_air_temperature_probe"),
-            .gnss = parse_sensor<avionics::GNSSReceiver>(config, "gnss_receiver"),
-            .magnetometer = parse_sensor<avionics::Magnetometer>(config, "magnetometer"),
+    sensors::SensorProperties parse_sensor_properties(const nlohmann::json& config) {
+        sensors::Sensors sensors = {
+            .aoa_vane = parse_sensor<sensors::AngleOfAttackVane>(config, "angle_of_attack_vane"),
+            .accelerometer = parse_sensor<sensors::Accelerometer>(config, "accelerometer"),
+            .gyro = parse_sensor<sensors::Gyroscope>(config, "gyroscope"),
+            .pitot_tube = parse_sensor<sensors::PitotTube>(config, "pitot_tube"),
+            .static_port = parse_sensor<sensors::StaticPort>(config, "static_port"),
+            .tat_probe = parse_sensor<sensors::TotalAirTemperatureProbe>(config, "total_air_temperature_probe"),
+            .gnss = parse_sensor<sensors::GNSSReceiver>(config, "gnss_receiver"),
+            .magnetometer = parse_sensor<sensors::Magnetometer>(config, "magnetometer"),
         };
 
         return { .sensors = sensors };
