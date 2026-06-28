@@ -11,7 +11,7 @@
 		"estimation": true,
 		"control": true,
 		"wind": true,
-		"verbose": true,
+		"verbose": false,
 		"rerun": true
 	}
 }

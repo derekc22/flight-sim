@@ -23,6 +23,13 @@ FetchContent_Declare(rerun_sdk
 )
 FetchContent_MakeAvailable(rerun_sdk)
 
+# Fetch spdlog
+FetchContent_Declare(spdlog
+    GIT_REPOSITORY https://github.com/gabime/spdlog.git
+    GIT_TAG v1.17.0
+)
+FetchContent_MakeAvailable(spdlog)
+
 # Find GoogleTest
 find_package(GTest CONFIG REQUIRED)
 include(GoogleTest)
@@ -81,16 +88,16 @@ add_executable(${PROJECT_NAME} src/main.cpp)
 target_include_directories(flight_sim_core PRIVATE ${CMAKE_SOURCE_DIR}/include ${OpenCV_INCLUDE_DIRS})
 target_include_directories(flight_sim_cv2 PRIVATE ${CMAKE_SOURCE_DIR}/include ${OpenCV_INCLUDE_DIRS})
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include)
-target_link_libraries(flight_sim_core PRIVATE control_care Eigen3::Eigen PkgConfig::CPPAD nlohmann_json::nlohmann_json rerun_sdk ${OpenCV_LIBS})
+target_link_libraries(flight_sim_core PRIVATE control_care Eigen3::Eigen PkgConfig::CPPAD nlohmann_json::nlohmann_json rerun_sdk spdlog::spdlog ${OpenCV_LIBS})
 target_link_libraries(flight_sim_cv2 PRIVATE ${OpenCV_LIBS})
 
 # Link Eigen, CppAD/Ipopt, and nlohmann_json to the executable
-target_link_libraries(${PROJECT_NAME} flight_sim_core flight_sim_cv2 control_care Eigen3::Eigen PkgConfig::CPPAD nlohmann_json::nlohmann_json rerun_sdk)
+target_link_libraries(${PROJECT_NAME} flight_sim_core flight_sim_cv2 control_care Eigen3::Eigen PkgConfig::CPPAD nlohmann_json::nlohmann_json rerun_sdk spdlog::spdlog)
 
 # Test executable
 add_executable(flight_sim_tests ${TEST_SOURCES})
 target_include_directories(flight_sim_tests SYSTEM BEFORE PRIVATE ${GTEST_INCLUDE_DIRS})
 target_include_directories(flight_sim_tests PRIVATE ${CMAKE_SOURCE_DIR}/include)
-target_link_libraries(flight_sim_tests PRIVATE flight_sim_core control_care Eigen3::Eigen PkgConfig::CPPAD nlohmann_json::nlohmann_json rerun_sdk GTest::gtest GTest::gtest_main)
+target_link_libraries(flight_sim_tests PRIVATE flight_sim_core control_care Eigen3::Eigen PkgConfig::CPPAD nlohmann_json::nlohmann_json rerun_sdk spdlog::spdlog GTest::gtest GTest::gtest_main)
 set_target_properties(flight_sim_tests PROPERTIES BUILD_RPATH "$<TARGET_FILE_DIR:GTest::gtest>;$<TARGET_FILE_DIR:GTest::gtest_main>")
 gtest_discover_tests(flight_sim_tests)

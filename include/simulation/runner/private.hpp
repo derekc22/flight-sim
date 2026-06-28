@@ -6,6 +6,8 @@
 
 namespace runner {
 
+    void print_vec(const char* name, const Eigen::Vector3d& x, const char* unit);
+
     void print_state(
         int t,
         const dynamics::RigidBodyState& Xt,
