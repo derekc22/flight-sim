@@ -4,7 +4,7 @@
 
 namespace io {
 
-	cv::Mat get_flightgear_camera() {
+	cv::Mat get_flightgear_camera(int width, int height) {
 		cv::VideoCapture cap("http://127.0.0.1:8080/screenshot");
 
 		if (!cap.isOpened()) {
@@ -18,7 +18,10 @@ namespace io {
 			throw std::runtime_error("Received empty frame");
 		}
 
-		return frame;
+		cv::Mat resized;
+		cv::resize(frame, resized, cv::Size(width, height), 0, 0, cv::INTER_AREA);
+
+		return resized;
 	}
 
 }

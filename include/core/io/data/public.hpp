@@ -20,16 +20,16 @@ namespace io {
     };
 
     struct DataContext {
-        const dynamics::RigidBodyState& Xt;
-        const dynamics::RigidBodyState& Yt;
-        const dynamics::RigidBodyState& Zt;
-        const actuators::SurfaceActuatorInputs_T<double>& u_surface;
-        const actuators::PropulsorActuatorInputs_T<double>& u_propulsor;
-        const dynamics::Wrench& WB_net;
-        const dynamics::Wrench& WB_aero;
-        const dynamics::Wrench& WB_propulsive;
-        const guidance::GuidanceSetpoint& setpoint;
-        const atmospheric::Wind& windB;
+        dynamics::RigidBodyState Xt;
+        dynamics::RigidBodyState Yt;
+        dynamics::RigidBodyState Zt;
+        actuators::SurfaceActuatorInputs_T<double> u_surface;
+        actuators::PropulsorActuatorInputs_T<double> u_propulsor;
+        dynamics::Wrench WB_net;
+        dynamics::Wrench WB_aero;
+        dynamics::Wrench WB_propulsive;
+        guidance::GuidanceSetpoint setpoint;
+        atmospheric::Wind windB;
     };
 
     struct DataManager {

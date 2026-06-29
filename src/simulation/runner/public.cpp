@@ -74,6 +74,7 @@ namespace runner {
         estimation_acc += json_options.estimation_hz;
         guidance_acc += json_options.guidance_hz;
         control_acc += json_options.control_hz;
+        logging_acc += json_options.logging_hz;
     }
 
     RunManager::RunManager(CLIOptions cli_options, JSONOptions json_options) :
@@ -83,7 +84,7 @@ namespace runner {
         aircraft(load_vehicle(cli_options.aircraft_id, json_options.trim_bool)),
         // create data manager
         data_manager(json_options.tf, cli_options.data_bool, json_options.control_bool, json_options.avionics_bool, json_options.estimation_bool, json_options.wind_bool),
-        rerun_manager(json_options.rerun_bool, json_options.control_bool, json_options.avionics_bool, json_options.estimation_bool, json_options.wind_bool),
+        rerun_manager(json_options.rerun_bool, json_options.control_bool, json_options.avionics_bool, json_options.estimation_bool, json_options.wind_bool, json_options.logging_hz),
         // create analysis manager
         analysis_manager{.data_bool=cli_options.data_bool, .analysis_bool=cli_options.analysis_bool, .trim_bool=json_options.trim_bool},
         // initialize udp connections
@@ -459,15 +460,18 @@ namespace runner {
             .windB=windB
         };
 
-        // step rerun manager
-        rerun_manager.step(t, data_context);
-
         // step data manager
         data_manager.step(t, data_context);
 
-        // print state
-        if (options.verbose_bool) {
-            print_state(t, Xt, geo_t, aero_t, windB);
+        if (acc.logging_acc >= constants::hz) {
+            // step rerun manager
+            rerun_manager.step(t, data_context);
+
+            // print state
+            if (options.verbose_bool) {
+                print_state(t, Xt, geo_t, aero_t, windB);
+            }
+            acc.logging_acc -= constants::hz;
         }
 
         // compute next-step rigid body state
