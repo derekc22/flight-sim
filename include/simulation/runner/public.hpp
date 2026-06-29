@@ -45,6 +45,8 @@ namespace runner {
         bool control_bool;
         bool estimation_bool;
         bool wind_bool;
+
+        double logging_hz;
         bool verbose_bool;
         bool rerun_bool;
     };
@@ -55,6 +57,7 @@ namespace runner {
         double estimation_acc = constants::hz;
         double guidance_acc = constants::hz;
         double control_acc = constants::hz;
+        double logging_acc = constants::hz;
         void step(const JSONOptions& json_options);
     };
 

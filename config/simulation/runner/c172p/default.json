@@ -1,19 +1,26 @@
 {
-	"time_sec": 60.0,
-	"hz": {
-		"sensors": 500.0,
-		"avionics": 100.0,
-		"estimation": 100.0,
-		"guidance": 20.0,
-		"control": 100.0
+	"simulation": {
+		"time_sec": 60.0,
+		"hz": {
+			"sensors": 500.0,
+			"avionics": 100.0,
+			"estimation": 100.0,
+			"guidance": 20.0,
+			"control": 100.0
+		},
+		"enable": {
+			"trim": true,
+			"avionics": true,
+			"estimation": true,
+			"control": true,
+			"wind": true
+		}
 	},
-	"enable": {
-		"trim": true,
-		"avionics": true,
-		"estimation": true,
-		"control": true,
-		"wind": true,
-		"verbose": false,
-		"rerun": true
+	"logging": {
+		"hz": 15.0,
+		"enable": {
+			"verbose": false,
+			"rerun": true
+		}
 	}
 }

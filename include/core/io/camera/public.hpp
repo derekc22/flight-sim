@@ -3,5 +3,6 @@
 
 namespace io {
 
-    cv::Mat get_flightgear_camera();
+	cv::Mat get_flightgear_camera(int width, int height);
+
 }

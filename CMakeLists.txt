@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Find Eigen3
 find_package(Eigen3 CONFIG REQUIRED)
+find_package(Threads REQUIRED)
 
 # Find pkg-config packages
 find_package(PkgConfig REQUIRED)
@@ -87,8 +88,8 @@ add_executable(${PROJECT_NAME} src/main.cpp)
 # Add include directory
 target_include_directories(flight_sim_core PRIVATE ${CMAKE_SOURCE_DIR}/include ${OpenCV_INCLUDE_DIRS})
 target_include_directories(flight_sim_cv2 PRIVATE ${CMAKE_SOURCE_DIR}/include ${OpenCV_INCLUDE_DIRS})
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include)
-target_link_libraries(flight_sim_core PRIVATE control_care Eigen3::Eigen PkgConfig::CPPAD nlohmann_json::nlohmann_json rerun_sdk spdlog::spdlog ${OpenCV_LIBS})
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include ${OpenCV_INCLUDE_DIRS})
+target_link_libraries(flight_sim_core PRIVATE control_care Eigen3::Eigen PkgConfig::CPPAD nlohmann_json::nlohmann_json rerun_sdk spdlog::spdlog Threads::Threads ${OpenCV_LIBS})
 target_link_libraries(flight_sim_cv2 PRIVATE ${OpenCV_LIBS})
 
 # Link Eigen, CppAD/Ipopt, and nlohmann_json to the executable
@@ -97,7 +98,7 @@ target_link_libraries(${PROJECT_NAME} flight_sim_core flight_sim_cv2 control_car
 # Test executable
 add_executable(flight_sim_tests ${TEST_SOURCES})
 target_include_directories(flight_sim_tests SYSTEM BEFORE PRIVATE ${GTEST_INCLUDE_DIRS})
-target_include_directories(flight_sim_tests PRIVATE ${CMAKE_SOURCE_DIR}/include)
+target_include_directories(flight_sim_tests PRIVATE ${CMAKE_SOURCE_DIR}/include ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(flight_sim_tests PRIVATE flight_sim_core control_care Eigen3::Eigen PkgConfig::CPPAD nlohmann_json::nlohmann_json rerun_sdk spdlog::spdlog GTest::gtest GTest::gtest_main)
 set_target_properties(flight_sim_tests PROPERTIES BUILD_RPATH "$<TARGET_FILE_DIR:GTest::gtest>;$<TARGET_FILE_DIR:GTest::gtest_main>")
 gtest_discover_tests(flight_sim_tests)
