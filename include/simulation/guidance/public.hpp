@@ -45,7 +45,7 @@ namespace guidance {
     struct GuidanceProperties {
         TrajectoryType trajectory_type;
         Trajectory trajectory;
-        int k;
+        int k = 0;
         GuidanceSetpoint step(int tf);
     };
 
