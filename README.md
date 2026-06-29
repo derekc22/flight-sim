@@ -49,7 +49,7 @@ Update the following environment variables in `.env` with the corresponding path
 - `FG_PATH`: FlightGear executable
 - `MATLAB_PATH`: MATLAB executable
   
-Update the following JSON configuration file paths in `config/run.json`:
+Customize the following JSON configuration file paths in `config/run.json`:
 - `initialization_config`: Initial conditions
 - `structural_config`: Structural properties
 - `aerodynamics_config`: Aerodynamic properties
@@ -61,7 +61,7 @@ Update the following JSON configuration file paths in `config/run.json`:
 - `settings_config`: Module settings
 - `runner_config`: Runner options
 
-Update the JSON configuration file paths in `config/analyze.json`
+Customize the JSON configuration file paths in `config/analyze.json`
   
 ## Run
 

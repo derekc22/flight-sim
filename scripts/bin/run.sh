@@ -41,7 +41,7 @@ done
 : "${QUICK_BOOL:=0}"
 
 DATA_DIR_PATH="$PROJ_PATH/results/data/$OUT_DIR"
-LOG_DIR_PATH="$PROJ_PATH/results/logs/$LOG_DIR"
+LOG_DIR_PATH="$PROJ_PATH/results/logs/$OUT_DIR"
 PLOT_DIR_PATH="$PROJ_PATH/results/figures/$OUT_DIR"
 REPORT_DIR_PATH="$PROJ_PATH/results/reports/$OUT_DIR"
 
