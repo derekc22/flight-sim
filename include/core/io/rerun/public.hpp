@@ -12,10 +12,10 @@
 
 namespace io {
 
-    struct RerunFrame {
+    struct RerunContext {
         int t;
-        DataContext context;
-        cv::Mat camera_frame;
+        DataContext data_context;
+        cv::Mat image;
     };
 
     struct RerunManager {
@@ -27,16 +27,16 @@ namespace io {
 
         double logging_hz;
         std::size_t max_traj_size = static_cast<std::size_t>(30.0 * logging_hz);  // 30 seconds
-        std::size_t max_queue_size = static_cast<std::size_t>(2.0 * logging_hz);    // 2 seconds
+        std::size_t max_queue_size = static_cast<std::size_t>(2.0 * logging_hz);  // 2 seconds
 
         // in pixels
-        int img_width = 300;
-        int img_height = 300;
+        int image_width = 500;
+        int image_height = 500;
 
         rerun::RecordingStream rec;
         std::vector<rerun::Vec3D> trajectory;
 
-        std::deque<RerunFrame> frame_queue;
+        std::deque<RerunContext> context_queue;
         std::mutex queue_mutex;
         std::condition_variable queue_cv;
         std::thread worker;
@@ -45,10 +45,10 @@ namespace io {
         std::thread camera_worker;
         std::atomic_bool stop_camera_worker = false;
         std::mutex camera_mutex;
-        cv::Mat latest_camera_frame;
+        cv::Mat latest_image;
 
-        void step(int t, const DataContext& context);
-        void stream_frame(const RerunFrame& sample);
+        void step(int t, const DataContext& data_context);
+        void stream_context(const RerunContext& sample);
         void run_worker();
         void run_camera_worker();
 

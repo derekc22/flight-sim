@@ -1,8 +1,8 @@
 #include <filesystem>
 #include <fstream>
-#include <iostream>
 #include <stdexcept>
 #include <string>
+#include <spdlog/spdlog.h>
 #include <nlohmann/json.hpp>
 #include "core/json/private.hpp"
 
@@ -23,7 +23,9 @@ namespace json {
 
         file_json << config.dump(4) << "\n";
         file_json.close();
-        std::cout << "File saved successfully to " << file_path.string() << std::endl;
+
+        std::string log_str = "File saved successfully to " + file_path.string();
+        spdlog::info(log_str);
     }
 
 }

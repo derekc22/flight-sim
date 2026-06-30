@@ -1,9 +1,14 @@
 #include <string>
+#include <spdlog/spdlog.h>
 #include "simulation/runner/public.hpp"
 #include "core/json/runner/public.hpp"
 
 int main(int argc, char* argv[]) {
-    if (argc != 7) { return 1; }
+    int nargin = 7;
+    if (argc != nargin) { 
+        spdlog::error("Invalid arguments: expected {}, got {}", nargin-1, argc-1);
+        return 1; 
+    }
 
     std::string aircraft_id = argv[1];
     bool data_bool = std::stoi(argv[2]) == 1;

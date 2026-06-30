@@ -23,5 +23,5 @@ namespace io {
     void stream_body_arrow(rerun::RecordingStream& rec, const std::string& path, const Eigen::Vector3d& data, double scale, const rerun::Color& color, const std::string& label);
     void stream_vehicle_model(rerun::RecordingStream& rec);
     void stream_vehicle_trajectory(rerun::RecordingStream& rec, const std::vector<rerun::Vec3D>& trajectory);
-    void stream_flightgear_camera(rerun::RecordingStream& rec, const cv::Mat& frame);
+    void stream_flightgear_image(rerun::RecordingStream& rec, const cv::Mat& image);
 }

@@ -106,16 +106,16 @@ namespace io {
         );
     }
 
-    void stream_flightgear_camera(rerun::RecordingStream& rec, const cv::Mat& frame) {
-        if (frame.empty()) {
-            throw std::runtime_error("stream_flightgear_camera: empty frame");
+    void stream_flightgear_image(rerun::RecordingStream& rec, const cv::Mat& image) {
+        if (image.empty()) {
+            throw std::runtime_error("stream_flightgear_image: empty image");
         }
 
-        if (frame.type() != CV_8UC3) {
-            throw std::runtime_error("stream_flightgear_camera: expected CV_8UC3 BGR image");
+        if (image.type() != CV_8UC3) {
+            throw std::runtime_error("stream_flightgear_image: expected CV_8UC3 BGR image");
         }
 
-        const cv::Mat img = frame.isContinuous() ? frame : frame.clone();
+        const cv::Mat img = image.isContinuous() ? image : image.clone();
 
         rec.log(
             "flightgear/camera",

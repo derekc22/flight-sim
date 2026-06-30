@@ -2,6 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime
 from plot_util import init_plot
+import logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="[%(levelname)s] %(message)s"
+)
 
 def main():
 
@@ -31,7 +36,7 @@ def main():
     plt.savefig(save_path)
     plt.close()
 
-    print(f"File saved successfully to {save_path}")
+    logging.info(f"File saved successfully to {save_path}")
 
 if __name__ == "__main__":
     main()

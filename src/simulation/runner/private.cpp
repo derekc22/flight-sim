@@ -1,6 +1,7 @@
 #include <iomanip>
-#include <iostream>
+#include <sstream>
 #include <Eigen/Dense>
+#include <spdlog/spdlog.h>
 #include "simulation/runner/private.hpp"
 #include "simulation/constants/public.hpp"
 #include "simulation/dynamics/public.hpp"
@@ -11,17 +12,22 @@
 
 namespace runner {
 
-    void print_vec(const char* name, const Eigen::Vector3d& x, const char* unit) {
-        std::cout
+    std::string print_vec(const char* name, const Eigen::Vector3d& x, const char* unit) {
+        std::ostringstream ss;
+        ss << std::fixed << std::setprecision(3);
+
+        ss
             << std::left << std::setw(8) << name
             << "[ "
             << std::right << std::setw(10) << x.x() << ", "
             << std::right << std::setw(10) << x.y() << ", "
             << std::right << std::setw(10) << x.z()
             << " ] " << unit << '\n';
+
+        return ss.str();
     }
 
-    void print_state(
+    void log_state(
         int t,
         const dynamics::RigidBodyState& Xt,
         const geography::GeographicState& geo,
@@ -38,16 +44,17 @@ namespace runner {
         const Eigen::Vector3d& g = geography::gB(Xt.q).data;
         const Eigen::Vector3d& wind = windB.data;
 
-        std::cout << std::fixed << std::setprecision(3);
+        std::ostringstream ss;
+        ss << std::fixed << std::setprecision(3);
 
-        std::cout
+        ss
             << "\n"
             << "t       " << t * constants::dt << " [s]\n"
             << "---------------------------------------------------------------------------------\n";
 
-        print_vec("p", p, "[m]");
+        ss << print_vec("p", p, "[m]");
 
-        std::cout
+        ss
             << std::left << std::setw(8) << "eul"
             << "[ "
             << std::right << std::setw(10) << util::rad_to_deg(eul.psi()) << ", "
@@ -55,9 +62,9 @@ namespace runner {
             << std::right << std::setw(10) << util::rad_to_deg(eul.phi())
             << " ] [deg]\n";
 
-        print_vec("v", v, "[m/s]");
+        ss << print_vec("v", v, "[m/s]");
 
-        std::cout
+        ss
             << std::left << std::setw(8) << "w"
             << "[ "
             << std::right << std::setw(10) << util::rad_to_deg(w.x()) << ", "
@@ -65,22 +72,24 @@ namespace runner {
             << std::right << std::setw(10) << util::rad_to_deg(w.z())
             << " ] [deg/s]\n";
 
-        print_vec("g", g, "[m/s^2]");
-        print_vec("wind", wind, "[m/s]");
+        ss << print_vec("g", g, "[m/s^2]");
+        ss << print_vec("wind", wind, "[m/s]");
 
-        std::cout
+        ss
             << std::left << std::setw(8) << "geo"
             << "lat: " << std::right << std::setw(10) << util::rad_to_deg(geo.lat.data) << " [deg], "
             << "lon: " << std::right << std::setw(10) << util::rad_to_deg(geo.lon.data) << " [deg], "
             << "alt: " << std::right << std::setw(10) << geo.alt.data << " [m]\n";
 
-        std::cout
+        ss
             << std::left << std::setw(8) << "aero"
             << "alpha: " << std::right << std::setw(10) << util::rad_to_deg(aero.alpha.data) << " [deg], "
             << "beta: "  << std::right << std::setw(10) << util::rad_to_deg(aero.beta.data)  << " [deg]\n";
 
-        std::cout
+        ss
             << "---------------------------------------------------------------------------------\n";
+
+        spdlog::info(ss.str());
     }
 
 }

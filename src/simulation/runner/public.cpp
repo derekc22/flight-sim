@@ -467,9 +467,9 @@ namespace runner {
             // step rerun manager
             rerun_manager.step(t, data_context);
 
-            // print state
+            // log state
             if (options.verbose_bool) {
-                print_state(t, Xt, geo_t, aero_t, windB);
+                log_state(t, Xt, geo_t, aero_t, windB);
             }
             acc.logging_acc -= constants::hz;
         }

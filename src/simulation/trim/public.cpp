@@ -1,9 +1,9 @@
 #include <Eigen/Dense>
-#include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
 #include <utility>
+#include <spdlog/spdlog.h>
 #include "simulation/actuators/public.hpp"
 #include "simulation/aerodynamics/public.hpp"
 #include "simulation/atmospheric/public.hpp"
@@ -62,7 +62,7 @@ namespace trim {
         const TrimSolution trim_sol = solve_trim(problem, model);
 
         if (!trim_sol.converged) {
-            std::cout << print_trim_solution(trim_sol) << std::endl;
+            spdlog::error(print_trim_solution(trim_sol));
             throw std::runtime_error("trim::inspect_trim: Error, trim failed to converge");
         }
 
@@ -79,9 +79,11 @@ namespace trim {
         const dynamics::EulerAngles trim_eul{ Eigen::Vector3d(0.0, trim_sol.operating_point.state.theta, trim_sol.operating_point.state.phi) };
         const dynamics::EulerAngleRates trim_eul_dot = dynamics::wB_BI_to_eul_dot(trim_w, trim_eul);
 
-        constexpr const char* section_rule = "---------------------------";
+        constexpr const char* section_rule = "------------------------------------------------------";
+
         std::ostringstream out;
-        out << "trim_sol.converged: " << trim_sol.converged << "\n";
+
+        out << "\n" << "summary:\n" << section_rule << "\n";
         out << "trim_sol.iterations: " << trim_sol.iterations << "\n\n";
 
         // out << "trim_sol.residual_norm_2: " << trim_sol.residual_norm_2 << "\n";
@@ -160,6 +162,7 @@ namespace trim {
             << "vx_err: " << trim_sol.weighted_residual.vx_err << "\n"
             << "vz_err: " << trim_sol.weighted_residual.vz_err << "\n"
             << "psi_dot_err: " << trim_sol.weighted_residual.psi_dot_err << "\n";
+
         return out.str();
     }
 

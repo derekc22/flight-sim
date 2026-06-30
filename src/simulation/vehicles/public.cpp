@@ -2,7 +2,6 @@
 #include <Eigen/Dense>
 #include <format>
 #include <string>
-#include <iostream>
 #include <stdexcept>
 #include <queue>
 #include <unordered_set>

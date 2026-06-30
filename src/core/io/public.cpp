@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <string>
 #include <Eigen/Dense>
+#include <spdlog/spdlog.h>
 #include "core/io/public.hpp"
 #include "core/io/private.hpp"
 
@@ -18,7 +19,9 @@ namespace io {
 
         file_txt << text;
         file_txt.close();
-        std::cout << "File saved successfully to " << file_path.string() << std::endl;
+
+        std::string log_str = "File saved successfully to " + file_path.string();
+        spdlog::info(log_str);
     }
 
     void write_csv(const Eigen::MatrixXd& data, const std::string& dir_path, const std::string& fname) {
@@ -37,6 +40,8 @@ namespace io {
         }
 
         file_csv.close();
-        std::cout << "File saved successfully to " << file_path.string() << std::endl;
+
+        std::string log_str = "File saved successfully to " + file_path.string();
+        spdlog::info(log_str);
     }
 }

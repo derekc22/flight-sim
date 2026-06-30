@@ -4,7 +4,7 @@
 
 namespace io {
 
-	cv::Mat get_flightgear_camera(int width, int height) {
+	cv::Mat get_flightgear_image(int width, int height) {
 		cv::VideoCapture cap("http://127.0.0.1:8080/screenshot");
 
 		if (!cap.isOpened()) {
