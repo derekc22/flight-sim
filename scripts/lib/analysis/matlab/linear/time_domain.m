@@ -111,62 +111,55 @@ fprintf('Exit MATLAB script: %s.m\n', mfilename)
 %% functions
 function simulateAndPlotResponse(G, dt, t, n_outputs, n_inputs, plot_dir_path, info_fid, file_prefix, make_input_signal)
     response_title = strrep(file_prefix, "_", " ");
-
+    
     for input_idx = 1:n_inputs
         u = zeros(length(t), n_inputs);
         u(:, input_idx) = make_input_signal(t(:), dt);
-
+    
         y = lsim(G, u, t);
-
-        figure();
-
-        plotOutputs(t, y, n_outputs);
-
-        sgtitle(sprintf('%s, input %d', response_title, input_idx));
-
-        fname = sprintf("%s_%d.pdf", file_prefix, input_idx);
-        save_path = fullfile(plot_dir_path, fname);
-        print(gcf, char(save_path), "-dpdf", "-vector", "-bestfit")
-        fprintf("File saved successfully to %s\n", char(save_path))
-
-        close(gcf)
-
+    
+        for output_idx = 1:n_outputs
+            figure();
+    
+            plot(t, y(:, output_idx), 'LineWidth', 2);
+            grid on;
+            title(sprintf('%s: input %d, output %d', response_title, input_idx, output_idx));
+            xlabel('time [s]');
+            ylabel(sprintf('y_%d', output_idx));
+    
+            fname = sprintf("%s_input_%d_output_%d.pdf", file_prefix, input_idx, output_idx);
+            save_path = fullfile(plot_dir_path, fname);
+            print(gcf, char(save_path), "-dpdf", "-vector", "-bestfit")
+            fprintf("File saved successfully to %s\n", char(save_path))
+    
+            close(gcf)
+        end
+    
         info = lsiminfo(y, t);
         writeLsimInfo(info_fid, info, file_prefix, input_idx)
-    end
-end
-
-function plotOutputs(t, y, n_outputs)
-    for output_idx = 1:n_outputs
-        subplot(4, 2, output_idx);
-        plot(t, y(:, output_idx), 'LineWidth', 2);
-        grid on;
-        title(sprintf('output %d', output_idx));
-        xlabel('time [s]');
-        ylabel(sprintf('y_%d', output_idx));
     end
 end
 
 function writeLsimInfo(info_fid, info, file_prefix, input_idx)
     response_title = strrep(file_prefix, "_", " ");
     fields = fieldnames(info);
-
+    
     fprintf(info_fid, "%s, input %d\n", response_title, input_idx);
     fprintf(info_fid, "%s\n", repmat('-', 1, 60));
-
+    
     for output_idx = 1:length(info)
         fprintf(info_fid, "output %d\n", output_idx);
-
+    
         for field_idx = 1:length(fields)
             field_name = fields{field_idx};
             field_value = info(output_idx).(field_name);
-
+    
             fprintf(info_fid, "  %s: %.10g\n", field_name, field_value);
         end
-
+    
         fprintf(info_fid, "\n");
     end
-
+    
     fprintf(info_fid, "\n");
 end
 

@@ -1,4 +1,7 @@
 {
+    "w_min_power": -2,
+    "w_max_power": 3,
+    "num_points": 1000,
     "bode": true,
     "nyquist": true,
     "nichols": true,

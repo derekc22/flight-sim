@@ -10,5 +10,5 @@ fi
 
 OUT_DIR="$1"
 
-"$PROJ_PATH/scripts/lib/analysis/run_m.sh" "$OUT_DIR" linear load
-"$PROJ_PATH/scripts/lib/analysis/run_m.sh" "$OUT_DIR" linear ss2tf
+"$PROJ_PATH/scripts/lib/analysis/run_m.sh" "$OUT_DIR" linear load_from_json
+"$PROJ_PATH/scripts/lib/analysis/run_m.sh" "$OUT_DIR" linear ss_to_tf

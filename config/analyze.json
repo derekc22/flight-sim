@@ -1,7 +1,7 @@
 {
     "linear": {
-        "time_domain": "analysis/linear/time_domain/default.json",
-        "frequency_domain": null,
+        "time_domain": null,
+        "frequency_domain": "analysis/linear/frequency_domain/default.json",
         "stability": null,
         "root_locus": null,
         "state_space": null,
