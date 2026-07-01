@@ -26,7 +26,7 @@ namespace structural {
         dynamics::CenterOfGravity p_cg;
         dynamics::InertiaTensor JB;
 
-        StructuralProperties(const std::vector<Geometry>& g);
+        StructuralProperties(const std::vector<Geometry>& geoms);
 
         Geometry& get_geometry(const std::string& id);
         double compute_mass();

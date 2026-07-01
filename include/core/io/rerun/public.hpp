@@ -9,6 +9,8 @@
 #include <thread>
 #include <vector>
 #include "core/io/data/public.hpp"
+#include "simulation/transforms/public.hpp"
+#include "simulation/constants/public.hpp"
 
 namespace io {
 
@@ -34,7 +36,13 @@ namespace io {
         int image_height = 500;
 
         rerun::RecordingStream rec;
+
+        Eigen::Quaterniond q_model_to_body = transforms::eul_to_quatR(
+            -constants::pi/2, constants::pi/2, 0.0, "ZYX"
+        );
+
         std::vector<rerun::Vec3D> trajectory;
+        std::vector<rerun::Vec3D> estimated_trajectory;
 
         std::deque<RerunContext> context_queue;
         std::mutex queue_mutex;

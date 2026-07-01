@@ -23,7 +23,11 @@ namespace io {
             std::system("rerun assets/default.rbl --connect rerun+http://127.0.0.1:9876/proxy &");
 
             rec.log_static("/", rerun::ViewCoordinates::FRD);
-            stream_vehicle_model(rec);
+            stream_vehicle_model(rec, q_model_to_body, "world/vehicle/frame");
+            if (estimation_bool) {
+                stream_vehicle_model(rec, q_model_to_body, "world/estimated_vehicle/frame");
+            }
+
             camera_worker = std::thread(&RerunManager::run_camera_worker, this);
             worker = std::thread(&RerunManager::run_worker, this);
         }
@@ -76,26 +80,43 @@ namespace io {
 
         stream_vehicle_transform(rec, context.data_context.Xt);
 
+        if (estimation_bool) {
+            stream_estimated_vehicle_transform(rec, context.data_context.Zt);
+        }
+
         trajectory.emplace_back(
             static_cast<float>(context.data_context.Xt.p.data.x()),
             static_cast<float>(context.data_context.Xt.p.data.y()),
             static_cast<float>(context.data_context.Xt.p.data.z())
         );
-        
-        if (trajectory.size() > max_traj_size) {
-            trajectory.erase(trajectory.begin());
-        }
+        clip_trajectory(trajectory, max_traj_size);
         stream_vehicle_trajectory(rec, trajectory);
 
-        stream_body_arrow(rec, "world/vehicle/vectors/velocity", context.data_context.Xt.v.data, 1.0, rerun::Color(0, 180, 255), "velocity");
+        if (estimation_bool) {
+            estimated_trajectory.emplace_back(
+                static_cast<float>(context.data_context.Zt.p.data.x()),
+                static_cast<float>(context.data_context.Zt.p.data.y()),
+                static_cast<float>(context.data_context.Zt.p.data.z())
+            );
+            clip_trajectory(estimated_trajectory, max_traj_size);
+            stream_estimated_vehicle_trajectory(rec, estimated_trajectory);
+        }
 
-        stream_body_arrow(rec, "world/vehicle/vectors/force_net", context.data_context.WB_net.F.data, 0.01, rerun::Color(255, 80, 80), "force_net");
-        stream_body_arrow(rec, "world/vehicle/vectors/force_aero", context.data_context.WB_aero.F.data, 0.01, rerun::Color(255, 160, 40), "force_aero");
-        stream_body_arrow(rec, "world/vehicle/vectors/force_propulsive", context.data_context.WB_propulsive.F.data, 0.001, rerun::Color(80, 220, 120), "force_prop");
+        stream_body_arrow(rec, "world/vehicle/vectors/v", context.data_context.Xt.v.data, 1.0, rerun::Color(0, 180, 255), "v");
+        stream_body_arrow(rec, "world/vehicle/vectors/w", context.data_context.Xt.w.data, 50.0, rerun::Color(255, 80, 200), "w");
 
-        stream_body_arrow(rec, "world/vehicle/vectors/moment_net", context.data_context.WB_net.M.data, 0.01, rerun::Color(210, 120, 255), "moment_net");
-        stream_body_arrow(rec, "world/vehicle/vectors/moment_aero", context.data_context.WB_aero.M.data, 0.01, rerun::Color(255, 220, 80), "moment_aero");
-        stream_body_arrow(rec, "world/vehicle/vectors/moment_propulsive", context.data_context.WB_propulsive.M.data, 0.01, rerun::Color(120, 255, 210), "moment_prop");
+        if (estimation_bool) {
+            stream_body_arrow(rec, "world/estimated_vehicle/vectors/v", context.data_context.Zt.v.data, 1.0, rerun::Color(0, 180, 255), "v");
+            stream_body_arrow(rec, "world/estimated_vehicle/vectors/w", context.data_context.Zt.w.data, 50.0, rerun::Color(255, 80, 200), "w");
+        }
+
+        stream_body_arrow(rec, "world/vehicle/vectors/F_net", context.data_context.WB_net.F.data, 0.01, rerun::Color(255, 80, 80), "F_net");
+        stream_body_arrow(rec, "world/vehicle/vectors/F_aero", context.data_context.WB_aero.F.data, 0.01, rerun::Color(255, 160, 40), "F_aero");
+        stream_body_arrow(rec, "world/vehicle/vectors/F_propulsive", context.data_context.WB_propulsive.F.data, 0.001, rerun::Color(80, 220, 120), "F_propulsive");
+
+        stream_body_arrow(rec, "world/vehicle/vectors/M_net", context.data_context.WB_net.M.data, 0.01, rerun::Color(210, 120, 255), "M_net");
+        stream_body_arrow(rec, "world/vehicle/vectors/M_aero", context.data_context.WB_aero.M.data, 0.01, rerun::Color(255, 220, 80), "M_aero");
+        stream_body_arrow(rec, "world/vehicle/vectors/M_propulsive", context.data_context.WB_propulsive.M.data, 0.01, rerun::Color(120, 255, 210), "M_propulsive");
 
         dynamics::EulerAngles eul_t;
         eul_t.set(context.data_context.Xt.q);
