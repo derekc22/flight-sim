@@ -74,22 +74,27 @@ namespace runner {
         estimation_acc += json_options.estimation_hz;
         guidance_acc += json_options.guidance_hz;
         control_acc += json_options.control_hz;
-        logging_acc += json_options.logging_hz;
+        log_acc += json_options.log_hz;
     }
 
     RunManager::RunManager(CLIOptions cli_options, JSONOptions json_options) :
         cli_options(cli_options),
         json_options(json_options),
+
         // load vehicle
         aircraft(load_vehicle(cli_options.aircraft_id, json_options.trim_bool)),
+
         // create data manager
         data_manager(json_options.tf, cli_options.data_bool, json_options.control_bool, json_options.avionics_bool, json_options.estimation_bool, json_options.wind_bool),
-        rerun_manager(json_options.rerun_bool, json_options.control_bool, json_options.avionics_bool, json_options.estimation_bool, json_options.wind_bool, json_options.logging_hz),
+        rerun_manager(json_options.rerun_bool, json_options.control_bool, json_options.avionics_bool, json_options.estimation_bool, json_options.wind_bool, json_options.log_hz),
+        
         // create analysis manager
         analysis_manager{.data_bool=cli_options.data_bool, .analysis_bool=cli_options.analysis_bool, .trim_bool=json_options.trim_bool},
+
         // initialize udp connections
         udp_out(5510),
         udp_in("127.0.0.1", 5511),
+
         // start timer
         next(std::chrono::steady_clock::now()) {}
 
@@ -463,7 +468,7 @@ namespace runner {
         // step data manager
         data_manager.step(t, data_context);
 
-        if (acc.logging_acc >= constants::hz) {
+        if (acc.log_acc >= constants::hz) {
             // step rerun manager
             rerun_manager.step(t, data_context);
 
@@ -471,7 +476,7 @@ namespace runner {
             if (options.verbose_bool) {
                 log_state(t, Xt, geo_t, aero_t, windB);
             }
-            acc.logging_acc -= constants::hz;
+            acc.log_acc -= constants::hz;
         }
 
         // compute next-step rigid body state
@@ -520,7 +525,9 @@ namespace runner {
         );
 
         // sleep to maintain frequency dictated by dt
-        std::this_thread::sleep_until(next);
+        if (!cli_options.fast_bool) {
+            std::this_thread::sleep_until(next);
+        }
     }
 
 }
