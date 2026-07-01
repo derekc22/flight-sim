@@ -6,7 +6,6 @@
 #include <rerun.hpp>
 #include "core/io/rerun/private.hpp"
 #include "simulation/dynamics/public.hpp"
-#include "simulation/transforms/public.hpp"
 #include <opencv2/opencv.hpp>
 
 namespace io {
@@ -58,6 +57,27 @@ namespace io {
         );
     }
 
+    void stream_estimated_vehicle_transform(rerun::RecordingStream& rec, const dynamics::RigidBodyState& Zt) {
+        const Eigen::Quaterniond q_conj = Zt.q.data.conjugate();  // Rerun expects qBI, not qIB
+        rec.log(
+            "world/estimated_vehicle",
+            rerun::Transform3D::from_translation_rotation(
+                rerun::components::Translation3D(
+                    static_cast<float>(Zt.p.data.x()), 
+                    static_cast<float>(Zt.p.data.y()), 
+                    static_cast<float>(Zt.p.data.z())
+                ),
+                rerun::datatypes::Quaternion::from_xyzw(
+                    static_cast<float>(q_conj.x()), 
+                    static_cast<float>(q_conj.y()), 
+                    static_cast<float>(q_conj.z()), 
+                    static_cast<float>(q_conj.w())
+                )
+            ),
+            rerun::TransformAxes3D(5.0)
+        );
+    }
+
     void stream_body_arrow(rerun::RecordingStream& rec, const std::string& path, const Eigen::Vector3d& data, double scale, const rerun::Color& color, const std::string& label) {
         rec.log(
             path,
@@ -69,13 +89,9 @@ namespace io {
         );
     }
 
-    void stream_vehicle_model(rerun::RecordingStream& rec) {
-        Eigen::Quaterniond q_model_to_body = transforms::eul_to_quatR(
-            -constants::pi/2, constants::pi/2, 0.0, "ZYX"
-        );
-
+    void stream_vehicle_model(rerun::RecordingStream& rec, const Eigen::Quaterniond& q_model_to_body, const std::string& path) {
         rec.log_static(
-            "world/vehicle/model_frame",
+            path,
             rerun::Transform3D::from_translation_rotation(
                 rerun::components::Translation3D(0.0f, 0.0f, 0.0f),
                 rerun::datatypes::Quaternion::from_xyzw(
@@ -88,9 +104,15 @@ namespace io {
         );
 
         rec.log_static(
-            "world/vehicle/model_frame/model",
+            path + std::string("/model"),
             rerun::Asset3D::from_file_path("assets/cessna172.glb").value
         );
+    }
+
+    void clip_trajectory(std::vector<rerun::Vec3D>& trajectory, std::size_t max_size) {
+        if (trajectory.size() > max_size) {
+            trajectory.erase(trajectory.begin());
+        }
     }
 
     void stream_vehicle_trajectory(rerun::RecordingStream& rec, const std::vector<rerun::Vec3D>& trajectory) {
@@ -99,7 +121,20 @@ namespace io {
         rerun::LineStrip3D strip(trajectory);
 
         rec.log(
-            "world/trajectory/line",
+            "world/trajectory",
+            rerun::LineStrips3D(strip)
+                .with_radii(rerun::Radius::ui_points(0.5f))
+                .with_colors(rerun::Color(255, 255, 0))
+        );
+    }
+
+    void stream_estimated_vehicle_trajectory(rerun::RecordingStream& rec, const std::vector<rerun::Vec3D>& estimated_trajectory) {
+        if (estimated_trajectory.size() < 2) { return; }
+
+        rerun::LineStrip3D strip(estimated_trajectory);
+
+        rec.log(
+            "world/estimated_trajectory",
             rerun::LineStrips3D(strip)
                 .with_radii(rerun::Radius::ui_points(0.5f))
                 .with_colors(rerun::Color(255, 255, 0))
