@@ -27,6 +27,7 @@ namespace runner {
         std::string aircraft_id;
         bool data_bool;
         bool analysis_bool;
+        bool fast_bool;
         std::string log_dir_path;
         std::string data_dir_path;
         std::string report_dir_path;
@@ -46,7 +47,7 @@ namespace runner {
         bool estimation_bool;
         bool wind_bool;
 
-        double logging_hz;
+        double log_hz;
         bool verbose_bool;
         bool rerun_bool;
     };
@@ -57,7 +58,7 @@ namespace runner {
         double estimation_acc = constants::hz;
         double guidance_acc = constants::hz;
         double control_acc = constants::hz;
-        double logging_acc = constants::hz;
+        double log_acc = constants::hz;
         void step(const JSONOptions& json_options);
     };
 

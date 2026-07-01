@@ -27,9 +27,9 @@ namespace io {
         bool estimation_bool;
         bool wind_bool;
 
-        double logging_hz;
-        std::size_t max_traj_size = static_cast<std::size_t>(30.0 * logging_hz);  // 30 seconds
-        std::size_t max_queue_size = static_cast<std::size_t>(2.0 * logging_hz);  // 2 seconds
+        double log_hz;
+        std::size_t max_traj_size = static_cast<std::size_t>(30.0 * log_hz);  // 30 seconds
+        std::size_t max_queue_size = static_cast<std::size_t>(2.0 * log_hz);  // 2 seconds
 
         // in pixels
         int image_width = 500;
@@ -60,7 +60,7 @@ namespace io {
         void run_worker();
         void run_camera_worker();
 
-        RerunManager(bool rerun_bool, bool control_bool, bool avionics_bool, bool estimation_bool, bool wind_bool, double logging_hz);
+        RerunManager(bool rerun_bool, bool control_bool, bool avionics_bool, bool estimation_bool, bool wind_bool, double log_hz);
         ~RerunManager();
     };
 }

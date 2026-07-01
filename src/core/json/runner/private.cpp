@@ -74,19 +74,19 @@ namespace json {
 		validate_simulation_hz_json(hz_json, enable_json);
 	}
 
-	void validate_logging_hz(double hz, const nlohmann::json& enable_json) {
+	void validate_log_hz(double hz, const nlohmann::json& enable_json) {
 		if (enable_json.at("verbose").get<bool>()) {
 			if (!hz) {
-				throw std::runtime_error("json::validate_logging_hz verbose requires logging hz to be specified"); 
+				throw std::runtime_error("json::validate_log_hz verbose requires logging hz to be specified"); 
 			}
 		}
 		if (enable_json.at("rerun").get<bool>()) {
 			if (!hz) {
-				throw std::runtime_error("json::validate_logging_hz rerun requires logging hz to be specified"); 
+				throw std::runtime_error("json::validate_log_hz rerun requires logging hz to be specified"); 
 			}
 		}
 		if (hz > constants::hz) {
-			throw std::runtime_error(std::format("json::validate_logging_hz hz cannot exceed simulation hz: {} hz", constants::hz)); 
+			throw std::runtime_error(std::format("json::validate_log_hz hz cannot exceed simulation hz: {} hz", constants::hz)); 
 		}
 	}
 
@@ -96,7 +96,7 @@ namespace json {
         const auto& enable_json = logging_json.at("enable");
 		validate_enable_json(enable_json);
 
-		validate_logging_hz(hz, enable_json);
+		validate_log_hz(hz, enable_json);
 	}
 
     runner::JSONOptions parse_runner_options(const nlohmann::json& config) {
@@ -113,7 +113,7 @@ namespace json {
 		const auto& simulation_hz_json = simulation_json.at("hz");
 		const auto& simulation_enable_json = simulation_json.at("enable");
 
-		double logging_hz = logging_json.at("hz");
+		double log_hz = logging_json.at("hz");
 		const auto& logging_enable_json = logging_json.at("enable");
 
 		return {
@@ -131,7 +131,7 @@ namespace json {
 			.estimation_bool=simulation_enable_json.at("estimation").get<bool>(),
 			.wind_bool=simulation_enable_json.at("wind").get<bool>(),
 
-			.logging_hz = logging_hz,
+			.log_hz = log_hz,
 
 			.verbose_bool=logging_enable_json.at("verbose").get<bool>(),
 			.rerun_bool=logging_enable_json.at("rerun").get<bool>()

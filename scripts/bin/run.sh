@@ -12,21 +12,23 @@ USAGE: $0
   [-p PLOT_BOOL]
   [-m ANALYSIS_BOOL]
   -o <OUT_DIR>
-  [-x HEADLESS_BOOL]
-  [-q QUICK_BOOL]
+  [-x FAST_BOOL]
+  [-y HEADLESS_BOOL]
+  [-b BUILD_BOOL]
 EOF
 	exit "$exit_code"
 }
 
-while getopts "a:dpo:mxqh" opt; do
+while getopts "a:dpo:mxybh" opt; do
 	case "$opt" in
 		a) AIRCRAFT="$OPTARG" ;;
 		d) DATA_BOOL=1 ;;
 		p) PLOT_BOOL=1 ;;
 		o) OUT_DIR="$OPTARG" ;;
 		m) ANALYSIS_BOOL=1 ;;
-		x) HEADLESS_BOOL=1 ;;
-		q) QUICK_BOOL=1 ;;
+		x) FAST_BOOL=1 ;;
+		y) HEADLESS_BOOL=1 ;;
+		b) BUILD_BOOL=1 ;;
 			h) usage 0 ;;
 			?) usage 1 ;;
 	esac
@@ -37,8 +39,9 @@ done
 : "${PLOT_BOOL:=0}"
 : "${OUT_DIR:=$(date +"%Y%b%d_%H-%M-%S")}"
 : "${ANALYSIS_BOOL:=0}"
+: "${FAST_BOOL:=0}"
 : "${HEADLESS_BOOL:=0}"
-: "${QUICK_BOOL:=0}"
+: "${BUILD_BOOL:=0}"
 
 DATA_DIR_PATH="$PROJ_PATH/results/data/$OUT_DIR"
 LOG_DIR_PATH="$PROJ_PATH/results/logs/$OUT_DIR"
@@ -74,11 +77,11 @@ if [ "$HEADLESS_BOOL" -eq 0 ]; then
 	trap 'kill "$FG_PID" 2>/dev/null || true' EXIT
 fi
 
-if [ "$QUICK_BOOL" -eq 0 ]; then
+if [ "$BUILD_BOOL" -eq 1 ]; then
 	rm -rf "$PROJ_PATH/build"
 fi
 
-if [[ "$QUICK_BOOL" -eq 1 && "$HEADLESS_BOOL" -eq 0 ]]; then
+if [[ "$BUILD_BOOL" -eq 0 && "$HEADLESS_BOOL" -eq 0 ]]; then
 	sleep 10
 fi
 
@@ -89,6 +92,7 @@ cmake --build "$PROJ_PATH/build"
 	"$AIRCRAFT" \
 	"$DATA_BOOL" \
 	"$ANALYSIS_BOOL" \
+	"$FAST_BOOL" \
 	"$LOG_DIR_PATH" \
 	"$DATA_DIR_PATH" \
 	"$REPORT_DIR_PATH"

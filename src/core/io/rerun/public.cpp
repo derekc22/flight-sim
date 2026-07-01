@@ -15,8 +15,8 @@
 
 namespace io {
 
-    RerunManager::RerunManager(bool rerun_bool, bool control_bool, bool avionics_bool, bool estimation_bool, bool wind_bool, double logging_hz)
-        : rerun_bool(rerun_bool), control_bool(control_bool), avionics_bool(avionics_bool), estimation_bool(estimation_bool), wind_bool(wind_bool), logging_hz(logging_hz), rec("flight_sim")
+    RerunManager::RerunManager(bool rerun_bool, bool control_bool, bool avionics_bool, bool estimation_bool, bool wind_bool, double log_hz)
+        : rerun_bool(rerun_bool), control_bool(control_bool), avionics_bool(avionics_bool), estimation_bool(estimation_bool), wind_bool(wind_bool), log_hz(log_hz), rec("flight_sim")
     {
         if (rerun_bool) {
             auto server_uri = rec.serve_grpc("0.0.0.0", 9876, "1GiB").value;
@@ -196,7 +196,8 @@ namespace io {
     }
 
     void RerunManager::run_camera_worker() {
-        const std::chrono::duration<double> camera_period(1.0 / logging_hz);
+        // camera is async and captures at log_hz wrt the wall clock, not the sim clock
+        const std::chrono::duration<double> camera_period(1.0 / log_hz);
 
         while (!stop_camera_worker) {
             try {
