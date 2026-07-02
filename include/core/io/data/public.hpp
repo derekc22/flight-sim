@@ -33,11 +33,11 @@ namespace io {
     };
 
     struct DataManager {
-        bool data_bool;
-        bool control_bool;
-        bool avionics_bool;
-        bool estimation_bool;
-        bool wind_bool;
+        bool data_flag;
+        bool control_flag;
+        bool avionics_flag;
+        bool estimation_flag;
+        bool wind_flag;
 
         std::optional<DataTable> p_DT;
         std::optional<DataTable> p_meas_DT;
@@ -66,7 +66,7 @@ namespace io {
 
         void step(int t, const DataContext& context);
         void save(const std::string& data_dir_path);
-        DataManager(int tf, bool data_bool, bool control_bool, bool avionics_bool, bool estimation_bool, bool wind_bool);
+        DataManager(int tf, bool data_flag, bool control_flag, bool avionics_flag, bool estimation_flag, bool wind_flag);
 
     };
 }

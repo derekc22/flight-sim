@@ -21,11 +21,11 @@ namespace io {
     };
 
     struct RerunManager {
-        bool rerun_bool;
-        bool control_bool;
-        bool avionics_bool;
-        bool estimation_bool;
-        bool wind_bool;
+        bool rerun_flag;
+        bool control_flag;
+        bool avionics_flag;
+        bool estimation_flag;
+        bool wind_flag;
 
         double log_hz;
         std::size_t max_traj_size = static_cast<std::size_t>(30.0 * log_hz);  // 30 seconds
@@ -60,7 +60,7 @@ namespace io {
         void run_worker();
         void run_camera_worker();
 
-        RerunManager(bool rerun_bool, bool control_bool, bool avionics_bool, bool estimation_bool, bool wind_bool, double log_hz);
+        RerunManager(bool rerun_flag, bool control_flag, bool avionics_flag, bool estimation_flag, bool wind_flag, double log_hz);
         ~RerunManager();
     };
 }

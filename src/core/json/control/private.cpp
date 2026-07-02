@@ -222,26 +222,26 @@ namespace json {
     }
 
     void validate_controllers(const nlohmann::json& controllers_json) {
-        bool attitude_bool = controllers_json.contains("attitude");
-        bool velocity_bool = controllers_json.contains("velocity");
-        bool linear_quadratic_bool = controllers_json.contains("linear_quadratic");
-        bool nonlinear_bool = controllers_json.contains("nonlinear");
+        bool has_attitude = controllers_json.contains("attitude");
+        bool has_velocity = controllers_json.contains("velocity");
+        bool has_linear_quadratic = controllers_json.contains("linear_quadratic");
+        bool has_nonlinear = controllers_json.contains("nonlinear");
 
-        if (attitude_bool && linear_quadratic_bool) { 
+        if (has_attitude && has_linear_quadratic) { 
             throw std::runtime_error("json::validate_controllers: attitude and linear_quadratic control laws cannot both be present"); 
         }
-        if (attitude_bool && nonlinear_bool) { 
+        if (has_attitude && has_nonlinear) { 
             throw std::runtime_error("json::validate_controllers: attitude and nonlinear control laws cannot both be present"); 
         }
 
-        if (linear_quadratic_bool && nonlinear_bool) { 
+        if (has_linear_quadratic && has_nonlinear) { 
             throw std::runtime_error("json::validate_controllers: linear_quadratic and nonlinear control laws cannot both be present"); 
         }
 
-        if (velocity_bool && linear_quadratic_bool) { 
+        if (has_velocity && has_linear_quadratic) { 
             throw std::runtime_error("json::validate_controllers: velocity and linear_quadratic control laws cannot both be present"); 
         }
-        if (velocity_bool && nonlinear_bool) { 
+        if (has_velocity && has_nonlinear) { 
             throw std::runtime_error("json::validate_controllers: velocity and nonlinear control laws cannot both be present"); 
         }
     }

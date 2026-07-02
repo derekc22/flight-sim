@@ -151,7 +151,7 @@ namespace json {
         }
     }
 
-    void validate_initialization_config(const nlohmann::json& config, bool trim_bool) {
+    void validate_initialization_config(const nlohmann::json& config, bool trim_flag) {
         if (!config.contains("NEDFrameECEF") && !config.contains("FRDFrameECEF")) { 
             throw std::runtime_error("json::validate_initialization_config: One of NEDFrameECEF, FRDFrameECEF required"); 
         }
@@ -164,7 +164,7 @@ namespace json {
         if (config.contains("STABFrameFRD")) { 
             throw std::runtime_error("json::validate_initialization_config: STABFrameFRD is an aerodynamic frame. User initialization is not allowed"); 
         }
-        if (trim_bool && !config.contains("FRDFrameNED")) { 
+        if (trim_flag && !config.contains("FRDFrameNED")) { 
             throw std::runtime_error("json::validate_initialization_config: FRDFrameNED required for trim"); 
         }
 

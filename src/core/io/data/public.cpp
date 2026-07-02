@@ -28,10 +28,10 @@ namespace io {
     }
 
 
-    DataManager::DataManager(int tf, bool data_bool, bool control_bool, bool avionics_bool, bool estimation_bool, bool wind_bool)
-        : data_bool(data_bool), control_bool(control_bool), avionics_bool(avionics_bool), estimation_bool(estimation_bool), wind_bool(wind_bool)
+    DataManager::DataManager(int tf, bool data_flag, bool control_flag, bool avionics_flag, bool estimation_flag, bool wind_flag)
+        : data_flag(data_flag), control_flag(control_flag), avionics_flag(avionics_flag), estimation_flag(estimation_flag), wind_flag(wind_flag)
     {
-        if (data_bool) {
+        if (data_flag) {
             p_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
             eul_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
             w_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
@@ -45,27 +45,27 @@ namespace io {
             F_prop_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
             M_prop_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
 
-            if (control_bool) {
+            if (control_flag) {
                 eul_setpoint_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
                 w_setpoint_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
                 v_setpoint_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
             }
 
-            if (avionics_bool) {
+            if (avionics_flag) {
                 p_meas_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
                 eul_meas_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
                 w_meas_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
                 v_meas_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
             }
 
-            if (estimation_bool) {
+            if (estimation_flag) {
                 p_est_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
                 eul_est_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
                 w_est_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
                 v_est_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
             }
 
-            if (wind_bool) {
+            if (wind_flag) {
                 windB_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
             }
         }
@@ -73,7 +73,7 @@ namespace io {
 
     void DataManager::step(int t, const DataContext& context) {
 
-        if (data_bool) {
+        if (data_flag) {
             dynamics::EulerAngles eul_t;
             eul_t.set(context.Xt.q);
 
@@ -90,13 +90,13 @@ namespace io {
             F_prop_DT->insert(t, context.WB_propulsive.F.data);
             M_prop_DT->insert(t, context.WB_propulsive.M.data);
 
-            if (control_bool) {
+            if (control_flag) {
                 eul_setpoint_DT->insert(t, context.setpoint.eulIB.data);
                 w_setpoint_DT->insert(t, context.setpoint.wB_BI.data);
                 v_setpoint_DT->insert(t, context.setpoint.vB_BI.data);
             }
 
-            if (avionics_bool) {
+            if (avionics_flag) {
                 dynamics::EulerAngles eul_meas_t;
                 eul_meas_t.set(context.Yt.q);
                 p_meas_DT->insert(t, context.Yt.p.data);
@@ -105,7 +105,7 @@ namespace io {
                 v_meas_DT->insert(t, context.Yt.v.data);
             }
 
-            if (estimation_bool) {
+            if (estimation_flag) {
                 dynamics::EulerAngles eul_est_t;
                 eul_est_t.set(context.Zt.q);
                 p_est_DT->insert(t, context.Zt.p.data);
@@ -114,7 +114,7 @@ namespace io {
                 v_est_DT->insert(t, context.Zt.v.data);
             }
 
-            if (wind_bool) {
+            if (wind_flag) {
                 windB_DT->insert(t, context.windB.data);
             }
         }
@@ -123,7 +123,7 @@ namespace io {
 
     void DataManager::save(const std::string& data_dir_path) {
 
-        if (data_bool) {
+        if (data_flag) {
             write_csv(p_DT->data, data_dir_path, "p");
             write_csv(eul_DT->data, data_dir_path, "eul");
             write_csv(w_DT->data, data_dir_path, "w");
@@ -137,27 +137,27 @@ namespace io {
             write_csv(F_prop_DT->data, data_dir_path, "F_prop");
             write_csv(M_prop_DT->data, data_dir_path, "M_prop");
 
-            if (control_bool) {
+            if (control_flag) {
                 write_csv(eul_setpoint_DT->data, data_dir_path, "eul_setpoint");
                 write_csv(w_setpoint_DT->data, data_dir_path, "w_setpoint");
                 write_csv(v_setpoint_DT->data, data_dir_path, "v_setpoint");
             }
 
-            if (avionics_bool) {
+            if (avionics_flag) {
                 write_csv(p_meas_DT->data, data_dir_path, "p_meas");
                 write_csv(eul_meas_DT->data, data_dir_path, "eul_meas");
                 write_csv(w_meas_DT->data, data_dir_path, "w_meas");
                 write_csv(v_meas_DT->data, data_dir_path, "v_meas");
             }
 
-            if (estimation_bool) {
+            if (estimation_flag) {
                 write_csv(p_est_DT->data, data_dir_path, "p_est");
                 write_csv(eul_est_DT->data, data_dir_path, "eul_est");
                 write_csv(w_est_DT->data, data_dir_path, "w_est");
                 write_csv(v_est_DT->data, data_dir_path, "v_est");
             }
 
-            if (wind_bool) {
+            if (wind_flag) {
                 write_csv(windB_DT->data, data_dir_path, "windB");
             }
         }

@@ -25,9 +25,9 @@ namespace runner {
 
     struct CLIOptions {
         std::string aircraft_id;
-        bool data_bool;
-        bool analysis_bool;
-        bool fast_bool;
+        bool data_flag;
+        bool analysis_flag;
+        bool fast_flag;
         std::string log_dir_path;
         std::string data_dir_path;
         std::string report_dir_path;
@@ -41,15 +41,15 @@ namespace runner {
         double guidance_hz;
         double control_hz;
 
-        bool trim_bool;
-        bool avionics_bool;
-        bool control_bool;
-        bool estimation_bool;
-        bool wind_bool;
+        bool trim_flag;
+        bool avionics_flag;
+        bool control_flag;
+        bool estimation_flag;
+        bool wind_flag;
 
         double log_hz;
-        bool verbose_bool;
-        bool rerun_bool;
+        bool verbose_flag;
+        bool rerun_flag;
     };
 
     struct MultiRateAccumulator {
@@ -62,7 +62,7 @@ namespace runner {
         void step(const JSONOptions& json_options);
     };
 
-    vehicles::Aircraft load_vehicle(const std::string& aircraft_id, bool trim_bool);
+    vehicles::Aircraft load_vehicle(const std::string& aircraft_id, bool trim_flag);
 
     struct RunManager {
         CLIOptions cli_options;

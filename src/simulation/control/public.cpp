@@ -4,10 +4,10 @@
 
 namespace control {
 
-    ControlOutput ControlProperties::step(const ControllerInputs& inputs, bool trim_bool) {
+    ControlOutput ControlProperties::step(const ControllerInputs& inputs, bool trim_flag) {
         ControlOutput out{};
 
-        if (!trim_bool) {
+        if (!trim_flag) {
             if (attitude_controller) {
                 out.surface_inputs = attitude_controller(inputs.attitude_controller_input).surface_inputs;
             }
@@ -22,7 +22,7 @@ namespace control {
             }
         }
 
-        if (trim_bool) {
+        if (trim_flag) {
             if (linear_quadratic_controller) {
                 out = linear_quadratic_controller(inputs.linear_quadratic_controller_input);
             }

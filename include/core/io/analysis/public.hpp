@@ -14,9 +14,9 @@ namespace io {
     };
 
     struct AnalysisManager {
-        bool data_bool;
-        bool analysis_bool;
-        bool trim_bool;
+        bool data_flag;
+        bool analysis_flag;
+        bool trim_flag;
 
         std::string aircraft_id;
         trim::TrimSolution trim_sol;

@@ -6,10 +6,10 @@
 
 namespace json {
 
-    vehicles::StepOptions parse_initialization_config(bool trim_bool) {
+    vehicles::StepOptions parse_initialization_config(bool trim_flag) {
         const auto config_path = resolve_run_config_entry_path("initialization_config");
         const auto config = read_json_file(config_path);
-        validate_initialization_config(config, trim_bool);
+        validate_initialization_config(config, trim_flag);
 
         vehicles::StepOptions opts;
         if (config.contains("NEDFrameECEF")) { opts.NEDFrameECEFStepOpts = parse_NEDFrameECEF_step_options(config.at("NEDFrameECEF")); }

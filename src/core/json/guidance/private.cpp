@@ -146,26 +146,26 @@ namespace json {
     }
 
     void validate_guidance(const nlohmann::json& guidance_json) {
-        bool attitude_bool = guidance_json.contains("attitude");
-        bool velocity_bool = guidance_json.contains("velocity");
-        bool linear_quadratic_bool = guidance_json.contains("linear_quadratic");
-        bool nonlinear_bool = guidance_json.contains("nonlinear");
+        bool attitude_flag = guidance_json.contains("attitude");
+        bool velocity_flag = guidance_json.contains("velocity");
+        bool linear_quadratic_flag = guidance_json.contains("linear_quadratic");
+        bool nonlinear_flag = guidance_json.contains("nonlinear");
 
-        if (attitude_bool && linear_quadratic_bool) { 
+        if (attitude_flag && linear_quadratic_flag) { 
             throw std::runtime_error("json::validate_guidance: attitude and linear_quadratic guidance cannot both be present"); 
         }
-        if (attitude_bool && nonlinear_bool) { 
+        if (attitude_flag && nonlinear_flag) { 
             throw std::runtime_error("json::validate_guidance: attitude and nonlinear guidance cannot both be present"); 
         }
 
-        if (linear_quadratic_bool && nonlinear_bool) { 
+        if (linear_quadratic_flag && nonlinear_flag) { 
             throw std::runtime_error("json::validate_guidance: linear_quadratic and nonlinear guidance cannot both be present"); 
         }
 
-        if (velocity_bool && linear_quadratic_bool) { 
+        if (velocity_flag && linear_quadratic_flag) { 
             throw std::runtime_error("json::validate_guidance: velocity and linear_quadratic guidance cannot both be present"); 
         }
-        if (velocity_bool && nonlinear_bool) { 
+        if (velocity_flag && nonlinear_flag) { 
             throw std::runtime_error("json::validate_guidance: velocity and nonlinear guidance cannot both be present"); 
         }
     }

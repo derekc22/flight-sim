@@ -77,12 +77,12 @@ namespace json {
 	void validate_log_hz(double hz, const nlohmann::json& enable_json) {
 		if (enable_json.at("verbose").get<bool>()) {
 			if (!hz) {
-				throw std::runtime_error("json::validate_log_hz verbose requires logging hz to be specified"); 
+				throw std::runtime_error("json::validate_log_hz verbose requires log hz to be specified"); 
 			}
 		}
 		if (enable_json.at("rerun").get<bool>()) {
 			if (!hz) {
-				throw std::runtime_error("json::validate_log_hz rerun requires logging hz to be specified"); 
+				throw std::runtime_error("json::validate_log_hz rerun requires log hz to be specified"); 
 			}
 		}
 		if (hz > constants::hz) {
@@ -125,16 +125,16 @@ namespace json {
 			.guidance_hz = simulation_hz_json.at("guidance").get<double>(),
 			.control_hz = simulation_hz_json.at("control").get<double>(),
 
-			.trim_bool=simulation_enable_json.at("trim").get<bool>(),
-			.avionics_bool=simulation_enable_json.at("avionics").get<bool>(),
-			.control_bool=simulation_enable_json.at("control").get<bool>(),
-			.estimation_bool=simulation_enable_json.at("estimation").get<bool>(),
-			.wind_bool=simulation_enable_json.at("wind").get<bool>(),
+			.trim_flag=simulation_enable_json.at("trim").get<bool>(),
+			.avionics_flag=simulation_enable_json.at("avionics").get<bool>(),
+			.control_flag=simulation_enable_json.at("control").get<bool>(),
+			.estimation_flag=simulation_enable_json.at("estimation").get<bool>(),
+			.wind_flag=simulation_enable_json.at("wind").get<bool>(),
 
 			.log_hz = log_hz,
 
-			.verbose_bool=logging_enable_json.at("verbose").get<bool>(),
-			.rerun_bool=logging_enable_json.at("rerun").get<bool>()
+			.verbose_flag=logging_enable_json.at("verbose").get<bool>(),
+			.rerun_flag=logging_enable_json.at("rerun").get<bool>()
 		};
 
     }

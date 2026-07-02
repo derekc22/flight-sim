@@ -11,9 +11,9 @@ int main(int argc, char* argv[]) {
     }
 
     std::string aircraft_id = argv[1];
-    bool data_bool = std::stoi(argv[2]) == 1;
-    bool analysis_bool = std::stoi(argv[3]) == 1;
-    bool fast_bool = std::stoi(argv[4]) == 1;
+    bool data_flag = std::stoi(argv[2]) == 1;
+    bool analysis_flag = std::stoi(argv[3]) == 1;
+    bool fast_flag = std::stoi(argv[4]) == 1;
     std::string log_dir_path = argv[5];
     std::string data_dir_path = argv[6];
     std::string report_dir_path = argv[7];
@@ -21,9 +21,9 @@ int main(int argc, char* argv[]) {
     // create cli options
     runner::CLIOptions cli_options {
         .aircraft_id=aircraft_id,
-        .data_bool=data_bool,
-        .analysis_bool=analysis_bool,
-        .fast_bool=fast_bool,
+        .data_flag=data_flag,
+        .analysis_flag=analysis_flag,
+        .fast_flag=fast_flag,
         .log_dir_path=log_dir_path,
         .data_dir_path=data_dir_path,
         .report_dir_path=report_dir_path,

@@ -28,6 +28,6 @@ namespace estimation {
         LinearKalmanEstimator linear_kalman_estimator;
         ExtendedKalmanEstimator extended_kalman_estimator;
 
-        EstimationOutput step(const EstimatorInputs& inputs, bool trim_bool);
+        EstimationOutput step(const EstimatorInputs& inputs, bool trim_flag);
     };
 }

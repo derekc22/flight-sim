@@ -38,7 +38,7 @@
 
 namespace runner {
 
-    vehicles::Aircraft load_vehicle(const std::string& aircraft_id, bool trim_bool) {
+    vehicles::Aircraft load_vehicle(const std::string& aircraft_id, bool trim_flag) {
         structural::StructuralProperties structural_properties = json::parse_structural_config();
         actuators::ActuatorProperties actuator_properties = json::parse_actuator_config(structural_properties);
         control::ControlProperties control_properties = json::parse_control_config();
@@ -57,7 +57,7 @@ namespace runner {
         };
 
         // set initial conditions from config
-        aircraft.step(json::parse_initialization_config(trim_bool));
+        aircraft.step(json::parse_initialization_config(trim_flag));
 
         // parse settings
         settings::SettingsManager settings_manager = json::parse_settings_config(actuator_properties);
@@ -82,14 +82,14 @@ namespace runner {
         json_options(json_options),
 
         // load vehicle
-        aircraft(load_vehicle(cli_options.aircraft_id, json_options.trim_bool)),
+        aircraft(load_vehicle(cli_options.aircraft_id, json_options.trim_flag)),
 
         // create data manager
-        data_manager(json_options.tf, cli_options.data_bool, json_options.control_bool, json_options.avionics_bool, json_options.estimation_bool, json_options.wind_bool),
-        rerun_manager(json_options.rerun_bool, json_options.control_bool, json_options.avionics_bool, json_options.estimation_bool, json_options.wind_bool, json_options.log_hz),
+        data_manager(json_options.tf, cli_options.data_flag, json_options.control_flag, json_options.avionics_flag, json_options.estimation_flag, json_options.wind_flag),
+        rerun_manager(json_options.rerun_flag, json_options.control_flag, json_options.avionics_flag, json_options.estimation_flag, json_options.wind_flag, json_options.log_hz),
         
         // create analysis manager
-        analysis_manager{.data_bool=cli_options.data_bool, .analysis_bool=cli_options.analysis_bool, .trim_bool=json_options.trim_bool},
+        analysis_manager{.data_flag=cli_options.data_flag, .analysis_flag=cli_options.analysis_flag, .trim_flag=json_options.trim_flag},
 
         // initialize udp connections
         udp_out(5510),
@@ -141,7 +141,7 @@ namespace runner {
 
         // apply wind
         atmospheric::Wind windB { constants::Zero3 };
-        if (options.wind_bool) {
+        if (options.wind_flag) {
             windB.data = frames::transform_vec(
                 cached_msg_out.wind.data,
                 aircraft.NEDFrameECEF,
@@ -170,7 +170,7 @@ namespace runner {
         atmospheric::StaticAtmosphericState atm_t = atmospheric::compute_static_atmospheric_state(aircraft.FRDFrameECEF);
 
         // trim and linearization
-        if (options.trim_bool && !trim_sol.attempted) {
+        if (options.trim_flag && !trim_sol.attempted) {
             trim_sol = trim::inspect_trim(aircraft, windB);
 
             // initialize analysis context
@@ -254,7 +254,7 @@ namespace runner {
         // use sensors and avionics
         sensors::SensorMeasurements sensor_meas;
 
-        if (options.avionics_bool) {
+        if (options.avionics_flag) {
             if (acc.sensor_acc >= constants::hz) {
 
                 // step sensors
@@ -266,7 +266,7 @@ namespace runner {
             else sensor_meas = sensor_meas_t_1; // perform ZOH
         }
 
-        if (options.avionics_bool) {
+        if (options.avionics_flag) {
             if (acc.avionics_acc >= constants::hz) {
                 // aggregate ground truth avionics data
                 avionics::AvionicsGroundTruth avionics_gt = avionics::build_avionics_gt(
@@ -297,7 +297,7 @@ namespace runner {
         // initialize estimated state to measurements
         dynamics::RigidBodyState Zt = Yt;
 
-        if (options.estimation_bool) {
+        if (options.estimation_flag) {
             if (acc.estimation_acc >= constants::hz) {
                 linearization::LocalLinearization estimator_lin_sol;
                 operating::OperatingPoint estimator_operating_point;
@@ -345,7 +345,7 @@ namespace runner {
                 };
 
                 // overwrite local estimated state with estimator result
-                Zt = estimation_properties.step(estimator_inputs, options.trim_bool).Zt;
+                Zt = estimation_properties.step(estimator_inputs, options.trim_flag).Zt;
                 Zt_1 = Zt;
 
                 acc.estimation_acc -= constants::hz;
@@ -355,7 +355,7 @@ namespace runner {
 
         // specify guidance setpoint
         guidance::GuidanceSetpoint setpoint{};
-        if (options.control_bool) {
+        if (options.control_flag) {
             if (acc.guidance_acc >= constants::hz) {
                 setpoint = guidance_properties.step(options.tf);
                 setpoint_t_1 = setpoint;
@@ -368,11 +368,11 @@ namespace runner {
         // specify control commands
         control::ControlOutput u_cmd{};
 
-        if (options.trim_bool && !options.control_bool) {
+        if (options.trim_flag && !options.control_flag) {
             u_cmd = trim::set_control_inputs_from_trim(trim_sol);
         }
 
-        if (options.control_bool) {
+        if (options.control_flag) {
             if (acc.control_acc >= constants::hz) {
                 control::ControllerInputs controller_inputs {
                     .attitude_controller_input = control::AttitudeControllerInput{
@@ -401,7 +401,7 @@ namespace runner {
                         .setpoint = guidance::NonlinearSetpoint{ setpoint }
                     }
                 };
-                u_cmd = control_properties.step(controller_inputs, options.trim_bool);
+                u_cmd = control_properties.step(controller_inputs, options.trim_flag);
                 u_cmd_t_1 = u_cmd;
 
                 acc.control_acc -= constants::hz;
@@ -473,7 +473,7 @@ namespace runner {
             rerun_manager.step(t, data_context);
 
             // log state
-            if (options.verbose_bool) {
+            if (options.verbose_flag) {
                 log_state(t, Xt, geo_t, aero_t, windB);
             }
             acc.log_acc -= constants::hz;
@@ -525,7 +525,7 @@ namespace runner {
         );
 
         // sleep to maintain frequency dictated by dt
-        if (!cli_options.fast_bool) {
+        if (!cli_options.fast_flag) {
             std::this_thread::sleep_until(next);
         }
     }

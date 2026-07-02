@@ -11,10 +11,10 @@
 namespace io {
 
     void AnalysisManager::step(const AnalysisContext& context) {
-        if (data_bool && analysis_bool) {
+        if (data_flag && analysis_flag) {
             aircraft_id = context.aircraft_id;
 
-            if (trim_bool) {
+            if (trim_flag) {
                 trim_sol = context.trim_sol;
 
                 if (context.trim_sol.converged) {
@@ -26,13 +26,13 @@ namespace io {
     }
 
     void AnalysisManager::save(const std::string& data_dir_path, const std::string& report_dir_path) {
-        if (data_bool && analysis_bool) {
+        if (data_flag && analysis_flag) {
 
             MatlabContext matlab_context {
                 .aircraft_id = aircraft_id
             };
 
-            if (trim_bool) {
+            if (trim_flag) {
                 write_txt(trim::print_trim_solution(trim_sol), report_dir_path, "trim_sol");
 
                 if (trim_sol.converged) {

@@ -47,7 +47,7 @@ namespace control {
         LinearQuadraticController linear_quadratic_controller;
         NonlinearController nonlinear_controller;
 
-        ControlOutput step(const ControllerInputs& inputs, bool trim_bool);
+        ControlOutput step(const ControllerInputs& inputs, bool trim_flag);
     };
 
 }
