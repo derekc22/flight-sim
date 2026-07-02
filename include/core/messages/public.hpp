@@ -27,7 +27,7 @@ namespace messages {
         geography::GroundElevation ground_elevation{ 0.0 };
     };
 
-    FlightGearMessageIn process_in_pkt(const geography::GeographicState& geo, const dynamics::EulerAngles& attitude);
-    ProcessedFlightGearMessageOut process_out_pkt(const FlightGearMessageOut& out_pkt);
+    FlightGearMessageIn process_in_msg(const geography::GeographicState& geo, const dynamics::EulerAngles& attitude);
+    ProcessedFlightGearMessageOut process_out_msg(const FlightGearMessageOut& out_msg);
 
 }

@@ -135,8 +135,8 @@ namespace runner {
         JSONOptions& options = json_options; 
 
         // fetch from FlightGear
-        if (auto out_pkt = udp_out.try_receive()) {
-            cached_msg_out = messages::process_out_pkt(out_pkt.value());
+        if (auto out_msg = udp_out.try_receive()) {
+            cached_msg_out = messages::process_out_msg(out_msg.value());
         }
 
         // apply wind
@@ -507,14 +507,14 @@ namespace runner {
         };
         failure_manager.check_runtime_failures(failure_inputs);
 
-        // generate in_pkt from the simulation state
-        messages::FlightGearMessageIn in_pkt = messages::process_in_pkt(
+        // generate in_msg from the simulation state
+        messages::FlightGearMessageIn in_msg = messages::process_in_msg(
             geo_t1,
             aircraft.FRDFrameNED.eulNB
         );
 
-        // send packet
-        udp_in.send(in_pkt);
+        // send message
+        udp_in.send(in_msg);
 
         // step accumulator
         acc.step(options);

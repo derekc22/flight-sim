@@ -5,7 +5,7 @@
 
 namespace messages {
 
-    FlightGearMessageIn process_in_pkt(const geography::GeographicState& geo, const dynamics::EulerAngles& attitude) {
+    FlightGearMessageIn process_in_msg(const geography::GeographicState& geo, const dynamics::EulerAngles& attitude) {
         return FlightGearMessageIn {
             .altitude_ft = util::m_to_ft(geo.alt.data),
             .latitude_deg = util::rad_to_deg(geo.lat.data),
@@ -16,12 +16,12 @@ namespace messages {
         };
     }
 
-    ProcessedFlightGearMessageOut process_out_pkt(const FlightGearMessageOut& out_pkt) {
+    ProcessedFlightGearMessageOut process_out_msg(const FlightGearMessageOut& out_msg) {
         atmospheric::Wind wind = atmospheric::build_wind(
-            out_pkt.wind_heading_deg, 
-            out_pkt.wind_speed_kt
+            out_msg.wind_heading_deg, 
+            out_msg.wind_speed_kt
         );
-        geography::GroundElevation ground_elevation{ util::ft_to_m(out_pkt.ground_elev_ft) };
+        geography::GroundElevation ground_elevation{ util::ft_to_m(out_msg.ground_elev_ft) };
 
         return { .wind = wind, .ground_elevation = ground_elevation };
     }
