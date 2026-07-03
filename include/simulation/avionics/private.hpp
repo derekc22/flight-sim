@@ -51,8 +51,10 @@ namespace avionics {
         );
         double Kp;
         double Ki;
+        double fB_tol_scale;
+
         Eigen::Vector3d integral = constants::Zero3;
-        double fB_tol = 0.2 * constants::g_earth;
+        double fB_tol = fB_tol_scale * constants::g_earth;
     };
 
     struct InertialNavigationSystem {

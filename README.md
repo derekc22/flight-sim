@@ -40,7 +40,7 @@ https://www.mathworks.com/products/compiler/matlab-runtime.html
 - `scripts/bin/plot.sh` generates plots from logged data
 - `scripts/bin/analyze.sh` runs post-run analysis with MATLAB
 - `scripts/bin/test.sh` runs unit tests
-- `.env` stores local machine paths for the repository, FlightGear, and the FlightGear protocol directory
+- `.env` stores local machine paths for the repository, FlightGear, and MATLAB
 
 ## Setup
 
@@ -54,6 +54,7 @@ Customize the following JSON configuration file paths in `config/run.json`:
 - `structural_config`: Structural properties
 - `aerodynamics_config`: Aerodynamic properties
 - `avionics_config`: Avionics properties
+- `sensors_config`: Sensor properties
 - `actuator_config`: Actuator properties
 - `control_config`: Control properties
 - `estimation_config`: Estimation properties

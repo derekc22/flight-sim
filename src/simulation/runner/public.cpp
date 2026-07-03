@@ -25,6 +25,7 @@
 #include "core/connection/public.hpp"
 #include "core/json/actuators/public.hpp"
 #include "core/json/aerodynamics/public.hpp"
+#include "core/json/avionics/public.hpp"
 #include "core/json/sensors/public.hpp"
 #include "core/json/control/public.hpp"
 #include "core/json/estimation/public.hpp"
@@ -51,7 +52,7 @@ namespace runner {
             actuator_properties,
             control_properties,
             json::parse_sensors_config(),
-            avionics::AvionicsProperties{},
+            json::parse_avionics_config(),
             json::parse_guidance_config(control_properties),
             json::parse_estimation_config()
         };
