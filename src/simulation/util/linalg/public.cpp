@@ -23,8 +23,4 @@ namespace util {
         return v / n;
     }
 
-    double vector_norm(const Eigen::Vector3d& v) {
-        return sqrt(v.dot(v));
-    }
-
 }

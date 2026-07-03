@@ -25,18 +25,49 @@ namespace avionics {
     struct AirDensityMeasurement : atmospheric::AirDensity {};
 
     struct AirDataComputer {
-        FreeStreamVelocityMeasurement compute(const MachNumberMeasurement& Mach, const StaticAirTemperatureMeasurement& T);
-        PressureAltitudeMeasurement compute(const sensors::StaticAirPressureMeasurement& P);
-        VerticalSpeedMeasurement compute(const sensors::StaticAirPressureMeasurement& P, const sensors::StaticAirPressureMeasurement& prev_P, const StaticAirTemperatureMeasurement& T);
-        AirDensityMeasurement compute(const sensors::StaticAirPressureMeasurement& P, const StaticAirTemperatureMeasurement& T);
+        FreeStreamVelocityMeasurement compute(
+            const MachNumberMeasurement& Mach, 
+            const StaticAirTemperatureMeasurement& T
+        );
+        PressureAltitudeMeasurement compute(
+            const sensors::StaticAirPressureMeasurement& P
+        );
+        VerticalSpeedMeasurement compute(
+            const sensors::StaticAirPressureMeasurement& P, 
+            const sensors::StaticAirPressureMeasurement& prev_P, 
+            const StaticAirTemperatureMeasurement& T
+        );
+        AirDensityMeasurement compute(
+            const sensors::StaticAirPressureMeasurement& P,     
+            const StaticAirTemperatureMeasurement& T
+        );
     };
 
     struct AttitudeHeadingReferenceSystem {
-        OrientationMeasurement compute(const OrientationMeasurement& prev_qIB, const sensors::AngularVelocityMeasurement& wB_BI);
+        OrientationMeasurement compute(
+            const OrientationMeasurement& prev_qIB, 
+            const sensors::AngularVelocityMeasurement& wB_BI,
+            const sensors::TranslationalAccelerationMeasurement& fB
+        );
+        double Kp;
+        double Ki;
+        Eigen::Vector3d integral = constants::Zero3;
+        double fB_tol = 0.2 * constants::g_earth;
     };
 
     struct InertialNavigationSystem {
-        sensors::PositionMeasurement compute(const sensors::PositionMeasurement& prev_pI_BI, const sensors::TranslationalVelocityMeasurement& prev_vB_BI, const sensors::TranslationalAccelerationMeasurement& fB, const dynamics::Gravity& gB, const OrientationMeasurement& prev_qIB);
-        sensors::TranslationalVelocityMeasurement compute(const sensors::TranslationalVelocityMeasurement& prev_vB_BI, const sensors::TranslationalAccelerationMeasurement& fB, const dynamics::Gravity& gB, const sensors::AngularVelocityMeasurement& wB_BI);
+        sensors::PositionMeasurement compute(
+            const sensors::PositionMeasurement& prev_pI_BI, 
+            const sensors::TranslationalVelocityMeasurement& prev_vB_BI, 
+            const sensors::TranslationalAccelerationMeasurement& fB, 
+            const dynamics::Gravity& gB, 
+            const OrientationMeasurement& prev_qIB
+        );
+        sensors::TranslationalVelocityMeasurement compute(
+            const sensors::TranslationalVelocityMeasurement& prev_vB_BI, 
+            const sensors::TranslationalAccelerationMeasurement& fB,
+            const dynamics::Gravity& gB, 
+            const sensors::AngularVelocityMeasurement& wB_BI
+        );
     };
 }

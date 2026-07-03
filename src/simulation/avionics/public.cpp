@@ -14,8 +14,8 @@ namespace avionics {
         const sensors::SensorGroundTruth& sensor_gt,
         const AvionicsGroundTruth& avionics_gt
     ) {
-        MachNumberMeasurement curr_Mach_meas{ atmospheric::compute_mach(sensor_meas.P0, sensor_meas.P).data };
-        StaticAirTemperatureMeasurement curr_T_meas{ atmospheric::T_from_T0(sensor_meas.T0, curr_Mach_meas) };
+        MachNumberMeasurement mach_meas{ atmospheric::compute_mach(sensor_meas.P0, sensor_meas.P) };
+        StaticAirTemperatureMeasurement T_meas{ atmospheric::T_from_T0(sensor_meas.T0, mach_meas) };
 
         AvionicsMeasurements avionics_meas {
             .pI_BI_ins = hist ?
@@ -25,30 +25,31 @@ namespace avionics {
                             sensor_meas.fB,
                             avionics_gt.gB,
                             hist->qIB
-                        ) : sensors::PositionMeasurement{ sensor_gt.pI_BI.data },
+                        ) : sensors::PositionMeasurement{ sensor_gt.pI_BI },
             .vB_BI_ins = hist ?
                          avionics.INS.compute(
                             hist->vB_BI_ins,
                             sensor_meas.fB,
                             avionics_gt.gB,
                             sensor_meas.wB_BI
-                        ) : sensors::TranslationalVelocityMeasurement{ sensor_gt.vB_BI.data },
-            .T = curr_T_meas,
-            .Mach = curr_Mach_meas,
+                        ) : sensors::TranslationalVelocityMeasurement{ sensor_gt.vB_BI },
+            .T = T_meas,
+            .Mach = mach_meas,
             .qIB = hist ?
                    avionics.AHRS.compute(
                       hist->qIB,
-                      sensor_meas.wB_BI
-                    ) : OrientationMeasurement{ avionics_gt.qIB.data },
-            .Vinf = avionics.ADC.compute(curr_Mach_meas, curr_T_meas),
+                      sensor_meas.wB_BI,
+                      sensor_meas.fB
+                    ) : OrientationMeasurement{ avionics_gt.qIB },
+            .Vinf = avionics.ADC.compute(mach_meas, T_meas),
             .pressure_alt_BE = avionics.ADC.compute(sensor_meas.P),
             .alt_BE_dot = sensor_hist ?
                           avionics.ADC.compute(
                             sensor_meas.P,
                             sensor_hist->P,
-                            curr_T_meas
-                        ) : VerticalSpeedMeasurement{ avionics_gt.alt_BE_dot.data },
-            .rho = avionics.ADC.compute(sensor_meas.P, curr_T_meas)
+                            T_meas
+                        ) : VerticalSpeedMeasurement{ avionics_gt.alt_BE_dot },
+            .rho = avionics.ADC.compute(sensor_meas.P, T_meas)
         };
 
         hist = avionics_meas;

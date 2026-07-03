@@ -24,9 +24,6 @@ namespace util {
     CppAD::AD<double> clamp_positive(const CppAD::AD<double>& x, double max_value);
     CppAD::AD<double> clamp_to_1(const CppAD::AD<double>& x);
 
-    double vector_norm(const Eigen::Vector3d& v);
-    CppAD::AD<double> vector_norm(const Eigen::Matrix<CppAD::AD<double>, 3, 1>& v);
-
     Eigen::Matrix<CppAD::AD<double>, 3, 1> norm(const Eigen::Matrix<CppAD::AD<double>, 3, 1>& v);
 
 }

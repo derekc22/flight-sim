@@ -12,7 +12,7 @@ namespace aerodynamics {
         SurfaceKinematics_T<T> out;
         const constants::Vector3_T<T> p_ac_cg = s.p_ac_cg.cast<T>();
         out.vB_rel = (twist.v - windB.data.cast<T>()) + twist.w.cross(p_ac_cg);
-        out.V = util::vector_norm(out.vB_rel);
+        out.V = out.vB_rel.norm();
 
         if (out.V < T(constants::eps)) {
             return out;
@@ -96,7 +96,7 @@ namespace aerodynamics {
     AerodynamicState_T<T> compute_aerodynamic_state_T(const dynamics::Twist_T<T>& twist, const atmospheric::Wind& windB) {
         AerodynamicState_T<T> out;
         const constants::Vector3_T<T> vB_rel = twist.v - windB.data.cast<T>();
-        out.Vinf = util::vector_norm(vB_rel);
+        out.Vinf = vB_rel.norm();
 
         if (out.Vinf > T(constants::eps)) {
             out.alpha = util::atan2(vB_rel.z(), vB_rel.x());

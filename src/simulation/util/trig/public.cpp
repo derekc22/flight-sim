@@ -21,7 +21,7 @@ namespace util {
     }
 
     double cot(double x) {
-        return 1.0 / std::tan(x);
+        return std::cos(x) / std::sin(x);
     }
 
     double sin(double x) {
