@@ -161,8 +161,8 @@ namespace dynamics {
         if (F.parent != nullptr && F.parent->name != "NEDFrameECEF") {
             throw std::invalid_argument(
                 std::format(
-                    "dynamics::rigid_body_state: Invalid frame input"
-                    ". The parent of {} must be an inertial frame: ECEFFrame or NEDFrameECEF", F.name
+                    "dynamics::rigid_body_state: Invalid frame input. "
+                    "The parent of {} must be an inertial frame: ECEFFrame or NEDFrameECEF", F.name
                 )
             );
         }
@@ -235,7 +235,7 @@ namespace dynamics {
         // Quaternion rotational kinematics
         const OrientationQuaternion qIB_t1 = quat_kin(XB_BI_t.q, XB_BI_t.w);
 
-        // Convert body velocity/acceleleration to inertial for translational kinematics update on pI_BI
+        // Convert body velocity/acceleration to inertial for translational kinematics update on pI_BI
         const TranslationalVelocity vI_BI_t { CBI_t * XB_BI_t.v.data };
         const TranslationalAcceleration aI_BI_t { CBI_t * aB_BI_t.data };
 

@@ -29,8 +29,26 @@ namespace avionics {
         return { rho };
     }
 
-    OrientationMeasurement AttitudeHeadingReferenceSystem::compute(const OrientationMeasurement& prev_qIB, const sensors::AngularVelocityMeasurement& wB_BI) {
-        return { dynamics::quat_kin(prev_qIB, wB_BI) };
+    OrientationMeasurement AttitudeHeadingReferenceSystem::compute(
+        const OrientationMeasurement& prev_qIB, 
+        const sensors::AngularVelocityMeasurement& wB_BI,
+        const sensors::TranslationalAccelerationMeasurement& fB
+    ) {
+        // Mahony filter
+        dynamics::OrientationQuaternion qIB_pred = dynamics::quat_kin(prev_qIB, wB_BI);
+        if (util::abs(fB.data.norm() - constants::g_earth) > fB_tol) {
+            return { qIB_pred };
+        }
+
+        Eigen::Vector3d gB_pred = qIB_pred.data * geography::gN().data;
+        Eigen::Vector3d gB_meas = -fB.data;
+        Eigen::Vector3d gB_err = gB_pred.normalized().cross(gB_meas.normalized());
+
+        integral += gB_err * constants::dt;
+        dynamics::AngularVelocity wB_BI_corrected{ wB_BI.data + Kp * gB_err + Ki * integral };
+
+        return { dynamics::quat_kin(prev_qIB, wB_BI_corrected) };
+
     }
 
     sensors::PositionMeasurement InertialNavigationSystem::compute(

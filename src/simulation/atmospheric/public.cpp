@@ -24,7 +24,7 @@ namespace atmospheric {
 
     MachNumber mps_to_mach(const dynamics::TranslationalVelocity& v, const StaticAirTemperature& T) {
         double a = util::sqrt(constants::gamma_air * constants::R_air * T.data);
-        double M = util::vector_norm(v.data)/a;
+        double M = v.data.norm()/a;
         return { M };
     }
 
