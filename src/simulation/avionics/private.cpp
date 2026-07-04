@@ -42,10 +42,10 @@ namespace avionics {
 
         Eigen::Vector3d gB_pred = qIB_pred.data * geography::gN().data;
         Eigen::Vector3d gB_meas = -fB.data;
-        Eigen::Vector3d gB_err = gB_pred.normalized().cross(gB_meas.normalized());
+        Eigen::Vector3d err = -gB_pred.normalized().cross(gB_meas.normalized());
 
-        integral += gB_err * constants::dt;
-        dynamics::AngularVelocity wB_BI_corrected{ wB_BI.data + Kp * gB_err + Ki * integral };
+        integral += err * constants::dt;
+        dynamics::AngularVelocity wB_BI_corrected{ wB_BI.data + Kp * err + Ki * integral };
 
         return { dynamics::quat_kin(prev_qIB, wB_BI_corrected) };
 
