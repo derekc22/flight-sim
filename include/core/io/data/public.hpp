@@ -7,6 +7,7 @@
 #include "simulation/atmospheric/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/guidance/public.hpp"
+#include "simulation/runner/public.hpp"
 
 namespace io {
 
@@ -33,11 +34,8 @@ namespace io {
     };
 
     struct DataManager {
-        bool data_flag;
-        bool control_flag;
-        bool avionics_flag;
-        bool estimation_flag;
-        bool wind_flag;
+        runner::CLIFlags cli_flags;
+        runner::JSONFlags json_flags;
 
         std::optional<DataTable> p_DT;
         std::optional<DataTable> p_meas_DT;
@@ -66,7 +64,7 @@ namespace io {
 
         void step(int t, const DataContext& context);
         void save(const std::string& data_dir_path);
-        DataManager(int tf, bool data_flag, bool control_flag, bool avionics_flag, bool estimation_flag, bool wind_flag);
+        DataManager(int tf, const runner::CLIFlags& cli_flags, const runner::JSONFlags& json_flags);
 
     };
 }

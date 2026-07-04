@@ -15,9 +15,9 @@ namespace estimation {
         LinearKalmanPolicy policy;
 
         LinearKalmanFilter(const LinearKalmanFilterParameters& params);
-        EstimationOutput step(const LinearKalmanEstimatorInput& input);
+        EstimationOutput step(const LinearKalmanEstimatorInput& input, double dt);
 
-        LinearKalmanPolicyInput make_linear_kalman_policy_input(const LinearKalmanEstimatorInput& input);
+        LinearKalmanPolicyInput make_linear_kalman_policy_input(const LinearKalmanEstimatorInput& input, double dt);
         dynamics::RigidBodyState make_lkf_state_estimate(const LinearKalmanEstimatorInput& input, const dynamics::StateVector_T<double>& zt);
 
     };

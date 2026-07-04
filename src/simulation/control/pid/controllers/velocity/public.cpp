@@ -63,12 +63,13 @@ namespace control {
         };
     }
 
-    ControlOutput VelocityPID::step(const VelocityControllerInput& input) {
+    ControlOutput VelocityPID::step(const VelocityControllerInput& input, double dt) {
         actuators::SurfaceActuatorInputs_T<double> u_surface{};
         actuators::PropulsorActuatorInputs_T<double> u_propulsor{};
 
         double T_tot = policy.step(
-            make_pid_policy_input(input)
+            make_pid_policy_input(input),
+            dt
         );
 
         auto [T_front, T_left, T_right] = allocate_thrust(T_tot, input.propulsor_actuators);

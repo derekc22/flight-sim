@@ -46,7 +46,7 @@ namespace guidance {
         TrajectoryType trajectory_type;
         Trajectory trajectory;
         int k = 0;
-        GuidanceSetpoint step(int tf);
+        GuidanceSetpoint step(int kf);
     };
 
     GuidanceSetpointVector unpack_guidance_setpoint(const dynamics::RigidBodyState& Xt);

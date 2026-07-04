@@ -23,7 +23,7 @@ namespace control {
         };
     }
 
-    ControlOutput LinearQuadraticRegulator::step(const LinearQuadraticControllerInput& input) {
+    ControlOutput LinearQuadraticRegulator::step(const LinearQuadraticControllerInput& input, double dt) {
         actuators::ActuatorInputsVector_T<double> u_deviation = policy.step(
             make_linear_quadratic_policy_input(input)
         );

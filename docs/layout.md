@@ -31,9 +31,11 @@ A symbol is public when any of these files includes it, calls it, constructs it,
 stores it, names it, or needs it to compile a declaration:
 
 - A file in a different module.
-- A file in `src/main.cpp` or tests.
 - For `simulation` symbols, any file in `src/core`, JSON, messages, or IO.
 - A public header or public `.tpp` in any sibling submodule.
+
+`src/main.cpp` and tests are one-way consumers. Their private uses do not force
+symbols into `public.*`.
 
 A symbol is private when all uses stay in one of these places:
 
@@ -77,9 +79,9 @@ header includes them.
 
 Put a symbol in `public.*` when a file outside the owner uses it, except for
 uses from sibling `.cpp`, `private.hpp`, or `private.tpp` files under the same
-immediate parent. `src/main.cpp` and tests always count as outside the owner.
-For `simulation` symbols, `src/core`, JSON, messages, and IO also always count
-as outside the owner.
+immediate parent. `src/main.cpp` and tests do not count as outside the owner
+for this rule. For `simulation` symbols, `src/core`, JSON, messages, and IO
+always count as outside the owner.
 
 Also put a symbol in `public.*` when any of these are true:
 
@@ -181,11 +183,14 @@ transitive includes.
 - Standard library headers must be included directly by the file that uses them.
 - Do not use broad aggregate headers to hide missing direct includes.
 
-Files outside the owner should include public headers, for example
+Module files outside the owner should include public headers, for example
 `simulation/actuators/propulsor/public.hpp`, not private owner headers such as
 `simulation/actuators/propulsor/private.hpp`. Core files follow the same rule:
 use `core/json/control/public.hpp`, not `core/json/control/private.hpp`, from
 outside `core/json/control`.
+
+`src/main.cpp` and tests may include private headers for executable wiring and
+white-box coverage.
 
 A module-level `public.hpp` can be a used public aggregate. A used aggregate may
 contain no declarations after its includes; an unused aggregate wrapper should
@@ -229,7 +234,7 @@ When creating or refactoring a module:
 
 1. Identify every symbol used outside its owner and outside sibling `.cpp`,
    `private.hpp`, or `private.tpp` files under the same immediate parent, then
-   put it in `public.*`.
+   put it in `public.*`. Ignore uses from `src/main.cpp` and tests.
 2. Put private-only symbols in `private.*`.
 3. Put template definitions in the matching `.tpp`.
 4. Put non-template definitions in the matching `.cpp`.

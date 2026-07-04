@@ -1,4 +1,5 @@
 #include <Eigen/Dense>
+#include "simulation/estimation/kalman/private.hpp"
 #include "simulation/estimation/kalman/linear_kalman/public.hpp"
 #include "simulation/estimation/kalman/linear_kalman/estimators/lkf/public.hpp"
 
@@ -8,7 +9,7 @@ namespace estimation {
         params(params), policy(params)
     {};
 
-    LinearKalmanPolicyInput LinearKalmanFilter::make_linear_kalman_policy_input(const LinearKalmanEstimatorInput& input) {
+    LinearKalmanPolicyInput LinearKalmanFilter::make_linear_kalman_policy_input(const LinearKalmanEstimatorInput& input, double dt) {
         dynamics::StateVector_T<double> yt_deviation = dynamics::unpack_state(
             input.Yt) - dynamics::unpack_state_T(input.operating_point.state);
 
@@ -16,7 +17,7 @@ namespace estimation {
             input.u_surface_actual_prev, input.u_propulsor_actual_prev) - 
             actuators::unpack_actuator_inputs_T(input.operating_point.input);
 
-        linearization::DiscretizedLocalLinearization lin_sol_k = linearization::discretize(input.lin_sol);
+        linearization::DiscretizedLocalLinearization lin_sol_k = linearization::discretize(input.lin_sol, dt);
 
         return {
             .A = lin_sol_k.A,
@@ -34,9 +35,9 @@ namespace estimation {
         return make_kalman_state_estimate(input.Yt, zt_full);
     }
 
-    EstimationOutput LinearKalmanFilter::step(const LinearKalmanEstimatorInput& input) {
+    EstimationOutput LinearKalmanFilter::step(const LinearKalmanEstimatorInput& input, double dt) {
         KalmanState kalman_state = policy.step(
-            make_linear_kalman_policy_input(input)
+            make_linear_kalman_policy_input(input, dt)
         );
 
         dynamics::RigidBodyState Zt = make_lkf_state_estimate(input, kalman_state.zt);

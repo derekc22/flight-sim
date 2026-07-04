@@ -11,9 +11,9 @@ namespace estimation {
         ExtendedKalmanFilter
     };
 
-    using LinearKalmanEstimator = std::function<EstimationOutput(const LinearKalmanEstimatorInput&)>;
+    using LinearKalmanEstimatorFunction = std::function<EstimationOutput(const LinearKalmanEstimatorInput&, double dt)>;
 
-    using ExtendedKalmanEstimator = std::function<EstimationOutput(const ExtendedKalmanEstimatorInput&)>;
+    using ExtendedKalmanEstimatorFunction = std::function<EstimationOutput(const ExtendedKalmanEstimatorInput&, double dt)>;
 
     struct EstimatorInputs {
         const dynamics::RigidBodyState& Yt;
@@ -25,9 +25,9 @@ namespace estimation {
         EstimatorType linear_kalman_estimator_type = EstimatorType::None;
         EstimatorType extended_kalman_estimator_type = EstimatorType::None;
 
-        LinearKalmanEstimator linear_kalman_estimator;
-        ExtendedKalmanEstimator extended_kalman_estimator;
+        LinearKalmanEstimatorFunction linear_kalman_estimator;
+        ExtendedKalmanEstimatorFunction extended_kalman_estimator;
 
-        EstimationOutput step(const EstimatorInputs& inputs, bool trim_flag);
+        EstimationOutput step(const EstimatorInputs& inputs, double dt, bool trim_flag);
     };
 }

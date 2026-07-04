@@ -41,21 +41,21 @@ namespace actuators {
         };
     }
 
-    SurfaceActuatorInputs_T<double> ActuatorProperties::step(const SurfaceActuatorInputs_T<double>& u_cmd) {
+    SurfaceActuatorInputs_T<double> ActuatorProperties::step(const SurfaceActuatorInputs_T<double>& u_cmd, double dt) {
         return {
-            .elevator_cmd = surface_actuators.elevator.step(u_cmd.elevator_cmd, surface_actuators.elevator.prev_cmd),
-            .aileron_cmd = surface_actuators.aileron.step(u_cmd.aileron_cmd, surface_actuators.aileron.prev_cmd),
-            .rudder_cmd = surface_actuators.rudder.step(u_cmd.rudder_cmd, surface_actuators.rudder.prev_cmd),
-            .flap_cmd = surface_actuators.flap.step(u_cmd.flap_cmd, surface_actuators.flap.prev_cmd),
-            .spoiler_cmd = surface_actuators.spoiler.step(u_cmd.spoiler_cmd, surface_actuators.spoiler.prev_cmd)
+            .elevator_cmd = surface_actuators.elevator.step(u_cmd.elevator_cmd, surface_actuators.elevator.prev_cmd, dt),
+            .aileron_cmd = surface_actuators.aileron.step(u_cmd.aileron_cmd, surface_actuators.aileron.prev_cmd, dt),
+            .rudder_cmd = surface_actuators.rudder.step(u_cmd.rudder_cmd, surface_actuators.rudder.prev_cmd, dt),
+            .flap_cmd = surface_actuators.flap.step(u_cmd.flap_cmd, surface_actuators.flap.prev_cmd, dt),
+            .spoiler_cmd = surface_actuators.spoiler.step(u_cmd.spoiler_cmd, surface_actuators.spoiler.prev_cmd, dt)
         };
     }
 
-    PropulsorActuatorInputs_T<double> ActuatorProperties::step(const PropulsorActuatorInputs_T<double>& u_cmd) {
+    PropulsorActuatorInputs_T<double> ActuatorProperties::step(const PropulsorActuatorInputs_T<double>& u_cmd, double dt) {
         return {
-            .front_propulsor_cmd = propulsor_actuators.front_propulsor.step(u_cmd.front_propulsor_cmd, propulsor_actuators.front_propulsor.prev_cmd),
-            .left_propulsor_cmd = propulsor_actuators.left_propulsor.step(u_cmd.left_propulsor_cmd, propulsor_actuators.left_propulsor.prev_cmd),
-            .right_propulsor_cmd = propulsor_actuators.right_propulsor.step(u_cmd.right_propulsor_cmd, propulsor_actuators.right_propulsor.prev_cmd),
+            .front_propulsor_cmd = propulsor_actuators.front_propulsor.step(u_cmd.front_propulsor_cmd, propulsor_actuators.front_propulsor.prev_cmd, dt),
+            .left_propulsor_cmd = propulsor_actuators.left_propulsor.step(u_cmd.left_propulsor_cmd, propulsor_actuators.left_propulsor.prev_cmd, dt),
+            .right_propulsor_cmd = propulsor_actuators.right_propulsor.step(u_cmd.right_propulsor_cmd, propulsor_actuators.right_propulsor.prev_cmd, dt),
         };
     }
 

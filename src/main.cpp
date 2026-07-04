@@ -1,5 +1,6 @@
 #include <string>
 #include <spdlog/spdlog.h>
+#include "simulation/runner/private.hpp"
 #include "simulation/runner/public.hpp"
 #include "core/json/runner/public.hpp"
 
@@ -18,12 +19,17 @@ int main(int argc, char* argv[]) {
     std::string data_dir_path = argv[6];
     std::string report_dir_path = argv[7];
 
+    // aggregate cli flags
+    runner::CLIFlags cli_flags {
+        .data_flag=data_flag,
+        .analysis_flag=analysis_flag,
+        .fast_flag=fast_flag
+    };
+
     // create cli options
     runner::CLIOptions cli_options {
         .aircraft_id=aircraft_id,
-        .data_flag=data_flag,
-        .analysis_flag=analysis_flag,
-        .fast_flag=fast_flag,
+        .flags=cli_flags,
         .log_dir_path=log_dir_path,
         .data_dir_path=data_dir_path,
         .report_dir_path=report_dir_path,

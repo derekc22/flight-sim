@@ -8,12 +8,12 @@ namespace actuators {
 
     Actuator::Actuator() : Actuator(0.0, 0.0, 0.0) {};
 
-    double Actuator::step(double cmd, std::optional<double>& lag_state) {
+    double Actuator::step(double cmd, std::optional<double>& lag_state, double dt) {
         double cmd_clamped = util::clamp(cmd, limit_min, limit_max);
         double init_lag_state = util::clamp(0.0, limit_min, limit_max);
 
         double prev_cmd = lag_state ? lag_state.value() : init_lag_state;
-        double cmd_lagged = util::first_order_lag(cmd_clamped, prev_cmd, tau);
+        double cmd_lagged = util::first_order_lag(cmd_clamped, prev_cmd, tau, dt);
         lag_state = cmd_lagged;
         return cmd_lagged;
     }
