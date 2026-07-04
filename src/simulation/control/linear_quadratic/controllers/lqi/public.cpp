@@ -25,11 +25,11 @@ namespace control {
         });
     };
 
-    IntegratedStateVector LinearQuadraticIntegrator::integrate_state_err(const dynamics::StateVector_T<double>& zt, const dynamics::StateVector_T<double>& zt_des) {
+    IntegratedStateVector LinearQuadraticIntegrator::integrate_state_err(const dynamics::StateVector_T<double>& zt, const dynamics::StateVector_T<double>& zt_des, double dt) {
         IntegratedStateVector zt_pqr = zt.segment<integrated_state_dim>(3);  // grab p, q, r
         IntegratedStateVector zt_des_pqr = zt_des.segment<integrated_state_dim>(3);
 
-        return integral + (zt_des_pqr - zt_pqr) * constants::dt;     // integrate
+        return integral + (zt_des_pqr - zt_pqr) * dt;     // integrate
     }
 
 
@@ -67,12 +67,13 @@ namespace control {
         };
     }
 
-    ControlOutput LinearQuadraticIntegrator::step(const LinearQuadraticControllerInput& input) {
+    ControlOutput LinearQuadraticIntegrator::step(const LinearQuadraticControllerInput& input, double dt) {
 
         // integral candidate
         IntegratedStateVector integral_new = integrate_state_err(
             dynamics::unpack_state(input.Zt),
-            unpack_state(input.setpoint)
+            unpack_state(input.setpoint),
+            dt
         );
 
         actuators::ActuatorInputsVector_T<double> u_deviation = policy.step(

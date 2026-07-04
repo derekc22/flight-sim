@@ -21,13 +21,13 @@ namespace control {
         IncrementalNonlinearDynamicInversion
     };
 
-    using AttitudeController = std::function<ControlOutput(const AttitudeControllerInput&)>;
+    using AttitudeController = std::function<ControlOutput(const AttitudeControllerInput&, double dt)>;
 
-    using VelocityController = std::function<ControlOutput(const VelocityControllerInput&)>;
+    using VelocityController = std::function<ControlOutput(const VelocityControllerInput&, double dt)>;
 
-    using LinearQuadraticController = std::function<ControlOutput(const LinearQuadraticControllerInput&)>;
+    using LinearQuadraticController = std::function<ControlOutput(const LinearQuadraticControllerInput&, double dt)>;
 
-    using NonlinearController = std::function<ControlOutput(const NonlinearControllerInput&)>;
+    using NonlinearController = std::function<ControlOutput(const NonlinearControllerInput&, double dt)>;
 
     struct ControllerInputs {
         const AttitudeControllerInput& attitude_controller_input;
@@ -47,7 +47,7 @@ namespace control {
         LinearQuadraticController linear_quadratic_controller;
         NonlinearController nonlinear_controller;
 
-        ControlOutput step(const ControllerInputs& inputs, bool trim_flag);
+        ControlOutput step(const ControllerInputs& inputs, double dt, bool trim_flag);
     };
 
 }

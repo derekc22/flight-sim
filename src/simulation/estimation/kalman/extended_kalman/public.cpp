@@ -6,13 +6,12 @@
 #include "simulation/linearization/public.hpp"
 #include "simulation/operating/public.hpp"
 #include "simulation/estimation/kalman/extended_kalman/public.hpp"
-#include "simulation/estimation/kalman/private.hpp"
 
 namespace estimation {
 
     ExtendedKalmanPolicy::ExtendedKalmanPolicy(const ExtendedKalmanPolicyParameters& params) : params(params) {}
 
-    std::tuple<KalmanState, linearization::OutputJacobian> ExtendedKalmanPolicy::predict(const ExtendedKalmanPolicyInput& input) {
+    std::tuple<KalmanState, linearization::OutputJacobian> ExtendedKalmanPolicy::predict(const ExtendedKalmanPolicyInput& input, double dt) {
         KalmanState prev = state.value();
 
         dynamics::State_T<double> zt_1 = dynamics::pack_state_T(prev.zt);
@@ -21,12 +20,12 @@ namespace estimation {
 
         // A @ zt_1 + B @ ut_1 -> f(zt_1, ut_1)
         dynamics::StateDot_T<double> zt_1_dot = autodiff::compute_state_dot_T(zt_1, ut_1, model, input.conditions);
-        dynamics::StateVector_T<double> zt_bar = prev.zt + dynamics::unpack_state_dot_T(zt_1_dot) * constants::dt;
+        dynamics::StateVector_T<double> zt_bar = prev.zt + dynamics::unpack_state_dot_T(zt_1_dot) * dt;
 
         // A -> Ft
         operating::OperatingPoint operating_point{ .state = zt_1, .input = ut_1 };
         linearization::LocalLinearization lin_sol = linearization::linearize_operating_point(input.aircraft, operating_point, input.conditions);
-        linearization::StateJacobian Ft = linearization::discretize_euler(lin_sol).A;
+        linearization::StateJacobian Ft = linearization::discretize_euler(lin_sol, dt).A;
 
         Eigen::MatrixXd Pt_bar = Ft * prev.Pt * Ft.transpose() + params.R;
 
@@ -53,13 +52,13 @@ namespace estimation {
         return { .zt = zt, .Pt = Pt };
     }
 
-    KalmanState ExtendedKalmanPolicy::step(const ExtendedKalmanPolicyInput& input) {
+    KalmanState ExtendedKalmanPolicy::step(const ExtendedKalmanPolicyInput& input, double dt) {
         if (!state.has_value()) {
             state = KalmanState{ .zt = input.yt, .Pt = params.P0 };
             return state.value();
         }
 
-        auto [temporary, C] = predict(input);
+        auto [temporary, C] = predict(input, dt);
         state = temporary;
         state = correct(input, C);
 

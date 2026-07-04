@@ -18,8 +18,8 @@ namespace dynamics {
         return wB_BI_to_eul_dot_mat_T<double>(theta, phi);
     }
 
-    EulerAngles eul_kin(const EulerAngles& eul_t, const EulerAngleRates& eul_dot_t) {
-        const Eigen::Vector3d eul_t1 = eul_t.data + eul_dot_t.data * constants::dt;
+    EulerAngles eul_kin(const EulerAngles& eul_t, const EulerAngleRates& eul_dot_t, double dt) {
+        const Eigen::Vector3d eul_t1 = eul_t.data + eul_dot_t.data * dt;
 
         return { eul_t1 };
     }
@@ -37,7 +37,7 @@ namespace dynamics {
     }
 
 
-    OrientationMatrix rot_kin(const OrientationMatrix& CIB_t, const AngularVelocity& wB_BI_t) {
+    OrientationMatrix rot_kin(const OrientationMatrix& CIB_t, const AngularVelocity& wB_BI_t, double dt) {
         // strap_down/poisson
         const double Omega = wB_BI_t.data.norm();
         Eigen::Matrix3d exp_term;
@@ -46,7 +46,7 @@ namespace dynamics {
         else {
             const Eigen::Vector3d w_hat = wB_BI_t.data/Omega;
             Eigen::Matrix3d w_hat_skew = util::hat(w_hat);
-            exp_term = constants::I3 - util::sin(Omega * constants::dt) * w_hat_skew + (1 - util::cos(Omega * constants::dt)) * w_hat_skew * w_hat_skew;
+            exp_term = constants::I3 - util::sin(Omega * dt) * w_hat_skew + (1 - util::cos(Omega * dt)) * w_hat_skew * w_hat_skew;
         }
 
         const Eigen::Matrix3d CIB_t1 = exp_term * CIB_t.data;
@@ -74,10 +74,10 @@ namespace dynamics {
         return { ddtB_vB_BI_T<double>(vB_BI.data, wB_BI.data, mass.data, FB_net.data) };
     }
 
-    TranslationalVelocity trans_dyn_vel(const TranslationalVelocity& vB_BI_t, const AngularVelocity& wB_BI_t, const Mass& mass, const Force& FB_net_t) {
+    TranslationalVelocity trans_dyn_vel(const TranslationalVelocity& vB_BI_t, const AngularVelocity& wB_BI_t, const Mass& mass, const Force& FB_net_t, double dt) {
         const TranslationalAcceleration vB_BI_dot_t = ddtB_vB_BI(vB_BI_t, wB_BI_t, mass, FB_net_t);
 
-        const Eigen::Vector3d vB_BI_t1 = vB_BI_t.data + vB_BI_dot_t.data * constants::dt;
+        const Eigen::Vector3d vB_BI_t1 = vB_BI_t.data + vB_BI_dot_t.data * dt;
         return { vB_BI_t1 };
     }
 
@@ -93,10 +93,10 @@ namespace dynamics {
         return ddtB_wB_BI_T<double>(wB_BI.data, JB.data, MB_net.data);
     }
 
-    AngularVelocity rot_dyn(const AngularVelocity& wB_BI_t, const InertiaTensor& JB, const Moment& MB_net_t) {
+    AngularVelocity rot_dyn(const AngularVelocity& wB_BI_t, const InertiaTensor& JB, const Moment& MB_net_t, double dt) {
         const Eigen::Vector3d wB_BI_dot_t = ddtB_wB_BI(wB_BI_t, JB, MB_net_t);
 
-        const Eigen::Vector3d wB_BI_t1 = wB_BI_t.data + wB_BI_dot_t * constants::dt;
+        const Eigen::Vector3d wB_BI_t1 = wB_BI_t.data + wB_BI_dot_t * dt;
         return { wB_BI_t1 };
     }
 

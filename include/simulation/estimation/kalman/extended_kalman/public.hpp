@@ -6,7 +6,7 @@
 #include "simulation/dynamics/public.hpp"
 #include "simulation/linearization/public.hpp"
 #include "simulation/operating/public.hpp"
-#include "simulation/estimation/kalman/private.hpp"
+#include "simulation/estimation/kalman/public.hpp"
 
 namespace vehicles { struct Aircraft; } // forward declare
 
@@ -26,9 +26,9 @@ namespace estimation {
         std::optional<KalmanState> state;
 
         ExtendedKalmanPolicy(const ExtendedKalmanPolicyParameters& params);
-        KalmanState step(const ExtendedKalmanPolicyInput& input);
+        KalmanState step(const ExtendedKalmanPolicyInput& input, double dt);
 
-        std::tuple<KalmanState, linearization::OutputJacobian> predict(const ExtendedKalmanPolicyInput& input);
+        std::tuple<KalmanState, linearization::OutputJacobian> predict(const ExtendedKalmanPolicyInput& input, double dt);
         KalmanState correct(const ExtendedKalmanPolicyInput& input, const linearization::OutputJacobian& C);
     };
 

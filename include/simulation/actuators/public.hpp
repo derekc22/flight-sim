@@ -61,10 +61,10 @@ namespace actuators {
 
     struct ActuatorProperties {
         SurfaceActuators surface_actuators;
-        SurfaceActuatorInputs_T<double> step(const SurfaceActuatorInputs_T<double>& u_cmd);
+        SurfaceActuatorInputs_T<double> step(const SurfaceActuatorInputs_T<double>& u_cmd, double dt);
 
         PropulsorActuators propulsor_actuators;
-        PropulsorActuatorInputs_T<double> step(const PropulsorActuatorInputs_T<double>& u_cmd);
+        PropulsorActuatorInputs_T<double> step(const PropulsorActuatorInputs_T<double>& u_cmd, double dt);
 
         Settings settings;
     };

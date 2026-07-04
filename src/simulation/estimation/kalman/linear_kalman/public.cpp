@@ -1,6 +1,5 @@
 #include "simulation/dynamics/public.hpp"
 #include "simulation/estimation/kalman/linear_kalman/public.hpp"
-#include "simulation/estimation/kalman/private.hpp"
 
 namespace estimation {
 

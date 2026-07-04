@@ -14,7 +14,7 @@
 
 namespace linearization {
 
-    DiscretizedLocalLinearization discretize(const linearization::LocalLinearization& lin_sol) {
+    DiscretizedLocalLinearization discretize(const linearization::LocalLinearization& lin_sol, double dt) {
         int nx = lin_sol.A.rows();
         int nu = lin_sol.B.cols();
 
@@ -23,7 +23,7 @@ namespace linearization {
         M.block(0, 0, nx, nx) = lin_sol.A;
         M.block(0, nx, nx, nu) = lin_sol.B;
 
-        Eigen::MatrixXd Md = (M * constants::dt).exp();
+        Eigen::MatrixXd Md = (M * dt).exp();
 
         Eigen::MatrixXd Ak = Md.block(0, 0, nx, nx);
         Eigen::MatrixXd Bk = Md.block(0, nx, nx, nu);
@@ -32,11 +32,11 @@ namespace linearization {
         return { .A = Ak, .B = Bk, .C = lin_sol.C, .D = lin_sol.D };
     }
 
-    DiscretizedLocalLinearization discretize_euler(const linearization::LocalLinearization& lin_sol) {
+    DiscretizedLocalLinearization discretize_euler(const linearization::LocalLinearization& lin_sol, double dt) {
         int nx = lin_sol.A.rows();
 
-        Eigen::MatrixXd Ak = Eigen::MatrixXd::Identity(nx, nx) + constants::dt * lin_sol.A;
-        Eigen::MatrixXd Bk = constants::dt * lin_sol.B;
+        Eigen::MatrixXd Ak = Eigen::MatrixXd::Identity(nx, nx) + dt * lin_sol.A;
+        Eigen::MatrixXd Bk = dt * lin_sol.B;
 
         // C and D are pass-through
         return { .A = Ak, .B = Bk, .C = lin_sol.C, .D = lin_sol.D };

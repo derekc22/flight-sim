@@ -6,18 +6,18 @@ namespace control {
 
     PIDPolicy::PIDPolicy(const PIDPolicyParameters& params) : params(params) {}
 
-    double PIDPolicy::step(const PIDPolicyInput& input) {
+    double PIDPolicy::step(const PIDPolicyInput& input, double dt) {
         double err = input.x_des - input.x;
 
         double d_term = input.x_dot.has_value()
-                        ? input.x_dot.value()   // PI-D
-                        : (prev_err - err) / constants::dt; // PID
+                        ? input.x_dot.value()    // PI-D
+                        : (prev_err - err) / dt; // PID
 
         // filtered deriative
-        d_filtered = util::first_order_lag(d_term, d_filtered, params.tau);
+        d_filtered = util::first_order_lag(d_term, d_filtered, params.tau, dt);
 
         // integral candidate
-        double integral_new = integral + err * constants::dt;
+        double integral_new = integral + err * dt;
 
         // unsaturated control
         double u_unsat = params.Kp * err - params.Kd * d_filtered + params.Ki * integral_new;
@@ -26,7 +26,9 @@ namespace control {
         double u = util::clamp(u_unsat, input.limit_min, input.limit_max);
 
         // anti-windup
-        if ((u == u_unsat) || (u == input.limit_max && err < 0.0) || (u == input.limit_min && err > 0.0)) { integral = integral_new; }
+        if ((u == u_unsat) || (u == input.limit_max && err < 0.0) || (u == input.limit_min && err > 0.0)) { 
+            integral = integral_new;
+        }
 
         prev_err = err;
 

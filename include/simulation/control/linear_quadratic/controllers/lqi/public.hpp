@@ -19,10 +19,10 @@ namespace control {
         IntegratedStateVector integral = Eigen::Vector3d::Zero();
 
         LinearQuadraticIntegrator(const LinearQuadraticIntegratorParameters& params);
-        ControlOutput step(const LinearQuadraticControllerInput& input);
+        ControlOutput step(const LinearQuadraticControllerInput& input, double dt);
 
         LinearQuadraticPolicyInput make_linear_quadratic_policy_input(const LinearQuadraticControllerInput& input, const IntegratedStateVector& integral_candidate);
-        IntegratedStateVector integrate_state_err(const dynamics::StateVector_T<double>& zt, const dynamics::StateVector_T<double>& zt_des);
+        IntegratedStateVector integrate_state_err(const dynamics::StateVector_T<double>& zt, const dynamics::StateVector_T<double>& zt_des, double dt);
     };
 
 }

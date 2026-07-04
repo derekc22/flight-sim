@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "core/io/analysis/private.hpp"
+#include "core/io/analysis/public.hpp"
 
 namespace json {
 

@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <cmath>
 #include <cstdlib>
 #include <exception>
 #include <chrono>
@@ -12,19 +14,24 @@
 #include "simulation/actuators/surface/public.hpp"
 #include "simulation/constants/public.hpp"
 #include "simulation/dynamics/public.hpp"
+#include "simulation/runner/public.hpp"
 
 namespace io {
 
-    RerunManager::RerunManager(bool rerun_flag, bool control_flag, bool avionics_flag, bool estimation_flag, bool wind_flag, double log_hz)
-        : rerun_flag(rerun_flag), control_flag(control_flag), avionics_flag(avionics_flag), estimation_flag(estimation_flag), wind_flag(wind_flag), log_hz(log_hz), rec("flight_sim")
+    RerunManager::RerunManager(const runner::JSONFlags& json_flags, double log_hz)
+        : json_flags(json_flags), 
+          log_hz(log_hz), 
+          max_traj_size(std::max<std::size_t>(1, static_cast<std::size_t>(std::ceil(30.0 * log_hz)))),  // 30 seconds-worth of data
+          max_queue_size(std::max<std::size_t>(1, static_cast<std::size_t>(std::ceil(2.0 * log_hz)))),  // 2 seconds-worth of data
+          rec("flight-sim")
     {
-        if (rerun_flag) {
+        if (json_flags.rerun_flag) {
             auto server_uri = rec.serve_grpc("0.0.0.0", 9876, "1GiB").value;
             std::system("rerun assets/default.rbl --connect rerun+http://127.0.0.1:9876/proxy &");
 
             rec.log_static("/", rerun::ViewCoordinates::FRD);
             stream_vehicle_model(rec, q_model_to_body, "world/vehicle/frame");
-            if (estimation_flag) {
+            if (json_flags.estimation_flag) {
                 stream_vehicle_model(rec, q_model_to_body, "world/estimated_vehicle/frame");
             }
 
@@ -53,7 +60,7 @@ namespace io {
     }
 
     void RerunManager::step(int t, const DataContext& data_context) {
-        if (!rerun_flag) {
+        if (!json_flags.rerun_flag) {
             return;
         }
 
@@ -80,7 +87,7 @@ namespace io {
 
         stream_vehicle_transform(rec, context.data_context.Xt);
 
-        if (estimation_flag) {
+        if (json_flags.estimation_flag) {
             stream_estimated_vehicle_transform(rec, context.data_context.Zt);
         }
 
@@ -92,7 +99,7 @@ namespace io {
         clip_trajectory(trajectory, max_traj_size);
         stream_vehicle_trajectory(rec, trajectory);
 
-        if (estimation_flag) {
+        if (json_flags.estimation_flag) {
             estimated_trajectory.emplace_back(
                 static_cast<float>(context.data_context.Zt.p.data.x()),
                 static_cast<float>(context.data_context.Zt.p.data.y()),
@@ -105,7 +112,7 @@ namespace io {
         stream_body_arrow(rec, "world/vehicle/vectors/v", context.data_context.Xt.v.data, 1.0, rerun::Color(0, 180, 255), "v");
         stream_body_arrow(rec, "world/vehicle/vectors/w", context.data_context.Xt.w.data, 50.0, rerun::Color(255, 80, 200), "w");
 
-        if (estimation_flag) {
+        if (json_flags.estimation_flag) {
             stream_body_arrow(rec, "world/estimated_vehicle/vectors/v", context.data_context.Zt.v.data, 1.0, rerun::Color(0, 180, 255), "v");
             stream_body_arrow(rec, "world/estimated_vehicle/vectors/w", context.data_context.Zt.w.data, 50.0, rerun::Color(255, 80, 200), "w");
         }
@@ -137,13 +144,13 @@ namespace io {
         stream_vector(rec, "forces/propulsive", context.data_context.WB_propulsive.F.data, xyz_labels);
         stream_vector(rec, "moments/propulsive", context.data_context.WB_propulsive.M.data, xyz_labels);
 
-        if (control_flag) {
+        if (json_flags.control_flag) {
             stream_vector(rec, "setpoint/eul", context.data_context.setpoint.eulIB.data, eul_labels);
             stream_vector(rec, "setpoint/w", context.data_context.setpoint.wB_BI.data, angular_rate_labels);
             stream_vector(rec, "setpoint/v", context.data_context.setpoint.vB_BI.data, velocity_labels);
         }
 
-        if (avionics_flag) {
+        if (json_flags.avionics_flag) {
             dynamics::EulerAngles eul_meas_t;
             eul_meas_t.set(context.data_context.Yt.q);
             stream_vector(rec, "measured/p", context.data_context.Yt.p.data, xyz_labels);
@@ -152,7 +159,7 @@ namespace io {
             stream_vector(rec, "measured/v", context.data_context.Yt.v.data, velocity_labels);
         }
 
-        if (estimation_flag) {
+        if (json_flags.estimation_flag) {
             dynamics::EulerAngles eul_est_t;
             eul_est_t.set(context.data_context.Zt.q);
             stream_vector(rec, "estimated/p", context.data_context.Zt.p.data, xyz_labels);
@@ -161,7 +168,7 @@ namespace io {
             stream_vector(rec, "estimated/v", context.data_context.Zt.v.data, velocity_labels);
         }
 
-        if (wind_flag) {
+        if (json_flags.wind_flag) {
             stream_body_arrow(rec, "world/vehicle/vectors/wind", context.data_context.windB.data, 1.0, rerun::Color(180, 180, 180), "wind");
             stream_vector(rec, "wind/body", context.data_context.windB.data, xyz_labels);
         }

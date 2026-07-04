@@ -44,11 +44,11 @@ namespace json {
         return { P0, Q, R };
     }
 
-    estimation::LinearKalmanEstimator make_linear_kalman_estimator(estimation::EstimatorType estimator_type, const nlohmann::json& estimator_json) {
+    estimation::LinearKalmanEstimatorFunction make_linear_kalman_estimator(estimation::EstimatorType estimator_type, const nlohmann::json& estimator_json) {
         switch (estimator_type) {
             case estimation::EstimatorType::LinearKalmanFilter: {
                 estimation::LinearKalmanFilterParameters params = parse_linear_kalman_filter_parameters(estimator_json);
-                return make_stateful_estimator<struct estimation::LinearKalmanFilter, estimation::LinearKalmanEstimator, estimation::LinearKalmanFilterParameters, estimation::LinearKalmanEstimatorInput>(params);
+                return make_stateful_estimator<struct estimation::LinearKalmanFilter, estimation::LinearKalmanEstimatorFunction, estimation::LinearKalmanFilterParameters, estimation::LinearKalmanEstimatorInput>(params);
             }
 
             default:
@@ -56,11 +56,11 @@ namespace json {
         }
     }
 
-    estimation::ExtendedKalmanEstimator make_extended_kalman_estimator(estimation::EstimatorType estimator_type, const nlohmann::json& estimator_json) {
+    estimation::ExtendedKalmanEstimatorFunction make_extended_kalman_estimator(estimation::EstimatorType estimator_type, const nlohmann::json& estimator_json) {
         switch (estimator_type) {
             case estimation::EstimatorType::ExtendedKalmanFilter: {
                 estimation::ExtendedKalmanFilterParameters params = parse_extended_kalman_filter_parameters(estimator_json);
-                return make_stateful_estimator<struct estimation::ExtendedKalmanFilter, estimation::ExtendedKalmanEstimator, estimation::ExtendedKalmanFilterParameters, estimation::ExtendedKalmanEstimatorInput>(params);
+                return make_stateful_estimator<struct estimation::ExtendedKalmanFilter, estimation::ExtendedKalmanEstimatorFunction, estimation::ExtendedKalmanFilterParameters, estimation::ExtendedKalmanEstimatorInput>(params);
             }
 
             default:
@@ -80,12 +80,12 @@ namespace json {
         return map_estimator_type(estimator_type_str);
     }
 
-    void parse_linear_kalman_estimator(const nlohmann::json& estimator_json, estimation::LinearKalmanEstimator& estimator, estimation::EstimatorType& estimator_type) {
+    void parse_linear_kalman_estimator(const nlohmann::json& estimator_json, estimation::LinearKalmanEstimatorFunction& estimator, estimation::EstimatorType& estimator_type) {
         estimator_type = fetch_estimator_type(estimator_json);
         estimator = make_linear_kalman_estimator(estimator_type, estimator_json);
     }
 
-    void parse_extended_kalman_estimator(const nlohmann::json& estimator_json, estimation::ExtendedKalmanEstimator& estimator, estimation::EstimatorType& estimator_type) {
+    void parse_extended_kalman_estimator(const nlohmann::json& estimator_json, estimation::ExtendedKalmanEstimatorFunction& estimator, estimation::EstimatorType& estimator_type) {
         estimator_type = fetch_estimator_type(estimator_json);
         estimator = make_extended_kalman_estimator(estimator_type, estimator_json);
     }

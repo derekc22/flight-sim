@@ -1,7 +1,7 @@
 {
     "attitude_heading_reference_system": {
-        "Kp": 2.0,
-        "Ki": 0.05,
-        "fB_tol_scale": 0.2
+        "Kp": 1.0,
+        "Ki": 0.0,
+        "fB_tol_scale": 0.1
     }
 }

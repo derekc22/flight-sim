@@ -11,6 +11,7 @@
 #include "core/io/data/public.hpp"
 #include "simulation/transforms/public.hpp"
 #include "simulation/constants/public.hpp"
+#include "simulation/runner/public.hpp"
 
 namespace io {
 
@@ -21,15 +22,11 @@ namespace io {
     };
 
     struct RerunManager {
-        bool rerun_flag;
-        bool control_flag;
-        bool avionics_flag;
-        bool estimation_flag;
-        bool wind_flag;
+        runner::JSONFlags json_flags;
 
         double log_hz;
-        std::size_t max_traj_size = static_cast<std::size_t>(30.0 * log_hz);  // 30 seconds
-        std::size_t max_queue_size = static_cast<std::size_t>(2.0 * log_hz);  // 2 seconds
+        std::size_t max_traj_size;
+        std::size_t max_queue_size;
 
         // in pixels
         int image_width = 500;
@@ -60,7 +57,7 @@ namespace io {
         void run_worker();
         void run_camera_worker();
 
-        RerunManager(bool rerun_flag, bool control_flag, bool avionics_flag, bool estimation_flag, bool wind_flag, double log_hz);
+        RerunManager(const runner::JSONFlags& json_flags, double log_hz);
         ~RerunManager();
     };
 }

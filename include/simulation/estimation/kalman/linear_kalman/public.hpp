@@ -4,7 +4,7 @@
 #include "simulation/actuators/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/linearization/public.hpp"
-#include "simulation/estimation/kalman/private.hpp"
+#include "simulation/estimation/kalman/public.hpp"
 
 namespace estimation {
 

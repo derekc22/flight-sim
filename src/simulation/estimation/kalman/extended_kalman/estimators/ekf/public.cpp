@@ -1,4 +1,5 @@
 #include <Eigen/Dense>
+#include "simulation/estimation/kalman/private.hpp"
 #include "simulation/estimation/kalman/extended_kalman/public.hpp"
 #include "simulation/estimation/kalman/extended_kalman/estimators/ekf/public.hpp"
 
@@ -29,9 +30,10 @@ namespace estimation {
         return make_kalman_state_estimate(input.Yt, zt);
     }
 
-    EstimationOutput ExtendedKalmanFilter::step(const ExtendedKalmanEstimatorInput& input) {
+    EstimationOutput ExtendedKalmanFilter::step(const ExtendedKalmanEstimatorInput& input, double dt) {
         KalmanState kalman_state = policy.step(
-            make_extended_kalman_policy_input(input)
+            make_extended_kalman_policy_input(input),
+            dt
         );
 
         dynamics::RigidBodyState Zt = make_ekf_state_estimate(input, kalman_state.zt);

@@ -75,20 +75,23 @@ namespace control {
         }
     }
 
-    ControlOutput AttitudePID::step(const AttitudeControllerInput& input) {
+    ControlOutput AttitudePID::step(const AttitudeControllerInput& input, double dt) {
         actuators::SurfaceActuatorInputs_T<double> u_surface{};
         actuators::PropulsorActuatorInputs_T<double> u_propulsor{};
 
         u_surface.aileron_cmd = lateral_policy.step(
-            make_pid_policy_input(input, ControlAxis::Lateral)
+            make_pid_policy_input(input, ControlAxis::Lateral),
+            dt
         );
 
         u_surface.elevator_cmd = longitudinal_policy.step(
-            make_pid_policy_input(input, ControlAxis::Longitudinal)
+            make_pid_policy_input(input, ControlAxis::Longitudinal),
+            dt
         );
 
         u_surface.rudder_cmd = vertical_policy.step(
-            make_pid_policy_input(input, ControlAxis::Vertical)
+            make_pid_policy_input(input, ControlAxis::Vertical),
+            dt
         );
 
         return { u_surface, u_propulsor };

@@ -25,6 +25,6 @@ namespace control {
         double prev_err = 0.0;
 
         PIDPolicy(const PIDPolicyParameters& params);
-        double step(const PIDPolicyInput& input);
+        double step(const PIDPolicyInput& input, double dt);
     };
 }
