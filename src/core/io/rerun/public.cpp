@@ -21,8 +21,12 @@ namespace io {
     RerunManager::RerunManager(const runner::JSONFlags& json_flags, double log_hz)
         : json_flags(json_flags), 
           log_hz(log_hz), 
-          max_traj_size(std::max<std::size_t>(1, static_cast<std::size_t>(std::ceil(30.0 * log_hz)))),  // 30 seconds-worth of data
-          max_queue_size(std::max<std::size_t>(1, static_cast<std::size_t>(std::ceil(2.0 * log_hz)))),  // 2 seconds-worth of data
+          max_traj_size(std::max<std::size_t>(1, 
+            static_cast<std::size_t>(std::ceil(30.0 * log_hz)) // 30 seconds-worth of data
+          )),
+          max_queue_size(std::max<std::size_t>(1, 
+            static_cast<std::size_t>(std::ceil(2.0 * log_hz)) // 2 seconds-worth of data
+          )), 
           rec("flight-sim")
     {
         if (json_flags.rerun_flag) {
