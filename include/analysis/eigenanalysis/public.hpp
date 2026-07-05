@@ -1,5 +1,4 @@
 #pragma once
-
 #include <Eigen/Dense>
 #include <complex>
 #include <string>

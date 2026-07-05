@@ -12,7 +12,7 @@ namespace estimation {
 
         if (!trim_flag) {
             if (linear_kalman_estimator) { 
-                throw std::runtime_error("estimation::EstimationProperties::step LinearKalmanEstimatorFunction requires trim"); 
+                throw std::runtime_error("estimation::EstimationProperties::step LinearKalmanEstimator requires trim"); 
             }
         }
 
