@@ -19,7 +19,7 @@ namespace estimation {
         autodiff::AutoDiffModel model = autodiff::build_autodiff_model(input.aircraft);
 
         // A @ zt_1 + B @ ut_1 -> f(zt_1, ut_1)
-        dynamics::StateDot_T<double> zt_1_dot = autodiff::compute_state_dot_T(zt_1, ut_1, model, input.conditions);
+        dynamics::StateDot_T<double> zt_1_dot = autodiff::compute_state_dot_T(zt_1, ut_1, model, input.conditions, dt);
         dynamics::StateVector_T<double> zt_bar = prev.zt + dynamics::unpack_state_dot_T(zt_1_dot) * dt;
 
         // A -> Ft

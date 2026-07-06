@@ -102,9 +102,74 @@ function of a public struct or class is a public symbol and belongs in
 `public.*`. A member function of a private struct or class is a private symbol
 and belongs in `private.*`.
 
+Public template helper rule:
+
 If a helper appears in the body of a public template definition in `public.tpp`,
-keep that helper in `public.*`. Public headers include `public.tpp`, and files
-that include those public headers compile the public template body.
+keep that helper in `public.*`. This is because the C++ preprocessor literally pastes the contents of public.tpp into any translation unit that includes public.hpp.
+Thus, because public.tpp contents are exposed through public.hpp, this repo requires helpers called by public.tpp to live in public.*.
+
+```cpp
+// include/simulation/foo/public.hpp
+namespace foo {
+    template <typename T>
+    T public_func(T x);
+}
+
+#include "simulation/foo/public.tpp"
+```
+
+```cpp
+// include/simulation/foo/public.tpp
+namespace foo {
+    template <typename T>
+    T public_func(T x) {
+        return private_helper(x);
+    }
+}
+```
+
+This is invalid under these layout rules. `private_helper` is needed by a public
+template body, so `private_helper` must be moved to `public.*` or the public
+template must be redesigned so it does not call a private helper.
+
+Helper visibility relations:
+
+This list is about direct references to private symbols. For `.hpp`, this means
+a declaration names a private type, alias, constant, or function in a signature,
+alias, or type layout. For `.cpp` and `.tpp`, this usually means code calls a
+private helper function.
+
+- Owner `public.hpp -> private symbol`: disallowed.
+- Owner `public.tpp -> private helper function`: disallowed.
+- Owner `public.cpp -> private helper function`: allowed.
+- Owner `private.hpp -> private symbol`: allowed.
+- Owner `private.tpp -> private helper function`: allowed.
+- Owner `private.cpp -> private helper function`: allowed.
+- Sibling `.cpp`, `private.hpp`, or `private.tpp -> private symbol`: allowed
+  only under the same immediate parent.
+- Sibling `public.hpp` or `public.tpp -> private symbol`: disallowed.
+- Different module file `-> private symbol`: disallowed, except for the
+  `src/main.cpp` and test one-way-consumer exception.
+
+Who may include private headers:
+
+Here `A -> B` means `A` includes `B`.
+
+- `private.hpp` or `private.tpp -> public.hpp`: allowed when the private code
+  uses the public API.
+- `public.hpp -> private.hpp`: disallowed.
+- `public.tpp -> private.hpp`: disallowed.
+
+Which `.tpp` file belongs with which header:
+
+Here `A -> B` means `A` includes `B`.
+
+- `public.hpp -> public.tpp`: allowed for public template definitions.
+- `private.hpp -> private.tpp`: allowed for private template definitions.
+- `public.hpp -> private.tpp`: disallowed.
+- `public.tpp -> private.tpp`: disallowed.
+- `private.tpp -> public.tpp`: allowed through `public.hpp` when the private
+  template uses a public template definition.
 
 A helper used only by non-template definitions in the owner's `public.cpp` may
 be private when it is not in a public signature or data layout. The same rule

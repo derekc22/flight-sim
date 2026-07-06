@@ -43,7 +43,7 @@ namespace linearization {
     }
 
     LocalLinearization linearize_operating_point(vehicles::Aircraft& aircraft, const operating::OperatingPoint& operating_point, const operating::OperatingConditions& conditions) {
-        const autodiff::AutoDiffModel model = autodiff::build_autodiff_model(aircraft);
+        autodiff::AutoDiffModel model = autodiff::build_autodiff_model(aircraft);
 
         const operating::StateInputVector_T<double> xu = operating::unpack_state_input_T<double>(operating_point.state, operating_point.input);
         CppAD::eigen_vector<CppAD::AD<double>> xu_tracked = autodiff::start_autodiff_tracking(xu);
@@ -52,7 +52,7 @@ namespace linearization {
         const dynamics::State_T<CppAD::AD<double>> xt = operating::pack_state_T<CppAD::AD<double>>(xu_ad);
         const actuators::ActuatorInputs_T<CppAD::AD<double>> ut = operating::pack_actuator_inputs_T<CppAD::AD<double>>(xu_ad);
         
-        const dynamics::StateDot_T<CppAD::AD<double>> state_dot = autodiff::compute_state_dot_T<CppAD::AD<double>>(xt, ut, model, conditions);
+        const dynamics::StateDot_T<CppAD::AD<double>> state_dot = autodiff::compute_state_dot_T<CppAD::AD<double>>(xt, ut, model, conditions, constants::dt);
         const dynamics::StateDotVector_T<CppAD::AD<double>> x_dot = dynamics::unpack_state_dot_T(state_dot);
         const CppAD::eigen_vector<CppAD::AD<double>> x_dot_tracked = autodiff::cppad_vector_from_eigen_vector(x_dot);
         

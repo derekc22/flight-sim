@@ -98,8 +98,6 @@ namespace aerodynamics {
         SideslipAngle beta;
     };
 
-    struct AerodynamicWrench : dynamics::Wrench {};
-
     template <typename T>
     struct AerodynamicState_T {
         T Vinf = T(0.0);
@@ -125,7 +123,7 @@ namespace aerodynamics {
     template <typename T>
     AerodynamicState_T<T> compute_aerodynamic_state_T(const dynamics::Twist_T<T>& twist, const atmospheric::Wind& windB);
 
-    AerodynamicWrench step_aero_forces_moments(const AerodynamicProperties& aerodynamic_properties, const dynamics::RigidBodyState& X, const atmospheric::StaticAtmosphericState& atm, const actuators::SurfaceActuatorInputs_T<double>& u, const atmospheric::Wind& windB);
+    dynamics::Wrench step_aero_forces_moments(const AerodynamicProperties& aerodynamic_properties, const dynamics::RigidBodyState& X, const atmospheric::StaticAtmosphericState& atm, const actuators::SurfaceActuatorInputs_T<double>& u, const atmospheric::Wind& windB);
     AerodynamicState compute_aerodynamic_state(const dynamics::RigidBodyState& X, const atmospheric::Wind& windB);
 
     dynamics::OrientationMatrix CBS(const aerodynamics::AngleOfAttack& alpha);

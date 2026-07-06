@@ -34,7 +34,7 @@ namespace aerodynamics {
         return aerodynamics::compute_aerodynamic_state(dynamics::compute_rigid_body_state(F), windB);
     }
 
-    AerodynamicWrench step_aero_forces_moments(const AerodynamicProperties& aerodynamic_properties, const dynamics::RigidBodyState& X, const atmospheric::StaticAtmosphericState& atm, const actuators::SurfaceActuatorInputs_T<double>& u, const atmospheric::Wind& windB) {
+    dynamics::Wrench step_aero_forces_moments(const AerodynamicProperties& aerodynamic_properties, const dynamics::RigidBodyState& X, const atmospheric::StaticAtmosphericState& atm, const actuators::SurfaceActuatorInputs_T<double>& u, const atmospheric::Wind& windB) {
         const dynamics::Twist_T<double> twist{
             .v = X.v.data,
             .w = X.w.data,

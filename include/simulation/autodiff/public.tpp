@@ -36,12 +36,32 @@ namespace autodiff {
     }
 
     template <typename T>
-    dynamics::Wrench_T<T> compute_net_wrench_T(const dynamics::State_T<T>& x, const dynamics::Twist_T<T>& twist, const actuators::ActuatorInputs_T<T>& u, const AutoDiffModel& model, const operating::OperatingConditions& conditions) {
+    dynamics::Wrench_T<T> compute_net_wrench_T(
+        const dynamics::State_T<T>& x, 
+        const dynamics::Twist_T<T>& twist, 
+        const actuators::ActuatorInputs_T<T>& u, 
+        AutoDiffModel& model, 
+        const operating::OperatingConditions& conditions,
+        T dt
+    ) {
         const actuators::SurfaceActuatorInputs_T<T> surface_actuator_inputs = pack_surface_actuator_inputs_T(u, model.fixed_actuator_inputs);
-        const dynamics::Wrench_T<T> aero_wrench = aerodynamics::step_aero_forces_moments_T<T>(model.aerodynamic, twist, conditions.atm, surface_actuator_inputs, conditions.windB);
+        const dynamics::Wrench_T<T> aero_wrench = aerodynamics::step_aero_forces_moments_T<T>(
+            model.aerodynamic, 
+            twist, 
+            conditions.atm, 
+            surface_actuator_inputs, 
+            conditions.windB
+        );
 
         const actuators::PropulsorActuatorInputs_T<T> propulsor_actuator_inputs = pack_propulsor_actuator_inputs_T(u);
-        const dynamics::Wrench_T<T> prop_wrench = propulsion::step_propulsive_forces_moments_T<T>(model.propulsor_actuators, twist, conditions.atm, propulsor_actuator_inputs, propulsion::PropulsorOmegaDot_T<T>{});
+        const dynamics::Wrench_T<T> prop_wrench = propulsion::step_propulsive_forces_moments_T<T>(
+            model.propulsor_actuators,
+            twist,
+            conditions.atm, 
+            propulsor_actuator_inputs, 
+            dt,
+            conditions.steady_state
+        );
 
         return {
             .F = aero_wrench.F + prop_wrench.F + T(model.structural.mass.data) * geography::gB_T(x.phi, x.theta),
@@ -50,9 +70,15 @@ namespace autodiff {
     }
 
     template <typename T>
-    dynamics::StateDot_T<T> compute_state_dot_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u, const AutoDiffModel& model, const operating::OperatingConditions& conditions) {
+    dynamics::StateDot_T<T> compute_state_dot_T(
+        const dynamics::State_T<T>& x, 
+        const actuators::ActuatorInputs_T<T>& u, 
+        AutoDiffModel& model, 
+        const operating::OperatingConditions& conditions, 
+        T dt
+    ) {
         const dynamics::Twist_T<T> twist = dynamics::build_twist_from_state_T(x);
-        const dynamics::Wrench_T<T> net_wrench = compute_net_wrench_T<T>(x, twist, u, model, conditions);
+        const dynamics::Wrench_T<T> net_wrench = compute_net_wrench_T<T>(x, twist, u, model, conditions, dt);
         const constants::Vector3_T<T> v_dot = dynamics::ddtB_vB_BI_T<T>(twist.v, twist.w, model.structural.mass.data, net_wrench.F);
         const constants::Vector3_T<T> w_dot = dynamics::ddtB_wB_BI_T<T>(twist.w, model.structural.JB.data, net_wrench.M);
         const constants::Vector3_T<T> eul_dot = dynamics::wB_BI_to_eul_dot_T<T>(twist.w, x.theta, x.phi);

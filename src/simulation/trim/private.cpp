@@ -31,7 +31,11 @@ namespace trim {
         return ratio / util::sqrt(std::max(1.0 - ratio * ratio, constants::eps));
     }
 
-    operating::StateInputVector_T<double> unpack_trim_solver_variables(const dynamics::State_T<double>& x, const actuators::ActuatorInputs_T<double>& u, const actuators::ActuatorLimits_T<double>& actuator_limits) {
+    operating::StateInputVector_T<double> unpack_trim_solver_variables(
+        const dynamics::State_T<double>& x, 
+        const actuators::ActuatorInputs_T<double>& u, 
+        const actuators::ActuatorLimits_T<double>& actuator_limits
+    ) {
         operating::StateInputVector_T<double> xu = operating::unpack_state_input_T<double>(x, u);
         const actuators::ActuatorInputsVector_T<double> u_vec = actuators::unpack_actuator_inputs_T<double>(u);
         const actuators::ActuatorLimitsVector_T<double> limits = actuators::unpack_actuator_limits_T<double>(actuator_limits);
@@ -81,9 +85,9 @@ namespace trim {
         if (options.min_step_scale <= 0.0 || options.min_step_scale > 1.0) throw std::invalid_argument("trim::validate_trim_solve_options: min_step_scale must be in (0, 1]");
     }
 
-    dynamics::Wrench compute_trim_wrench(const dynamics::State_T<double>& x, const actuators::ActuatorInputs_T<double>& u, const autodiff::AutoDiffModel& model, const operating::OperatingConditions& conditions) {
+    dynamics::Wrench compute_trim_wrench(const dynamics::State_T<double>& x, const actuators::ActuatorInputs_T<double>& u, autodiff::AutoDiffModel& model, const operating::OperatingConditions& conditions) {
         const dynamics::Twist_T<double> twist = dynamics::build_twist_from_state_T<double>(x);
-        const dynamics::Wrench_T<double> net_wrench = autodiff::compute_net_wrench_T<double>(x, twist, u, model, conditions);
+        const dynamics::Wrench_T<double> net_wrench = autodiff::compute_net_wrench_T<double>(x, twist, u, model, conditions, constants::dt);
 
         return {
             .F = dynamics::Force{ net_wrench.F },
@@ -91,7 +95,7 @@ namespace trim {
         };
     }
 
-    TrimSolution build_trim_solution(const operating::StateInputVector_T<double>& xu, const TrimResidualVector_T<double>& residual, const TrimResidualVector_T<double>& weighted_residual, const autodiff::AutoDiffModel& model, const operating::OperatingConditions& conditions, bool converged, std::size_t iterations) {
+    TrimSolution build_trim_solution(const operating::StateInputVector_T<double>& xu, const TrimResidualVector_T<double>& residual, const TrimResidualVector_T<double>& weighted_residual, autodiff::AutoDiffModel& model, const operating::OperatingConditions& conditions, bool converged, std::size_t iterations) {
         TrimSolution out;
         out.operating_point.state = operating::pack_state_T<double>(xu);
         out.operating_point.input = pack_trim_actuator_inputs_T<double>(xu, model.actuator_limits);
@@ -140,11 +144,23 @@ namespace trim {
         return out;
     }
 
-    TrimResidualVector_T<double> compute_trim_residual_vector(const operating::StateInputVector_T<double>& xu, const autodiff::AutoDiffModel& model, const TrimTarget& target, const operating::OperatingConditions& conditions, bool use_physical_controls) {
+    TrimResidualVector_T<double> compute_trim_residual_vector(
+        const operating::StateInputVector_T<double>& xu, 
+        autodiff::AutoDiffModel& model,
+        const TrimTarget& target, 
+        const operating::OperatingConditions& conditions, 
+        bool use_physical_controls
+    ) {
         return compute_trim_residual_vector_T<double>(xu, model, target, conditions, use_physical_controls);
     }
 
-    TrimResidualJacobian compute_trim_residual_jac(const operating::StateInputVector_T<double>& xu, const autodiff::AutoDiffModel& model, const TrimTarget& target, const operating::OperatingConditions& conditions, bool use_physical_controls) {
+    TrimResidualJacobian compute_trim_residual_jac(
+        const operating::StateInputVector_T<double>& xu, 
+        autodiff::AutoDiffModel& model, 
+        const TrimTarget& target, 
+        const operating::OperatingConditions& conditions, 
+        bool use_physical_controls
+    ) {
         CppAD::eigen_vector<CppAD::AD<double>> xu_tracked = autodiff::start_autodiff_tracking(xu);
         const operating::StateInputVector_T<CppAD::AD<double>> xu_ad = autodiff::eigen_vector_from_cppad_vector<CppAD::AD<double>, constants::state_input_dim>(xu_tracked);
         const TrimResidualVector_T<CppAD::AD<double>> residual_tracked = compute_trim_residual_vector_T<CppAD::AD<double>>(
@@ -159,7 +175,11 @@ namespace trim {
         return autodiff::compute_jac<trim_residual_dim, constants::state_input_dim>(f, xu);
     }
 
-    TrimSolution solve_trim(const TrimProblem<double>& problem, const autodiff::AutoDiffModel& model, TrimSolveOptions options) {
+    TrimSolution solve_trim(
+        const TrimProblem<double>& problem, 
+        autodiff::AutoDiffModel& model, 
+        TrimSolveOptions options
+    ) {
         validate_trim_solve_options(options);
 
         const bool use_physical_controls = false;

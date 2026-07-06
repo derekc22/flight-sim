@@ -2,24 +2,23 @@
 #include "simulation/atmospheric/public.hpp"
 #include "simulation/constants/public.hpp"
 #include "simulation/dynamics/public.hpp"
-#include "simulation/propulsion/private.hpp"
 #include "simulation/propulsion/public.hpp"
 
 namespace propulsion {
 
-    PropulsiveWrench step_propulsive_forces_moments(actuators::PropulsorActuators& propulsor_actuators, const dynamics::RigidBodyState& X, const atmospheric::StaticAtmosphericState& atm, const actuators::PropulsorActuatorInputs_T<double>& u, double dt) {
-        PropulsorOmegaDot_T<double> omega_dot{
-            .front_propulsor = step_propeller_omega_dot(propulsor_actuators.front_propulsor, u.front_propulsor_cmd, atm, dt),
-            .left_propulsor = step_propeller_omega_dot(propulsor_actuators.left_propulsor, u.left_propulsor_cmd, atm, dt),
-            .right_propulsor = step_propeller_omega_dot(propulsor_actuators.right_propulsor, u.right_propulsor_cmd, atm, dt)
-        };
-
+    dynamics::Wrench step_propulsive_forces_moments(
+        actuators::PropulsorActuators& propulsor_actuators, 
+        const dynamics::RigidBodyState& X, 
+        const atmospheric::StaticAtmosphericState& atm, 
+        const actuators::PropulsorActuatorInputs_T<double>& u, 
+        double dt
+    ) {
         dynamics::Twist_T<double> twist{
             .v = X.v.data,
             .w = X.w.data
         };
 
-        dynamics::Wrench_T<double> loads = step_propulsive_forces_moments_T<double>(
+        dynamics::Wrench_T<double> wrench = step_propulsive_forces_moments_T<double>(
             propulsor_actuators,
             twist,
             atm,
@@ -28,10 +27,11 @@ namespace propulsion {
                 .left_propulsor_cmd = u.left_propulsor_cmd,
                 .right_propulsor_cmd = u.right_propulsor_cmd
             },
-            omega_dot
+            dt,
+            false   // runtime is not steady-state
         );
 
-        return { dynamics::Force{ loads.F }, dynamics::Moment{ loads.M } };
+        return { dynamics::Force{ wrench.F }, dynamics::Moment{ wrench.M } };
     }
 
 }

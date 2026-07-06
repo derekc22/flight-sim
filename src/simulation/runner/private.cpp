@@ -345,7 +345,8 @@ namespace runner {
 
                     estimator_conditions = {
                         .atm = atm_t,
-                        .windB = windB
+                        .windB = windB,
+                        .steady_state = false
                     };
 
                 } else if (estimation_properties.linear_kalman_estimator_type == estimation::EstimatorType::LinearKalmanFilter) {
@@ -454,7 +455,7 @@ namespace runner {
         u_propulsor_actual_prev = u_propulsor_actual;
 
         // compute aerodynamic forces and moments
-        aerodynamics::AerodynamicWrench WB_aero = aerodynamics::step_aero_forces_moments(
+        dynamics::Wrench WB_aero = aerodynamics::step_aero_forces_moments(
             aerodynamic_properties,
             Xt,
             atm_t,
@@ -465,7 +466,7 @@ namespace runner {
         dynamics::Moment MB_aero = WB_aero.M;
 
         // compute propulsive forces and momments
-        propulsion::PropulsiveWrench WB_propulsive = propulsion::step_propulsive_forces_moments(
+        dynamics::Wrench WB_propulsive = propulsion::step_propulsive_forces_moments(
             propulsor_actuators,
             Xt,
             atm_t,

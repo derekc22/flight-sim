@@ -38,6 +38,7 @@ namespace trim {
             .conditions = operating::OperatingConditions{
                 .atm = atmospheric::compute_static_atmospheric_state(aircraft.FRDFrameECEF),
                 .windB = wind,
+                .steady_state = true
             },
             .state_guess = dynamics::State_T<double>{
                 .vx = aircraft.FRDFrameNED.vB_BN.data.x(),
