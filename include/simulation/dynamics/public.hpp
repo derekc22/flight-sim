@@ -197,8 +197,6 @@ namespace dynamics {
 
     StateVector_T<double> unpack_state(const RigidBodyState& Xt);
 
-    RigidBodyState step_rigid_body(const RigidBodyState& XB_BI_t, const Mass& mass, const InertiaTensor& JB, const Wrench& WB_net_t, double dt);
-
     /** @warning The parent of F must be an inertial frame: ECEFFrame or NEDFrameECEF */
     RigidBodyState compute_rigid_body_state(const frames::Frame& F);
 

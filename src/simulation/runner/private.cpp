@@ -23,6 +23,7 @@
 #include "simulation/frames/public.hpp"
 #include "simulation/geography/public.hpp"
 #include "simulation/guidance/public.hpp"
+#include "simulation/integrators/public.hpp"
 #include "simulation/linearization/public.hpp"
 #include "simulation/operating/public.hpp"
 #include "simulation/propulsion/public.hpp"
@@ -168,17 +169,22 @@ namespace runner {
 
         // apply wind
         atmospheric::Wind windB { constants::Zero3 };
+        atmospheric::Wind windI { constants::Zero3 };
         if (json_flags.wind_flag) {
             windB.data = frames::transform_vec(
                 cached_msg_out.wind.data,
                 aircraft.NEDFrameECEF,
                 aircraft.FRDFrameNED
             );
+            windI.data = frames::transform_vec(
+                windB.data,
+                aircraft.FRDFrameNED,
+                aircraft.NEDFrameECEF
+            );
         }
 
         // extract reuseable quantities
         dynamics::Mass mass = structural_properties.mass;
-        dynamics::InertiaTensor JB = structural_properties.JB;
 
         actuators::SurfaceActuators& surface_actuators = actuator_properties.surface_actuators;
         actuators::PropulsorActuators& propulsor_actuators = actuator_properties.propulsor_actuators;
@@ -454,66 +460,49 @@ namespace runner {
         u_surface_actual_prev = u_surface_actual;
         u_propulsor_actual_prev = u_propulsor_actual;
 
-        // compute aerodynamic forces and moments
-        dynamics::Wrench WB_aero = aerodynamics::step_aero_forces_moments(
-            aerodynamic_properties,
-            Xt,
-            atm_t,
-            u_surface_actual,
-            windB
-        );
-        dynamics::Force FB_aero = WB_aero.F;
-        dynamics::Moment MB_aero = WB_aero.M;
-
-        // compute propulsive forces and momments
-        dynamics::Wrench WB_propulsive = propulsion::step_propulsive_forces_moments(
-            propulsor_actuators,
-            Xt,
-            atm_t,
-            u_propulsor_actual,
-            constants::dt
-        );
-        dynamics::Force FB_propulsive = WB_propulsive.F;
-        dynamics::Moment MB_propulsive = WB_propulsive.M;
-
-        // compute gravitational force
-        Eigen::Vector3d FB_g = mass.data * aircraft.FRDFrameNED.gB.data;
-
-        // compute net forces and moments
-        dynamics::Force FB_net{ FB_g + FB_aero.data + FB_propulsive.data };
-        dynamics::Moment MB_net{ MB_aero.data + MB_propulsive.data };
-        dynamics::Wrench WB_net{ .F = FB_net, .M = MB_net };
-
-        // update data context
-        io::DataContext data_context{
-            .Xt=Xt,
-            .Yt=Yt,
-            .Zt=Zt,
-            .u_surface=u_surface_actual,
-            .u_propulsor=u_propulsor_actual,
-            .WB_net=WB_net,
-            .WB_aero=WB_aero,
-            .WB_propulsive=WB_propulsive,
-            .setpoint=setpoint,
-            .windB=windB
+        integrators::RK4Model rk4_model{
+            .structural = structural_properties,
+            .aerodynamic = aerodynamic_properties,
+            .propulsor_actuators = propulsor_actuators
         };
 
-        // step data manager
-        data_manager.step(t, data_context);
+        operating::OperatingConditions rk4_conditions{
+            .atm = atm_t,
+            .windI = windI,
+            .steady_state = false
+        };
 
-        if (scheduler.log_tick >= constants::hz) {
-            // step rerun manager
-            rerun_manager.step(t, data_context);
-
-            // log state
-            if (json_flags.verbose_flag) {
-                log_state(t, Xt, geo_t, aero_t, windB);
-            }
-            scheduler.log_tick -= constants::hz;
-        }
-
+        // compute net forces and moments
         // compute next-step rigid body state
-        dynamics::RigidBodyState Xt1{ dynamics::step_rigid_body(Xt, mass, JB, WB_net, constants::dt) };
+        auto [Xt1, WB_net] = integrators::step_rigid_body_rk4(Xt, rk4_model, rk4_conditions, u_surface_actual, u_propulsor_actual, constants::dt);
+
+        // // update data context
+        // io::DataContext data_context{
+        //     .Xt=Xt,
+        //     .Yt=Yt,
+        //     .Zt=Zt,
+        //     .u_surface=u_surface_actual,
+        //     .u_propulsor=u_propulsor_actual,
+        //     .WB_net=WB_net,
+        //     .WB_aero=WB_aero,
+        //     .WB_propulsive=WB_propulsive,
+        //     .setpoint=setpoint,
+        //     .windB=windB
+        // };
+
+        // // step data manager
+        // data_manager.step(t, data_context);
+
+        // if (scheduler.log_tick >= constants::hz) {
+        //     // step rerun manager
+        //     rerun_manager.step(t, data_context);
+
+        //     // log state
+        //     if (json_flags.verbose_flag) {
+        //         log_state(t, Xt, geo_t, aero_t, windB);
+        //     }
+        //     scheduler.log_tick -= constants::hz;
+        // }
 
         // compute next-step aerodynamic state
         aerodynamics::AerodynamicState aero_t1 = aerodynamics::compute_aerodynamic_state(Xt1, windB);

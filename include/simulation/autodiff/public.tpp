@@ -36,14 +36,7 @@ namespace autodiff {
     }
 
     template <typename T>
-    dynamics::Wrench_T<T> compute_net_wrench_T(
-        const dynamics::State_T<T>& x, 
-        const dynamics::Twist_T<T>& twist, 
-        const actuators::ActuatorInputs_T<T>& u, 
-        AutoDiffModel& model, 
-        const operating::OperatingConditions& conditions,
-        T dt
-    ) {
+    dynamics::Wrench_T<T> compute_net_wrench_T(const dynamics::State_T<T>& x, const dynamics::Twist_T<T>& twist, const actuators::ActuatorInputs_T<T>& u, AutoDiffModel& model, const operating::OperatingConditions& conditions,T dt) {
         const actuators::SurfaceActuatorInputs_T<T> surface_actuator_inputs = pack_surface_actuator_inputs_T(u, model.fixed_actuator_inputs);
         const dynamics::Wrench_T<T> aero_wrench = aerodynamics::step_aero_forces_moments_T<T>(
             model.aerodynamic, 
@@ -54,13 +47,30 @@ namespace autodiff {
         );
 
         const actuators::PropulsorActuatorInputs_T<T> propulsor_actuator_inputs = pack_propulsor_actuator_inputs_T(u);
+
+        // recall, the definition of steady trim is ẋ = f(x, u) = 0
+        // that is, for trim, d/dt(·) = 0 must be enforced for all modelled state variables
+        // however, even though omega_dot is not part of the modelled aircraft state, x, it too is set to 0
+        // this is done because nonzero omega_dot represents a non-steady propeller transient that creates a moment on the aircraft
+        // this moment, if unbalanced, can cause ẋ != 0, which violates the condition of steady equilibrium
+        // thus, setting omega_dot to 0 allows equilibrium to be enforced
+        // note: a nonzero omega_dot only violates the reduced aircraft trim condition if its induced moment is unbalanced and causes the modelled aircraft state derivatives to be nonzero
+        // however, for a true steady operating point, omega_dot must still be zero, because otherwise the omitted propeller spin state is changing
+        const propulsion::PropulsorOmegaDot_T<T> omega_dot = conditions.steady_state ? 
+            propulsion::PropulsorOmegaDot_T<T>{} : 
+            propulsion::compute_propellers_omega_dot_T<T>(
+                model.propulsor_actuators, 
+                propulsor_actuator_inputs, 
+                conditions.atm, 
+                dt
+        );
+
         const dynamics::Wrench_T<T> prop_wrench = propulsion::step_propulsive_forces_moments_T<T>(
             model.propulsor_actuators,
             twist,
             conditions.atm, 
             propulsor_actuator_inputs, 
-            dt,
-            conditions.steady_state
+            omega_dot
         );
 
         return {
@@ -70,13 +80,7 @@ namespace autodiff {
     }
 
     template <typename T>
-    dynamics::StateDot_T<T> compute_state_dot_T(
-        const dynamics::State_T<T>& x, 
-        const actuators::ActuatorInputs_T<T>& u, 
-        AutoDiffModel& model, 
-        const operating::OperatingConditions& conditions, 
-        T dt
-    ) {
+    dynamics::StateDot_T<T> compute_state_dot_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u, AutoDiffModel& model, const operating::OperatingConditions& conditions, T dt) {
         const dynamics::Twist_T<T> twist = dynamics::build_twist_from_state_T(x);
         const dynamics::Wrench_T<T> net_wrench = compute_net_wrench_T<T>(x, twist, u, model, conditions, dt);
         const constants::Vector3_T<T> v_dot = dynamics::ddtB_vB_BI_T<T>(twist.v, twist.w, model.structural.mass.data, net_wrench.F);
@@ -119,7 +123,11 @@ namespace autodiff {
 
     template <int rows>
     CppAD::eigen_vector<CppAD::AD<double>> start_autodiff_tracking(const Eigen::Matrix<double, rows, 1>& x) {
-        CppAD::eigen_vector<CppAD::AD<double>> x_tracked = cppad_vector_from_eigen_vector(Eigen::Matrix<CppAD::AD<double>, rows, 1>(x.template cast<CppAD::AD<double>>()));
+        CppAD::eigen_vector<CppAD::AD<double>> x_tracked = cppad_vector_from_eigen_vector(
+            Eigen::Matrix<CppAD::AD<double>, rows, 1>(
+                x.template cast<CppAD::AD<double>>()
+            )
+        );
         CppAD::Independent(x_tracked);
         return x_tracked;
     }

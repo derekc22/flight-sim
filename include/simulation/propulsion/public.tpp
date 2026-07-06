@@ -1,5 +1,4 @@
 #pragma once
-#include <type_traits>
 #include "simulation/constants/public.hpp"
 #include "simulation/propulsion/public.hpp"
 #include "simulation/util/public.hpp"
@@ -55,32 +54,8 @@ namespace propulsion {
     }
 
     template <typename T>
-    dynamics::Wrench_T<T> step_propulsive_forces_moments_T(
-        actuators::PropulsorActuators& propulsor_actuators, 
-        const dynamics::Twist_T<T>& twist, 
-        const atmospheric::StaticAtmosphericState& atm, 
-        const actuators::PropulsorActuatorInputs_T<T>& u, 
-        T dt,
-        bool steady_state
-    ) {
+    dynamics::Wrench_T<T> step_propulsive_forces_moments_T(const actuators::PropulsorActuators& propulsor_actuators, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& atm, const actuators::PropulsorActuatorInputs_T<T>& u, const PropulsorOmegaDot_T<T>& omega_dot) {
         dynamics::Wrench_T<T> total;
-
-        // recall, the definition of steady trim is ẋ = f(x, u) = 0
-        // that is, for trim, d/dt(·) = 0 must be enforced for all modelled state variables
-        // however, even though omega_dot is not part of the modelled aircraft state, x, it too is set to 0
-        // this is done because nonzero omega_dot represents a non-steady propeller transient that creates a moment on the aircraft
-        // this moment, if unbalanced, can cause ẋ != 0, which violates the condition of steady equilibrium
-        // thus, setting omega_dot to 0 allows equilibrium to be enforced
-        // note: a nonzero omega_dot only violates the reduced aircraft trim condition if its induced moment is unbalanced and causes the modelled aircraft state derivatives to be nonzero
-        // however, for a true steady operating point, omega_dot must still be zero, because otherwise the omitted propeller spin state is changing
-        PropulsorOmegaDot_T omega_dot = steady_state ? 
-            PropulsorOmegaDot_T<T>{} :
-            step_propellers_omega_dot_T<T>(
-                propulsor_actuators, 
-                u, 
-                atm, 
-                dt
-            );
 
         const dynamics::Wrench_T<T> front = step_propulsor_forces_moments_T<T>(propulsor_actuators.front_propulsor, twist, atm, u.front_propulsor_cmd, omega_dot.front_propulsor);
         const dynamics::Wrench_T<T> left = step_propulsor_forces_moments_T<T>(propulsor_actuators.left_propulsor, twist, atm, u.left_propulsor_cmd, omega_dot.left_propulsor);
@@ -93,31 +68,31 @@ namespace propulsion {
     }
 
     template <typename T>
-    PropulsorOmegaDot_T<T> step_propellers_omega_dot_T(actuators::PropulsorActuators& propulsor_actuators, const actuators::PropulsorActuatorInputs_T<T>& u, const atmospheric::StaticAtmosphericState& atm, T dt) {
+    PropulsorOmegaDot_T<T> compute_propellers_omega_dot_T(const actuators::PropulsorActuators& propulsor_actuators, const actuators::PropulsorActuatorInputs_T<T>& u, const atmospheric::StaticAtmosphericState& atm, T dt) {
         return {
-            .front_propulsor = step_propeller_omega_dot_T(propulsor_actuators.front_propulsor, u.front_propulsor_cmd, atm.rho, dt),
-            .left_propulsor = step_propeller_omega_dot_T(propulsor_actuators.left_propulsor, u.left_propulsor_cmd, atm.rho, dt),
-            .right_propulsor = step_propeller_omega_dot_T(propulsor_actuators.right_propulsor, u.right_propulsor_cmd, atm.rho, dt)
+            .front_propulsor = compute_propeller_omega_dot_T(propulsor_actuators.front_propulsor, u.front_propulsor_cmd, atm.rho, dt),
+            .left_propulsor = compute_propeller_omega_dot_T(propulsor_actuators.left_propulsor, u.left_propulsor_cmd, atm.rho, dt),
+            .right_propulsor = compute_propeller_omega_dot_T(propulsor_actuators.right_propulsor, u.right_propulsor_cmd, atm.rho, dt)
         };
     }
 
     template <typename T>
-    T step_propeller_omega_dot_T(actuators::PropulsorActuator& propulsor, T thrust, const atmospheric::AirDensity& rho, T dt) {
+    T compute_propeller_omega_dot_T(const actuators::PropulsorActuator& propulsor, T thrust, const atmospheric::AirDensity& rho, T dt) {
+        return compute_propeller_omega_state_T<T>(propulsor, thrust, rho, dt).omega_dot;
+    }
+
+    template <typename T>
+    PropellerOmegaState_T<T> compute_propeller_omega_state_T(const actuators::PropulsorActuator& propulsor, T thrust, const atmospheric::AirDensity& rho, T dt) {
         if (!propulsor.propellers.has_value()) {
-            return T(0.0); 
+            return {}; 
         }
 
         T omega = compute_propeller_omega_T<T>(propulsor, thrust, rho);
         T prev_omega = propulsor.propellers->prev_omega.has_value() ? T(propulsor.propellers->prev_omega.value()) : omega;
-
-        // only the runtime/non-autodiff path should enter this branch because
-        // 1) a type error will occur if this line attempts to assign a CppAD::AD<double> to a double field
-        // 2) autodiff/trim/linearization/etc should have no side-effects; it should only evaluate simulation state, not mutate it 
-        if constexpr (std::is_same_v<T, double>) {
-            propulsor.propellers->prev_omega = omega;
-        }
-
-        return (omega - prev_omega) / dt;
+        return {
+            .omega = omega,
+            .omega_dot = (omega - prev_omega) / dt
+        };
     }
 
 

@@ -67,9 +67,6 @@ namespace dynamics {
         return qIB_dot;
     }
 
-
-    // Translational Dynamics (non-rotating earth), velocity expressed in body coordinates
-    // vB_dot = (1/mass) * FB_net - wB_BI x vB
     TranslationalAcceleration ddtB_vB_BI(const TranslationalVelocity& vB_BI, const AngularVelocity& wB_BI, const Mass& mass, const Force& FB_net) {
         return { ddtB_vB_BI_T<double>(vB_BI.data, wB_BI.data, mass.data, FB_net.data) };
     }
@@ -85,10 +82,6 @@ namespace dynamics {
         return ddtB_v + w.cross(v);
     }
 
-
-    // Rotational Dynamics, body rates expressed in body coordinates
-    // J * w_dot + w x (J*w) = M
-    // w_dot = J^{-1} * (M - w x (J*w))
     Eigen::Vector3d ddtB_wB_BI(const AngularVelocity& wB_BI, const InertiaTensor& JB, const Moment& MB_net) {
         return ddtB_wB_BI_T<double>(wB_BI.data, JB.data, MB_net.data);
     }
