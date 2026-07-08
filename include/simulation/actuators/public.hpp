@@ -1,7 +1,6 @@
 #pragma once
 #include <Eigen/Dense>
 #include <tuple>
-#include <utility> // For std::pair
 #include "simulation/actuators/propulsor/public.hpp"
 #include "simulation/actuators/surface/public.hpp"
 #include "simulation/constants/public.hpp"

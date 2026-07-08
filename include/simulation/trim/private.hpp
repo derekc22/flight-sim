@@ -1,6 +1,5 @@
 #pragma once
 #include <cstddef>
-#include <utility> // For std::pair
 #include <string>
 #include <Eigen/Dense>
 #include "simulation/trim/public.hpp"

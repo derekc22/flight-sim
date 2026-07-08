@@ -1,7 +1,6 @@
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
-#include <utility> // For std::pair
 #include <stdexcept>
 #include <cppad/example/cppad_eigen.hpp>
 #include <cppad/cppad.hpp>
