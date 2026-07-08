@@ -12,12 +12,13 @@ namespace dynamics {
         In practice, most of the calls made in this codebase to the functions below are WRT the NED frame; however, as stated above, calls WRT the ECEF frame are also valid
     */
 
-    EulerAngles eul_kin(const EulerAngles& eul_t, const EulerAngleRates& eul_dot_t, double dt);
-
     OrientationMatrixRate ddt_CIB(const OrientationMatrix& CIB, const AngularVelocity& wB_BI);
+
     OrientationMatrixRate ddt_CBI(const OrientationMatrix& CBI, const AngularVelocity& wB_BI);
-    OrientationMatrix rot_kin(const OrientationMatrix& CIB_t, const AngularVelocity& wB_BI_t, double dt);
-    OrientationQuaternionRate quat_kin_vel(const OrientationQuaternion& qIB_t, const AngularVelocity& wB_BI_t);
+
+    OrientationQuaternionRate quat_kin_vel(const OrientationQuaternion& qIB, const AngularVelocity& wB_BI);
+
+    OrientationQuaternionRate quat_kin_vel(const OrientationQuaternion& qIB, const AngularVelocityQuaternion& wq_BI);
 
     /**
     * @brief Returns the body derivative of body-expressed linear velocity
@@ -29,18 +30,15 @@ namespace dynamics {
     */
     Eigen::Vector3d ddtB_wB_BI(const AngularVelocity& wB_BI, const InertiaTensor& JB, const Moment& MB_net);
 
-
     /**
     * @brief Converts a body derivative to an inertial derivative
     */
     Eigen::Vector3d ddtB_to_ddtI(const Eigen::Vector3d& ddtB_v, const Eigen::Vector3d& v, const Eigen::Vector3d& w);
 
-
-    TranslationalVelocity trans_dyn_vel(const TranslationalVelocity& vB_t, const AngularVelocity& wB_BI_t, const Mass& mass, const Force& FB_net_t, double dt);
-    AngularVelocity rot_dyn(const AngularVelocity& wB_BI_t, const InertiaTensor& JB, const Moment& MB_net_t, double dt);
-
     OrientationQuaternionRate CIB_dot_to_qIB_dot(const OrientationMatrixRate& CIB_dot, const OrientationMatrix& CIB, const OrientationQuaternion& qIB);
+
     OrientationQuaternionRate wB_BI_to_qIB_dot(const AngularVelocity& wB_BI, const OrientationQuaternion& qIB);
+
     OrientationMatrixRate qIB_dot_to_CIB_dot(const OrientationQuaternionRate& qIB_dot, const OrientationQuaternion& qIB, const OrientationMatrix& CIB);
 
     Eigen::Matrix3d eul_dot_to_wB_BI_mat(double theta, double phi);

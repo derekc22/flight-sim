@@ -4,34 +4,11 @@
 #include "simulation/dynamics/private.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/frames/public.hpp"
+#include "simulation/integrators/public.hpp"
 #include "simulation/transforms/public.hpp"
 #include "simulation/util/public.hpp"
 
 namespace dynamics {
-
-    Position trans_kin(const Position& pt, const TranslationalVelocity& vt, const TranslationalAcceleration& at, double dt) {
-        const Eigen::Vector3d pt1 = pt.data + vt.data * dt + 0.5 * at.data * (dt * dt);
-
-        return { pt1 };
-    }
-
-    OrientationQuaternion quat_kin(const OrientationQuaternion& qIB_t, const AngularVelocity& wB_BI_t, double dt) {
-        const Eigen::Vector3d w = wB_BI_t.data;
-        const double Omega = w.norm();
-        const double half_theta = 0.5 * Omega * dt;
-
-        Eigen::Quaterniond dq;
-        dq.w() = util::cos(half_theta);
-
-        if (Omega < constants::eps) {
-            dq.vec() = -0.5 * w * dt;
-        } else {
-            dq.vec() = -w * (util::sin(half_theta) / Omega);
-        }
-
-        const Eigen::Quaterniond qIB_t1 = dq * qIB_t.data;
-        return { transforms::normalize_and_canonicalize(qIB_t1) };
-    }
 
     void OrientationMatrix::set(const OrientationQuaternion& q) { 
         data = transforms::quat_to_rot(q.data); 
@@ -89,17 +66,17 @@ namespace dynamics {
     }
 
     void OrientationMatrixRate::set(const OrientationQuaternionRate& q_dot, const OrientationQuaternion& q, const OrientationMatrix& C) {
-        data = dynamics::qIB_dot_to_CIB_dot(q_dot, q, C).data; 
+        data = qIB_dot_to_CIB_dot(q_dot, q, C).data; 
     }
     void OrientationMatrixRate::set(const OrientationMatrix& C, const AngularVelocity& w) {
-        data = dynamics::ddt_CIB(C, w).data; 
+        data = ddt_CIB(C, w).data; 
     }
 
     void OrientationQuaternionRate::set(const OrientationMatrixRate& C_dot, const OrientationMatrix& C, const OrientationQuaternion& q) {
-        data = dynamics::CIB_dot_to_qIB_dot(C_dot, C, q).data; 
+        data = CIB_dot_to_qIB_dot(C_dot, C, q).data; 
     }
     void OrientationQuaternionRate::set(const OrientationQuaternion& q, const AngularVelocity& w) {
-        data = dynamics::quat_kin_vel(q, w).data; 
+        data = quat_kin_vel(q, w).data; 
     }
 
     double AngularVelocity::p() const {
@@ -122,7 +99,7 @@ namespace dynamics {
         return data[2]; 
     }
     void EulerAngleRates::set(const AngularVelocity& w, const EulerAngles& eul) {
-        data = dynamics::wB_BI_to_eul_dot(w, eul).data; 
+        data = wB_BI_to_eul_dot(w, eul).data; 
     }
 
     AngularVelocity AngularVelocityQuaternion::w() const { 
@@ -161,7 +138,7 @@ namespace dynamics {
         if (F.parent != nullptr && F.parent->name != "NEDFrameECEF") {
             throw std::invalid_argument(
                 std::format(
-                    "dynamics::rigid_body_state: Invalid frame input. "
+                    "rigid_body_state: Invalid frame input. "
                     "The parent of {} must be an inertial frame: ECEFFrame or NEDFrameECEF", F.name
                 )
             );
@@ -173,12 +150,6 @@ namespace dynamics {
             .q = *fv.q,
             .w = *fv.w
         };
-    }
-
-    TranslationalVelocity trans_kin_vel(const TranslationalVelocity& vt, const TranslationalAcceleration& at, double dt) {
-        const Eigen::Vector3d vt1 = vt.data + at.data * dt;
-
-        return { vt1 };
     }
 
     AngularVelocity eul_dot_to_wB_BI(const EulerAngleRates& eul_dot, const EulerAngles& eul) {

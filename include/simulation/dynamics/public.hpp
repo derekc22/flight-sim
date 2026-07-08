@@ -212,17 +212,11 @@ namespace dynamics {
     template <typename T>
     constants::Matrix3_T<T> wB_BI_to_eul_dot_mat_T(const T& theta, const T& phi);
 
-    Position trans_kin(const Position& xt, const TranslationalVelocity& xt_dot, const TranslationalAcceleration& xt_ddot, double dt);
-
-    OrientationQuaternion quat_kin(const OrientationQuaternion& qIB_t, const AngularVelocity& wB_BI_t, double dt);
-
     AngularVelocity CIB_dot_to_wB_BI(const OrientationMatrixRate& CIB_dot, const OrientationMatrix& CIB);
 
     AngularVelocity qIB_dot_to_wB_BI(const OrientationQuaternionRate& qIB_dot, const OrientationQuaternion& qIB);
 
     EulerAngleRates wB_BI_to_eul_dot(const AngularVelocity& wB_BI, const EulerAngles& eul);
-
-    TranslationalVelocity trans_kin_vel(const TranslationalVelocity& xt_dot, const TranslationalAcceleration& xt_ddot, double dt);
 
     AngularVelocity eul_dot_to_wB_BI(const EulerAngleRates& eul_dot, const EulerAngles& eul);
 
