@@ -1,3 +1,4 @@
+#include <tuple>
 #include <utility> // For std::pair
 #include "simulation/actuators/public.hpp"
 #include "simulation/actuators/propulsor/public.hpp"
@@ -59,7 +60,7 @@ namespace actuators {
         };
     }
 
-    std::pair<ActuatorInputsVector_T<double>, ActuatorInputsVector_T<double>> unpack_actuator_limits(const SurfaceActuators& surface_actuators, const PropulsorActuators& propulsor_actuators) {
+    std::tuple<ActuatorInputsVector_T<double>, ActuatorInputsVector_T<double>> unpack_actuator_limits(const SurfaceActuators& surface_actuators, const PropulsorActuators& propulsor_actuators) {
         ActuatorLimits_T<double> max_min_limits = pack_actuator_limits(surface_actuators, propulsor_actuators);
         return { unpack_actuator_inputs_T(max_min_limits.limit_min), unpack_actuator_inputs_T(max_min_limits.limit_max) };
     }
