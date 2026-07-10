@@ -43,6 +43,8 @@ namespace io {
                 throw std::runtime_error(err_msg);
             }
 
+            rec.log_file_from_path("assets/default.rbl");
+
             rec.log_static("/", rerun::ViewCoordinates::FRD);
             stream_vehicle_model(rec, q_model_to_body, "world/vehicle/frame");
             if (json_flags.estimation_flag) {
