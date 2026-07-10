@@ -86,8 +86,8 @@ namespace io {
             u_propulsor_DT->insert(t, actuators::unpack_propulsor_actuator_inputs(context.u_propulsor));
             F_net_DT->insert(t, context.WB_net.F.data);
             M_net_DT->insert(t, context.WB_net.M.data);
-            F_aero_DT->insert(t, context.WB_aero.F.data);
-            M_aero_DT->insert(t, context.WB_aero.M.data);
+            F_aero_DT->insert(t, context.WB_aerodynamic.F.data);
+            M_aero_DT->insert(t, context.WB_aerodynamic.M.data);
             F_prop_DT->insert(t, context.WB_propulsive.F.data);
             M_prop_DT->insert(t, context.WB_propulsive.M.data);
 

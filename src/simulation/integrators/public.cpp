@@ -1,5 +1,4 @@
 #include <Eigen/Dense>
-#include <tuple>
 #include "simulation/actuators/public.hpp"
 #include "simulation/dynamics/private.hpp"
 #include "simulation/integrators/private.hpp"
@@ -76,7 +75,7 @@ namespace integrators {
         return { .p = pI_BI_t1, .v = vB_BI_t1, .q = qIB_t1, .w = wB_BI_t1 };
     }
 
-    std::tuple<dynamics::RigidBodyState, dynamics::Wrench> step_rigid_body_rk4(const dynamics::RigidBodyState& Xt, RK4Model& model, const operating::OperatingConditions& conditions, const actuators::SurfaceActuatorInputs_T<double>& u_surface, const actuators::PropulsorActuatorInputs_T<double>& u_propulsor, double dt) {
+    RK4Output step_rigid_body_rk4(const dynamics::RigidBodyState& Xt, RK4Model& model, const operating::OperatingConditions& conditions, const actuators::SurfaceActuatorInputs_T<double>& u_surface, const actuators::PropulsorActuatorInputs_T<double>& u_propulsor, double dt) {
         const propulsion::PropellerOmegaState_T<double> front_propulsor_omega_state = propulsion::compute_propeller_omega_state_T<double>(
             model.propulsor_actuators.front_propulsor,
             u_propulsor.front_propulsor_cmd,
@@ -102,26 +101,31 @@ namespace integrators {
             .right_propulsor = right_propulsor_omega_state.omega_dot
         };
 
-        const dynamics::Wrench WB_net_1 = compute_rigid_body_net_wrench(Xt, model, conditions, u_surface, u_propulsor, omega_dot);
+        auto [WB_net_1, WB_aerodynamic_1, WB_propulsive_1] = compute_rigid_body_net_wrench(Xt, model, conditions, u_surface, u_propulsor, omega_dot);
         const RigidBodyStateDot k1 = compute_rigid_body_state_dot(Xt, model.structural.mass, model.structural.JB, WB_net_1);
 
         const dynamics::RigidBodyState X2 = add_scaled_rigid_body_state_dot(Xt, k1, 0.5 * dt);
-        const dynamics::Wrench WB_net_2 = compute_rigid_body_net_wrench(X2, model, conditions, u_surface, u_propulsor, omega_dot);
+        auto [WB_net_2, WB_aerodynamic_2, WB_propulsive_2] = compute_rigid_body_net_wrench(X2, model, conditions, u_surface, u_propulsor, omega_dot);
         const RigidBodyStateDot k2 = compute_rigid_body_state_dot(X2, model.structural.mass, model.structural.JB, WB_net_2);
 
         const dynamics::RigidBodyState X3 = add_scaled_rigid_body_state_dot(Xt, k2, 0.5 * dt);
-        const dynamics::Wrench WB_net_3 = compute_rigid_body_net_wrench(X3, model, conditions, u_surface, u_propulsor, omega_dot);
+        auto [WB_net_3, WB_aerodynamic_3, WB_propulsive_3] = compute_rigid_body_net_wrench(X3, model, conditions, u_surface, u_propulsor, omega_dot);
         const RigidBodyStateDot k3 = compute_rigid_body_state_dot(X3, model.structural.mass, model.structural.JB, WB_net_3);
 
         const dynamics::RigidBodyState X4 = add_scaled_rigid_body_state_dot(Xt, k3, dt);
-        const dynamics::Wrench WB_net_4 = compute_rigid_body_net_wrench(X4, model, conditions, u_surface, u_propulsor, omega_dot);
+        auto [WB_net_4, WB_aerodynamic_4, WB_propulsive_4] = compute_rigid_body_net_wrench(X4, model, conditions, u_surface, u_propulsor, omega_dot);
         const RigidBodyStateDot k4 = compute_rigid_body_state_dot(X4, model.structural.mass, model.structural.JB, WB_net_4);
 
         const dynamics::RigidBodyState Xt1 = add_rk4_weighted_rigid_body_state_dot(Xt, k1, k2, k3, k4, dt);
 
         propulsion::commit_propellers_omega_state(model.propulsor_actuators, front_propulsor_omega_state, left_propulsor_omega_state, right_propulsor_omega_state);
 
-        return { Xt1, WB_net_1 };
+        return { 
+            .Xt1 = Xt1, 
+            .WB_net = WB_net_1, 
+            .WB_aerodynamic = WB_aerodynamic_1, 
+            .WB_propulsive = WB_propulsive_1 
+        };
     }
 
 }

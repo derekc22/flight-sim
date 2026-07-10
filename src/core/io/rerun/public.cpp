@@ -122,11 +122,11 @@ namespace io {
         }
 
         stream_body_arrow(rec, "world/vehicle/vectors/F_net", context.data_context.WB_net.F.data, 0.01, rerun::Color(255, 80, 80), "F_net");
-        stream_body_arrow(rec, "world/vehicle/vectors/F_aero", context.data_context.WB_aero.F.data, 0.01, rerun::Color(255, 160, 40), "F_aero");
+        stream_body_arrow(rec, "world/vehicle/vectors/F_aero", context.data_context.WB_aerodynamic.F.data, 0.01, rerun::Color(255, 160, 40), "F_aero");
         stream_body_arrow(rec, "world/vehicle/vectors/F_propulsive", context.data_context.WB_propulsive.F.data, 0.001, rerun::Color(80, 220, 120), "F_propulsive");
 
         stream_body_arrow(rec, "world/vehicle/vectors/M_net", context.data_context.WB_net.M.data, 0.01, rerun::Color(210, 120, 255), "M_net");
-        stream_body_arrow(rec, "world/vehicle/vectors/M_aero", context.data_context.WB_aero.M.data, 0.01, rerun::Color(255, 220, 80), "M_aero");
+        stream_body_arrow(rec, "world/vehicle/vectors/M_aero", context.data_context.WB_aerodynamic.M.data, 0.01, rerun::Color(255, 220, 80), "M_aero");
         stream_body_arrow(rec, "world/vehicle/vectors/M_propulsive", context.data_context.WB_propulsive.M.data, 0.01, rerun::Color(120, 255, 210), "M_propulsive");
 
         dynamics::EulerAngles eul_t;
@@ -142,8 +142,8 @@ namespace io {
         stream_vector(rec, "forces/net", context.data_context.WB_net.F.data, xyz_labels);
         stream_vector(rec, "moments/net", context.data_context.WB_net.M.data, xyz_labels);
 
-        stream_vector(rec, "forces/aero", context.data_context.WB_aero.F.data, xyz_labels);
-        stream_vector(rec, "moments/aero", context.data_context.WB_aero.M.data, xyz_labels);
+        stream_vector(rec, "forces/aero", context.data_context.WB_aerodynamic.F.data, xyz_labels);
+        stream_vector(rec, "moments/aero", context.data_context.WB_aerodynamic.M.data, xyz_labels);
 
         stream_vector(rec, "forces/propulsive", context.data_context.WB_propulsive.F.data, xyz_labels);
         stream_vector(rec, "moments/propulsive", context.data_context.WB_propulsive.M.data, xyz_labels);

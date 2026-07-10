@@ -472,37 +472,38 @@ namespace runner {
             .steady_state = false
         };
 
-        // compute net forces and moments
-        // compute next-step rigid body state
-        auto [Xt1, WB_net] = integrators::step_rigid_body_rk4(Xt, rk4_model, rk4_conditions, u_surface_actual, u_propulsor_actual, constants::dt);
+        // compute forces, moments, and next-step rigid body state
+        integrators::RK4Output rk4_out = integrators::step_rigid_body_rk4(Xt, rk4_model, rk4_conditions, u_surface_actual, u_propulsor_actual, constants::dt);
+        dynamics::RigidBodyState Xt1 = rk4_out.Xt1;
+        dynamics::Wrench WB_net = rk4_out.WB_net;
 
-        // // update data context
-        // io::DataContext data_context{
-        //     .Xt=Xt,
-        //     .Yt=Yt,
-        //     .Zt=Zt,
-        //     .u_surface=u_surface_actual,
-        //     .u_propulsor=u_propulsor_actual,
-        //     .WB_net=WB_net,
-        //     .WB_aero=WB_aero,
-        //     .WB_propulsive=WB_propulsive,
-        //     .setpoint=setpoint,
-        //     .windB=windB
-        // };
+        // update data context
+        io::DataContext data_context{
+            .Xt=Xt,
+            .Yt=Yt,
+            .Zt=Zt,
+            .u_surface=u_surface_actual,
+            .u_propulsor=u_propulsor_actual,
+            .WB_net=WB_net,
+            .WB_aerodynamic=rk4_out.WB_aerodynamic,
+            .WB_propulsive=rk4_out.WB_propulsive,
+            .setpoint=setpoint,
+            .windB=windB
+        };
 
-        // // step data manager
-        // data_manager.step(t, data_context);
+        // step data manager
+        data_manager.step(t, data_context);
 
-        // if (scheduler.log_tick >= constants::hz) {
-        //     // step rerun manager
-        //     rerun_manager.step(t, data_context);
+        if (scheduler.log_tick >= constants::hz) {
+            // step rerun manager
+            rerun_manager.step(t, data_context);
 
-        //     // log state
-        //     if (json_flags.verbose_flag) {
-        //         log_state(t, Xt, geo_t, aero_t, windB);
-        //     }
-        //     scheduler.log_tick -= constants::hz;
-        // }
+            // log state
+            if (json_flags.verbose_flag) {
+                log_state(t, Xt, geo_t, aero_t, windB);
+            }
+            scheduler.log_tick -= constants::hz;
+        }
 
         // compute next-step aerodynamic state
         aerodynamics::AerodynamicState aero_t1 = aerodynamics::compute_aerodynamic_state(Xt1, windB);

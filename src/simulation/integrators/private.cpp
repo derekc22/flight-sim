@@ -1,4 +1,5 @@
 #include <Eigen/Dense>
+#include <tuple>
 #include "simulation/actuators/public.hpp"
 #include "simulation/aerodynamics/public.hpp"
 #include "simulation/atmospheric/public.hpp"
@@ -48,23 +49,38 @@ namespace integrators {
         return { wB_BI_t1 };
     }
 
-    dynamics::Wrench compute_rigid_body_net_wrench(const dynamics::RigidBodyState& Xt, RK4Model& model, const operating::OperatingConditions& conditions, const actuators::SurfaceActuatorInputs_T<double>& u_surface, const actuators::PropulsorActuatorInputs_T<double>& u_propulsor, const propulsion::PropulsorOmegaDot_T<double>& omega_dot) {
+    std::tuple<dynamics::Wrench, dynamics::Wrench, dynamics::Wrench> compute_rigid_body_net_wrench(const dynamics::RigidBodyState& Xt, RK4Model& model, const operating::OperatingConditions& conditions, const actuators::SurfaceActuatorInputs_T<double>& u_surface, const actuators::PropulsorActuatorInputs_T<double>& u_propulsor, const propulsion::PropulsorOmegaDot_T<double>& omega_dot) {
         const dynamics::Twist_T<double> twist{
             .v = Xt.v.data,
             .w = Xt.w.data
         };
 
         const atmospheric::Wind windB{ transforms::quat_to_rot(Xt.q.data) * conditions.windI.data };
-        const dynamics::Wrench_T<double> aero_wrench = aerodynamics::step_aero_forces_moments_T<double>(model.aerodynamic, twist, conditions.atm, u_surface, windB);
+        const dynamics::Wrench_T<double> aerodynamic_wrench = aerodynamics::step_aero_forces_moments_T<double>(model.aerodynamic, twist, conditions.atm, u_surface, windB);
 
-        const dynamics::Wrench_T<double> prop_wrench = propulsion::step_propulsive_forces_moments_T<double>(model.propulsor_actuators, twist, conditions.atm, u_propulsor, omega_dot);
+        const dynamics::Wrench_T<double> propulsive_wrench = propulsion::step_propulsive_forces_moments_T<double>(model.propulsor_actuators, twist, conditions.atm, u_propulsor, omega_dot);
 
         const Eigen::Vector3d FB_g = model.structural.mass.data * geography::gB(Xt.q).data;
 
-        return {
-            .F = dynamics::Force{ FB_g + aero_wrench.F + prop_wrench.F },
-            .M = dynamics::Moment{ aero_wrench.M + prop_wrench.M }
+        const Eigen::Vector3d FB_net = FB_g + aerodynamic_wrench.F + propulsive_wrench.F;
+        const Eigen::Vector3d MB_net = aerodynamic_wrench.M + propulsive_wrench.M; 
+
+        dynamics::Wrench WB_aerodynamic{
+            .F = dynamics::Force{ aerodynamic_wrench.F },
+            .M = dynamics::Moment{ aerodynamic_wrench.M }
         };
+
+        dynamics::Wrench WB_propulsive{
+            .F = dynamics::Force{ propulsive_wrench.F },
+            .M = dynamics::Moment{ propulsive_wrench.M }
+        };
+
+        dynamics::Wrench WB_net{
+            .F = dynamics::Force{FB_net},
+            .M = dynamics::Moment{MB_net}
+        };
+
+        return { WB_net, WB_aerodynamic, WB_propulsive };
     }
 
     RigidBodyStateDot compute_rigid_body_state_dot(const dynamics::RigidBodyState& Xt, const dynamics::Mass& mass, const dynamics::InertiaTensor& JB, const dynamics::Wrench& WB_net_t) {
