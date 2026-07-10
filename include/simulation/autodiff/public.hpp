@@ -19,7 +19,7 @@ namespace autodiff {
     struct AutoDiffModel {
         const structural::StructuralProperties& structural;
         const aerodynamics::AerodynamicProperties& aerodynamic;
-        const actuators::PropulsorActuators& propulsor_actuators;
+        actuators::PropulsorActuators& propulsor_actuators;
         actuators::ActuatorLimits_T<double> actuator_limits;
         actuators::FixedActuatorInputs fixed_actuator_inputs{};
     };
@@ -33,10 +33,10 @@ namespace autodiff {
     actuators::PropulsorActuatorInputs_T<T> pack_propulsor_actuator_inputs_T(const actuators::ActuatorInputs_T<T>& u);
 
     template <typename T>
-    dynamics::Wrench_T<T> compute_net_wrench_T(const dynamics::State_T<T>& x, const dynamics::Twist_T<T>& twist, const actuators::ActuatorInputs_T<T>& u, const AutoDiffModel& model, const operating::OperatingConditions& conditions);
+    dynamics::Wrench_T<T> compute_net_wrench_T(const dynamics::State_T<T>& x, const dynamics::Twist_T<T>& twist, const actuators::ActuatorInputs_T<T>& u, AutoDiffModel& model, const operating::OperatingConditions& conditions,T dt);
 
     template <typename T>
-    dynamics::StateDot_T<T> compute_state_dot_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u, const AutoDiffModel& model, const operating::OperatingConditions& conditions);
+    dynamics::StateDot_T<T> compute_state_dot_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u, AutoDiffModel& model, const operating::OperatingConditions& conditions, T dt);
 
     template <typename T, std::size_t rows>
     Eigen::Matrix<T, rows, 1> eigen_vector_from_cppad_vector(const CppAD::eigen_vector<T>& x);

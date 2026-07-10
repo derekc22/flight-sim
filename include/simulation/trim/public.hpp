@@ -2,7 +2,7 @@
 #include <cstddef>
 #include <Eigen/Dense>
 #include <string>
-#include <utility>
+#include <tuple>
 #include "simulation/actuators/propulsor/public.hpp"
 #include "simulation/actuators/surface/public.hpp"
 #include "simulation/actuators/public.hpp"
@@ -13,8 +13,8 @@
 #include "simulation/aerodynamics/public.hpp"
 #include "simulation/structural/public.hpp"
 #include "simulation/operating/public.hpp"
+#include "simulation/control/shared/public.hpp"
 
-namespace control { struct ControlOutput; } // forward declare
 namespace vehicles { struct Aircraft; } // forward declare
 
 namespace trim {
@@ -61,14 +61,14 @@ namespace trim {
 
     std::string print_trim_solution(const TrimSolution& trim_sol);
 
-    std::pair<dynamics::RigidBodyState, aerodynamics::AerodynamicState> update_state_from_trim(const dynamics::RigidBodyState& Xt, const TrimSolution& trim_sol);
+    std::tuple<dynamics::RigidBodyState, aerodynamics::AerodynamicState> update_state_from_trim(const dynamics::RigidBodyState& Xt, const TrimSolution& trim_sol);
 
     control::ControlOutput set_control_inputs_from_trim(const TrimSolution& trim_sol);
 
     /** @deprecated */
     // void update_actuators_lag_from_trim(actuators::SurfaceActuators& surface_actuators, actuators::PropulsorActuators& propulsor_actuators, const TrimSolution& trim_sol);
 
-    std::pair<actuators::SurfaceActuatorInputs_T<double>, actuators::PropulsorActuatorInputs_T<double>> update_actuators_from_trim(actuators::SurfaceActuatorInputs_T<double>& surface_actuator_inputs, actuators::PropulsorActuatorInputs_T<double>& propulsor_actuator_inputs, const TrimSolution& trim_sol);
+    std::tuple<actuators::SurfaceActuatorInputs_T<double>, actuators::PropulsorActuatorInputs_T<double>> update_actuators_from_trim(actuators::SurfaceActuatorInputs_T<double>& surface_actuator_inputs, actuators::PropulsorActuatorInputs_T<double>& propulsor_actuator_inputs, const TrimSolution& trim_sol);
 
 }
 

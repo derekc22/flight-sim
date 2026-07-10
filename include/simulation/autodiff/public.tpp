@@ -36,23 +36,53 @@ namespace autodiff {
     }
 
     template <typename T>
-    dynamics::Wrench_T<T> compute_net_wrench_T(const dynamics::State_T<T>& x, const dynamics::Twist_T<T>& twist, const actuators::ActuatorInputs_T<T>& u, const AutoDiffModel& model, const operating::OperatingConditions& conditions) {
+    dynamics::Wrench_T<T> compute_net_wrench_T(const dynamics::State_T<T>& x, const dynamics::Twist_T<T>& twist, const actuators::ActuatorInputs_T<T>& u, AutoDiffModel& model, const operating::OperatingConditions& conditions,T dt) {
         const actuators::SurfaceActuatorInputs_T<T> surface_actuator_inputs = pack_surface_actuator_inputs_T(u, model.fixed_actuator_inputs);
-        const dynamics::Wrench_T<T> aero_wrench = aerodynamics::step_aero_forces_moments_T<T>(model.aerodynamic, twist, conditions.atm, surface_actuator_inputs, conditions.windB);
+        const dynamics::Wrench_T<T> aerodynamic_wrench = aerodynamics::step_aero_forces_moments_T<T>(
+            model.aerodynamic, 
+            twist, 
+            conditions.atm, 
+            surface_actuator_inputs, 
+            conditions.windB
+        );
 
         const actuators::PropulsorActuatorInputs_T<T> propulsor_actuator_inputs = pack_propulsor_actuator_inputs_T(u);
-        const dynamics::Wrench_T<T> prop_wrench = propulsion::step_propulsive_forces_moments_T<T>(model.propulsor_actuators, twist, conditions.atm, propulsor_actuator_inputs, propulsion::PropulsorOmegaDot_T<T>{});
 
-        return {
-            .F = aero_wrench.F + prop_wrench.F + T(model.structural.mass.data) * geography::gB_T(x.phi, x.theta),
-            .M = aero_wrench.M + prop_wrench.M,
-        };
+        // recall, the definition of steady trim is ẋ = f(x, u) = 0
+        // that is, for trim, d/dt(·) = 0 must be enforced for all modelled state variables
+        // however, despite this repo not including omega as part of the modelled aircraft state, omega_dot is also set to 0
+        // this is done because nonzero omega_dot represents a non-steady propeller transient that induces a moment on the aircraft
+        // this moment, if unbalanced, will result in ẋ != 0, which violates the condition of steady equilibrium
+        // thus, setting omega_dot = 0 allows trim to be achieved
+        // note: nonzero omega_dot only violates trim for the reduced-order model if the moment if it results in any of the modelled aircraft states changing (ẋ != 0)
+        // however, for a higher-order model, omega is necessarily included as part of the modelled aircraft state. as such, omega_dot = 0 is required regardless
+        const propulsion::PropulsorOmegaDot_T<T> omega_dot = conditions.steady_state ? 
+            propulsion::PropulsorOmegaDot_T<T>{} : // set omega_dot = 0 if computing gradients for trim (steady state)
+            propulsion::compute_propellers_omega_dot_T<T>(
+                model.propulsor_actuators, 
+                propulsor_actuator_inputs, 
+                conditions.atm, 
+                dt
+        );
+
+        const dynamics::Wrench_T<T> propulsive_wrench = propulsion::step_propulsive_forces_moments_T<T>(
+            model.propulsor_actuators,
+            twist,
+            conditions.atm, 
+            propulsor_actuator_inputs, 
+            omega_dot
+        );
+
+        constants::Vector3_T<T> FB_net = aerodynamic_wrench.F + propulsive_wrench.F + T(model.structural.mass.data) * geography::gB_T(x.phi, x.theta);
+        constants::Vector3_T<T> MB_net = aerodynamic_wrench.M + propulsive_wrench.M;
+
+        return { .F = FB_net, .M = MB_net };
     }
 
     template <typename T>
-    dynamics::StateDot_T<T> compute_state_dot_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u, const AutoDiffModel& model, const operating::OperatingConditions& conditions) {
+    dynamics::StateDot_T<T> compute_state_dot_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u, AutoDiffModel& model, const operating::OperatingConditions& conditions, T dt) {
         const dynamics::Twist_T<T> twist = dynamics::build_twist_from_state_T(x);
-        const dynamics::Wrench_T<T> net_wrench = compute_net_wrench_T<T>(x, twist, u, model, conditions);
+        const dynamics::Wrench_T<T> net_wrench = compute_net_wrench_T<T>(x, twist, u, model, conditions, dt);
         const constants::Vector3_T<T> v_dot = dynamics::ddtB_vB_BI_T<T>(twist.v, twist.w, model.structural.mass.data, net_wrench.F);
         const constants::Vector3_T<T> w_dot = dynamics::ddtB_wB_BI_T<T>(twist.w, model.structural.JB.data, net_wrench.M);
         const constants::Vector3_T<T> eul_dot = dynamics::wB_BI_to_eul_dot_T<T>(twist.w, x.theta, x.phi);
@@ -93,7 +123,11 @@ namespace autodiff {
 
     template <int rows>
     CppAD::eigen_vector<CppAD::AD<double>> start_autodiff_tracking(const Eigen::Matrix<double, rows, 1>& x) {
-        CppAD::eigen_vector<CppAD::AD<double>> x_tracked = cppad_vector_from_eigen_vector(Eigen::Matrix<CppAD::AD<double>, rows, 1>(x.template cast<CppAD::AD<double>>()));
+        CppAD::eigen_vector<CppAD::AD<double>> x_tracked = cppad_vector_from_eigen_vector(
+            Eigen::Matrix<CppAD::AD<double>, rows, 1>(
+                x.template cast<CppAD::AD<double>>()
+            )
+        );
         CppAD::Independent(x_tracked);
         return x_tracked;
     }

@@ -2,7 +2,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#include <utility>
+#include <tuple>
 #include <spdlog/spdlog.h>
 #include "simulation/actuators/public.hpp"
 #include "simulation/aerodynamics/public.hpp"
@@ -38,6 +38,7 @@ namespace trim {
             .conditions = operating::OperatingConditions{
                 .atm = atmospheric::compute_static_atmospheric_state(aircraft.FRDFrameECEF),
                 .windB = wind,
+                .steady_state = true
             },
             .state_guess = dynamics::State_T<double>{
                 .vx = aircraft.FRDFrameNED.vB_BN.data.x(),
@@ -167,7 +168,7 @@ namespace trim {
     }
 
 
-    std::pair<dynamics::RigidBodyState, aerodynamics::AerodynamicState> update_state_from_trim(const dynamics::RigidBodyState& Xt, const TrimSolution& trim_sol) {
+    std::tuple<dynamics::RigidBodyState, aerodynamics::AerodynamicState> update_state_from_trim(const dynamics::RigidBodyState& Xt, const TrimSolution& trim_sol) {
             dynamics::EulerAngles eul_curr;
             eul_curr.set(Xt.q);
             dynamics::EulerAngles eul_trim{ Eigen::Vector3d(eul_curr.psi(), trim_sol.operating_point.state.theta, trim_sol.operating_point.state.phi) };
@@ -212,7 +213,7 @@ namespace trim {
     //     propulsor_actuators.right_propulsor.prev_cmd = trim_sol.operating_point.input.right_propulsor_cmd;
     // }
 
-    std::pair<actuators::SurfaceActuatorInputs_T<double>, actuators::PropulsorActuatorInputs_T<double>> update_actuators_from_trim(actuators::SurfaceActuatorInputs_T<double>& surface_actuator_inputs, actuators::PropulsorActuatorInputs_T<double>& propulsor_actuator_inputs, const TrimSolution& trim_sol) {
+    std::tuple<actuators::SurfaceActuatorInputs_T<double>, actuators::PropulsorActuatorInputs_T<double>> update_actuators_from_trim(actuators::SurfaceActuatorInputs_T<double>& surface_actuator_inputs, actuators::PropulsorActuatorInputs_T<double>& propulsor_actuator_inputs, const TrimSolution& trim_sol) {
         surface_actuator_inputs.elevator_cmd = trim_sol.operating_point.input.elevator_cmd;
         surface_actuator_inputs.aileron_cmd = trim_sol.operating_point.input.aileron_cmd;
         surface_actuator_inputs.rudder_cmd = trim_sol.operating_point.input.rudder_cmd;

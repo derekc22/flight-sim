@@ -27,7 +27,7 @@ namespace io {
         actuators::SurfaceActuatorInputs_T<double> u_surface;
         actuators::PropulsorActuatorInputs_T<double> u_propulsor;
         dynamics::Wrench WB_net;
-        dynamics::Wrench WB_aero;
+        dynamics::Wrench WB_aerodynamic;
         dynamics::Wrench WB_propulsive;
         guidance::GuidanceSetpoint setpoint;
         atmospheric::Wind windB;

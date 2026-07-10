@@ -43,11 +43,16 @@ namespace dynamics {
         return twist;
     }
 
+    // Translational Dynamics (non-rotating earth), velocity expressed in body coordinates
+    // vB_dot = (1/mass) * FB_net - wB_BI x vB
     template <typename T>
     constants::Vector3_T<T> ddtB_vB_BI_T(const constants::Vector3_T<T>& vB, const constants::Vector3_T<T>& wB_BI, double mass, const constants::Vector3_T<T>& FB_net) {
         return (FB_net / T(mass)) - wB_BI.cross(vB);
     }
 
+    // Rotational Dynamics, body rates expressed in body coordinates
+    // J * w_dot + w x (J*w) = M
+    // w_dot = J^{-1} * (M - w x (J*w))
     template <typename T>
     constants::Vector3_T<T> ddtB_wB_BI_T(const constants::Vector3_T<T>& wB_BI, const Eigen::Matrix3d& J, const constants::Vector3_T<T>& MB_net) {
         const constants::Matrix3_T<T> J_T = J.cast<T>();

@@ -6,6 +6,7 @@
 #include "simulation/constants/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/geography/public.hpp"
+#include "simulation/integrators/public.hpp"
 #include "simulation/sensors/public.hpp"
 #include "simulation/util/public.hpp"
 
@@ -34,7 +35,7 @@ namespace avionics {
 
     OrientationMeasurement AttitudeHeadingReferenceSystem::compute(const OrientationMeasurement& prev_qIB, const sensors::AngularVelocityMeasurement& wB_BI, const sensors::TranslationalAccelerationMeasurement& fB, double dt) {
         // Mahony filter
-        dynamics::OrientationQuaternion qIB_pred = dynamics::quat_kin(prev_qIB, wB_BI, dt);
+        dynamics::OrientationQuaternion qIB_pred = integrators::quat_kin(prev_qIB, wB_BI, dt);
         if (util::abs(fB.data.norm() - constants::g_earth) > fB_tol) {
             return { qIB_pred };
         }
@@ -46,19 +47,19 @@ namespace avionics {
         integral += err * dt;
         dynamics::AngularVelocity wB_BI_corrected{ wB_BI.data + Kp * err + Ki * integral };
 
-        return { dynamics::quat_kin(prev_qIB, wB_BI_corrected, dt) };
+        return { integrators::quat_kin(prev_qIB, wB_BI_corrected, dt) };
 
     }
 
     sensors::PositionMeasurement InertialNavigationSystem::compute(const sensors::PositionMeasurement& prev_pI_BI, const sensors::TranslationalVelocityMeasurement& prev_vB_BI, const sensors::TranslationalAccelerationMeasurement& fB, const dynamics::Gravity& gB, const OrientationMeasurement& prev_qIB, double dt) {
         dynamics::TranslationalVelocity pI_BI_dot{ prev_qIB.data.conjugate() * prev_vB_BI.data };
         dynamics::TranslationalAcceleration aI_BI{ prev_qIB.data.conjugate() * (fB.data + gB.data) };
-        return { dynamics::trans_kin(prev_pI_BI, pI_BI_dot, aI_BI, dt).data };
+        return { integrators::trans_kin(prev_pI_BI, pI_BI_dot, aI_BI, dt).data };
     }
 
     sensors::TranslationalVelocityMeasurement InertialNavigationSystem::compute(const sensors::TranslationalVelocityMeasurement& prev_vB_BI, const sensors::TranslationalAccelerationMeasurement& fB, const dynamics::Gravity& gB, const sensors::AngularVelocityMeasurement& wB_BI, double dt) {
         dynamics::TranslationalAcceleration vB_BI_dot{ fB.data + gB.data - wB_BI.data.cross(prev_vB_BI.data) };
-        return { dynamics::trans_kin_vel(prev_vB_BI, vB_BI_dot, dt).data };
+        return { integrators::trans_kin_vel(prev_vB_BI, vB_BI_dot, dt).data };
     }
 
     AvionicsMeasurements AvionicsProperties::step(

@@ -23,6 +23,7 @@
 #include "simulation/frames/public.hpp"
 #include "simulation/geography/public.hpp"
 #include "simulation/guidance/public.hpp"
+#include "simulation/integrators/public.hpp"
 #include "simulation/linearization/public.hpp"
 #include "simulation/operating/public.hpp"
 #include "simulation/propulsion/public.hpp"
@@ -168,17 +169,22 @@ namespace runner {
 
         // apply wind
         atmospheric::Wind windB { constants::Zero3 };
+        atmospheric::Wind windI { constants::Zero3 };
         if (json_flags.wind_flag) {
             windB.data = frames::transform_vec(
                 cached_msg_out.wind.data,
                 aircraft.NEDFrameECEF,
                 aircraft.FRDFrameNED
             );
+            windI.data = frames::transform_vec(
+                windB.data,
+                aircraft.FRDFrameNED,
+                aircraft.NEDFrameECEF
+            );
         }
 
         // extract reuseable quantities
         dynamics::Mass mass = structural_properties.mass;
-        dynamics::InertiaTensor JB = structural_properties.JB;
 
         actuators::SurfaceActuators& surface_actuators = actuator_properties.surface_actuators;
         actuators::PropulsorActuators& propulsor_actuators = actuator_properties.propulsor_actuators;
@@ -345,7 +351,8 @@ namespace runner {
 
                     estimator_conditions = {
                         .atm = atm_t,
-                        .windB = windB
+                        .windB = windB,
+                        .steady_state = false
                     };
 
                 } else if (estimation_properties.linear_kalman_estimator_type == estimation::EstimatorType::LinearKalmanFilter) {
@@ -453,35 +460,22 @@ namespace runner {
         u_surface_actual_prev = u_surface_actual;
         u_propulsor_actual_prev = u_propulsor_actual;
 
-        // compute aerodynamic forces and moments
-        aerodynamics::AerodynamicWrench WB_aero = aerodynamics::step_aero_forces_moments(
-            aerodynamic_properties,
-            Xt,
-            atm_t,
-            u_surface_actual,
-            windB
-        );
-        dynamics::Force FB_aero = WB_aero.F;
-        dynamics::Moment MB_aero = WB_aero.M;
+        integrators::RK4Model rk4_model{
+            .structural = structural_properties,
+            .aerodynamic = aerodynamic_properties,
+            .propulsor_actuators = propulsor_actuators
+        };
 
-        // compute propulsive forces and momments
-        propulsion::PropulsiveWrench WB_propulsive = propulsion::step_propulsive_forces_moments(
-            propulsor_actuators,
-            Xt,
-            atm_t,
-            u_propulsor_actual,
-            constants::dt
-        );
-        dynamics::Force FB_propulsive = WB_propulsive.F;
-        dynamics::Moment MB_propulsive = WB_propulsive.M;
+        operating::OperatingConditions rk4_conditions{
+            .atm = atm_t,
+            .windI = windI,
+            .steady_state = false
+        };
 
-        // compute gravitational force
-        Eigen::Vector3d FB_g = mass.data * aircraft.FRDFrameNED.gB.data;
-
-        // compute net forces and moments
-        dynamics::Force FB_net{ FB_g + FB_aero.data + FB_propulsive.data };
-        dynamics::Moment MB_net{ MB_aero.data + MB_propulsive.data };
-        dynamics::Wrench WB_net{ .F = FB_net, .M = MB_net };
+        // compute forces, moments, and next-step rigid body state
+        integrators::RK4Output rk4_out = integrators::step_rigid_body_rk4(Xt, rk4_model, rk4_conditions, u_surface_actual, u_propulsor_actual, constants::dt);
+        dynamics::RigidBodyState Xt1 = rk4_out.Xt1;
+        dynamics::Wrench WB_net = rk4_out.WB_net;
 
         // update data context
         io::DataContext data_context{
@@ -491,8 +485,8 @@ namespace runner {
             .u_surface=u_surface_actual,
             .u_propulsor=u_propulsor_actual,
             .WB_net=WB_net,
-            .WB_aero=WB_aero,
-            .WB_propulsive=WB_propulsive,
+            .WB_aerodynamic=rk4_out.WB_aerodynamic,
+            .WB_propulsive=rk4_out.WB_propulsive,
             .setpoint=setpoint,
             .windB=windB
         };
@@ -510,9 +504,6 @@ namespace runner {
             }
             scheduler.log_tick -= constants::hz;
         }
-
-        // compute next-step rigid body state
-        dynamics::RigidBodyState Xt1{ dynamics::step_rigid_body(Xt, mass, JB, WB_net, constants::dt) };
 
         // compute next-step aerodynamic state
         aerodynamics::AerodynamicState aero_t1 = aerodynamics::compute_aerodynamic_state(Xt1, windB);
