@@ -1,11 +1,11 @@
 #pragma once
 #include <tuple>
 #include "simulation/dynamics/public.hpp"
-
-namespace structural { struct StructuralProperties; } // forward declare
-namespace aerodynamics { struct AerodynamicProperties; } // forward declare
-namespace actuators { struct PropulsorActuators; template <typename T> struct SurfaceActuatorInputs_T; template <typename T> struct PropulsorActuatorInputs_T; } // forward declare
-namespace operating { struct OperatingConditions; } // forward declare
+#include "simulation/structural/public.hpp"
+#include "simulation/aerodynamics/public.hpp"
+#include "simulation/actuators/propulsor/public.hpp"
+#include "simulation/actuators/surface/public.hpp"
+#include "simulation/operating/public.hpp"
 
 namespace integrators {
 
@@ -27,8 +27,8 @@ namespace integrators {
 
     dynamics::TranslationalVelocity trans_kin_vel(const dynamics::TranslationalVelocity& xt_dot, const dynamics::TranslationalAcceleration& xt_ddot, double dt);
 
-    dynamics::RigidBodyState step_rigid_body(const dynamics::RigidBodyState& XB_BI_t, const dynamics::Mass& mass, const dynamics::InertiaTensor& JB, const dynamics::Wrench& WB_net_t, double dt);
+    dynamics::RigidBodyState step_rigid_body(const dynamics::RigidBodyState& Xt, const dynamics::Mass& mass, const dynamics::InertiaTensor& JB, const dynamics::Wrench& WB_net_t, double dt);
 
-    std::tuple<dynamics::RigidBodyState, dynamics::Wrench> step_rigid_body_rk4(const dynamics::RigidBodyState& XB_BI_t, RK4Model& model, const operating::OperatingConditions& conditions, const actuators::SurfaceActuatorInputs_T<double>& u_surface, const actuators::PropulsorActuatorInputs_T<double>& u_propulsor, double dt);
+    std::tuple<dynamics::RigidBodyState, dynamics::Wrench> step_rigid_body_rk4(const dynamics::RigidBodyState& Xt, RK4Model& model, const operating::OperatingConditions& conditions, const actuators::SurfaceActuatorInputs_T<double>& u_surface, const actuators::PropulsorActuatorInputs_T<double>& u_propulsor, double dt);
 
 }

@@ -1,8 +1,7 @@
 #pragma once
 #include "simulation/dynamics/public.hpp"
 #include "simulation/integrators/public.hpp"
-
-namespace propulsion { template <typename T> struct PropulsorOmegaDot_T; } // forward declare
+#include "simulation/propulsion/public.hpp"
 
 namespace integrators {
 
@@ -14,9 +13,9 @@ namespace integrators {
 
     dynamics::AngularVelocity rot_dyn(const dynamics::AngularVelocity& wB_BI_t, const dynamics::InertiaTensor& JB, const dynamics::Moment& MB_net_t, double dt);
 
-    dynamics::Wrench compute_rigid_body_net_wrench(const dynamics::RigidBodyState& XB_BI_t, RK4Model& model, const operating::OperatingConditions& conditions, const actuators::SurfaceActuatorInputs_T<double>& u_surface, const actuators::PropulsorActuatorInputs_T<double>& u_propulsor, const propulsion::PropulsorOmegaDot_T<double>& omega_dot);
+    dynamics::Wrench compute_rigid_body_net_wrench(const dynamics::RigidBodyState& Xt, RK4Model& model, const operating::OperatingConditions& conditions, const actuators::SurfaceActuatorInputs_T<double>& u_surface, const actuators::PropulsorActuatorInputs_T<double>& u_propulsor, const propulsion::PropulsorOmegaDot_T<double>& omega_dot);
 
-    RigidBodyStateDot compute_rigid_body_state_dot(const dynamics::RigidBodyState& XB_BI_t, const dynamics::Mass& mass, const dynamics::InertiaTensor& JB, const dynamics::Wrench& WB_net_t);
+    RigidBodyStateDot compute_rigid_body_state_dot(const dynamics::RigidBodyState& Xt, const dynamics::Mass& mass, const dynamics::InertiaTensor& JB, const dynamics::Wrench& WB_net_t);
 
     dynamics::RigidBodyState add_scaled_rigid_body_state_dot(const dynamics::RigidBodyState& X, const RigidBodyStateDot& X_dot, double scale);
 

@@ -49,8 +49,12 @@ namespace dynamics {
         return { ddtB_vB_BI_T<double>(vB_BI.data, wB_BI.data, mass.data, FB_net.data) };
     }
 
-    Eigen::Vector3d ddtB_to_ddtI(const Eigen::Vector3d& ddtB_v, const Eigen::Vector3d& v, const Eigen::Vector3d& w) {
-        return ddtB_v + w.cross(v);
+    Eigen::Vector3d ddtB_to_ddtI(const Eigen::Vector3d& ddtB_vB, const Eigen::Vector3d& vB, const Eigen::Vector3d& wB_BI) {
+        return ddtB_vB + wB_BI.cross(vB);
+    }
+
+    Eigen::Vector3d ddtI_to_ddtB(const Eigen::Vector3d& ddtI_vI, const Eigen::Vector3d& vI, const Eigen::Vector3d& wI_BI) {
+        return ddtI_vI - wI_BI.cross(vI);
     }
 
     Eigen::Vector3d ddtB_wB_BI(const AngularVelocity& wB_BI, const InertiaTensor& JB, const Moment& MB_net) {

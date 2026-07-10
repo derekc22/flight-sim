@@ -33,7 +33,12 @@ namespace dynamics {
     /**
     * @brief Converts a body derivative to an inertial derivative
     */
-    Eigen::Vector3d ddtB_to_ddtI(const Eigen::Vector3d& ddtB_v, const Eigen::Vector3d& v, const Eigen::Vector3d& w);
+    Eigen::Vector3d ddtB_to_ddtI(const Eigen::Vector3d& ddtB_vB, const Eigen::Vector3d& vB, const Eigen::Vector3d& wB_BI);
+
+    /**
+    * @brief Converts an inertial derivative to a body derivative
+    */
+    Eigen::Vector3d ddtI_to_ddtB(const Eigen::Vector3d& ddtI_vI, const Eigen::Vector3d& vI, const Eigen::Vector3d& wI_BI);
 
     OrientationQuaternionRate CIB_dot_to_qIB_dot(const OrientationMatrixRate& CIB_dot, const OrientationMatrix& CIB, const OrientationQuaternion& qIB);
 

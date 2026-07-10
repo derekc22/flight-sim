@@ -13,8 +13,8 @@
 #include "simulation/aerodynamics/public.hpp"
 #include "simulation/structural/public.hpp"
 #include "simulation/operating/public.hpp"
+#include "simulation/control/shared/public.hpp"
 
-namespace control { struct ControlOutput; } // forward declare
 namespace vehicles { struct Aircraft; } // forward declare
 
 namespace trim {
