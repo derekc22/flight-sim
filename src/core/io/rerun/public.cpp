@@ -2,6 +2,9 @@
 #include <cmath>
 #include <cstdlib>
 #include <exception>
+#include <stdexcept>
+#include <string>
+#include <format>
 #include <chrono>
 #include <thread>
 #include <utility>
@@ -30,8 +33,15 @@ namespace io {
           rec("flight-sim")
     {
         if (json_flags.rerun_flag) {
-            auto server_uri = rec.serve_grpc("0.0.0.0", 9876, "1GiB").value;
-            std::system("rerun assets/default.rbl --connect rerun+http://127.0.0.1:9876/proxy &");
+
+            rerun::SpawnOptions options;
+            options.port = 9876;
+            const auto result = rec.spawn(options);
+
+            if (result.is_err()) {
+                std::string err_msg = std::format("Failed to spawn Rerun Viewer: {}", result.description);
+                throw std::runtime_error(err_msg);
+            }
 
             rec.log_static("/", rerun::ViewCoordinates::FRD);
             stream_vehicle_model(rec, q_model_to_body, "world/vehicle/frame");
