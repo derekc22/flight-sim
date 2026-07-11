@@ -18,13 +18,12 @@
 
 namespace trim {
 
-    TrimSolution inspect_trim(vehicles::Aircraft& aircraft, const atmospheric::Wind& wind) {
+    TrimSolution inspect_trim(vehicles::Aircraft& aircraft, autodiff::AutoDiffModel& model, const atmospheric::Wind& wind) {
 
-        autodiff::AutoDiffModel model = autodiff::build_autodiff_model(aircraft);
         const actuators::ActuatorLimits_T actuator_limits = model.actuator_limits;
         const actuators::ActuatorInputs_T actuator_limits_max = model.actuator_limits.limit_max;
         const actuators::ActuatorInputs_T actuator_limits_min = model.actuator_limits.limit_min;
-        const aerodynamics::AerodynamicState target_aero = aerodynamics::aerodynamic_state(aircraft.FRDFrameNED, wind);
+        const aerodynamics::AerodynamicState target_aero = aerodynamics::compute_aerodynamic_state(aircraft.FRDFrameNED, wind);
 
         const TrimProblem<double> problem{
             .target = TrimTarget{
@@ -75,7 +74,9 @@ namespace trim {
         dynamics::Twist_T<double> trim_sol_twist;
         trim_sol_twist.v << trim_sol.operating_point.state.vx, trim_sol.operating_point.state.vy, trim_sol.operating_point.state.vz;
         trim_sol_twist.w << trim_sol.operating_point.state.p, trim_sol.operating_point.state.q, trim_sol.operating_point.state.r;
+
         const aerodynamics::AerodynamicState_T<double> trim_sol_aero = aerodynamics::compute_aerodynamic_state_T<double>(trim_sol_twist, trim_sol.conditions.windB);
+
         const dynamics::AngularVelocity trim_w{ Eigen::Vector3d(trim_sol.operating_point.state.p, trim_sol.operating_point.state.q, trim_sol.operating_point.state.r) };
         const dynamics::EulerAngles trim_eul{ Eigen::Vector3d(0.0, trim_sol.operating_point.state.theta, trim_sol.operating_point.state.phi) };
         const dynamics::EulerAngleRates trim_eul_dot = dynamics::wB_BI_to_eul_dot(trim_w, trim_eul);

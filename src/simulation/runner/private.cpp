@@ -202,9 +202,12 @@ namespace runner {
         // compute static atmospheric state
         atmospheric::StaticAtmosphericState atm_t = atmospheric::compute_static_atmospheric_state(aircraft.FRDFrameECEF);
 
+        // build autodiff model
+        autodiff::AutoDiffModel autodiff_model = autodiff::build_autodiff_model(aircraft);
+
         // trim and linearization
         if (json_flags.trim_flag && !trim_sol.attempted) {
-            trim_sol = trim::inspect_trim(aircraft, windB);
+            trim_sol = trim::inspect_trim(aircraft, autodiff_model, windB);
 
             // initialize analysis context
             io::AnalysisContext analysis_context{
@@ -254,7 +257,7 @@ namespace runner {
 
                 // linearize
                 lin_sol = linearization::linearize_operating_point(
-                    aircraft,
+                    autodiff_model,
                     trim_sol.operating_point,
                     trim_sol.conditions
                 );
@@ -374,7 +377,7 @@ namespace runner {
                         .operating_point = estimator_operating_point,
                         .u_surface_actual_prev = u_surface_actual_prev,
                         .u_propulsor_actual_prev = u_propulsor_actual_prev,
-                        .aircraft = aircraft,
+                        .model = autodiff_model,
                         .conditions = estimator_conditions
                     }
                 };

@@ -11,7 +11,6 @@ exec "$FG_PATH" \
 --generic=socket,in,100,127.0.0.1,5511,udp,udp-in \
 --fdm=external \
 --timeofday=noon \
---prop:/sim/time/warp=43200 \
 --graphics-preset=minimal-quality \
 --aircraft="$AIRCRAFT" \
 --prop:/sim/current-view/view-number-raw=1 \

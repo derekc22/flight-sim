@@ -115,7 +115,7 @@ namespace aerodynamics {
     dynamics::Wrench_T<T> compute_surface_loads_T(const Surface& s, const SurfaceKinematics_T<T>& sk, const SurfaceCoefficients_T<T>& sc);
 
     /** @warning The parent of F must be an inertial frame: ECEFFrame or NEDFrameECEF */
-    AerodynamicState aerodynamic_state(const frames::Frame& F, const atmospheric::Wind& windB);
+    AerodynamicState compute_aerodynamic_state(const frames::Frame& F, const atmospheric::Wind& windB);
 
     template <typename T>
     dynamics::Wrench_T<T> step_aero_forces_moments_T(const AerodynamicProperties& aerodynamic_properties, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& atm, const actuators::SurfaceActuatorInputs_T<T>& u, const atmospheric::Wind& windB);
@@ -124,6 +124,7 @@ namespace aerodynamics {
     AerodynamicState_T<T> compute_aerodynamic_state_T(const dynamics::Twist_T<T>& twist, const atmospheric::Wind& windB);
 
     dynamics::Wrench step_aero_forces_moments(const AerodynamicProperties& aerodynamic_properties, const dynamics::RigidBodyState& X, const atmospheric::StaticAtmosphericState& atm, const actuators::SurfaceActuatorInputs_T<double>& u, const atmospheric::Wind& windB);
+
     AerodynamicState compute_aerodynamic_state(const dynamics::RigidBodyState& X, const atmospheric::Wind& windB);
 
     dynamics::OrientationMatrix CBS(const aerodynamics::AngleOfAttack& alpha);

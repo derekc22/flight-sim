@@ -14,6 +14,7 @@
 #include "simulation/structural/public.hpp"
 #include "simulation/operating/public.hpp"
 #include "simulation/control/shared/public.hpp"
+#include "simulation/autodiff/public.hpp"
 
 namespace vehicles { struct Aircraft; } // forward declare
 
@@ -57,7 +58,7 @@ namespace trim {
     template <typename T>
     actuators::ActuatorInputs_T<T> pack_trim_actuator_inputs_T(const operating::StateInputVector_T<T>& xu, const actuators::ActuatorLimits_T<double>& actuator_limits);
 
-    TrimSolution inspect_trim(vehicles::Aircraft& aircraft, const atmospheric::Wind& wind);
+    TrimSolution inspect_trim(vehicles::Aircraft& aircraft, autodiff::AutoDiffModel& model, const atmospheric::Wind& wind);
 
     std::string print_trim_solution(const TrimSolution& trim_sol);
 

@@ -7,8 +7,7 @@
 #include "simulation/linearization/public.hpp"
 #include "simulation/operating/public.hpp"
 #include "simulation/estimation/kalman/public.hpp"
-
-namespace vehicles { struct Aircraft; } // forward declare
+#include "simulation/autodiff/public.hpp"
 
 namespace estimation {
 
@@ -16,7 +15,7 @@ namespace estimation {
         dynamics::StateVector_T<double> yt;
         actuators::ActuatorInputsVector_T<double> ut_1;
         operating::OperatingConditions conditions;
-        vehicles::Aircraft& aircraft;
+        autodiff::AutoDiffModel& model;
     };
 
     struct ExtendedKalmanPolicyParameters : KalmanPolicyParameters {};

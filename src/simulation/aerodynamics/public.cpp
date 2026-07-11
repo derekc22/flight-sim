@@ -27,11 +27,11 @@ namespace aerodynamics {
         }
     }
 
-    AerodynamicState aerodynamic_state(const frames::Frame& F, const atmospheric::Wind& windB) {
+    AerodynamicState compute_aerodynamic_state(const frames::Frame& F, const atmospheric::Wind& windB) {
         if (F.parent != nullptr && F.parent->name != "NEDFrameECEF") {
-            throw std::invalid_argument(std::format("aerodynamics::aerodynamic_state: Invalid frame input, the parent of {} must be an inertial frame: ECEFFrame or NEDFrameECEF", F.name));
+            throw std::invalid_argument(std::format("compute_aerodynamic_state: Invalid frame input, the parent of {} must be an inertial frame: ECEFFrame or NEDFrameECEF", F.name));
         }
-        return aerodynamics::compute_aerodynamic_state(dynamics::compute_rigid_body_state(F), windB);
+        return compute_aerodynamic_state(dynamics::compute_rigid_body_state(F), windB);
     }
 
     dynamics::Wrench step_aero_forces_moments(const AerodynamicProperties& aerodynamic_properties, const dynamics::RigidBodyState& X, const atmospheric::StaticAtmosphericState& atm, const actuators::SurfaceActuatorInputs_T<double>& u, const atmospheric::Wind& windB) {
@@ -53,7 +53,7 @@ namespace aerodynamics {
         return { FreeStreamVelocity{ aero.Vinf }, AngleOfAttack{ aero.alpha }, SideslipAngle{ aero.beta } };
     }
 
-    dynamics::OrientationMatrix CBS(const aerodynamics::AngleOfAttack& alpha) {
+    dynamics::OrientationMatrix CBS(const AngleOfAttack& alpha) {
         Eigen::Matrix3d CBS;
         double a = alpha.data;
         CBS     <<   util::cos(a),   0,   util::sin(a),
@@ -62,7 +62,7 @@ namespace aerodynamics {
         return { CBS };
     };
 
-    dynamics::OrientationMatrix CSW(const aerodynamics::SideslipAngle& beta) {
+    dynamics::OrientationMatrix CSW(const SideslipAngle& beta) {
         Eigen::Matrix3d CSW;
         double b = beta.data;
         CSW     <<   util::cos(b),   util::sin(b),   0,

@@ -189,7 +189,15 @@ namespace trim {
             }
 
             if (step.norm() <= options.step_tolerance) {
-                return build_trim_solution(xu, residual, weighted_residual, model, problem.conditions, weighted_residual_norm_inf <= options.residual_tolerance, iteration);
+                return build_trim_solution(
+                    xu, 
+                    residual,
+                    weighted_residual,
+                    model,
+                    problem.conditions,
+                    weighted_residual_norm_inf <= options.residual_tolerance,
+                    iteration
+                );
             }
 
             bool accepted = false;
@@ -198,7 +206,13 @@ namespace trim {
 
             while (step_scale >= options.min_step_scale) {
                 const operating::StateInputVector_T<double> xu_trial = xu + step_scale * step;
-                const TrimResidualVector_T<double> residual_trial = compute_trim_residual_vector(xu_trial, model, problem.target, problem.conditions, use_physical_controls);
+                const TrimResidualVector_T<double> residual_trial = compute_trim_residual_vector(
+                    xu_trial,
+                    model,
+                    problem.target,
+                    problem.conditions,
+                    use_physical_controls
+                );
                 const double weighted_residual_trial_norm_2 = weights.cwiseProduct(residual_trial).norm();
 
                 if (weighted_residual_trial_norm_2 < weighted_residual_norm_2) {

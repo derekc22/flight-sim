@@ -42,8 +42,7 @@ namespace linearization {
         return { .A = Ak, .B = Bk, .C = lin_sol.C, .D = lin_sol.D };
     }
 
-    LocalLinearization linearize_operating_point(vehicles::Aircraft& aircraft, const operating::OperatingPoint& operating_point, const operating::OperatingConditions& conditions) {
-        autodiff::AutoDiffModel model = autodiff::build_autodiff_model(aircraft);
+    LocalLinearization linearize_operating_point(autodiff::AutoDiffModel& model, const operating::OperatingPoint& operating_point, const operating::OperatingConditions& conditions) {
 
         const operating::StateInputVector_T<double> xu = operating::unpack_state_input_T<double>(operating_point.state, operating_point.input);
         CppAD::eigen_vector<CppAD::AD<double>> xu_tracked = autodiff::start_autodiff_tracking(xu);

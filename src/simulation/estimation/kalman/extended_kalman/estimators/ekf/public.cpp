@@ -21,7 +21,7 @@ namespace estimation {
             .yt = yt,
             .ut_1 = ut_1,
             .conditions = input.conditions,
-            .aircraft = input.aircraft,
+            .model = input.model,
         };
     }
 
