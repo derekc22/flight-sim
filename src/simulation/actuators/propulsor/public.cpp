@@ -20,8 +20,8 @@ namespace actuators {
 
     PropulsorActuator::PropulsorActuator() : PropulsorActuator(0.0, 0.0, 0.0, 0.0, 0.0, constants::Zero3) {}
 
-    PropulsorActuatorInputsVector_T<double> unpack_propulsor_actuator_inputs(const PropulsorActuatorInputs_T<double>& u_propulsor) {
-        PropulsorActuatorInputsVector_T<double> out;
+    PropulsorActuatorInputsVector unpack_propulsor_actuator_inputs(const PropulsorActuatorInputs_T<double>& u_propulsor) {
+        PropulsorActuatorInputsVector out;
         out << u_propulsor.front_propulsor_cmd,
                u_propulsor.left_propulsor_cmd,
                u_propulsor.right_propulsor_cmd;

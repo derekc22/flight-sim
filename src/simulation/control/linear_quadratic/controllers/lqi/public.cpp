@@ -25,7 +25,7 @@ namespace control {
         });
     };
 
-    IntegratedStateVector LinearQuadraticIntegrator::integrate_state_err(const dynamics::StateVector_T<double>& zt, const dynamics::StateVector_T<double>& zt_des, double dt) {
+    IntegratedStateVector LinearQuadraticIntegrator::integrate_state_err(const dynamics::StateVector& zt, const dynamics::StateVector& zt_des, double dt) {
         IntegratedStateVector zt_pqr = zt.segment<integrated_state_dim>(3);  // grab p, q, r
         IntegratedStateVector zt_des_pqr = zt_des.segment<integrated_state_dim>(3);
 
@@ -49,8 +49,8 @@ namespace control {
         Eigen::MatrixXd B_aug = Eigen::MatrixXd::Zero(n + i, m);
         B_aug.block(0, 0, n, m) = input.B;
 
-        dynamics::StateVector_T<double> zt = dynamics::unpack_state(input.Zt);
-        dynamics::StateVector_T<double> zt_des = unpack_state(input.setpoint);
+        dynamics::StateVector zt = dynamics::unpack_state(input.Zt);
+        dynamics::StateVector zt_des = unpack_state(input.setpoint);
 
         AugmentedStateVector zt_aug;
         zt_aug << zt, integral_new;
@@ -76,17 +76,17 @@ namespace control {
             dt
         );
 
-        actuators::ActuatorInputsVector_T<double> u_deviation = policy.step(
+        actuators::ActuatorInputsVector u_deviation = policy.step(
             make_linear_quadratic_policy_input(input, integral_new)
         );
 
         // unsaturated control
-        actuators::ActuatorInputsVector_T<double> u_trim = actuators::unpack_actuator_inputs_T(input.u_sol_trim);
-        actuators::ActuatorInputsVector_T<double> u_unsat = u_deviation + u_trim;
+        actuators::ActuatorInputsVector u_trim = actuators::unpack_actuator_inputs(input.u_sol_trim);
+        actuators::ActuatorInputsVector u_unsat = u_deviation + u_trim;
 
         // saturate
         auto [u_min, u_max] = actuators::unpack_actuator_limits(input.surface_actuators, input.propulsor_actuators);
-        actuators::ActuatorInputsVector_T<double> u = util::vec_clamp(u_unsat, u_min, u_max);
+        actuators::ActuatorInputsVector u = util::vec_clamp(u_unsat, u_min, u_max);
 
         // anti-windup
         if (util::vec_is_close(u, u_unsat)) { integral = integral_new; }

@@ -130,13 +130,7 @@ namespace dynamics {
         Eigen::Vector3d data;   // p_cg [m]
     };
 
-    struct Twist {
-        TranslationalVelocity v;    // e.g. vB_BI
-        AngularVelocity w;          // e.g. wB_BI
-    };
-
-    template <typename T>
-    using StateVector_T = Eigen::Matrix<T, constants::state_dim, 1>;
+    using StateVector = Eigen::Matrix<double, constants::state_dim, 1>;
 
     template <typename T>
     using StateDotVector_T = Eigen::Matrix<T, constants::state_dim, 1>;
@@ -181,11 +175,9 @@ namespace dynamics {
         constants::Vector3_T<T> M = constants::Zero3_T<T>;
     };
 
-    template <typename T>
-    StateVector_T<T> unpack_state_T(const State_T<T>& x);
+    StateVector unpack_state(const State_T<double>& x);
 
-    template <typename T>
-    State_T<T> pack_state_T(const StateVector_T<T>& x);
+    State_T<double> pack_state(const StateVector& x);
 
     template <typename T>
     StateDotVector_T<T> unpack_state_dot_T(const StateDot_T<T>& x_dot);
@@ -195,7 +187,7 @@ namespace dynamics {
 
     State_T<double> pack_state(const RigidBodyState& Xt);
 
-    StateVector_T<double> unpack_state(const RigidBodyState& Xt);
+    StateVector unpack_state(const RigidBodyState& Xt);
 
     /** @warning The parent of F must be an inertial frame: ECEFFrame or NEDFrameECEF */
     RigidBodyState compute_rigid_body_state(const frames::Frame& F);

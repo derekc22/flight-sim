@@ -12,8 +12,8 @@
 namespace estimation {
 
     struct ExtendedKalmanPolicyInput {
-        dynamics::StateVector_T<double> yt;
-        actuators::ActuatorInputsVector_T<double> ut_1;
+        dynamics::StateVector yt;
+        actuators::ActuatorInputsVector ut_1;
         operating::OperatingConditions conditions;
         autodiff::AutoDiffModel& model;
     };

@@ -158,6 +158,27 @@ namespace dynamics {
         return { eul_dot_to_wB_BI_mat(theta, phi) * eul_dot.data };
     }
 
+    State_T<double> pack_state(const StateVector& x) {
+        return {
+            .vx = x(0),
+            .vy = x(1),
+            .vz = x(2),
+            .p = x(3),
+            .q = x(4),
+            .r = x(5),
+            .phi = x(6),
+            .theta = x(7)
+        };
+    }
+
+    StateVector unpack_state(const State_T<double>& x) {
+        StateVector out;
+        out << x.vx, x.vy, x.vz,
+               x.p, x.q, x.r,
+               x.phi, x.theta;
+        return out;
+    }
+
     State_T<double> pack_state(const RigidBodyState& Xt) {
         TranslationalVelocity vB_BI = Xt.v;
         AngularVelocity wB_BI = Xt.w;
@@ -176,8 +197,8 @@ namespace dynamics {
         };
     }
 
-    StateVector_T<double> unpack_state(const RigidBodyState& Xt) {
-        return unpack_state_T(pack_state(Xt));
+    StateVector unpack_state(const RigidBodyState& Xt) {
+        return unpack_state(pack_state(Xt));
     }
 
 }

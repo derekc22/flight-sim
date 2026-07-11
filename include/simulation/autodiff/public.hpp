@@ -20,7 +20,7 @@ namespace autodiff {
         const structural::StructuralProperties& structural;
         const aerodynamics::AerodynamicProperties& aerodynamic;
         actuators::PropulsorActuators& propulsor_actuators;
-        actuators::ActuatorLimits_T<double> actuator_limits;
+        actuators::ActuatorLimits actuator_limits;
         actuators::FixedActuatorInputs fixed_actuator_inputs{};
     };
 

@@ -10,12 +10,12 @@ namespace estimation {
     {};
 
     LinearKalmanPolicyInput LinearKalmanFilter::make_linear_kalman_policy_input(const LinearKalmanEstimatorInput& input, double dt) {
-        dynamics::StateVector_T<double> yt_deviation = dynamics::unpack_state(
-            input.Yt) - dynamics::unpack_state_T(input.operating_point.state);
+        dynamics::StateVector yt_deviation = dynamics::unpack_state(
+            input.Yt) - dynamics::unpack_state(input.operating_point.state);
 
-        actuators::ActuatorInputsVector_T<double> ut_1_deviation = actuators::unpack_actuator_inputs(
+        actuators::ActuatorInputsVector ut_1_deviation = actuators::unpack_actuator_inputs(
             input.u_surface_actual_prev, input.u_propulsor_actual_prev) - 
-            actuators::unpack_actuator_inputs_T(input.operating_point.input);
+            actuators::unpack_actuator_inputs(input.operating_point.input);
 
         linearization::DiscretizedLocalLinearization lin_sol_k = linearization::discretize(input.lin_sol, dt);
 
@@ -28,9 +28,9 @@ namespace estimation {
         };
     }
 
-    dynamics::RigidBodyState LinearKalmanFilter::make_lkf_state_estimate(const LinearKalmanEstimatorInput& input, const dynamics::StateVector_T<double>& zt) {
-        dynamics::StateVector_T<double> x_trim = dynamics::unpack_state_T(input.operating_point.state);
-        dynamics::StateVector_T<double> zt_full = zt + x_trim;  // LKF predicts deviation state, so trim state is added back
+    dynamics::RigidBodyState LinearKalmanFilter::make_lkf_state_estimate(const LinearKalmanEstimatorInput& input, const dynamics::StateVector& zt) {
+        dynamics::StateVector x_trim = dynamics::unpack_state(input.operating_point.state);
+        dynamics::StateVector zt_full = zt + x_trim;  // LKF predicts deviation state, so trim state is added back
 
         return make_kalman_state_estimate(input.Yt, zt_full);
     }

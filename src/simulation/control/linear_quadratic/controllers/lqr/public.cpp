@@ -14,7 +14,7 @@ namespace control {
         dynamics::RigidBodyState Zt = input.Zt;
         guidance::LinearQuadraticSetpoint setpoint = input.setpoint;
 
-        dynamics::StateVector_T<double> zt_deviation = dynamics::unpack_state(Zt) - unpack_state(setpoint);
+        dynamics::StateVector zt_deviation = dynamics::unpack_state(Zt) - unpack_state(setpoint);
 
         return {
             .zt = zt_deviation,
@@ -24,11 +24,11 @@ namespace control {
     }
 
     ControlOutput LinearQuadraticRegulator::step(const LinearQuadraticControllerInput& input, double dt) {
-        actuators::ActuatorInputsVector_T<double> u_deviation = policy.step(
+        actuators::ActuatorInputsVector u_deviation = policy.step(
             make_linear_quadratic_policy_input(input)
         );
-        actuators::ActuatorInputsVector_T<double> u_trim = actuators::unpack_actuator_inputs_T(input.u_sol_trim);
-        actuators::ActuatorInputsVector_T<double> u_cmd = u_deviation + u_trim;
+        actuators::ActuatorInputsVector u_trim = actuators::unpack_actuator_inputs(input.u_sol_trim);
+        actuators::ActuatorInputsVector u_cmd = u_deviation + u_trim;
 
         return make_control_output(u_cmd);
     }

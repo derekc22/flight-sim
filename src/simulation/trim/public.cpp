@@ -20,12 +20,12 @@ namespace trim {
 
     TrimSolution inspect_trim(vehicles::Aircraft& aircraft, autodiff::AutoDiffModel& model, const atmospheric::Wind& wind) {
 
-        const actuators::ActuatorLimits_T actuator_limits = model.actuator_limits;
+        const actuators::ActuatorLimits actuator_limits = model.actuator_limits;
         const actuators::ActuatorInputs_T actuator_limits_max = model.actuator_limits.limit_max;
         const actuators::ActuatorInputs_T actuator_limits_min = model.actuator_limits.limit_min;
         const aerodynamics::AerodynamicState target_aero = aerodynamics::compute_aerodynamic_state(aircraft.FRDFrameNED, wind);
 
-        const TrimProblem<double> problem{
+        const TrimProblem problem{
             .target = TrimTarget{
                 .beta = target_aero.beta.data,
                 .phi = aircraft.FRDFrameNED.eulNB.phi(),

@@ -22,7 +22,7 @@ namespace control {
         ControlOutput step(const LinearQuadraticControllerInput& input, double dt);
 
         LinearQuadraticPolicyInput make_linear_quadratic_policy_input(const LinearQuadraticControllerInput& input, const IntegratedStateVector& integral_candidate);
-        IntegratedStateVector integrate_state_err(const dynamics::StateVector_T<double>& zt, const dynamics::StateVector_T<double>& zt_des, double dt);
+        IntegratedStateVector integrate_state_err(const dynamics::StateVector& zt, const dynamics::StateVector& zt_des, double dt);
     };
 
 }

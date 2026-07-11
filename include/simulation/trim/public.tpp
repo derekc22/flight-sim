@@ -21,7 +21,7 @@ namespace trim {
 
 
     template <typename T>
-    actuators::ActuatorInputs_T<T> pack_trim_actuator_inputs_T(const operating::StateInputVector_T<T>& xu, const actuators::ActuatorLimits_T<double>& actuator_limits) {
+    actuators::ActuatorInputs_T<T> pack_trim_actuator_inputs_T(const operating::StateInputVector_T<T>& xu, const actuators::ActuatorLimits& actuator_limits) {
         return {
             .elevator_cmd = get_control_from_solver_space_T<T>(
                 xu(constants::state_dim + 0),

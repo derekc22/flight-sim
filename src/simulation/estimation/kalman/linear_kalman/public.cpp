@@ -8,7 +8,7 @@ namespace estimation {
     KalmanState LinearKalmanPolicy::predict(const LinearKalmanPolicyInput& input) {
         KalmanState prev = state.value();
 
-        dynamics::StateVector_T<double> zt_bar = input.A * prev.zt + input.B * input.ut_1;
+        dynamics::StateVector zt_bar = input.A * prev.zt + input.B * input.ut_1;
 
         Eigen::MatrixXd Pt_bar = input.A * prev.Pt * input.A.transpose() + params.R;
 
@@ -20,9 +20,9 @@ namespace estimation {
 
         Eigen::MatrixXd Kt = pred.Pt * input.C.transpose() * (input.C * pred.Pt * input.C.transpose() + params.Q).inverse(); // Kalman gain
 
-        dynamics::StateVector_T<double> Lt = input.yt - input.C * pred.zt; // Innovation
+        dynamics::StateVector Lt = input.yt - input.C * pred.zt; // Innovation
 
-        dynamics::StateVector_T<double> zt = pred.zt + Kt * Lt;
+        dynamics::StateVector zt = pred.zt + Kt * Lt;
 
         Eigen::MatrixXd Inxn = Eigen::MatrixXd::Identity(pred.Pt.rows(), pred.Pt.cols());
 
