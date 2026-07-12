@@ -17,10 +17,10 @@ namespace propulsion {
         propulsor.propellers->prev_omega = propeller_omega.omega;
     }
 
-    void commit_propellers_omega_state(actuators::PropulsorActuators& propulsor_actuators, const PropellerOmegaState_T<double>& front_propulsor_omega_state, const PropellerOmegaState_T<double>& left_propulsor_omega_state, const PropellerOmegaState_T<double>& right_propulsor_omega_state) {
-        commit_propeller_omega_state(propulsor_actuators.front_propulsor, front_propulsor_omega_state);
-        commit_propeller_omega_state(propulsor_actuators.left_propulsor, left_propulsor_omega_state);
-        commit_propeller_omega_state(propulsor_actuators.right_propulsor, right_propulsor_omega_state);
+    void commit_propeller_omega_state_set(actuators::PropulsorActuators& propulsor_actuators, const PropellerOmegaStateSet_T<double>& propeller_omega_state_set) {
+        commit_propeller_omega_state(propulsor_actuators.front_propulsor, propeller_omega_state_set.front_propulsor);
+        commit_propeller_omega_state(propulsor_actuators.left_propulsor, propeller_omega_state_set.left_propulsor);
+        commit_propeller_omega_state(propulsor_actuators.right_propulsor, propeller_omega_state_set.right_propulsor);
     }
 
     dynamics::Wrench step_propulsive_forces_moments(actuators::PropulsorActuators& propulsor_actuators, const dynamics::RigidBodyState& X, const atmospheric::StaticAtmosphericState& atm, const actuators::PropulsorActuatorInputs_T<double>& u, double dt) {
@@ -29,34 +29,21 @@ namespace propulsion {
             .w = X.w.data
         };
 
-        PropellerOmegaState_T<double> front_propulsor_omega_state = compute_propeller_omega_state_T<double>(
-            propulsor_actuators.front_propulsor, 
-            u.front_propulsor_cmd, 
-            atm.rho, 
-            dt
-        );
-        PropellerOmegaState_T<double> left_propulsor_omega_state = compute_propeller_omega_state_T<double>(
-            propulsor_actuators.left_propulsor, 
-            u.left_propulsor_cmd, 
-            atm.rho, 
-            dt
-        );
-        PropellerOmegaState_T<double> right_propulsor_omega_state = compute_propeller_omega_state_T<double>(
-            propulsor_actuators.right_propulsor, 
-            u.right_propulsor_cmd, 
-            atm.rho, 
-            dt
-        );
-
-        PropulsorOmegaDot_T<double> omega_dot{
-            .front_propulsor = front_propulsor_omega_state.omega_dot,
-            .left_propulsor = left_propulsor_omega_state.omega_dot,
-            .right_propulsor = right_propulsor_omega_state.omega_dot
+        const PropellerOmegaStateSet_T<double> propeller_omega_state_set{
+            .front_propulsor = compute_propeller_omega_state_T<double>(propulsor_actuators.front_propulsor, u.front_propulsor_cmd, atm.rho, dt),
+            .left_propulsor = compute_propeller_omega_state_T<double>(propulsor_actuators.left_propulsor, u.left_propulsor_cmd, atm.rho, dt),
+            .right_propulsor = compute_propeller_omega_state_T<double>(propulsor_actuators.right_propulsor, u.right_propulsor_cmd, atm.rho, dt)
         };
 
-        dynamics::Wrench_T<double> wrench = step_propulsive_forces_moments_T<double>(propulsor_actuators, twist, atm, actuators::PropulsorActuatorInputs_T<double>{ .front_propulsor_cmd = u.front_propulsor_cmd, .left_propulsor_cmd = u.left_propulsor_cmd, .right_propulsor_cmd = u.right_propulsor_cmd }, omega_dot);
+        PropellerOmegaDotSet_T<double> propeller_omega_dot_set{
+            .front_propulsor = propeller_omega_state_set.front_propulsor.omega_dot,
+            .left_propulsor = propeller_omega_state_set.left_propulsor.omega_dot,
+            .right_propulsor = propeller_omega_state_set.right_propulsor.omega_dot
+        };
 
-        commit_propellers_omega_state(propulsor_actuators, front_propulsor_omega_state, left_propulsor_omega_state, right_propulsor_omega_state);
+        dynamics::Wrench_T<double> wrench = step_propulsive_forces_moments_T<double>(propulsor_actuators, twist, atm, u, propeller_omega_dot_set);
+
+        commit_propeller_omega_state_set(propulsor_actuators, propeller_omega_state_set);
 
         return { dynamics::Force{ wrench.F }, dynamics::Moment{ wrench.M } };
     }

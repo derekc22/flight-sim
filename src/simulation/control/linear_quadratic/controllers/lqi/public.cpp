@@ -85,8 +85,8 @@ namespace control {
         actuators::ActuatorInputsVector u_unsat = u_deviation + u_trim;
 
         // saturate
-        auto [u_min, u_max] = actuators::unpack_actuator_limits(input.surface_actuators, input.propulsor_actuators);
-        actuators::ActuatorInputsVector u = util::vec_clamp(u_unsat, u_min, u_max);
+        actuators::ActuatorLimitsVector limits = actuators::unpack_actuator_limits(input.surface_actuators, input.propulsor_actuators);
+        actuators::ActuatorInputsVector u = util::vec_clamp(u_unsat, limits.col(0), limits.col(1));
 
         // anti-windup
         if (util::vec_is_close(u, u_unsat)) { integral = integral_new; }

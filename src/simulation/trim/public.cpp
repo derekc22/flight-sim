@@ -38,35 +38,37 @@ namespace trim {
                 .windB = wind,
                 .steady_state = true
             },
-            .state_guess = dynamics::State_T<double>{
-                .vx = aircraft.FRDFrameNED.vB_BN.data.x(),
-                .vy = aircraft.FRDFrameNED.vB_BN.data.y(),
-                .vz = aircraft.FRDFrameNED.vB_BN.data.z(),
-                .p = aircraft.FRDFrameNED.wB_BN.p(),
-                .q = aircraft.FRDFrameNED.wB_BN.q(),
-                .r = aircraft.FRDFrameNED.wB_BN.r(),
-                .phi = aircraft.FRDFrameNED.eulNB.phi(),
-                .theta = aircraft.FRDFrameNED.eulNB.theta(),
-            },
-            .input_guess = actuators::ActuatorInputs_T<double>{
-                .surface_inputs = {
-                    .elevator_cmd = 0,
-                    .aileron_cmd = 0,
-                    .rudder_cmd = 0,
+            .initial_guess = operating::OperatingPoint{
+                .state = dynamics::State_T<double>{
+                    .vx = aircraft.FRDFrameNED.vB_BN.data.x(),
+                    .vy = aircraft.FRDFrameNED.vB_BN.data.y(),
+                    .vz = aircraft.FRDFrameNED.vB_BN.data.z(),
+                    .p = aircraft.FRDFrameNED.wB_BN.p(),
+                    .q = aircraft.FRDFrameNED.wB_BN.q(),
+                    .r = aircraft.FRDFrameNED.wB_BN.r(),
+                    .phi = aircraft.FRDFrameNED.eulNB.phi(),
+                    .theta = aircraft.FRDFrameNED.eulNB.theta(),
                 },
-                .propulsor_inputs = {
-                    .front_propulsor_cmd = 0.5 * (
-                        propulsor_limit_max.front_propulsor_cmd +
-                        propulsor_limit_min.front_propulsor_cmd
-                    ),
-                    .left_propulsor_cmd = 0.5 * (
-                        propulsor_limit_max.left_propulsor_cmd +
-                        propulsor_limit_min.left_propulsor_cmd
-                    ),
-                    .right_propulsor_cmd = 0.5 * (
-                        propulsor_limit_max.right_propulsor_cmd +
-                        propulsor_limit_min.right_propulsor_cmd
-                    )
+                .input = actuators::ActuatorInputs_T<double>{
+                    .surface_inputs = {
+                        .elevator_cmd = 0,
+                        .aileron_cmd = 0,
+                        .rudder_cmd = 0,
+                    },
+                    .propulsor_inputs = {
+                        .front_propulsor_cmd = 0.5 * (
+                            propulsor_limit_max.front_propulsor_cmd +
+                            propulsor_limit_min.front_propulsor_cmd
+                        ),
+                        .left_propulsor_cmd = 0.5 * (
+                            propulsor_limit_max.left_propulsor_cmd +
+                            propulsor_limit_min.left_propulsor_cmd
+                        ),
+                        .right_propulsor_cmd = 0.5 * (
+                            propulsor_limit_max.right_propulsor_cmd +
+                            propulsor_limit_min.right_propulsor_cmd
+                        )
+                    }
                 }
             }
         };
@@ -83,17 +85,25 @@ namespace trim {
 
 
     std::string print_trim_solution(const TrimSolution& trim_sol) {
+        const operating::OperatingPoint& operating_point = trim_sol.operating_point;
+        const dynamics::State_T<double>& state = operating_point.state;
+        const dynamics::Wrench& wrench = trim_sol.wrench;
+        const Eigen::Vector3d& F = wrench.F.data;
+        const Eigen::Vector3d& M = wrench.M.data;
+        const TrimResidual_T<double>& residual = trim_sol.residual;
+        const TrimResidual_T<double>& weighted_residual = trim_sol.weighted_residual;
+
         dynamics::Twist_T<double> trim_sol_twist;
-        trim_sol_twist.v << trim_sol.operating_point.state.vx, trim_sol.operating_point.state.vy, trim_sol.operating_point.state.vz;
-        trim_sol_twist.w << trim_sol.operating_point.state.p, trim_sol.operating_point.state.q, trim_sol.operating_point.state.r;
+        trim_sol_twist.v << state.vx, state.vy, state.vz;
+        trim_sol_twist.w << state.p, state.q, state.r;
 
         const aerodynamics::AerodynamicState_T<double> trim_sol_aero = aerodynamics::compute_aerodynamic_state_T<double>(trim_sol_twist, trim_sol.conditions.windB);
 
-        const dynamics::AngularVelocity trim_w{ Eigen::Vector3d(trim_sol.operating_point.state.p, trim_sol.operating_point.state.q, trim_sol.operating_point.state.r) };
-        const dynamics::EulerAngles trim_eul{ Eigen::Vector3d(0.0, trim_sol.operating_point.state.theta, trim_sol.operating_point.state.phi) };
+        const dynamics::AngularVelocity trim_w{ Eigen::Vector3d(state.p, state.q, state.r) };
+        const dynamics::EulerAngles trim_eul{ Eigen::Vector3d(0.0, state.theta, state.phi) };
         const dynamics::EulerAngleRates trim_eul_dot = dynamics::wB_BI_to_eul_dot(trim_w, trim_eul);
-        const actuators::SurfaceActuatorInputs_T<double>& surface_inputs = trim_sol.operating_point.input.surface_inputs;
-        const actuators::PropulsorActuatorInputs_T<double>& propulsor_inputs = trim_sol.operating_point.input.propulsor_inputs;
+        const actuators::SurfaceActuatorInputs_T<double>& surface_inputs = operating_point.input.surface_inputs;
+        const actuators::PropulsorActuatorInputs_T<double>& propulsor_inputs = operating_point.input.propulsor_inputs;
 
         constexpr const char* section_rule = "------------------------------------------------------";
 
@@ -109,19 +119,19 @@ namespace trim {
         out << "trim_sol.weighted_residual_norm_inf: " << trim_sol.weighted_residual_norm_inf << "\n\n";
 
         out << "trim_sol.operating_point.state:\n" << section_rule << "\n";
-        out << "vB_BN: [" << trim_sol.operating_point.state.vx << ", " << trim_sol.operating_point.state.vy << ", " << trim_sol.operating_point.state.vz << "]\n";
-        out << "wB_BN: [" << trim_sol.operating_point.state.p << ", " << trim_sol.operating_point.state.q << ", " << trim_sol.operating_point.state.r << "]\n";
+        out << "vB_BN: [" << state.vx << ", " << state.vy << ", " << state.vz << "]\n";
+        out << "wB_BN: [" << state.p << ", " << state.q << ", " << state.r << "]\n";
         out << "eulNB: [n/a, "
-            << trim_sol.operating_point.state.theta << ", "
-            << trim_sol.operating_point.state.phi << "]\n";
+            << state.theta << ", "
+            << state.phi << "]\n";
         out << "eulNB_dot: ["
             << trim_eul_dot.phi_dot() << ", "
             << trim_eul_dot.theta_dot() << ", "
             << trim_eul_dot.psi_dot() << "]\n\n";
 
         out << "eulNB_deg: [n/a, "
-            << util::rad_to_deg(trim_sol.operating_point.state.theta) << ", "
-            << util::rad_to_deg(trim_sol.operating_point.state.phi) << "]\n";
+            << util::rad_to_deg(state.theta) << ", "
+            << util::rad_to_deg(state.phi) << "]\n";
         out << "eulNB_dot_deg_s: ["
             << util::rad_to_deg(trim_eul_dot.phi_dot()) << ", "
             << util::rad_to_deg(trim_eul_dot.theta_dot()) << ", "
@@ -142,68 +152,66 @@ namespace trim {
         out << "right_propulsor_cmd: " << propulsor_inputs.right_propulsor_cmd << "\n\n";
 
         out << "trim_sol.wrench:\n" << section_rule << "\n";
-        out << "F: [" << trim_sol.wrench.F.data.x() << ", " << trim_sol.wrench.F.data.y() << ", " << trim_sol.wrench.F.data.z() << "]\n";
-        out << "M: [" << trim_sol.wrench.M.data.x() << ", " << trim_sol.wrench.M.data.y() << ", " << trim_sol.wrench.M.data.z() << "]\n\n";
+        out << "F: [" << F.x() << ", " << F.y() << ", " << F.z() << "]\n";
+        out << "M: [" << M.x() << ", " << M.y() << ", " << M.z() << "]\n\n";
 
         out << "trim_sol.residual:\n"
             << section_rule << "\n"
-            << "vx_dot: " << trim_sol.residual.vx_dot << "\n"
-            << "vy_dot: " << trim_sol.residual.vy_dot << "\n"
-            << "vz_dot: " << trim_sol.residual.vz_dot << "\n"
-            << "p_dot: " << trim_sol.residual.p_dot << "\n"
-            << "q_dot: " << trim_sol.residual.q_dot << "\n"
-            << "r_dot: " << trim_sol.residual.r_dot << "\n"
-            << "phi_dot: " << trim_sol.residual.phi_dot << "\n"
-            << "theta_dot: " << trim_sol.residual.theta_dot << "\n"
-            << "beta_err: " << trim_sol.residual.beta_err << "\n"
-            << "phi_err: " << trim_sol.residual.phi_err << "\n"
-            << "theta_err: " << trim_sol.residual.theta_err << "\n"
-            << "vx_err: " << trim_sol.residual.vx_err << "\n"
-            << "vz_err: " << trim_sol.residual.vz_err << "\n"
-            << "psi_dot_err: " << trim_sol.residual.psi_dot_err << "\n\n";
+            << "vx_dot: " << residual.vx_dot << "\n"
+            << "vy_dot: " << residual.vy_dot << "\n"
+            << "vz_dot: " << residual.vz_dot << "\n"
+            << "p_dot: " << residual.p_dot << "\n"
+            << "q_dot: " << residual.q_dot << "\n"
+            << "r_dot: " << residual.r_dot << "\n"
+            << "phi_dot: " << residual.phi_dot << "\n"
+            << "theta_dot: " << residual.theta_dot << "\n"
+            << "beta_err: " << residual.beta_err << "\n"
+            << "phi_err: " << residual.phi_err << "\n"
+            << "theta_err: " << residual.theta_err << "\n"
+            << "vx_err: " << residual.vx_err << "\n"
+            << "vz_err: " << residual.vz_err << "\n"
+            << "psi_dot_err: " << residual.psi_dot_err << "\n\n";
 
         out << "trim_sol.weighted_residual:\n"
             << section_rule << "\n"
-            << "vx_dot: " << trim_sol.weighted_residual.vx_dot << "\n"
-            << "vy_dot: " << trim_sol.weighted_residual.vy_dot << "\n"
-            << "vz_dot: " << trim_sol.weighted_residual.vz_dot << "\n"
-            << "p_dot: " << trim_sol.weighted_residual.p_dot << "\n"
-            << "q_dot: " << trim_sol.weighted_residual.q_dot << "\n"
-            << "r_dot: " << trim_sol.weighted_residual.r_dot << "\n"
-            << "phi_dot: " << trim_sol.weighted_residual.phi_dot << "\n"
-            << "theta_dot: " << trim_sol.weighted_residual.theta_dot << "\n"
-            << "beta_err: " << trim_sol.weighted_residual.beta_err << "\n"
-            << "phi_err: " << trim_sol.weighted_residual.phi_err << "\n"
-            << "theta_err: " << trim_sol.weighted_residual.theta_err << "\n"
-            << "vx_err: " << trim_sol.weighted_residual.vx_err << "\n"
-            << "vz_err: " << trim_sol.weighted_residual.vz_err << "\n"
-            << "psi_dot_err: " << trim_sol.weighted_residual.psi_dot_err << "\n";
+            << "vx_dot: " << weighted_residual.vx_dot << "\n"
+            << "vy_dot: " << weighted_residual.vy_dot << "\n"
+            << "vz_dot: " << weighted_residual.vz_dot << "\n"
+            << "p_dot: " << weighted_residual.p_dot << "\n"
+            << "q_dot: " << weighted_residual.q_dot << "\n"
+            << "r_dot: " << weighted_residual.r_dot << "\n"
+            << "phi_dot: " << weighted_residual.phi_dot << "\n"
+            << "theta_dot: " << weighted_residual.theta_dot << "\n"
+            << "beta_err: " << weighted_residual.beta_err << "\n"
+            << "phi_err: " << weighted_residual.phi_err << "\n"
+            << "theta_err: " << weighted_residual.theta_err << "\n"
+            << "vx_err: " << weighted_residual.vx_err << "\n"
+            << "vz_err: " << weighted_residual.vz_err << "\n"
+            << "psi_dot_err: " << weighted_residual.psi_dot_err << "\n";
 
         return out.str();
     }
 
 
-    std::tuple<dynamics::RigidBodyState, aerodynamics::AerodynamicState> update_state_from_trim(const dynamics::RigidBodyState& Xt, const TrimSolution& trim_sol) {
+    dynamics::RigidBodyState update_state_from_trim(const dynamics::RigidBodyState& Xt, const dynamics::State_T<double>& trim_state) {
             dynamics::EulerAngles eul_curr;
             eul_curr.set(Xt.q);
-            dynamics::EulerAngles eul_trim{ Eigen::Vector3d(eul_curr.psi(), trim_sol.operating_point.state.theta, trim_sol.operating_point.state.phi) };
+            dynamics::EulerAngles eul_trim{ Eigen::Vector3d(eul_curr.psi(), trim_state.theta, trim_state.phi) };
             dynamics::OrientationQuaternion qNB_trim;
             qNB_trim.set(eul_trim);
 
             dynamics::RigidBodyState Xt_trim = {
                 .p = Xt.p,
-                .v = dynamics::TranslationalVelocity{ Eigen::Vector3d(trim_sol.operating_point.state.vx, trim_sol.operating_point.state.vy, trim_sol.operating_point.state.vz) },
+                .v = dynamics::TranslationalVelocity{ Eigen::Vector3d(trim_state.vx, trim_state.vy, trim_state.vz) },
                 .q = qNB_trim,
-                .w = dynamics::AngularVelocity{ Eigen::Vector3d(trim_sol.operating_point.state.p, trim_sol.operating_point.state.q, trim_sol.operating_point.state.r) },
+                .w = dynamics::AngularVelocity{ Eigen::Vector3d(trim_state.p, trim_state.q, trim_state.r) },
             };
 
-            aerodynamics::AerodynamicState aero_t_trim = aerodynamics::compute_aerodynamic_state(Xt_trim, trim_sol.conditions.windB);
-
-        return { Xt_trim, aero_t_trim };
+        return Xt_trim;
     }
 
-    control::ControlOutput set_control_inputs_from_trim(const TrimSolution& trim_sol) {
-        return trim_sol.operating_point.input;
+    control::ControlOutput set_control_inputs_from_trim(const actuators::ActuatorInputs_T<double>& trim_inputs) {
+        return trim_inputs;
     }
 
     /** @deprecated */
@@ -217,18 +225,20 @@ namespace trim {
     //     propulsor_actuators.right_propulsor.prev_cmd = trim_sol.operating_point.input.right_propulsor_cmd;
     // }
 
-    std::tuple<actuators::SurfaceActuatorInputs_T<double>, actuators::PropulsorActuatorInputs_T<double>> update_actuators_from_trim(actuators::SurfaceActuatorInputs_T<double>& surface_actuator_inputs, actuators::PropulsorActuatorInputs_T<double>& propulsor_actuator_inputs, const TrimSolution& trim_sol) {
-        const actuators::SurfaceActuatorInputs_T<double>& trim_surface_inputs = trim_sol.operating_point.input.surface_inputs;
-        const actuators::PropulsorActuatorInputs_T<double>& trim_propulsor_inputs = trim_sol.operating_point.input.propulsor_inputs;
+    actuators::ActuatorInputs_T<double> update_actuators_from_trim(actuators::ActuatorInputs_T<double> actuator_inputs, const actuators::ActuatorInputs_T<double>& trim_inputs) {
+        const actuators::SurfaceActuatorInputs_T<double>& trim_surface_inputs = trim_inputs.surface_inputs;
+        const actuators::PropulsorActuatorInputs_T<double>& trim_propulsor_inputs = trim_inputs.propulsor_inputs;
+        actuators::SurfaceActuatorInputs_T<double>& surface_inputs = actuator_inputs.surface_inputs;
+        actuators::PropulsorActuatorInputs_T<double>& propulsor_inputs = actuator_inputs.propulsor_inputs;
 
-        surface_actuator_inputs.elevator_cmd = trim_surface_inputs.elevator_cmd;
-        surface_actuator_inputs.aileron_cmd = trim_surface_inputs.aileron_cmd;
-        surface_actuator_inputs.rudder_cmd = trim_surface_inputs.rudder_cmd;
-        propulsor_actuator_inputs.front_propulsor_cmd = trim_propulsor_inputs.front_propulsor_cmd;
-        propulsor_actuator_inputs.left_propulsor_cmd = trim_propulsor_inputs.left_propulsor_cmd;
-        propulsor_actuator_inputs.right_propulsor_cmd = trim_propulsor_inputs.right_propulsor_cmd;
+        surface_inputs.elevator_cmd = trim_surface_inputs.elevator_cmd;
+        surface_inputs.aileron_cmd = trim_surface_inputs.aileron_cmd;
+        surface_inputs.rudder_cmd = trim_surface_inputs.rudder_cmd;
+        propulsor_inputs.front_propulsor_cmd = trim_propulsor_inputs.front_propulsor_cmd;
+        propulsor_inputs.left_propulsor_cmd = trim_propulsor_inputs.left_propulsor_cmd;
+        propulsor_inputs.right_propulsor_cmd = trim_propulsor_inputs.right_propulsor_cmd;
 
-        return { surface_actuator_inputs, propulsor_actuator_inputs };
+        return actuator_inputs;
     }
 
 }

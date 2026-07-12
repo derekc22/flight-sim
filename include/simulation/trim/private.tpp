@@ -15,13 +15,7 @@ namespace trim {
 
     template <typename T>
     TrimResidual_T<T> compute_trim_residual_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u, autodiff::AutoDiffModel& model, const TrimTarget& target, const operating::OperatingConditions& conditions) {
-        const dynamics::StateDot_T<T> trim_state_dot = autodiff::compute_state_dot_T<T>(
-            x, 
-            u, 
-            model, 
-            conditions, 
-            constants::dt
-        );
+        const dynamics::StateDot_T<T> trim_state_dot = autodiff::compute_state_dot_T<T>(x, u, model, conditions, constants::dt);
 
         const dynamics::Twist_T<T> twist = dynamics::build_twist_from_state_T(x);
         const aerodynamics::AerodynamicState_T<T> aero = aerodynamics::compute_aerodynamic_state_T<T>(twist, conditions.windB);

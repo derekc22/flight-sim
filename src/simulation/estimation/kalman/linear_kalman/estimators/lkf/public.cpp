@@ -13,8 +13,7 @@ namespace estimation {
         dynamics::StateVector yt_deviation = dynamics::unpack_state(
             input.Yt) - dynamics::unpack_state(input.operating_point.state);
 
-        actuators::ActuatorInputsVector ut_1_deviation = actuators::unpack_actuator_inputs(
-            input.u_surface_actual_prev, input.u_propulsor_actual_prev) - 
+        actuators::ActuatorInputsVector ut_1_deviation = actuators::unpack_actuator_inputs(input.u_actual_prev) -
             actuators::unpack_actuator_inputs(input.operating_point.input);
 
         linearization::DiscretizedLocalLinearization lin_sol_k = linearization::discretize(input.lin_sol, dt);

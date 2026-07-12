@@ -31,6 +31,8 @@ namespace aerodynamics {
 
     template <typename T>
     SurfaceCoefficients_T<T> compute_surface_coefficients_T(const Surface& s, const SurfaceKinematics_T<T>& sk, const actuators::SurfaceActuatorInputs_T<T>& u) {
+        const DynamicDerivatives& dyn = s.dyn;
+        const ControlDerivatives& ctrl = s.ctrl;
         const double CLalpha = 2.0 * constants::pi * (s.AR / (2.0 + s.AR));
 
         SurfaceCoefficients_T<T> out;
@@ -43,13 +45,13 @@ namespace aerodynamics {
         const T flap_cmd_abs = util::smooth_abs(u.flap_cmd);
         const T spoiler_cmd_abs = util::smooth_abs(u.spoiler_cmd);
 
-        out.CL += T(s.dyn.CL_phat) * sk.p_hat + T(s.dyn.CL_qhat) * sk.q_hat + T(s.dyn.CL_rhat) * sk.r_hat;
-        out.CM += T(s.dyn.CM_phat) * sk.p_hat + T(s.dyn.CM_qhat) * sk.q_hat + T(s.dyn.CM_rhat) * sk.r_hat;
-        out.CD += T(s.dyn.CD_phat) * sk.p_hat + T(s.dyn.CD_qhat) * sk.q_hat + T(s.dyn.CD_rhat) * sk.r_hat;
+        out.CL += T(dyn.CL_phat) * sk.p_hat + T(dyn.CL_qhat) * sk.q_hat + T(dyn.CL_rhat) * sk.r_hat;
+        out.CM += T(dyn.CM_phat) * sk.p_hat + T(dyn.CM_qhat) * sk.q_hat + T(dyn.CM_rhat) * sk.r_hat;
+        out.CD += T(dyn.CD_phat) * sk.p_hat + T(dyn.CD_qhat) * sk.q_hat + T(dyn.CD_rhat) * sk.r_hat;
 
-        out.CL += T(s.ctrl.dCL_de) * u.elevator_cmd + T(s.ctrl.dCL_da) * u.aileron_cmd + T(s.ctrl.dCL_dr) * u.rudder_cmd + T(s.ctrl.dCL_df) * u.flap_cmd + T(s.ctrl.dCL_ds) * u.spoiler_cmd;
-        out.CM += T(s.ctrl.dCM_de) * u.elevator_cmd + T(s.ctrl.dCM_da) * u.aileron_cmd + T(s.ctrl.dCM_dr) * u.rudder_cmd + T(s.ctrl.dCM_df) * u.flap_cmd + T(s.ctrl.dCM_ds) * u.spoiler_cmd;
-        out.CD += T(s.ctrl.dCD_de) * elevator_cmd_abs + T(s.ctrl.dCD_da) * aileron_cmd_abs + T(s.ctrl.dCD_dr) * rudder_cmd_abs + T(s.ctrl.dCD_df) * flap_cmd_abs + T(s.ctrl.dCD_ds) * spoiler_cmd_abs;
+        out.CL += T(ctrl.dCL_de) * u.elevator_cmd + T(ctrl.dCL_da) * u.aileron_cmd + T(ctrl.dCL_dr) * u.rudder_cmd + T(ctrl.dCL_df) * u.flap_cmd + T(ctrl.dCL_ds) * u.spoiler_cmd;
+        out.CM += T(ctrl.dCM_de) * u.elevator_cmd + T(ctrl.dCM_da) * u.aileron_cmd + T(ctrl.dCM_dr) * u.rudder_cmd + T(ctrl.dCM_df) * u.flap_cmd + T(ctrl.dCM_ds) * u.spoiler_cmd;
+        out.CD += T(ctrl.dCD_de) * elevator_cmd_abs + T(ctrl.dCD_da) * aileron_cmd_abs + T(ctrl.dCD_dr) * rudder_cmd_abs + T(ctrl.dCD_df) * flap_cmd_abs + T(ctrl.dCD_ds) * spoiler_cmd_abs;
 
         out.CD += T(s.CD0) + T(s.CDa) * (sk.alpha - T(s.a0)) * (sk.alpha - T(s.a0)) + (out.CL * out.CL) / T(constants::pi * s.e * s.AR);
         return out;

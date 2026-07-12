@@ -47,8 +47,7 @@ namespace trim {
     struct TrimProblem {
         TrimTarget target;
         operating::OperatingConditions conditions;
-        dynamics::State_T<double> state_guess;
-        actuators::ActuatorInputs_T<double> input_guess;
+        operating::OperatingPoint initial_guess;
     };
 
     template <typename T>
@@ -62,7 +61,7 @@ namespace trim {
 
     double send_control_to_solver_space(double u, double limit_min, double limit_max);
 
-    operating::StateInputVector_T<double> unpack_trim_solver_variables(const dynamics::State_T<double>& x, const actuators::ActuatorInputs_T<double>& u, const actuators::ActuatorLimits& actuator_limits);
+    operating::StateInputVector_T<double> unpack_trim_solver_variables(const operating::OperatingPoint& initial_guess, const actuators::ActuatorLimits& actuator_limits);
 
     TrimResidualVector_T<double> fetch_trim_residual_weights(const TrimSolveOptions& options);
 
@@ -70,7 +69,7 @@ namespace trim {
 
     void validate_trim_solve_options(const TrimSolveOptions& options);
 
-    dynamics::Wrench compute_trim_wrench(const dynamics::State_T<double>& x, const actuators::ActuatorInputs_T<double>& u, autodiff::AutoDiffModel& model, const operating::OperatingConditions& conditions);
+    dynamics::Wrench compute_trim_wrench(const operating::OperatingPoint& operating_point, autodiff::AutoDiffModel& model, const operating::OperatingConditions& conditions);
 
     TrimSolution build_trim_solution(const operating::StateInputVector_T<double>& xu, const TrimResidualVector_T<double>& residual, const TrimResidualVector_T<double>& weighted_residual, autodiff::AutoDiffModel& model, const operating::OperatingConditions& conditions, bool converged, std::size_t iterations);
 

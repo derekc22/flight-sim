@@ -8,12 +8,18 @@ namespace operating {
 
     template <typename T>
     StateInputVector_T<T> unpack_state_input_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u) {
+        const actuators::SurfaceActuatorInputs_T<T>& surface_inputs = u.surface_inputs;
+        const actuators::PropulsorActuatorInputs_T<T>& propulsor_inputs = u.propulsor_inputs;
         StateInputVector_T<T> out;
         out << x.vx, x.vy, x.vz,
                x.p, x.q, x.r,
                x.phi, x.theta,
-               u.surface_inputs.elevator_cmd, u.surface_inputs.aileron_cmd, u.surface_inputs.rudder_cmd,
-               u.propulsor_inputs.front_propulsor_cmd, u.propulsor_inputs.left_propulsor_cmd, u.propulsor_inputs.right_propulsor_cmd;
+               surface_inputs.elevator_cmd,
+               surface_inputs.aileron_cmd,
+               surface_inputs.rudder_cmd,
+               propulsor_inputs.front_propulsor_cmd,
+               propulsor_inputs.left_propulsor_cmd,
+               propulsor_inputs.right_propulsor_cmd;
         return out;
     }
 

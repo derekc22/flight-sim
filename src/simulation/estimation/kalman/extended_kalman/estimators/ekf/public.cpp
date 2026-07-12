@@ -12,10 +12,7 @@ namespace estimation {
     ExtendedKalmanPolicyInput ExtendedKalmanFilter::make_extended_kalman_policy_input(const ExtendedKalmanEstimatorInput& input) {
         dynamics::StateVector yt = dynamics::unpack_state(input.Yt);
 
-        actuators::ActuatorInputsVector ut_1 = actuators::unpack_actuator_inputs(
-            input.u_surface_actual_prev, 
-            input.u_propulsor_actual_prev
-        );
+        actuators::ActuatorInputsVector ut_1 = actuators::unpack_actuator_inputs(input.u_actual_prev);
 
         return { 
             .yt = yt,

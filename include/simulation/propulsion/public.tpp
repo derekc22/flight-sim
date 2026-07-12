@@ -54,12 +54,12 @@ namespace propulsion {
     }
 
     template <typename T>
-    dynamics::Wrench_T<T> step_propulsive_forces_moments_T(const actuators::PropulsorActuators& propulsor_actuators, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& atm, const actuators::PropulsorActuatorInputs_T<T>& u, const PropulsorOmegaDot_T<T>& omega_dot) {
+    dynamics::Wrench_T<T> step_propulsive_forces_moments_T(const actuators::PropulsorActuators& propulsor_actuators, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& atm, const actuators::PropulsorActuatorInputs_T<T>& u, const PropellerOmegaDotSet_T<T>& propeller_omega_dot_set) {
         dynamics::Wrench_T<T> total;
 
-        const dynamics::Wrench_T<T> front = step_propulsor_forces_moments_T<T>(propulsor_actuators.front_propulsor, twist, atm, u.front_propulsor_cmd, omega_dot.front_propulsor);
-        const dynamics::Wrench_T<T> left = step_propulsor_forces_moments_T<T>(propulsor_actuators.left_propulsor, twist, atm, u.left_propulsor_cmd, omega_dot.left_propulsor);
-        const dynamics::Wrench_T<T> right = step_propulsor_forces_moments_T<T>(propulsor_actuators.right_propulsor, twist, atm, u.right_propulsor_cmd, omega_dot.right_propulsor);
+        const dynamics::Wrench_T<T> front = step_propulsor_forces_moments_T<T>(propulsor_actuators.front_propulsor, twist, atm, u.front_propulsor_cmd, propeller_omega_dot_set.front_propulsor);
+        const dynamics::Wrench_T<T> left = step_propulsor_forces_moments_T<T>(propulsor_actuators.left_propulsor, twist, atm, u.left_propulsor_cmd, propeller_omega_dot_set.left_propulsor);
+        const dynamics::Wrench_T<T> right = step_propulsor_forces_moments_T<T>(propulsor_actuators.right_propulsor, twist, atm, u.right_propulsor_cmd, propeller_omega_dot_set.right_propulsor);
 
         total.F = front.F + left.F + right.F;
         total.M = front.M + left.M + right.M;
@@ -68,7 +68,7 @@ namespace propulsion {
     }
 
     template <typename T>
-    PropulsorOmegaDot_T<T> compute_propellers_omega_dot_T(const actuators::PropulsorActuators& propulsor_actuators, const actuators::PropulsorActuatorInputs_T<T>& u, const atmospheric::StaticAtmosphericState& atm, T dt) {
+    PropellerOmegaDotSet_T<T> compute_propeller_omega_dot_set_T(const actuators::PropulsorActuators& propulsor_actuators, const actuators::PropulsorActuatorInputs_T<T>& u, const atmospheric::StaticAtmosphericState& atm, T dt) {
         return {
             .front_propulsor = compute_propeller_omega_dot_T(propulsor_actuators.front_propulsor, u.front_propulsor_cmd, atm.rho, dt),
             .left_propulsor = compute_propeller_omega_dot_T(propulsor_actuators.left_propulsor, u.left_propulsor_cmd, atm.rho, dt),

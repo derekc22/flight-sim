@@ -73,57 +73,62 @@ namespace integrators {
         return { .p = pI_BI_t1, .v = vB_BI_t1, .q = qIB_t1, .w = wB_BI_t1 };
     }
 
-    RK4Output step_rigid_body_rk4(const dynamics::RigidBodyState& Xt, RK4Model& model, const operating::OperatingConditions& conditions, const actuators::SurfaceActuatorInputs_T<double>& u_surface, const actuators::PropulsorActuatorInputs_T<double>& u_propulsor, double dt) {
-        const propulsion::PropellerOmegaState_T<double> front_propulsor_omega_state = propulsion::compute_propeller_omega_state_T<double>(
-            model.propulsor_actuators.front_propulsor,
-            u_propulsor.front_propulsor_cmd,
-            conditions.atm.rho,
-            dt
-        );
-        const propulsion::PropellerOmegaState_T<double> left_propulsor_omega_state = propulsion::compute_propeller_omega_state_T<double>(
-            model.propulsor_actuators.left_propulsor,
-            u_propulsor.left_propulsor_cmd,
-            conditions.atm.rho,
-            dt
-        );
-        const propulsion::PropellerOmegaState_T<double> right_propulsor_omega_state = propulsion::compute_propeller_omega_state_T<double>(
-            model.propulsor_actuators.right_propulsor,
-            u_propulsor.right_propulsor_cmd,
-            conditions.atm.rho,
-            dt
-        );
+    RK4Output step_rigid_body_rk4(const dynamics::RigidBodyState& Xt, RK4Model& model, const operating::OperatingConditions& conditions, const actuators::ActuatorInputs_T<double>& u, double dt) {
+        actuators::PropulsorActuators& propulsor_actuators = model.propulsor_actuators;
+        const actuators::PropulsorActuatorInputs_T<double>& propulsor_inputs = u.propulsor_inputs;
+        const atmospheric::AirDensity& rho = conditions.atm.rho;
+        const structural::StructuralProperties& structural = model.structural;
 
-        const propulsion::PropulsorOmegaDot_T<double> omega_dot{
-            .front_propulsor = front_propulsor_omega_state.omega_dot,
-            .left_propulsor = left_propulsor_omega_state.omega_dot,
-            .right_propulsor = right_propulsor_omega_state.omega_dot
+        const propulsion::PropellerOmegaStateSet_T<double> propeller_omega_state_set{
+            .front_propulsor = propulsion::compute_propeller_omega_state_T<double>(
+                propulsor_actuators.front_propulsor, 
+                propulsor_inputs.front_propulsor_cmd, 
+                rho, 
+                dt
+            ),
+            .left_propulsor = propulsion::compute_propeller_omega_state_T<double>(
+                propulsor_actuators.left_propulsor, 
+                propulsor_inputs.left_propulsor_cmd, 
+                rho, 
+                dt
+            ),
+            .right_propulsor = propulsion::compute_propeller_omega_state_T<double>(
+                propulsor_actuators.right_propulsor, 
+                propulsor_inputs.right_propulsor_cmd, 
+                rho, 
+                dt
+            )
         };
-        const actuators::ActuatorInputs_T<double> u = actuators::pack_actuator_inputs(u_surface, u_propulsor);
 
-        auto [WB_net_1, WB_aerodynamic_1, WB_propulsive_1] = compute_rigid_body_net_wrench(Xt, model, conditions, u, omega_dot);
-        const RigidBodyStateDot k1 = compute_rigid_body_state_dot(Xt, model.structural.mass, model.structural.JB, WB_net_1);
+        const propulsion::PropellerOmegaDotSet_T<double> propeller_omega_dot_set{
+            .front_propulsor = propeller_omega_state_set.front_propulsor.omega_dot,
+            .left_propulsor = propeller_omega_state_set.left_propulsor.omega_dot,
+            .right_propulsor = propeller_omega_state_set.right_propulsor.omega_dot
+        };
+        const WrenchSet wrench_1 = compute_net_wrench(Xt, model, conditions, u, propeller_omega_dot_set);
+        const RigidBodyStateDot k1 = compute_rigid_body_state_dot(Xt, structural.mass, structural.JB, wrench_1.net);
 
         const dynamics::RigidBodyState X2 = add_scaled_rigid_body_state_dot(Xt, k1, 0.5 * dt);
-        auto [WB_net_2, WB_aerodynamic_2, WB_propulsive_2] = compute_rigid_body_net_wrench(X2, model, conditions, u, omega_dot);
-        const RigidBodyStateDot k2 = compute_rigid_body_state_dot(X2, model.structural.mass, model.structural.JB, WB_net_2);
+        const WrenchSet wrench_2 = compute_net_wrench(X2, model, conditions, u, propeller_omega_dot_set);
+        const RigidBodyStateDot k2 = compute_rigid_body_state_dot(X2, structural.mass, structural.JB, wrench_2.net);
 
         const dynamics::RigidBodyState X3 = add_scaled_rigid_body_state_dot(Xt, k2, 0.5 * dt);
-        auto [WB_net_3, WB_aerodynamic_3, WB_propulsive_3] = compute_rigid_body_net_wrench(X3, model, conditions, u, omega_dot);
-        const RigidBodyStateDot k3 = compute_rigid_body_state_dot(X3, model.structural.mass, model.structural.JB, WB_net_3);
+        const WrenchSet wrench_3 = compute_net_wrench(X3, model, conditions, u, propeller_omega_dot_set);
+        const RigidBodyStateDot k3 = compute_rigid_body_state_dot(X3, structural.mass, structural.JB, wrench_3.net);
 
         const dynamics::RigidBodyState X4 = add_scaled_rigid_body_state_dot(Xt, k3, dt);
-        auto [WB_net_4, WB_aerodynamic_4, WB_propulsive_4] = compute_rigid_body_net_wrench(X4, model, conditions, u, omega_dot);
-        const RigidBodyStateDot k4 = compute_rigid_body_state_dot(X4, model.structural.mass, model.structural.JB, WB_net_4);
+        const WrenchSet wrench_4 = compute_net_wrench(X4, model, conditions, u, propeller_omega_dot_set);
+        const RigidBodyStateDot k4 = compute_rigid_body_state_dot(X4, structural.mass, structural.JB, wrench_4.net);
 
         const dynamics::RigidBodyState Xt1 = add_rk4_weighted_rigid_body_state_dot(Xt, k1, k2, k3, k4, dt);
 
-        propulsion::commit_propellers_omega_state(model.propulsor_actuators, front_propulsor_omega_state, left_propulsor_omega_state, right_propulsor_omega_state);
+        propulsion::commit_propeller_omega_state_set(propulsor_actuators, propeller_omega_state_set);
 
         return { 
             .Xt1 = Xt1, 
-            .WB_net = WB_net_1, 
-            .WB_aerodynamic = WB_aerodynamic_1, 
-            .WB_propulsive = WB_propulsive_1 
+            .WB_net = wrench_1.net,
+            .WB_aerodynamic = wrench_1.aerodynamic,
+            .WB_propulsive = wrench_1.propulsive
         };
     }
 

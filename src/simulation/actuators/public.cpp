@@ -1,4 +1,3 @@
-#include <tuple>
 #include "simulation/actuators/public.hpp"
 #include "simulation/actuators/propulsor/public.hpp"
 #include "simulation/actuators/surface/public.hpp"
@@ -21,9 +20,15 @@ namespace actuators {
     }
 
     ActuatorInputsVector unpack_actuator_inputs(const ActuatorInputs_T<double>& u) {
+        const SurfaceActuatorInputs_T<double>& surface_inputs = u.surface_inputs;
+        const PropulsorActuatorInputs_T<double>& propulsor_inputs = u.propulsor_inputs;
         ActuatorInputsVector out;
-        out << u.surface_inputs.elevator_cmd, u.surface_inputs.aileron_cmd, u.surface_inputs.rudder_cmd,
-               u.propulsor_inputs.front_propulsor_cmd, u.propulsor_inputs.left_propulsor_cmd, u.propulsor_inputs.right_propulsor_cmd;
+        out << surface_inputs.elevator_cmd,
+               surface_inputs.aileron_cmd,
+               surface_inputs.rudder_cmd,
+               propulsor_inputs.front_propulsor_cmd,
+               propulsor_inputs.left_propulsor_cmd,
+               propulsor_inputs.right_propulsor_cmd;
         return out;
     }
 
@@ -133,12 +138,8 @@ namespace actuators {
         };
     }
 
-    std::tuple<ActuatorInputsVector, ActuatorInputsVector> unpack_actuator_limits(const SurfaceActuators& surface_actuators, const PropulsorActuators& propulsor_actuators) {
-        ActuatorLimits max_min_limits = pack_actuator_limits(surface_actuators, propulsor_actuators);
-        return { 
-            unpack_actuator_inputs(max_min_limits.limit_min),
-            unpack_actuator_inputs(max_min_limits.limit_max)
-        };
+    ActuatorLimitsVector unpack_actuator_limits(const SurfaceActuators& surface_actuators, const PropulsorActuators& propulsor_actuators) {
+        return unpack_actuator_limits(pack_actuator_limits(surface_actuators, propulsor_actuators));
     }
 
     FixedActuatorInputs Settings::get_fixed_actuator_inputs() {
