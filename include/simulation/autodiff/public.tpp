@@ -41,7 +41,7 @@ namespace autodiff {
         );
 
         const constants::Vector3_T<T> gB = geography::gB_T(x.phi, x.theta);
-        const integrators::WrenchSet_T<T> wrench = integrators::compute_wrench_set_T<T>(model, twist, conditions.atm, inputs, propeller_omega_dot_set, conditions.windB, gB);
+        const dynamics::WrenchSet_T<T> wrench = integrators::compute_wrench_set_T<T>(model, twist, conditions.atm, inputs, propeller_omega_dot_set, conditions.windB, gB);
         return wrench.net;
     }
 

@@ -6,7 +6,7 @@
 namespace integrators {
 
     template <typename T, typename Model>
-    WrenchSet_T<T> compute_wrench_set_T(const Model& model, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& atm, const actuators::ActuatorInputs_T<T>& u, const propulsion::PropellerOmegaDotSet_T<T>& propeller_omega_dot_set, const atmospheric::Wind& windB, const constants::Vector3_T<T>& gB) {
+    dynamics::WrenchSet_T<T> compute_wrench_set_T(const Model& model, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& atm, const actuators::ActuatorInputs_T<T>& u, const propulsion::PropellerOmegaDotSet_T<T>& propeller_omega_dot_set, const atmospheric::Wind& windB, const constants::Vector3_T<T>& gB) {
         const dynamics::Wrench_T<T> aerodynamic = aerodynamics::step_aero_forces_moments_T<T>(model.aerodynamic, twist, atm, u.surface_inputs, windB);
         const dynamics::Wrench_T<T> propulsive = propulsion::step_propulsive_forces_moments_T<T>(model.propulsor_actuators, twist, atm, u.propulsor_inputs, propeller_omega_dot_set);
 

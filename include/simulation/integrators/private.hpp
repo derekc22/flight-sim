@@ -13,12 +13,12 @@ namespace integrators {
 
     dynamics::AngularVelocity rot_dyn(const dynamics::AngularVelocity& wB_BI_t, const dynamics::InertiaTensor& JB, const dynamics::Moment& MB_net_t, double dt);
 
-    WrenchSet compute_net_wrench(const dynamics::RigidBodyState& Xt, RK4Model& model, const operating::OperatingConditions& conditions, const actuators::ActuatorInputs_T<double>& u, const propulsion::PropellerOmegaDotSet_T<double>& propeller_omega_dot_set);
+    dynamics::WrenchSet compute_net_wrench(const dynamics::RigidBodyState& Xt, RK4Model& model, const operating::OperatingConditions& conditions, const actuators::ActuatorInputs_T<double>& u, const propulsion::PropellerOmegaDotSet_T<double>& propeller_omega_dot_set);
 
-    RigidBodyStateDot compute_rigid_body_state_dot(const dynamics::RigidBodyState& Xt, const dynamics::Mass& mass, const dynamics::InertiaTensor& JB, const dynamics::Wrench& WB_net_t);
+    dynamics::RigidBodyStateDot compute_rigid_body_state_dot(const dynamics::RigidBodyState& Xt, const dynamics::Mass& mass, const dynamics::InertiaTensor& JB, const dynamics::Wrench& WB_net_t);
 
-    dynamics::RigidBodyState add_scaled_rigid_body_state_dot(const dynamics::RigidBodyState& X, const RigidBodyStateDot& X_dot, double scale);
+    dynamics::RigidBodyState add_scaled_rigid_body_state_dot(const dynamics::RigidBodyState& X, const dynamics::RigidBodyStateDot& X_dot, double scale);
 
-    dynamics::RigidBodyState add_rk4_weighted_rigid_body_state_dot(const dynamics::RigidBodyState& X, const RigidBodyStateDot& k1, const RigidBodyStateDot& k2, const RigidBodyStateDot& k3, const RigidBodyStateDot& k4, double dt);
+    dynamics::RigidBodyState add_rk4_weighted_rigid_body_state_dot(const dynamics::RigidBodyState& X, const dynamics::RigidBodyStateDot& k1, const dynamics::RigidBodyStateDot& k2, const dynamics::RigidBodyStateDot& k3, const dynamics::RigidBodyStateDot& k4, double dt);
 
 }

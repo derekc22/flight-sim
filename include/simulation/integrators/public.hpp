@@ -17,34 +17,13 @@ namespace integrators {
         actuators::PropulsorActuators& propulsor_actuators;
     };
 
-    struct RigidBodyStateDot {
-        dynamics::TranslationalVelocity p_dot;
-        dynamics::TranslationalAcceleration v_dot;
-        dynamics::AngularAcceleration w_dot;
-    };
-
-    struct WrenchSet {
-        dynamics::Wrench aerodynamic;
-        dynamics::Wrench propulsive;
-        dynamics::Wrench net;
-    };
-
     struct RK4Output {
         dynamics::RigidBodyState Xt1;
-        dynamics::Wrench WB_net;
-        dynamics::Wrench WB_aerodynamic;
-        dynamics::Wrench WB_propulsive;
-    };
-
-    template <typename T>
-    struct WrenchSet_T {
-        dynamics::Wrench_T<T> aerodynamic;
-        dynamics::Wrench_T<T> propulsive;
-        dynamics::Wrench_T<T> net;
+        dynamics::WrenchSet WB_set;
     };
 
     template <typename T, typename Model>
-    WrenchSet_T<T> compute_wrench_set_T(const Model& model, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& atm, const actuators::ActuatorInputs_T<T>& u, const propulsion::PropellerOmegaDotSet_T<T>& propeller_omega_dot_set, const atmospheric::Wind& windB, const constants::Vector3_T<T>& gB);
+    dynamics::WrenchSet_T<T> compute_wrench_set_T(const Model& model, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& atm, const actuators::ActuatorInputs_T<T>& u, const propulsion::PropellerOmegaDotSet_T<T>& propeller_omega_dot_set, const atmospheric::Wind& windB, const constants::Vector3_T<T>& gB);
 
     dynamics::Position trans_kin(const dynamics::Position& xt, const dynamics::TranslationalVelocity& xt_dot, const dynamics::TranslationalAcceleration& xt_ddot, double dt);
 

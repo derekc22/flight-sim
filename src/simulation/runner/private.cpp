@@ -464,7 +464,7 @@ namespace runner {
         // compute forces, moments, and next-step rigid body state
         integrators::RK4Output rk4_out = integrators::step_rigid_body_rk4(Xt, rk4_model, rk4_conditions, u_actual, constants::dt);
         dynamics::RigidBodyState Xt1 = rk4_out.Xt1;
-        dynamics::Wrench WB_net = rk4_out.WB_net;
+        dynamics::Wrench WB_net = rk4_out.WB_set.net;
 
         // update data context
         io::DataContext data_context{
@@ -474,8 +474,8 @@ namespace runner {
             .u_surface=u_actual.surface_inputs,
             .u_propulsor=u_actual.propulsor_inputs,
             .WB_net=WB_net,
-            .WB_aerodynamic=rk4_out.WB_aerodynamic,
-            .WB_propulsive=rk4_out.WB_propulsive,
+            .WB_aerodynamic=rk4_out.WB_set.aerodynamic,
+            .WB_propulsive=rk4_out.WB_set.propulsive,
             .setpoint=setpoint,
             .windB=windB
         };

@@ -48,7 +48,7 @@ namespace integrators {
         return { wB_BI_t1 };
     }
 
-    WrenchSet compute_net_wrench(const dynamics::RigidBodyState& Xt, RK4Model& model, const operating::OperatingConditions& conditions, const actuators::ActuatorInputs_T<double>& u, const propulsion::PropellerOmegaDotSet_T<double>& propeller_omega_dot_set) {
+    dynamics::WrenchSet compute_net_wrench(const dynamics::RigidBodyState& Xt, RK4Model& model, const operating::OperatingConditions& conditions, const actuators::ActuatorInputs_T<double>& u, const propulsion::PropellerOmegaDotSet_T<double>& propeller_omega_dot_set) {
         const dynamics::Twist_T<double> twist{
             .v = Xt.v.data,
             .w = Xt.w.data
@@ -56,7 +56,7 @@ namespace integrators {
 
         const atmospheric::Wind windB{ Xt.q.data * conditions.windI.data };
         const Eigen::Vector3d gB = geography::gB(Xt.q).data;
-        const WrenchSet_T<double> wrench = compute_wrench_set_T<double>(model, twist, conditions.atm, u, propeller_omega_dot_set, windB, gB);
+        const dynamics::WrenchSet_T<double> wrench = compute_wrench_set_T<double>(model, twist, conditions.atm, u, propeller_omega_dot_set, windB, gB);
 
         return {
             .aerodynamic = { 
@@ -74,7 +74,7 @@ namespace integrators {
         };
     }
 
-    RigidBodyStateDot compute_rigid_body_state_dot(const dynamics::RigidBodyState& Xt, const dynamics::Mass& mass, const dynamics::InertiaTensor& JB, const dynamics::Wrench& WB_net_t) {
+    dynamics::RigidBodyStateDot compute_rigid_body_state_dot(const dynamics::RigidBodyState& Xt, const dynamics::Mass& mass, const dynamics::InertiaTensor& JB, const dynamics::Wrench& WB_net_t) {
         const dynamics::Force FB_net_t = WB_net_t.F;
         const dynamics::Moment MB_net_t = WB_net_t.M;
 
@@ -85,7 +85,7 @@ namespace integrators {
         };
     }
 
-    dynamics::RigidBodyState add_scaled_rigid_body_state_dot(const dynamics::RigidBodyState& X, const RigidBodyStateDot& X_dot, double scale) {
+    dynamics::RigidBodyState add_scaled_rigid_body_state_dot(const dynamics::RigidBodyState& X, const dynamics::RigidBodyStateDot& X_dot, double scale) {
         const dynamics::AngularVelocity w{ X.w.data + X_dot.w_dot.data * scale };
 
         return {
@@ -96,8 +96,8 @@ namespace integrators {
         };
     }
 
-    dynamics::RigidBodyState add_rk4_weighted_rigid_body_state_dot(const dynamics::RigidBodyState& X, const RigidBodyStateDot& k1, const RigidBodyStateDot& k2, const RigidBodyStateDot& k3, const RigidBodyStateDot& k4, double dt) {
-        RigidBodyStateDot X_dot{
+    dynamics::RigidBodyState add_rk4_weighted_rigid_body_state_dot(const dynamics::RigidBodyState& X, const dynamics::RigidBodyStateDot& k1, const dynamics::RigidBodyStateDot& k2, const dynamics::RigidBodyStateDot& k3, const dynamics::RigidBodyStateDot& k4, double dt) {
+        dynamics::RigidBodyStateDot X_dot{
             .p_dot = dynamics::TranslationalVelocity{ (
                 k1.p_dot.data + 
                 2.0 * k2.p_dot.data + 

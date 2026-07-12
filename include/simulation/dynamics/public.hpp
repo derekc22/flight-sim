@@ -113,6 +113,12 @@ namespace dynamics {
         AngularVelocity w;          // e.g. wB_BI
     };
 
+    struct RigidBodyStateDot {
+        TranslationalVelocity p_dot;
+        TranslationalAcceleration v_dot;
+        AngularAcceleration w_dot;
+    };
+
     struct Wrench {
         Force F;    // e.g. FB [N]
         Moment M;   // e.g. MB [Nm]
@@ -129,6 +135,13 @@ namespace dynamics {
     struct CenterOfGravity {
         Eigen::Vector3d data;   // p_cg [m]
     };
+
+    struct WrenchSet {
+        Wrench aerodynamic;
+        Wrench propulsive;
+        Wrench net;
+    };
+
 
     using StateVector = Eigen::Matrix<double, constants::state_dim, 1>;
 
@@ -173,6 +186,13 @@ namespace dynamics {
     struct Wrench_T {
         constants::Vector3_T<T> F = constants::Zero3_T<T>;
         constants::Vector3_T<T> M = constants::Zero3_T<T>;
+    };
+
+    template <typename T>
+    struct WrenchSet_T {
+        Wrench_T<T> aerodynamic;
+        Wrench_T<T> propulsive;
+        Wrench_T<T> net;
     };
 
     StateVector unpack_state(const State_T<double>& x);
