@@ -21,6 +21,6 @@ namespace control {
         LinearQuadraticPolicyParameters params;
 
         LinearQuadraticPolicy(const LinearQuadraticPolicyParameters& params);
-        actuators::ActuatorInputsVector_T<double> step(const LinearQuadraticPolicyInput& input);
+        actuators::ActuatorInputsVector step(const LinearQuadraticPolicyInput& input);
     };
 }

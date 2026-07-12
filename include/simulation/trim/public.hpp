@@ -2,7 +2,6 @@
 #include <cstddef>
 #include <Eigen/Dense>
 #include <string>
-#include <tuple>
 #include "simulation/actuators/propulsor/public.hpp"
 #include "simulation/actuators/surface/public.hpp"
 #include "simulation/actuators/public.hpp"
@@ -56,20 +55,20 @@ namespace trim {
     T get_control_from_solver_space_T(const T& u_solver, double limit_min, double limit_max);
 
     template <typename T>
-    actuators::ActuatorInputs_T<T> pack_trim_actuator_inputs_T(const operating::StateInputVector_T<T>& xu, const actuators::ActuatorLimits_T<double>& actuator_limits);
+    actuators::ActuatorInputs_T<T> pack_trim_actuator_inputs_T(const operating::StateInputVector_T<T>& xu, const actuators::ActuatorLimits& actuator_limits, const actuators::FixedActuatorInputs& fixed_actuator_inputs);
 
     TrimSolution inspect_trim(vehicles::Aircraft& aircraft, autodiff::AutoDiffModel& model, const atmospheric::Wind& wind);
 
     std::string print_trim_solution(const TrimSolution& trim_sol);
 
-    std::tuple<dynamics::RigidBodyState, aerodynamics::AerodynamicState> update_state_from_trim(const dynamics::RigidBodyState& Xt, const TrimSolution& trim_sol);
+    dynamics::RigidBodyState update_state_from_trim(const dynamics::RigidBodyState& Xt, const dynamics::State_T<double>& trim_state);
 
-    control::ControlOutput set_control_inputs_from_trim(const TrimSolution& trim_sol);
+    control::ControlOutput set_control_inputs_from_trim(const actuators::ActuatorInputs_T<double>& trim_inputs);
 
     /** @deprecated */
     // void update_actuators_lag_from_trim(actuators::SurfaceActuators& surface_actuators, actuators::PropulsorActuators& propulsor_actuators, const TrimSolution& trim_sol);
 
-    std::tuple<actuators::SurfaceActuatorInputs_T<double>, actuators::PropulsorActuatorInputs_T<double>> update_actuators_from_trim(actuators::SurfaceActuatorInputs_T<double>& surface_actuator_inputs, actuators::PropulsorActuatorInputs_T<double>& propulsor_actuator_inputs, const TrimSolution& trim_sol);
+    actuators::ActuatorInputs_T<double> set_actuator_inputs_from_trim(actuators::ActuatorInputs_T<double> actuator_inputs, const actuators::ActuatorInputs_T<double>& trim_inputs);
 
 }
 

@@ -12,8 +12,8 @@ namespace estimation {
         linearization::StateJacobian A; 
         linearization::InputJacobian B;
         linearization::OutputJacobian C;
-        dynamics::StateVector_T<double> yt;
-        actuators::ActuatorInputsVector_T<double> ut_1;
+        dynamics::StateVector yt;
+        actuators::ActuatorInputsVector ut_1;
     };
 
     struct LinearKalmanPolicyParameters : KalmanPolicyParameters {};

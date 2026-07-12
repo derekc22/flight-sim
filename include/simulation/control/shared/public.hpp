@@ -8,10 +8,7 @@
 
 namespace control {
 
-    struct ControlOutput {
-        actuators::SurfaceActuatorInputs_T<double> surface_inputs;
-        actuators::PropulsorActuatorInputs_T<double> propulsor_inputs;
-    };
+    using ControlOutput = actuators::ActuatorInputs_T<double>;
 
     struct AttitudeControllerInput {
         const dynamics::RigidBodyState& Zt;

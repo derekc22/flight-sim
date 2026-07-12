@@ -6,7 +6,7 @@
 namespace propulsion {
 
     template <typename T>
-    struct PropulsorOmegaDot_T {
+    struct PropellerOmegaDotSet_T {
         T front_propulsor = T(0.0);
         T left_propulsor = T(0.0);
         T right_propulsor = T(0.0);
@@ -19,6 +19,13 @@ namespace propulsion {
     };
 
     template <typename T>
+    struct PropellerOmegaStateSet_T {
+        PropellerOmegaState_T<T> front_propulsor{};
+        PropellerOmegaState_T<T> left_propulsor{};
+        PropellerOmegaState_T<T> right_propulsor{};
+    };
+
+    template <typename T>
     T compute_propeller_omega_T(const actuators::PropulsorActuator& propulsor, const T& thrust, const atmospheric::AirDensity& rho);
 
     template <typename T>
@@ -28,13 +35,13 @@ namespace propulsion {
     dynamics::Wrench_T<T> step_propulsor_forces_moments_T(const actuators::PropulsorActuator& propulsor, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& atm, const T& thrust, const T& omega_dot);
 
     template <typename T>
-    dynamics::Wrench_T<T> step_propulsive_forces_moments_T(const actuators::PropulsorActuators& propulsor_actuators, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& atm, const actuators::PropulsorActuatorInputs_T<T>& u, const PropulsorOmegaDot_T<T>& omega_dot);
+    dynamics::Wrench_T<T> step_propulsive_forces_moments_T(const actuators::PropulsorActuators& propulsor_actuators, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& atm, const actuators::PropulsorActuatorInputs_T<T>& u, const PropellerOmegaDotSet_T<T>& propeller_omega_dot_set);
 
     dynamics::Wrench step_propulsive_forces_moments(actuators::PropulsorActuators& propulsor_actuators, const dynamics::RigidBodyState& X, const atmospheric::StaticAtmosphericState& atm, const actuators::PropulsorActuatorInputs_T<double>& u, double dt);
 
     void commit_propeller_omega_state(actuators::PropulsorActuator& propulsor, const PropellerOmegaState_T<double>& propeller_omega);
 
-    void commit_propellers_omega_state(actuators::PropulsorActuators& propulsor_actuators, const PropellerOmegaState_T<double>& front_propulsor_omega, const PropellerOmegaState_T<double>& left_propulsor_omega, const PropellerOmegaState_T<double>& right_propulsor_omega);
+    void commit_propeller_omega_state_set(actuators::PropulsorActuators& propulsor_actuators, const PropellerOmegaStateSet_T<double>& propeller_omega_state_set);
 
     template <typename T>
     PropellerOmegaState_T<T> compute_propeller_omega_state_T(const actuators::PropulsorActuator& propulsor, T thrust, const atmospheric::AirDensity& rho, T dt);
@@ -43,7 +50,7 @@ namespace propulsion {
     T compute_propeller_omega_dot_T(const actuators::PropulsorActuator& propulsor, T thrust, const atmospheric::AirDensity& rho, T dt);
 
     template <typename T>
-    PropulsorOmegaDot_T<T> compute_propellers_omega_dot_T(const actuators::PropulsorActuators& propulsor_actuators, const actuators::PropulsorActuatorInputs_T<T>& u, const atmospheric::StaticAtmosphericState& atm, T dt);
+    PropellerOmegaDotSet_T<T> compute_propeller_omega_dot_set_T(const actuators::PropulsorActuators& propulsor_actuators, const actuators::PropulsorActuatorInputs_T<T>& u, const atmospheric::StaticAtmosphericState& atm, T dt);
 
 }
 

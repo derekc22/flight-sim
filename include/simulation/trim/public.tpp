@@ -21,32 +21,49 @@ namespace trim {
 
 
     template <typename T>
-    actuators::ActuatorInputs_T<T> pack_trim_actuator_inputs_T(const operating::StateInputVector_T<T>& xu, const actuators::ActuatorLimits_T<double>& actuator_limits) {
+    actuators::ActuatorInputs_T<T> pack_trim_actuator_inputs_T(const operating::StateInputVector_T<T>& xu, const actuators::ActuatorLimits& actuator_limits, const actuators::FixedActuatorInputs& fixed_actuator_inputs) {
+        const actuators::SurfaceActuatorInputs_T<double>& surface_limit_min = actuator_limits.limit_min.surface_inputs;
+        const actuators::SurfaceActuatorInputs_T<double>& surface_limit_max = actuator_limits.limit_max.surface_inputs;
+        const actuators::PropulsorActuatorInputs_T<double>& propulsor_limit_min = actuator_limits.limit_min.propulsor_inputs;
+        const actuators::PropulsorActuatorInputs_T<double>& propulsor_limit_max = actuator_limits.limit_max.propulsor_inputs;
+
         return {
-            .elevator_cmd = get_control_from_solver_space_T<T>(
-                xu(constants::state_dim + 0),
-                actuator_limits.limit_min.elevator_cmd, actuator_limits.limit_max.elevator_cmd
-            ),
-            .aileron_cmd = get_control_from_solver_space_T<T>(
-                xu(constants::state_dim + 1),
-                actuator_limits.limit_min.aileron_cmd, actuator_limits.limit_max.aileron_cmd
-            ),
-            .rudder_cmd = get_control_from_solver_space_T<T>(
-                xu(constants::state_dim + 2),
-                actuator_limits.limit_min.rudder_cmd, actuator_limits.limit_max.rudder_cmd
-            ),
-            .front_propulsor_cmd = get_control_from_solver_space_T<T>(
-                xu(constants::state_dim + 3),
-                actuator_limits.limit_min.front_propulsor_cmd, actuator_limits.limit_max.front_propulsor_cmd
-            ),
-            .left_propulsor_cmd = get_control_from_solver_space_T<T>(
-                xu(constants::state_dim + 4),
-                actuator_limits.limit_min.left_propulsor_cmd, actuator_limits.limit_max.left_propulsor_cmd
-            ),
-            .right_propulsor_cmd = get_control_from_solver_space_T<T>(
-                xu(constants::state_dim + 5),
-                actuator_limits.limit_min.right_propulsor_cmd, actuator_limits.limit_max.right_propulsor_cmd
-            ),
+            .surface_inputs = {
+                .elevator_cmd = get_control_from_solver_space_T<T>(
+                    xu(constants::state_dim + 0),
+                    surface_limit_min.elevator_cmd,
+                    surface_limit_max.elevator_cmd
+                ),
+                .aileron_cmd = get_control_from_solver_space_T<T>(
+                    xu(constants::state_dim + 1),
+                    surface_limit_min.aileron_cmd,
+                    surface_limit_max.aileron_cmd
+                ),
+                .rudder_cmd = get_control_from_solver_space_T<T>(
+                    xu(constants::state_dim + 2),
+                    surface_limit_min.rudder_cmd,
+                    surface_limit_max.rudder_cmd
+                ),
+                .flap_cmd = T(fixed_actuator_inputs.flap),
+                .spoiler_cmd = T(fixed_actuator_inputs.spoiler),
+            },
+            .propulsor_inputs = {
+                .front_propulsor_cmd = get_control_from_solver_space_T<T>(
+                    xu(constants::state_dim + 3),
+                    propulsor_limit_min.front_propulsor_cmd,
+                    propulsor_limit_max.front_propulsor_cmd
+                ),
+                .left_propulsor_cmd = get_control_from_solver_space_T<T>(
+                    xu(constants::state_dim + 4),
+                    propulsor_limit_min.left_propulsor_cmd,
+                    propulsor_limit_max.left_propulsor_cmd
+                ),
+                .right_propulsor_cmd = get_control_from_solver_space_T<T>(
+                    xu(constants::state_dim + 5),
+                    propulsor_limit_min.right_propulsor_cmd,
+                    propulsor_limit_max.right_propulsor_cmd
+                ),
+            }
         };
     }
 

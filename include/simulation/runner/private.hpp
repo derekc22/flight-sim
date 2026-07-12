@@ -5,6 +5,7 @@
 #include <spdlog/spdlog.h>
 #include "simulation/runner/public.hpp"
 #include "simulation/aerodynamics/public.hpp"
+#include "simulation/actuators/public.hpp"
 #include "simulation/actuators/propulsor/public.hpp"
 #include "simulation/actuators/surface/public.hpp"
 #include "simulation/atmospheric/public.hpp"
@@ -67,8 +68,7 @@ namespace runner {
         io::AnalysisManager analysis_manager;
         failures::FailureManager failure_manager;
 
-        actuators::SurfaceActuatorInputs_T<double> u_surface_actual_prev{};
-        actuators::PropulsorActuatorInputs_T<double> u_propulsor_actual_prev{};
+        actuators::ActuatorInputs_T<double> u_actual_t_1{};
 
         // initialize trim and linearization solutions
         trim::TrimSolution trim_sol;
@@ -112,7 +112,7 @@ namespace runner {
         const dynamics::RigidBodyState& Xt,
         const geography::GeographicState& geo,
         const aerodynamics::AerodynamicState& aero,
-        const atmospheric::Wind& windB
+        const atmospheric::Wind& windI
     );
 
 }

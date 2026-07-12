@@ -15,13 +15,7 @@ namespace trim {
 
     template <typename T>
     TrimResidual_T<T> compute_trim_residual_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u, autodiff::AutoDiffModel& model, const TrimTarget& target, const operating::OperatingConditions& conditions) {
-        const dynamics::StateDot_T<T> trim_state_dot = autodiff::compute_state_dot_T<T>(
-            x, 
-            u, 
-            model, 
-            conditions, 
-            constants::dt
-        );
+        const dynamics::StateDot_T<T> trim_state_dot = autodiff::compute_state_dot_T<T>(x, u, model, conditions, constants::dt);
 
         const dynamics::Twist_T<T> twist = dynamics::build_twist_from_state_T(x);
         const aerodynamics::AerodynamicState_T<T> aero = aerodynamics::compute_aerodynamic_state_T<T>(twist, conditions.windB);
@@ -49,29 +43,29 @@ namespace trim {
     TrimResidualVector_T<T> unpack_trim_residual_T(const TrimResidual_T<T>& residual) {
         TrimResidualVector_T<T> out;
         out << residual.vx_dot,
-               residual.vy_dot,
-               residual.vz_dot,
-               residual.p_dot,
-               residual.q_dot,
-               residual.r_dot,
-               residual.phi_dot,
-               residual.theta_dot,
-               residual.beta_err,
-               residual.phi_err,
-               residual.theta_err,
-               residual.vx_err,
-               residual.vz_err,
-               residual.psi_dot_err;
+            residual.vy_dot,
+            residual.vz_dot,
+            residual.p_dot,
+            residual.q_dot,
+            residual.r_dot,
+            residual.phi_dot,
+            residual.theta_dot,
+            residual.beta_err,
+            residual.phi_err,
+            residual.theta_err,
+            residual.vx_err,
+            residual.vz_err,
+            residual.psi_dot_err;
         return out;
     }
 
     template <typename T>
-    TrimResidualVector_T<T> compute_trim_residual_vector_T(const operating::StateInputVector_T<T>& xu, autodiff::AutoDiffModel& model, const TrimTarget& target, const operating::OperatingConditions& conditions, bool use_physical_controls) {
+    TrimResidualVector_T<T> compute_trim_residual_vector_T(const operating::StateInputVector_T<T>& xu, autodiff::AutoDiffModel& model, const TrimTarget& target, const operating::OperatingConditions& conditions, bool physical_controls) {
         const dynamics::State_T<T> x = operating::pack_state_T<T>(xu);
 
         actuators::ActuatorInputs_T<T> u;
-        if (use_physical_controls) u = operating::pack_actuator_inputs_T<T>(xu);
-        else u = pack_trim_actuator_inputs_T<T>(xu, model.actuator_limits);
+        if (physical_controls) u = operating::pack_actuator_inputs_T<T>(xu);
+        else u = pack_trim_actuator_inputs_T<T>(xu, model.actuator_limits, model.fixed_actuator_inputs);
 
         const TrimResidual_T<T> residual = compute_trim_residual_T<T>(x, u, model, target, conditions);
         return unpack_trim_residual_T(residual);

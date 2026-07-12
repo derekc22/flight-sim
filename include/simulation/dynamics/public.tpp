@@ -4,29 +4,6 @@
 namespace dynamics {
 
     template <typename T>
-    State_T<T> pack_state_T(const StateVector_T<T>& x) {
-        return {
-            .vx = x(0),
-            .vy = x(1),
-            .vz = x(2),
-            .p = x(3),
-            .q = x(4),
-            .r = x(5),
-            .phi = x(6),
-            .theta = x(7)
-        };
-    }
-
-    template <typename T>
-    StateVector_T<T> unpack_state_T(const State_T<T>& x) {
-        StateVector_T<T> out;
-        out << x.vx, x.vy, x.vz,
-               x.p, x.q, x.r,
-               x.phi, x.theta;
-        return out;
-    }
-
-    template <typename T>
     StateDotVector_T<T> unpack_state_dot_T(const StateDot_T<T>& x_dot) {
         StateDotVector_T<T> out;
         out << x_dot.vx_dot, x_dot.vy_dot, x_dot.vz_dot,
@@ -43,14 +20,14 @@ namespace dynamics {
         return twist;
     }
 
-    // Translational Dynamics (non-rotating earth), velocity expressed in body coordinates
+    // Translational dynamics (non-rotating earth), velocity expressed in body coordinates
     // vB_dot = (1/mass) * FB_net - wB_BI x vB
     template <typename T>
     constants::Vector3_T<T> ddtB_vB_BI_T(const constants::Vector3_T<T>& vB, const constants::Vector3_T<T>& wB_BI, double mass, const constants::Vector3_T<T>& FB_net) {
         return (FB_net / T(mass)) - wB_BI.cross(vB);
     }
 
-    // Rotational Dynamics, body rates expressed in body coordinates
+    // Rotational dynamics, angular velocity expressed in body coordinates
     // J * w_dot + w x (J*w) = M
     // w_dot = J^{-1} * (M - w x (J*w))
     template <typename T>

@@ -30,9 +30,8 @@ namespace actuators {
         T spoiler_cmd = T(0.0);
     };
 
-    template <typename T>
-    using SurfaceActuatorInputsVector_T = Eigen::Matrix<T, constants::full_surface_input_dim, 1>;
+    using SurfaceActuatorInputsVector = Eigen::Matrix<double, constants::full_surface_input_dim, 1>;
 
-    SurfaceActuatorInputsVector_T<double> unpack_surface_actuator_inputs(const SurfaceActuatorInputs_T<double>& u_surface);
+    SurfaceActuatorInputsVector unpack_surface_actuator_inputs(const SurfaceActuatorInputs_T<double>& u_surface);
 
 }

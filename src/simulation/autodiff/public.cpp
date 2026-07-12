@@ -9,7 +9,7 @@ namespace autodiff {
 
     AutoDiffModel build_autodiff_model(vehicles::Aircraft& aircraft) {
         actuators::PropulsorActuators& propulsor_actuators = aircraft.actuator_properties.propulsor_actuators;
-        actuators::ActuatorLimits_T<double> actuator_limits = actuators::pack_actuator_limits(aircraft.actuator_properties.surface_actuators, propulsor_actuators);
+        actuators::ActuatorLimits actuator_limits = actuators::pack_actuator_limits(aircraft.actuator_properties.surface_actuators, propulsor_actuators);
 
         return {
             .structural = aircraft.structural_properties,

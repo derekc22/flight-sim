@@ -8,12 +8,18 @@ namespace operating {
 
     template <typename T>
     StateInputVector_T<T> unpack_state_input_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u) {
+        const actuators::SurfaceActuatorInputs_T<T>& surface_inputs = u.surface_inputs;
+        const actuators::PropulsorActuatorInputs_T<T>& propulsor_inputs = u.propulsor_inputs;
         StateInputVector_T<T> out;
         out << x.vx, x.vy, x.vz,
                x.p, x.q, x.r,
                x.phi, x.theta,
-               u.elevator_cmd, u.aileron_cmd, u.rudder_cmd,
-               u.front_propulsor_cmd, u.left_propulsor_cmd, u.right_propulsor_cmd;
+               surface_inputs.elevator_cmd,
+               surface_inputs.aileron_cmd,
+               surface_inputs.rudder_cmd,
+               propulsor_inputs.front_propulsor_cmd,
+               propulsor_inputs.left_propulsor_cmd,
+               propulsor_inputs.right_propulsor_cmd;
         return out;
     }
 
@@ -34,13 +40,16 @@ namespace operating {
     template <typename T>
     actuators::ActuatorInputs_T<T> pack_actuator_inputs_T(const StateInputVector_T<T>& xu) {
         return {
-            .elevator_cmd = xu(8),
-            .aileron_cmd = xu(9),
-            .rudder_cmd = xu(10),
-
-            .front_propulsor_cmd = xu(11),
-            .left_propulsor_cmd = xu(12),
-            .right_propulsor_cmd = xu(13),
+            .surface_inputs = {
+                .elevator_cmd = xu(8),
+                .aileron_cmd = xu(9),
+                .rudder_cmd = xu(10),
+            },
+            .propulsor_inputs = {
+                .front_propulsor_cmd = xu(11),
+                .left_propulsor_cmd = xu(12),
+                .right_propulsor_cmd = xu(13),
+            }
         };
     }
 

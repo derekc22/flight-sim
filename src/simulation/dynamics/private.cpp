@@ -15,10 +15,6 @@ namespace dynamics {
         return T_mat;
     }
 
-    Eigen::Matrix3d wB_BI_to_eul_dot_mat(double theta, double phi) {
-        return wB_BI_to_eul_dot_mat_T<double>(theta, phi);
-    }
-
     OrientationMatrixRate ddt_CIB(const OrientationMatrix& CIB, const AngularVelocity& wB_BI) {
         const Eigen::Matrix3d CIB_dot = -util::hat(wB_BI.data) * CIB.data;  // minus for qIB convention
 

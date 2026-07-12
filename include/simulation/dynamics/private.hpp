@@ -48,5 +48,4 @@ namespace dynamics {
 
     Eigen::Matrix3d eul_dot_to_wB_BI_mat(double theta, double phi);
 
-    Eigen::Matrix3d wB_BI_to_eul_dot_mat(double theta, double phi);
 }

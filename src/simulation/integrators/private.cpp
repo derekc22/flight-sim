@@ -1,5 +1,4 @@
 #include <Eigen/Dense>
-#include <tuple>
 #include "simulation/actuators/public.hpp"
 #include "simulation/aerodynamics/public.hpp"
 #include "simulation/atmospheric/public.hpp"
@@ -49,55 +48,44 @@ namespace integrators {
         return { wB_BI_t1 };
     }
 
-    std::tuple<dynamics::Wrench, dynamics::Wrench, dynamics::Wrench> compute_rigid_body_net_wrench(const dynamics::RigidBodyState& Xt, RK4Model& model, const operating::OperatingConditions& conditions, const actuators::SurfaceActuatorInputs_T<double>& u_surface, const actuators::PropulsorActuatorInputs_T<double>& u_propulsor, const propulsion::PropulsorOmegaDot_T<double>& omega_dot) {
+    dynamics::WrenchSet compute_net_wrench(const dynamics::RigidBodyState& Xt, RK4Model& model, const operating::OperatingConditions& conditions, const actuators::ActuatorInputs_T<double>& u, const propulsion::PropellerOmegaDotSet_T<double>& propeller_omega_dot_set) {
         const dynamics::Twist_T<double> twist{
             .v = Xt.v.data,
             .w = Xt.w.data
         };
 
-        const atmospheric::Wind windB{ transforms::quat_to_rot(Xt.q.data) * conditions.windI.data };
-        const dynamics::Wrench_T<double> aerodynamic_wrench = aerodynamics::step_aero_forces_moments_T<double>(model.aerodynamic, twist, conditions.atm, u_surface, windB);
+        const atmospheric::Wind windB{ Xt.q.data * conditions.windI.data };
+        const Eigen::Vector3d gB = geography::gB(Xt.q).data;
+        const dynamics::WrenchSet_T<double> wrench = compute_wrench_set_T<double>(model, twist, conditions.atm, u, propeller_omega_dot_set, windB, gB);
 
-        const dynamics::Wrench_T<double> propulsive_wrench = propulsion::step_propulsive_forces_moments_T<double>(model.propulsor_actuators, twist, conditions.atm, u_propulsor, omega_dot);
-
-        const Eigen::Vector3d FB_g = model.structural.mass.data * geography::gB(Xt.q).data;
-
-        const Eigen::Vector3d FB_net = FB_g + aerodynamic_wrench.F + propulsive_wrench.F;
-        const Eigen::Vector3d MB_net = aerodynamic_wrench.M + propulsive_wrench.M; 
-
-        dynamics::Wrench WB_aerodynamic{
-            .F = dynamics::Force{ aerodynamic_wrench.F },
-            .M = dynamics::Moment{ aerodynamic_wrench.M }
+        return {
+            .aerodynamic = { 
+                .F = dynamics::Force{ wrench.aerodynamic.F },
+                .M = dynamics::Moment{ wrench.aerodynamic.M }
+            },
+            .propulsive = { 
+                .F = dynamics::Force{ wrench.propulsive.F },
+                .M = dynamics::Moment{ wrench.propulsive.M }
+            },
+            .net = { 
+                .F = dynamics::Force{ wrench.net.F },
+                .M = dynamics::Moment{ wrench.net.M }
+            }
         };
-
-        dynamics::Wrench WB_propulsive{
-            .F = dynamics::Force{ propulsive_wrench.F },
-            .M = dynamics::Moment{ propulsive_wrench.M }
-        };
-
-        dynamics::Wrench WB_net{
-            .F = dynamics::Force{FB_net},
-            .M = dynamics::Moment{MB_net}
-        };
-
-        return { WB_net, WB_aerodynamic, WB_propulsive };
     }
 
-    RigidBodyStateDot compute_rigid_body_state_dot(const dynamics::RigidBodyState& Xt, const dynamics::Mass& mass, const dynamics::InertiaTensor& JB, const dynamics::Wrench& WB_net_t) {
+    dynamics::RigidBodyStateDot compute_rigid_body_state_dot(const dynamics::RigidBodyState& Xt, const dynamics::Mass& mass, const dynamics::InertiaTensor& JB, const dynamics::Wrench& WB_net_t) {
         const dynamics::Force FB_net_t = WB_net_t.F;
         const dynamics::Moment MB_net_t = WB_net_t.M;
 
-        const Eigen::Matrix3d CIB_t = transforms::quat_to_rot(Xt.q.data);
-        const Eigen::Matrix3d CBI_t = CIB_t.transpose();
-
         return {
-            .p_dot = dynamics::TranslationalVelocity{ CBI_t * Xt.v.data },
+            .p_dot = dynamics::TranslationalVelocity{ Xt.q.data.conjugate() * Xt.v.data },
             .v_dot = dynamics::ddtB_vB_BI(Xt.v, Xt.w, mass, FB_net_t),
             .w_dot = dynamics::AngularAcceleration{ dynamics::ddtB_wB_BI(Xt.w, JB, MB_net_t) }
         };
     }
 
-    dynamics::RigidBodyState add_scaled_rigid_body_state_dot(const dynamics::RigidBodyState& X, const RigidBodyStateDot& X_dot, double scale) {
+    dynamics::RigidBodyState add_scaled_rigid_body_state_dot(const dynamics::RigidBodyState& X, const dynamics::RigidBodyStateDot& X_dot, double scale) {
         const dynamics::AngularVelocity w{ X.w.data + X_dot.w_dot.data * scale };
 
         return {
@@ -108,8 +96,8 @@ namespace integrators {
         };
     }
 
-    dynamics::RigidBodyState add_rk4_weighted_rigid_body_state_dot(const dynamics::RigidBodyState& X, const RigidBodyStateDot& k1, const RigidBodyStateDot& k2, const RigidBodyStateDot& k3, const RigidBodyStateDot& k4, double dt) {
-        RigidBodyStateDot X_dot{
+    dynamics::RigidBodyState add_rk4_weighted_rigid_body_state_dot(const dynamics::RigidBodyState& X, const dynamics::RigidBodyStateDot& k1, const dynamics::RigidBodyStateDot& k2, const dynamics::RigidBodyStateDot& k3, const dynamics::RigidBodyStateDot& k4, double dt) {
+        dynamics::RigidBodyStateDot X_dot{
             .p_dot = dynamics::TranslationalVelocity{ (
                 k1.p_dot.data + 
                 2.0 * k2.p_dot.data + 

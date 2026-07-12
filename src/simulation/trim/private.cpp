@@ -30,10 +30,10 @@ namespace trim {
         return ratio / util::sqrt(std::max(1.0 - ratio * ratio, constants::eps));
     }
 
-    operating::StateInputVector_T<double> unpack_trim_solver_variables(const dynamics::State_T<double>& x, const actuators::ActuatorInputs_T<double>& u, const actuators::ActuatorLimits_T<double>& actuator_limits) {
-        operating::StateInputVector_T<double> xu = operating::unpack_state_input_T<double>(x, u);
-        const actuators::ActuatorInputsVector_T<double> u_vec = actuators::unpack_actuator_inputs_T<double>(u);
-        const actuators::ActuatorLimitsVector_T<double> limits = actuators::unpack_actuator_limits_T<double>(actuator_limits);
+    operating::StateInputVector_T<double> unpack_trim_solver_variables(const operating::OperatingPoint& initial_guess, const actuators::ActuatorLimits& actuator_limits) {
+        operating::StateInputVector_T<double> xu = operating::unpack_state_input_T<double>(initial_guess.state, initial_guess.input);
+        const actuators::ActuatorInputsVector u_vec = actuators::unpack_actuator_inputs(initial_guess.input);
+        const actuators::ActuatorLimitsVector limits = actuators::unpack_actuator_limits(actuator_limits);
 
         xu(constants::state_dim + 0) = send_control_to_solver_space(u_vec(0), limits(0, 0), limits(0, 1));
         xu(constants::state_dim + 1) = send_control_to_solver_space(u_vec(1), limits(1, 0), limits(1, 1));
@@ -80,9 +80,8 @@ namespace trim {
         if (options.min_step_scale <= 0.0 || options.min_step_scale > 1.0) throw std::invalid_argument("trim::validate_trim_solve_options: min_step_scale must be in (0, 1]");
     }
 
-    dynamics::Wrench compute_trim_wrench(const dynamics::State_T<double>& x, const actuators::ActuatorInputs_T<double>& u, autodiff::AutoDiffModel& model, const operating::OperatingConditions& conditions) {
-        const dynamics::Twist_T<double> twist = dynamics::build_twist_from_state_T<double>(x);
-        const dynamics::Wrench_T<double> net_wrench = autodiff::compute_net_wrench_T<double>(x, twist, u, model, conditions, constants::dt);
+    dynamics::Wrench compute_trim_wrench(const operating::OperatingPoint& operating_point, autodiff::AutoDiffModel& model, const operating::OperatingConditions& conditions) {
+        const dynamics::Wrench_T<double> net_wrench = autodiff::compute_net_wrench_T<double>(operating_point.state, operating_point.input, model, conditions, constants::dt);
 
         return {
             .F = dynamics::Force{ net_wrench.F },
@@ -93,9 +92,9 @@ namespace trim {
     TrimSolution build_trim_solution(const operating::StateInputVector_T<double>& xu, const TrimResidualVector_T<double>& residual, const TrimResidualVector_T<double>& weighted_residual, autodiff::AutoDiffModel& model, const operating::OperatingConditions& conditions, bool converged, std::size_t iterations) {
         TrimSolution out;
         out.operating_point.state = operating::pack_state_T<double>(xu);
-        out.operating_point.input = pack_trim_actuator_inputs_T<double>(xu, model.actuator_limits);
+        out.operating_point.input = pack_trim_actuator_inputs_T<double>(xu, model.actuator_limits, model.fixed_actuator_inputs);
         out.conditions = conditions;
-        out.wrench = compute_trim_wrench(out.operating_point.state, out.operating_point.input, model, out.conditions);
+        out.wrench = compute_trim_wrench(out.operating_point, model, out.conditions);
         out.variables = operating::unpack_state_input_T<double>(out.operating_point.state, out.operating_point.input);
         out.attempted = true;
         out.converged = converged;
@@ -139,31 +138,21 @@ namespace trim {
         return out;
     }
 
-    TrimResidualVector_T<double> compute_trim_residual_vector(const operating::StateInputVector_T<double>& xu, autodiff::AutoDiffModel& model,const TrimTarget& target, const operating::OperatingConditions& conditions, bool use_physical_controls) {
-        return compute_trim_residual_vector_T<double>(xu, model, target, conditions, use_physical_controls);
-    }
-
-    TrimResidualJacobian compute_trim_residual_jac(const operating::StateInputVector_T<double>& xu, autodiff::AutoDiffModel& model, const TrimTarget& target, const operating::OperatingConditions& conditions, bool use_physical_controls) {
+    TrimResidualJacobian compute_trim_residual_jac(const operating::StateInputVector_T<double>& xu, autodiff::AutoDiffModel& model, const TrimTarget& target, const operating::OperatingConditions& conditions, bool physical_controls) {
         CppAD::eigen_vector<CppAD::AD<double>> xu_tracked = autodiff::start_autodiff_tracking(xu);
         const operating::StateInputVector_T<CppAD::AD<double>> xu_ad = autodiff::eigen_vector_from_cppad_vector<CppAD::AD<double>, constants::state_input_dim>(xu_tracked);
-        const TrimResidualVector_T<CppAD::AD<double>> residual_tracked = compute_trim_residual_vector_T<CppAD::AD<double>>(
-            xu_ad,
-            model,
-            target,
-            conditions,
-            use_physical_controls
-        );
+        const TrimResidualVector_T<CppAD::AD<double>> residual_tracked = compute_trim_residual_vector_T<CppAD::AD<double>>(xu_ad, model, target, conditions, physical_controls);
         const CppAD::eigen_vector<CppAD::AD<double>> residual_tracked_cppad = autodiff::cppad_vector_from_eigen_vector(residual_tracked);
         CppAD::ADFun<double> f(xu_tracked, residual_tracked_cppad);
         return autodiff::compute_jac<trim_residual_dim, constants::state_input_dim>(f, xu);
     }
 
-    TrimSolution solve_trim(const TrimProblem<double>& problem, autodiff::AutoDiffModel& model, TrimSolveOptions options) {
+    TrimSolution solve_trim(const TrimProblem& problem, autodiff::AutoDiffModel& model, TrimSolveOptions options) {
         validate_trim_solve_options(options);
 
-        const bool use_physical_controls = false;
-        operating::StateInputVector_T<double> xu = unpack_trim_solver_variables(problem.state_guess, problem.input_guess, model.actuator_limits);
-        TrimResidualVector_T<double> residual = compute_trim_residual_vector(xu, model, problem.target, problem.conditions, use_physical_controls);
+        const bool physical_controls = false;
+        operating::StateInputVector_T<double> xu = unpack_trim_solver_variables(problem.initial_guess, model.actuator_limits);
+        TrimResidualVector_T<double> residual = compute_trim_residual_vector_T<double>(xu, model, problem.target, problem.conditions, physical_controls);
         const TrimResidualVector_T<double> weights = fetch_trim_residual_weights(options);
         TrimResidualVector_T<double> weighted_residual = weights.cwiseProduct(residual);
         double damping = options.initial_damping;
@@ -177,7 +166,7 @@ namespace trim {
                 return build_trim_solution(xu, residual, weighted_residual, model, problem.conditions, true, iteration);
             }
 
-            const TrimResidualJacobian jac_raw = compute_trim_residual_jac(xu, model, problem.target, problem.conditions, use_physical_controls);
+            const TrimResidualJacobian jac_raw = compute_trim_residual_jac(xu, model, problem.target, problem.conditions, physical_controls);
             const TrimResidualJacobian jac = weights.asDiagonal() * jac_raw;
             const Eigen::Matrix<double, constants::state_input_dim, constants::state_input_dim> hess = jac.transpose() * jac + damping * Eigen::Matrix<double, constants::state_input_dim, constants::state_input_dim>::Identity();
             const operating::StateInputVector_T<double> grad = jac.transpose() * weighted_residual;
@@ -206,13 +195,7 @@ namespace trim {
 
             while (step_scale >= options.min_step_scale) {
                 const operating::StateInputVector_T<double> xu_trial = xu + step_scale * step;
-                const TrimResidualVector_T<double> residual_trial = compute_trim_residual_vector(
-                    xu_trial,
-                    model,
-                    problem.target,
-                    problem.conditions,
-                    use_physical_controls
-                );
+                const TrimResidualVector_T<double> residual_trial = compute_trim_residual_vector_T<double>(xu_trial, model, problem.target, problem.conditions, physical_controls);
                 const double weighted_residual_trial_norm_2 = weights.cwiseProduct(residual_trial).norm();
 
                 if (weighted_residual_trial_norm_2 < weighted_residual_norm_2) {
