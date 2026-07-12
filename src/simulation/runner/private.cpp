@@ -168,18 +168,14 @@ namespace runner {
         }
 
         // apply wind
-        atmospheric::Wind windB { constants::Zero3 };
         atmospheric::Wind windI { constants::Zero3 };
+        atmospheric::Wind windB { constants::Zero3 };
         if (json_flags.wind_flag) {
+            windI.data = cached_msg_out.wind.data;
             windB.data = frames::transform_vec(
-                cached_msg_out.wind.data,
+                windI.data,
                 aircraft.NEDFrameECEF,
                 aircraft.FRDFrameNED
-            );
-            windI.data = frames::transform_vec(
-                windB.data,
-                aircraft.FRDFrameNED,
-                aircraft.NEDFrameECEF
             );
         }
 
@@ -244,7 +240,7 @@ namespace runner {
 
                 // overwrite internal state with trim state
                 WB_net_t_1 = WB_net_trim;
-                u_actual_prev = trim::update_actuators_from_trim(u_actual_prev, trim_sol.operating_point.input);
+                u_actual_t_1 = trim::set_actuator_inputs_from_trim(u_actual_t_1, trim_sol.operating_point.input);
 
                 /** @deprecated */
                 // overwrite actuator lag state with trim controls
@@ -340,7 +336,7 @@ namespace runner {
 
                     estimator_operating_point = operating::OperatingPoint {
                         .state = yt,
-                        .input = u_actual_prev
+                        .input = u_actual_t_1
                     };
 
                     estimator_conditions = {
@@ -360,12 +356,12 @@ namespace runner {
                         .Yt = Yt,
                         .operating_point = estimator_operating_point,
                         .lin_sol = estimator_lin_sol,
-                        .u_actual_prev = u_actual_prev,
+                        .u_actual_t_1 = u_actual_t_1,
                     },
                     .extended_kalman_estimator_input = estimation::ExtendedKalmanEstimatorInput {
                         .Yt = Yt,
                         .operating_point = estimator_operating_point,
-                        .u_actual_prev = u_actual_prev,
+                        .u_actual_t_1 = u_actual_t_1,
                         .model = autodiff_model,
                         .conditions = estimator_conditions
                     }
@@ -451,7 +447,7 @@ namespace runner {
 
         // apply propulsor dynamics
         u_actual.propulsor_inputs = actuator_properties.step(u_cmd.propulsor_inputs, constants::dt);
-        u_actual_prev = u_actual;
+        u_actual_t_1 = u_actual;
 
         integrators::RK4Model rk4_model{
             .structural = structural_properties,
@@ -493,7 +489,7 @@ namespace runner {
 
             // log state
             if (json_flags.verbose_flag) {
-                log_state(t, Xt, geo_t, aero_t, windB);
+                log_state(t, Xt, geo_t, aero_t, windI);
             }
             scheduler.log_tick -= constants::hz;
         }
@@ -566,7 +562,7 @@ namespace runner {
         const dynamics::RigidBodyState& Xt,
         const geography::GeographicState& geo,
         const aerodynamics::AerodynamicState& aero,
-        const atmospheric::Wind& windB
+        const atmospheric::Wind& windI
     ) {
         const Eigen::Vector3d& p = Xt.p.data;
 
@@ -576,7 +572,7 @@ namespace runner {
         const Eigen::Vector3d& v = Xt.v.data;
         const Eigen::Vector3d& w = Xt.w.data;
         const Eigen::Vector3d& g = geography::gB(Xt.q).data;
-        const Eigen::Vector3d& wind = windB.data;
+        const Eigen::Vector3d& wind = windI.data;
 
         std::ostringstream ss;
         ss << std::fixed << std::setprecision(3);

@@ -2,7 +2,6 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#include <tuple>
 #include <spdlog/spdlog.h>
 #include "simulation/actuators/public.hpp"
 #include "simulation/aerodynamics/public.hpp"
@@ -22,6 +21,7 @@ namespace trim {
 
         const actuators::PropulsorActuatorInputs_T<double>& propulsor_limit_max = model.actuator_limits.limit_max.propulsor_inputs;
         const actuators::PropulsorActuatorInputs_T<double>& propulsor_limit_min = model.actuator_limits.limit_min.propulsor_inputs;
+
         const aerodynamics::AerodynamicState target_aero = aerodynamics::compute_aerodynamic_state(aircraft.FRDFrameNED, wind);
 
         const TrimProblem problem{
@@ -225,9 +225,10 @@ namespace trim {
     //     propulsor_actuators.right_propulsor.prev_cmd = trim_sol.operating_point.input.right_propulsor_cmd;
     // }
 
-    actuators::ActuatorInputs_T<double> update_actuators_from_trim(actuators::ActuatorInputs_T<double> actuator_inputs, const actuators::ActuatorInputs_T<double>& trim_inputs) {
+    actuators::ActuatorInputs_T<double> set_actuator_inputs_from_trim(actuators::ActuatorInputs_T<double> actuator_inputs, const actuators::ActuatorInputs_T<double>& trim_inputs) {
         const actuators::SurfaceActuatorInputs_T<double>& trim_surface_inputs = trim_inputs.surface_inputs;
         const actuators::PropulsorActuatorInputs_T<double>& trim_propulsor_inputs = trim_inputs.propulsor_inputs;
+
         actuators::SurfaceActuatorInputs_T<double>& surface_inputs = actuator_inputs.surface_inputs;
         actuators::PropulsorActuatorInputs_T<double>& propulsor_inputs = actuator_inputs.propulsor_inputs;
 
