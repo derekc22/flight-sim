@@ -50,9 +50,6 @@ namespace integrators {
         const dynamics::Force FB_net_t = WB_net_t.F;
         const dynamics::Moment MB_net_t = WB_net_t.M;
 
-        const Eigen::Matrix3d CIB_t = transforms::quat_to_rot(Xt.q.data);
-        const Eigen::Matrix3d CBI_t = CIB_t.transpose();
-
         // Translational dynamics in body coordinates
         const dynamics::TranslationalVelocity vB_BI_t1 = trans_dyn_vel(Xt.v, Xt.w, mass, FB_net_t, dt);
         const Eigen::Vector3d ddtB_vB_BI_t = dynamics::ddtB_vB_BI(Xt.v, Xt.w, mass, FB_net_t).data;           // produces a body derivative
@@ -66,8 +63,9 @@ namespace integrators {
         const dynamics::OrientationQuaternion qIB_t1 = quat_kin(Xt.q, Xt.w, dt);
 
         // Convert body velocity/acceleration to inertial for translational kinematics update on pI_BI
-        const dynamics::TranslationalVelocity vI_BI_t { CBI_t * Xt.v.data };
-        const dynamics::TranslationalAcceleration aI_BI_t { CBI_t * aB_BI_t.data };
+        const Eigen::Quaterniond qBI_t = Xt.q.data.conjugate();
+        const dynamics::TranslationalVelocity vI_BI_t { qBI_t * Xt.v.data };
+        const dynamics::TranslationalAcceleration aI_BI_t { qBI_t * aB_BI_t.data };
 
         // Translational kinematics in inertial coordinates
         const dynamics::Position pI_BI_t1 = trans_kin(Xt.p, vI_BI_t, aI_BI_t, dt);
@@ -100,20 +98,21 @@ namespace integrators {
             .left_propulsor = left_propulsor_omega_state.omega_dot,
             .right_propulsor = right_propulsor_omega_state.omega_dot
         };
+        const actuators::ActuatorInputs_T<double> u = actuators::pack_actuator_inputs(u_surface, u_propulsor);
 
-        auto [WB_net_1, WB_aerodynamic_1, WB_propulsive_1] = compute_rigid_body_net_wrench(Xt, model, conditions, u_surface, u_propulsor, omega_dot);
+        auto [WB_net_1, WB_aerodynamic_1, WB_propulsive_1] = compute_rigid_body_net_wrench(Xt, model, conditions, u, omega_dot);
         const RigidBodyStateDot k1 = compute_rigid_body_state_dot(Xt, model.structural.mass, model.structural.JB, WB_net_1);
 
         const dynamics::RigidBodyState X2 = add_scaled_rigid_body_state_dot(Xt, k1, 0.5 * dt);
-        auto [WB_net_2, WB_aerodynamic_2, WB_propulsive_2] = compute_rigid_body_net_wrench(X2, model, conditions, u_surface, u_propulsor, omega_dot);
+        auto [WB_net_2, WB_aerodynamic_2, WB_propulsive_2] = compute_rigid_body_net_wrench(X2, model, conditions, u, omega_dot);
         const RigidBodyStateDot k2 = compute_rigid_body_state_dot(X2, model.structural.mass, model.structural.JB, WB_net_2);
 
         const dynamics::RigidBodyState X3 = add_scaled_rigid_body_state_dot(Xt, k2, 0.5 * dt);
-        auto [WB_net_3, WB_aerodynamic_3, WB_propulsive_3] = compute_rigid_body_net_wrench(X3, model, conditions, u_surface, u_propulsor, omega_dot);
+        auto [WB_net_3, WB_aerodynamic_3, WB_propulsive_3] = compute_rigid_body_net_wrench(X3, model, conditions, u, omega_dot);
         const RigidBodyStateDot k3 = compute_rigid_body_state_dot(X3, model.structural.mass, model.structural.JB, WB_net_3);
 
         const dynamics::RigidBodyState X4 = add_scaled_rigid_body_state_dot(Xt, k3, dt);
-        auto [WB_net_4, WB_aerodynamic_4, WB_propulsive_4] = compute_rigid_body_net_wrench(X4, model, conditions, u_surface, u_propulsor, omega_dot);
+        auto [WB_net_4, WB_aerodynamic_4, WB_propulsive_4] = compute_rigid_body_net_wrench(X4, model, conditions, u, omega_dot);
         const RigidBodyStateDot k4 = compute_rigid_body_state_dot(X4, model.structural.mass, model.structural.JB, WB_net_4);
 
         const dynamics::RigidBodyState Xt1 = add_rk4_weighted_rigid_body_state_dot(Xt, k1, k2, k3, k4, dt);

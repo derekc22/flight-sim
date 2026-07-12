@@ -93,7 +93,7 @@ namespace trim {
     TrimSolution build_trim_solution(const operating::StateInputVector_T<double>& xu, const TrimResidualVector_T<double>& residual, const TrimResidualVector_T<double>& weighted_residual, autodiff::AutoDiffModel& model, const operating::OperatingConditions& conditions, bool converged, std::size_t iterations) {
         TrimSolution out;
         out.operating_point.state = operating::pack_state_T<double>(xu);
-        out.operating_point.input = pack_trim_actuator_inputs_T<double>(xu, model.actuator_limits);
+        out.operating_point.input = pack_trim_actuator_inputs_T<double>(xu, model.actuator_limits, model.fixed_actuator_inputs);
         out.conditions = conditions;
         out.wrench = compute_trim_wrench(out.operating_point.state, out.operating_point.input, model, out.conditions);
         out.variables = operating::unpack_state_input_T<double>(out.operating_point.state, out.operating_point.input);

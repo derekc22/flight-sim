@@ -71,7 +71,7 @@ namespace trim {
 
         actuators::ActuatorInputs_T<T> u;
         if (physical_controls) u = operating::pack_actuator_inputs_T<T>(xu);
-        else u = pack_trim_actuator_inputs_T<T>(xu, model.actuator_limits);
+        else u = pack_trim_actuator_inputs_T<T>(xu, model.actuator_limits, model.fixed_actuator_inputs);
 
         const TrimResidual_T<T> residual = compute_trim_residual_T<T>(x, u, model, target, conditions);
         return unpack_trim_residual_T(residual);

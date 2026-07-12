@@ -7,19 +7,23 @@ namespace actuators {
 
     ActuatorInputs_T<double> pack_actuator_inputs(const ActuatorInputsVector& u) {
         return {
-            .elevator_cmd = u(0),
-            .aileron_cmd = u(1),
-            .rudder_cmd = u(2),
-            .front_propulsor_cmd = u(3),
-            .left_propulsor_cmd = u(4),
-            .right_propulsor_cmd = u(5),
+            .surface_inputs = {
+                .elevator_cmd = u(0),
+                .aileron_cmd = u(1),
+                .rudder_cmd = u(2),
+            },
+            .propulsor_inputs = {
+                .front_propulsor_cmd = u(3),
+                .left_propulsor_cmd = u(4),
+                .right_propulsor_cmd = u(5),
+            }
         };
     }
 
     ActuatorInputsVector unpack_actuator_inputs(const ActuatorInputs_T<double>& u) {
         ActuatorInputsVector out;
-        out << u.elevator_cmd, u.aileron_cmd, u.rudder_cmd,
-               u.front_propulsor_cmd, u.left_propulsor_cmd, u.right_propulsor_cmd;
+        out << u.surface_inputs.elevator_cmd, u.surface_inputs.aileron_cmd, u.surface_inputs.rudder_cmd,
+               u.propulsor_inputs.front_propulsor_cmd, u.propulsor_inputs.left_propulsor_cmd, u.propulsor_inputs.right_propulsor_cmd;
         return out;
     }
 
@@ -41,12 +45,8 @@ namespace actuators {
 
     ActuatorInputs_T<double> pack_actuator_inputs(const SurfaceActuatorInputs_T<double>& u_surface, const PropulsorActuatorInputs_T<double>& u_propulsor) {
         return {
-            .elevator_cmd = u_surface.elevator_cmd,
-            .aileron_cmd = u_surface.aileron_cmd,
-            .rudder_cmd = u_surface.rudder_cmd,
-            .front_propulsor_cmd = u_propulsor.front_propulsor_cmd,
-            .left_propulsor_cmd = u_propulsor.left_propulsor_cmd,
-            .right_propulsor_cmd = u_propulsor.right_propulsor_cmd,
+            .surface_inputs = u_surface,
+            .propulsor_inputs = u_propulsor
         };
     }
 
@@ -57,20 +57,28 @@ namespace actuators {
     ActuatorLimits pack_actuator_limits(const SurfaceActuators& surface_actuators, const PropulsorActuators& propulsor_actuators) {
         return {
             .limit_min = {
-                .elevator_cmd = surface_actuators.elevator.limit_min,
-                .aileron_cmd = surface_actuators.aileron.limit_min,
-                .rudder_cmd = surface_actuators.rudder.limit_min,
-                .front_propulsor_cmd = propulsor_actuators.front_propulsor.limit_min,
-                .left_propulsor_cmd = propulsor_actuators.left_propulsor.limit_min,
-                .right_propulsor_cmd = propulsor_actuators.right_propulsor.limit_min,
+                .surface_inputs = {
+                    .elevator_cmd = surface_actuators.elevator.limit_min,
+                    .aileron_cmd = surface_actuators.aileron.limit_min,
+                    .rudder_cmd = surface_actuators.rudder.limit_min,
+                },
+                .propulsor_inputs = {
+                    .front_propulsor_cmd = propulsor_actuators.front_propulsor.limit_min,
+                    .left_propulsor_cmd = propulsor_actuators.left_propulsor.limit_min,
+                    .right_propulsor_cmd = propulsor_actuators.right_propulsor.limit_min,
+                }
             },
             .limit_max = {
-                .elevator_cmd = surface_actuators.elevator.limit_max,
-                .aileron_cmd = surface_actuators.aileron.limit_max,
-                .rudder_cmd = surface_actuators.rudder.limit_max,
-                .front_propulsor_cmd = propulsor_actuators.front_propulsor.limit_max,
-                .left_propulsor_cmd = propulsor_actuators.left_propulsor.limit_max,
-                .right_propulsor_cmd = propulsor_actuators.right_propulsor.limit_max,
+                .surface_inputs = {
+                    .elevator_cmd = surface_actuators.elevator.limit_max,
+                    .aileron_cmd = surface_actuators.aileron.limit_max,
+                    .rudder_cmd = surface_actuators.rudder.limit_max,
+                },
+                .propulsor_inputs = {
+                    .front_propulsor_cmd = propulsor_actuators.front_propulsor.limit_max,
+                    .left_propulsor_cmd = propulsor_actuators.left_propulsor.limit_max,
+                    .right_propulsor_cmd = propulsor_actuators.right_propulsor.limit_max,
+                }
             }
         };
     }

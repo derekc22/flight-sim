@@ -49,35 +49,29 @@ namespace integrators {
         return { wB_BI_t1 };
     }
 
-    std::tuple<dynamics::Wrench, dynamics::Wrench, dynamics::Wrench> compute_rigid_body_net_wrench(const dynamics::RigidBodyState& Xt, RK4Model& model, const operating::OperatingConditions& conditions, const actuators::SurfaceActuatorInputs_T<double>& u_surface, const actuators::PropulsorActuatorInputs_T<double>& u_propulsor, const propulsion::PropulsorOmegaDot_T<double>& omega_dot) {
+    std::tuple<dynamics::Wrench, dynamics::Wrench, dynamics::Wrench> compute_rigid_body_net_wrench(const dynamics::RigidBodyState& Xt, RK4Model& model, const operating::OperatingConditions& conditions, const actuators::ActuatorInputs_T<double>& u, const propulsion::PropulsorOmegaDot_T<double>& omega_dot) {
         const dynamics::Twist_T<double> twist{
             .v = Xt.v.data,
             .w = Xt.w.data
         };
 
-        const atmospheric::Wind windB{ transforms::quat_to_rot(Xt.q.data) * conditions.windI.data };
-        const dynamics::Wrench_T<double> aerodynamic_wrench = aerodynamics::step_aero_forces_moments_T<double>(model.aerodynamic, twist, conditions.atm, u_surface, windB);
-
-        const dynamics::Wrench_T<double> propulsive_wrench = propulsion::step_propulsive_forces_moments_T<double>(model.propulsor_actuators, twist, conditions.atm, u_propulsor, omega_dot);
-
-        const Eigen::Vector3d FB_g = model.structural.mass.data * geography::gB(Xt.q).data;
-
-        const Eigen::Vector3d FB_net = FB_g + aerodynamic_wrench.F + propulsive_wrench.F;
-        const Eigen::Vector3d MB_net = aerodynamic_wrench.M + propulsive_wrench.M; 
+        const atmospheric::Wind windB{ Xt.q.data * conditions.windI.data };
+        const Eigen::Vector3d gB = geography::gB(Xt.q).data;
+        const WrenchSet_T<double> wrench = compute_wrench_set_T<double>(model.aerodynamic, model.propulsor_actuators, twist, conditions.atm, u, omega_dot, windB, model.structural.mass.data, gB);
 
         dynamics::Wrench WB_aerodynamic{
-            .F = dynamics::Force{ aerodynamic_wrench.F },
-            .M = dynamics::Moment{ aerodynamic_wrench.M }
+            .F = dynamics::Force{ wrench.aerodynamic.F },
+            .M = dynamics::Moment{ wrench.aerodynamic.M }
         };
 
         dynamics::Wrench WB_propulsive{
-            .F = dynamics::Force{ propulsive_wrench.F },
-            .M = dynamics::Moment{ propulsive_wrench.M }
+            .F = dynamics::Force{ wrench.propulsive.F },
+            .M = dynamics::Moment{ wrench.propulsive.M }
         };
 
         dynamics::Wrench WB_net{
-            .F = dynamics::Force{FB_net},
-            .M = dynamics::Moment{MB_net}
+            .F = dynamics::Force{ wrench.net.F },
+            .M = dynamics::Moment{ wrench.net.M }
         };
 
         return { WB_net, WB_aerodynamic, WB_propulsive };
@@ -87,11 +81,8 @@ namespace integrators {
         const dynamics::Force FB_net_t = WB_net_t.F;
         const dynamics::Moment MB_net_t = WB_net_t.M;
 
-        const Eigen::Matrix3d CIB_t = transforms::quat_to_rot(Xt.q.data);
-        const Eigen::Matrix3d CBI_t = CIB_t.transpose();
-
         return {
-            .p_dot = dynamics::TranslationalVelocity{ CBI_t * Xt.v.data },
+            .p_dot = dynamics::TranslationalVelocity{ Xt.q.data.conjugate() * Xt.v.data },
             .v_dot = dynamics::ddtB_vB_BI(Xt.v, Xt.w, mass, FB_net_t),
             .w_dot = dynamics::AngularAcceleration{ dynamics::ddtB_wB_BI(Xt.w, JB, MB_net_t) }
         };
