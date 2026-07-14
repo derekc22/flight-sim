@@ -64,7 +64,7 @@ fi
 
 cd "$PROJ_PATH" || exit 1
 
-"$PROJ_PATH/scripts/lib/create_dirs.sh" \
+"$PROJ_PATH/scripts/lib/make_dirs.sh" \
 	"$LOG_DIR_PATH" \
 	"$DATA_DIR_PATH" \
 	"$PLOT_DIR_PATH" \
