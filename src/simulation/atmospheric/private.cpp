@@ -43,7 +43,7 @@ namespace atmospheric {
     };
 
     StagnationAirPressure P0_from_P(const StaticAirPressure& P, const MachNumber& M) {
-        double P0 = P.data * std::pow( 1 + ((constants::gamma_air - 1) / 2) * M.data * M.data, constants::gamma_air/(constants::gamma_air - 1) );
+        double P0 = P.data * std::pow( 1 + ((constants::gamma_air - 1) / 2) * M.data * M.data, constants::gamma_air / (constants::gamma_air - 1) );
         return { P0 };
     };
 

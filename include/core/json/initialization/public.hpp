@@ -3,6 +3,6 @@
 
 namespace json {
 
-    vehicles::StepOptions parse_initialization_config(bool trim_enabled);
+    vehicles::StepOptions parse_initialization_config(bool trim_flag);
 
 }

@@ -7,8 +7,6 @@
 #include "simulation/integrators/private.hpp"
 #include "simulation/operating/public.hpp"
 #include "simulation/propulsion/public.hpp"
-#include "simulation/structural/public.hpp"
-#include "simulation/transforms/public.hpp"
 
 namespace integrators {
 
@@ -56,7 +54,16 @@ namespace integrators {
 
         const atmospheric::Wind windB{ Xt.q.data * conditions.windI.data };
         const Eigen::Vector3d gB = geography::gB(Xt.q).data;
-        const dynamics::WrenchSet_T<double> wrench = compute_wrench_set_T<double>(model, twist, conditions.atm, u, propeller_omega_dot_set, windB, gB);
+
+        const dynamics::WrenchSet_T<double> wrench = compute_wrench_set_T<double>(
+            model, 
+            twist, 
+            conditions.atm, 
+            u, 
+            propeller_omega_dot_set, 
+            windB, 
+            gB
+        );
 
         return {
             .aerodynamic = { 

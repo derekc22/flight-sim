@@ -27,8 +27,11 @@ namespace linearization {
         DirectFeedthroughJacobian D = DirectFeedthroughJacobian::Zero();
     };
 
-    DiscretizedLocalLinearization discretize(const linearization::LocalLinearization& lin_sol, double dt);
-    DiscretizedLocalLinearization discretize_euler(const linearization::LocalLinearization& lin_sol, double dt);
+    DiscretizedLocalLinearization discretize(const LocalLinearization& lin_sol, double dt);
+
+    DiscretizedLocalLinearization discretize_euler(const LocalLinearization& lin_sol, double dt);
+
     LocalLinearization linearize_operating_point(autodiff::AutoDiffModel& model, const operating::OperatingPoint& operating_point, const operating::OperatingConditions& conditions);
+
     std::string print_linearization_solution(const LocalLinearization& lin);
 }

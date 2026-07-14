@@ -12,12 +12,12 @@
 namespace io {
 
     struct DataTable {
-        Eigen::MatrixXd data;
         int n_rows;
         int n_cols;
+        Eigen::MatrixXd data;
 
-        DataTable(const Eigen::MatrixXd& d);
-        void insert(int t, const Eigen::VectorXd& data);
+        DataTable(int n_rows, int n_cols);
+        void insert(int t, const Eigen::VectorXd& input);
     };
 
     struct DataContext {

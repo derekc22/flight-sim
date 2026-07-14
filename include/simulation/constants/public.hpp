@@ -1,5 +1,4 @@
 #pragma once
-#include <cstddef>
 #include <Eigen/Dense>
 
 namespace constants {

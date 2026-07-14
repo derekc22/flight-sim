@@ -10,7 +10,11 @@
 
 namespace io {
 
-    DataTable::DataTable(const Eigen::MatrixXd& d) : data(d), n_rows(static_cast<int>(data.rows())), n_cols(static_cast<int>(data.cols())) {}
+    DataTable::DataTable(int n_rows, int n_cols) : 
+        n_rows(n_rows), 
+        n_cols(n_cols), 
+        data(Eigen::MatrixXd::Zero(n_rows, n_cols)) 
+    {}
 
     void DataTable::insert(int t, const Eigen::VectorXd& input) {
         if (input.cols() > 1) { 
@@ -29,45 +33,46 @@ namespace io {
     }
 
 
-    DataManager::DataManager(int tf, const runner::CLIFlags& cli_flags, const runner::JSONFlags& json_flags) 
-        : cli_flags(cli_flags), json_flags(json_flags)
+    DataManager::DataManager(int tf, const runner::CLIFlags& cli_flags, const runner::JSONFlags& json_flags) : 
+        cli_flags(cli_flags), 
+        json_flags(json_flags)
     {
         if (cli_flags.data_flag) {
-            p_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
-            eul_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
-            w_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
-            v_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
-            u_surface_DT = DataTable{Eigen::MatrixXd::Zero(tf, 5+1) };
-            u_propulsor_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
-            F_net_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
-            M_net_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
-            F_aero_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
-            M_aero_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
-            F_prop_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
-            M_prop_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
+            p_DT = DataTable(tf, 3+1);
+            eul_DT = DataTable(tf, 3+1);
+            w_DT = DataTable(tf, 3+1);
+            v_DT = DataTable(tf, 3+1);
+            u_surface_DT = DataTable(tf, 5+1);
+            u_propulsor_DT = DataTable(tf, 3+1);
+            F_net_DT = DataTable(tf, 3+1);
+            M_net_DT = DataTable(tf, 3+1);
+            F_aero_DT = DataTable(tf, 3+1);
+            M_aero_DT = DataTable(tf, 3+1);
+            F_prop_DT = DataTable(tf, 3+1);
+            M_prop_DT = DataTable(tf, 3+1);
 
             if (json_flags.control_flag) {
-                eul_setpoint_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
-                w_setpoint_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
-                v_setpoint_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
+                eul_setpoint_DT = DataTable(tf, 3+1);
+                w_setpoint_DT = DataTable(tf, 3+1);
+                v_setpoint_DT = DataTable(tf, 3+1);
             }
 
             if (json_flags.avionics_flag) {
-                p_meas_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
-                eul_meas_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
-                w_meas_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
-                v_meas_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
+                p_meas_DT = DataTable(tf, 3+1);
+                eul_meas_DT = DataTable(tf, 3+1);
+                w_meas_DT = DataTable(tf, 3+1);
+                v_meas_DT = DataTable(tf, 3+1);
             }
 
             if (json_flags.estimation_flag) {
-                p_est_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
-                eul_est_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
-                w_est_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
-                v_est_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
+                p_est_DT = DataTable(tf, 3+1);
+                eul_est_DT = DataTable(tf, 3+1);
+                w_est_DT = DataTable(tf, 3+1);
+                v_est_DT = DataTable(tf, 3+1);
             }
 
             if (json_flags.wind_flag) {
-                windB_DT = DataTable{Eigen::MatrixXd::Zero(tf, 3+1) };
+                windB_DT = DataTable(tf, 3+1);
             }
         }
     }

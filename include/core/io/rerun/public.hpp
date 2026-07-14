@@ -53,7 +53,7 @@ namespace io {
         cv::Mat latest_image;
 
         void step(int t, const DataContext& data_context);
-        void stream_context(const RerunContext& sample);
+        void stream_context(const RerunContext& context);
         void run_worker();
         void run_camera_worker();
 

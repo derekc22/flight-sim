@@ -31,7 +31,7 @@ namespace json {
         }
 
         const auto& propulsor_actuator_json = config.at(key);
-        validate_propulsor_actuator_json(propulsor_actuator_json, key);
+        validate_propulsor_actuator_json(propulsor_actuator_json);
 
         std::string geometry_id = propulsor_actuator_json.at("geometry_id").get<std::string>();
         const structural::Geometry& geom = structural_properties.get_geometry(geometry_id);

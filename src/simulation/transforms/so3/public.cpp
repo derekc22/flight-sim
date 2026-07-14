@@ -24,7 +24,7 @@ namespace transforms {
     // Thus, the "intr" branch of `eul_to_R` and `R_to_eul` do not exist
     // That is, this function DOES NOT have a 'type' argument and appropriately ONLY calls `eul_to_R_extr` internally
     // Once again, the 'types' argument is omitted in eul_to_R and R_to_eul because including it would imply that active rotation matrices, R, can apply intrinsic rotations
-    // This is not true. Active rotation matrices CANNOT apply intrinsic rotations - they can ONLY apply extrinsic rotations, hence why `eul_to_R` automtically calls eul_to_R_extr and does not support the option to build an `intrinsic` R (which, again, DOES NOT EXIST)
+    // This is not true. Active rotation matrices CANNOT apply intrinsic rotations - they can ONLY apply extrinsic rotations, hence why `eul_to_R` automatically calls eul_to_R_extr and does not support the option to build an `intrinsic` R (which, again, DOES NOT EXIST)
     Eigen::Matrix3d eul_to_R(double a, double b, double c, const std::string& order) {
         return eul_to_R_extr(a, b, c, order);
     }
@@ -46,7 +46,7 @@ namespace transforms {
     }
 
     Eigen::Quaterniond rot_to_quat(const Eigen::Matrix3d& rot) {
-        return transforms::normalize_and_canonicalize(Eigen::Quaterniond(rot));
+        return normalize_and_canonicalize(Eigen::Quaterniond(rot));
     }
 
 }

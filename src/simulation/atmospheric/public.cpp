@@ -14,7 +14,7 @@ namespace atmospheric {
         if (F.parent != nullptr) {
             throw std::invalid_argument(std::format("atmospheric::compute_static_atmospheric_state: Invalid frame input, the parent of {} must be ECEFFrame", F.name));
         }
-        return atmospheric::std_atmosphere(geography::compute_geographic_state(F).alt);
+        return std_atmosphere(geography::compute_geographic_state(F).alt);
     }
 
     StaticAirTemperature T_from_T0(const StagnationAirTemperature& T0, const MachNumber& M) {

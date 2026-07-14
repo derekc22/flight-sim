@@ -1,13 +1,9 @@
 #pragma once
 #include <chrono>
 #include <string>
-#include <Eigen/Dense>
-#include <spdlog/spdlog.h>
 #include "simulation/runner/public.hpp"
 #include "simulation/aerodynamics/public.hpp"
 #include "simulation/actuators/public.hpp"
-#include "simulation/actuators/propulsor/public.hpp"
-#include "simulation/actuators/surface/public.hpp"
 #include "simulation/atmospheric/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/geography/public.hpp"
@@ -17,7 +13,6 @@
 #include "simulation/failures/public.hpp"
 #include "simulation/constants/public.hpp"
 #include "simulation/sensors/public.hpp"
-#include "simulation/avionics/public.hpp"
 #include "simulation/guidance/public.hpp"
 #include "simulation/control/public.hpp"
 #include "core/messages/public.hpp"

@@ -1,5 +1,4 @@
 #include <Eigen/Eigenvalues>
-#include <array>
 #include <iomanip>
 #include <sstream>
 #include <stdexcept>
