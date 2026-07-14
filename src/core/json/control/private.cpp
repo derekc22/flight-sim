@@ -4,7 +4,6 @@
 #include <nlohmann/json.hpp>
 #include "core/json/control/private.hpp"
 #include "core/json/public.hpp"
-#include "simulation/constants/public.hpp"
 #include "simulation/control/public.hpp"
 #include "simulation/control/linear_quadratic/controllers/lqi/public.hpp"
 #include "simulation/control/linear_quadratic/controllers/lqr/public.hpp"

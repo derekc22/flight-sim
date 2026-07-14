@@ -1,4 +1,4 @@
-#include <Eigen/Dense>
+#include <Eigen/Core>
 #include <optional>
 #include <string>
 #include "simulation/transforms/public.hpp"

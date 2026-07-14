@@ -4,7 +4,6 @@
 #include <nlohmann/json.hpp>
 #include "core/json/guidance/private.hpp"
 #include "core/json/public.hpp"
-#include "simulation/constants/public.hpp"
 #include "simulation/control/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/guidance/public.hpp"

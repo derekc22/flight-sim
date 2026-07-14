@@ -14,7 +14,7 @@
 
 namespace linearization {
 
-    DiscretizedLocalLinearization discretize(const linearization::LocalLinearization& lin_sol, double dt) {
+    DiscretizedLocalLinearization discretize(const LocalLinearization& lin_sol, double dt) {
         int nx = lin_sol.A.rows();
         int nu = lin_sol.B.cols();
 
@@ -32,7 +32,7 @@ namespace linearization {
         return { .A = Ak, .B = Bk, .C = lin_sol.C, .D = lin_sol.D };
     }
 
-    DiscretizedLocalLinearization discretize_euler(const linearization::LocalLinearization& lin_sol, double dt) {
+    DiscretizedLocalLinearization discretize_euler(const LocalLinearization& lin_sol, double dt) {
         int nx = lin_sol.A.rows();
 
         Eigen::MatrixXd Ak = Eigen::MatrixXd::Identity(nx, nx) + dt * lin_sol.A;

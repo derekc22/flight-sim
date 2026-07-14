@@ -1,10 +1,8 @@
 #include <chrono>
 #include <string>
 #include <thread>
-#include <cmath>
 #include <iomanip>
 #include <sstream>
-#include <Eigen/Dense>
 #include <spdlog/spdlog.h>
 #include "simulation/runner/public.hpp"
 #include "simulation/runner/private.hpp"
@@ -16,17 +14,13 @@
 #include "simulation/control/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/geography/public.hpp"
-#include "simulation/aerodynamics/public.hpp"
-#include "simulation/atmospheric/public.hpp"
 #include "simulation/util/trig/public.hpp"
 #include "simulation/estimation/public.hpp"
 #include "simulation/frames/public.hpp"
-#include "simulation/geography/public.hpp"
 #include "simulation/guidance/public.hpp"
 #include "simulation/integrators/public.hpp"
 #include "simulation/linearization/public.hpp"
 #include "simulation/operating/public.hpp"
-#include "simulation/propulsion/public.hpp"
 #include "simulation/structural/public.hpp"
 #include "simulation/trim/public.hpp"
 #include "simulation/vehicles/public.hpp"
@@ -445,7 +439,7 @@ namespace runner {
         // apply surface actuator dynamics
         u_actual.surface_inputs = actuator_properties.step(u_cmd.surface_inputs, constants::dt);
 
-        // apply propulsor dynamics
+        // apply propulsor actuator dynamics
         u_actual.propulsor_inputs = actuator_properties.step(u_cmd.propulsor_inputs, constants::dt);
         u_actual_t_1 = u_actual;
 

@@ -29,11 +29,11 @@ namespace io {
     }
 
     rerun::Vector3D scaled_vector(const Eigen::Vector3d& data, double scale) {
-        return rerun::Vector3D(
+        return {
             static_cast<float>(scale * data.x()), 
             static_cast<float>(scale * data.y()), 
             static_cast<float>(scale * data.z())
-        );
+        };
     }
 
     void stream_vehicle_transform(rerun::RecordingStream& rec, const dynamics::RigidBodyState& Xt) {

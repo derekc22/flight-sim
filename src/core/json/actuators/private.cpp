@@ -12,7 +12,6 @@
 #include "simulation/actuators/surface/public.hpp"
 #include "simulation/constants/public.hpp"
 #include "simulation/structural/public.hpp"
-#include "simulation/util/public.hpp"
 
 namespace json {
 
@@ -39,7 +38,7 @@ namespace json {
         }
     }
 
-    void validate_propulsor_actuator_json(const nlohmann::json& propulsor_actuator_json, const std::string& key) {
+    void validate_propulsor_actuator_json(const nlohmann::json& propulsor_actuator_json) {
         validate_actuator_json(propulsor_actuator_json);
         if (!propulsor_actuator_json.contains("geometry_id")) { 
             throw std::runtime_error("json::validate_propulsor_actuator_json: propulsor geometry_id not present"); 

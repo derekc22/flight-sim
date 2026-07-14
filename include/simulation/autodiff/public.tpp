@@ -29,8 +29,9 @@ namespace autodiff {
         // this is done because nonzero omega_dot represents a non-steady propeller transient that induces a moment on the aircraft
         // this moment, if unbalanced, will result in ẋ != 0, which violates the condition of steady equilibrium
         // thus, setting omega_dot = 0 allows trim to be achieved
-        // note: nonzero omega_dot only violates trim for the reduced-order model if the moment if it results in any of the modelled aircraft states changing (ẋ != 0)
-        // however, for a higher-order model, omega is necessarily included as part of the modelled aircraft state. as such, omega_dot = 0 is required regardless
+        // note: nonzero omega_dot only violates trim for the reduced-order model if the moment results in any of the modelled aircraft states changing (ẋ != 0)
+        // however, for a higher-order model, omega is necessarily included as a modelled aircraft state. as such, omega_dot = 0 is required in this case - regardless of whether it affects other states
+
         const propulsion::PropellerOmegaDotSet_T<T> propeller_omega_dot_set = conditions.steady_state ?
             propulsion::PropellerOmegaDotSet_T<T>{} : // set omega_dot = 0 if computing gradients for trim (steady state)
             propulsion::compute_propeller_omega_dot_set_T<T>(
@@ -41,7 +42,17 @@ namespace autodiff {
         );
 
         const constants::Vector3_T<T> gB = geography::gB_T(x.phi, x.theta);
-        const dynamics::WrenchSet_T<T> wrench = integrators::compute_wrench_set_T<T>(model, twist, conditions.atm, inputs, propeller_omega_dot_set, conditions.windB, gB);
+
+        const dynamics::WrenchSet_T<T> wrench = integrators::compute_wrench_set_T<T>(
+            model,
+            twist,
+            conditions.atm,
+            inputs,
+            propeller_omega_dot_set,
+            conditions.windB,
+            gB
+        );
+
         return wrench.net;
     }
 

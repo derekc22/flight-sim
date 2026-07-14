@@ -13,7 +13,7 @@ namespace connection {
         UDPIn(const UDPIn&) = delete;
         UDPIn& operator=(const UDPIn&) = delete;
 
-        bool send(const messages::FlightGearMessageIn& msg);
+        bool send(const messages::FlightGearMessageIn& in_msg);
 
         int fd_{-1};
         sockaddr_in dst_{};

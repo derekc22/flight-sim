@@ -38,7 +38,7 @@ namespace transforms {
     }
 
     Eigen::Matrix3d quat_to_rot(const Eigen::Quaterniond& q) {
-        return Eigen::Matrix3d(transforms::normalize_and_canonicalize(q));
+        return Eigen::Matrix3d(normalize_and_canonicalize(q));
     }
 
     Eigen::Quaterniond normalize_and_canonicalize(Eigen::Quaterniond q) {

@@ -127,8 +127,8 @@ namespace aerodynamics {
 
     AerodynamicState compute_aerodynamic_state(const dynamics::RigidBodyState& X, const atmospheric::Wind& windB);
 
-    dynamics::OrientationMatrix CBS(const aerodynamics::AngleOfAttack& alpha);
-    dynamics::OrientationMatrix CSW(const aerodynamics::SideslipAngle& beta);
+    dynamics::OrientationMatrix CBS(const AngleOfAttack& alpha);
+    dynamics::OrientationMatrix CSW(const SideslipAngle& beta);
 
 }
 #include "simulation/aerodynamics/public.tpp"

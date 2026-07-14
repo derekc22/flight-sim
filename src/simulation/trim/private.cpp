@@ -1,6 +1,4 @@
 #include <algorithm>
-#include <cmath>
-#include <cstddef>
 #include <stdexcept>
 #include <cppad/example/cppad_eigen.hpp>
 #include <cppad/cppad.hpp>
@@ -8,7 +6,6 @@
 #include "simulation/actuators/surface/public.hpp"
 #include "simulation/actuators/public.hpp"
 #include "simulation/aerodynamics/public.hpp"
-#include "simulation/atmospheric/public.hpp"
 #include "simulation/constants/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/trim/private.hpp"

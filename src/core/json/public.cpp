@@ -14,23 +14,23 @@ namespace json {
         if (!values.is_array() || values.size() != 3) { 
             throw std::runtime_error("expected a 3-element array"); 
         }
-        return Eigen::Vector3d(
+        return {
             values.at(0).get<double>(), 
             values.at(1).get<double>(), 
             values.at(2).get<double>()
-        );
+        };
     }
 
     Eigen::Vector4d parse_Vector4d(const nlohmann::json& values) {
         if (!values.is_array() || values.size() != 4) { 
             throw std::runtime_error("expected a 4-element array"); 
         }
-        return Eigen::Vector4d(
+        return {
             values.at(0).get<double>(), 
             values.at(1).get<double>(), 
             values.at(2).get<double>(), 
             values.at(3).get<double>()
-        );
+        };
     }
 
     Eigen::Matrix3d parse_Matrix3d(const nlohmann::json& values) {
@@ -93,12 +93,12 @@ namespace json {
 
     Eigen::Quaterniond parse_Quaterniond(const nlohmann::json& values) {
         const Eigen::Vector4d q = parse_Vector4d(values);
-        return Eigen::Quaterniond(
+        return {
             q(0), 
             q(1), 
             q(2), 
             q(3)
-        );
+        };
     }
 
     nlohmann::json read_json_file(const std::filesystem::path& path) {
