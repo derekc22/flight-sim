@@ -46,10 +46,10 @@ namespace io {
             u_propulsor_DT = DataTable(tf, 3+1);
             F_net_DT = DataTable(tf, 3+1);
             M_net_DT = DataTable(tf, 3+1);
-            F_aero_DT = DataTable(tf, 3+1);
-            M_aero_DT = DataTable(tf, 3+1);
-            F_prop_DT = DataTable(tf, 3+1);
-            M_prop_DT = DataTable(tf, 3+1);
+            F_aerodynamic_DT = DataTable(tf, 3+1);
+            M_aerodynamic_DT = DataTable(tf, 3+1);
+            F_propulsive_DT = DataTable(tf, 3+1);
+            M_propulsive_DT = DataTable(tf, 3+1);
 
             if (json_flags.control_flag) {
                 eul_setpoint_DT = DataTable(tf, 3+1);
@@ -58,17 +58,17 @@ namespace io {
             }
 
             if (json_flags.avionics_flag) {
-                p_meas_DT = DataTable(tf, 3+1);
-                eul_meas_DT = DataTable(tf, 3+1);
-                w_meas_DT = DataTable(tf, 3+1);
-                v_meas_DT = DataTable(tf, 3+1);
+                p_measured_DT = DataTable(tf, 3+1);
+                eul_measured_DT = DataTable(tf, 3+1);
+                w_measured_DT = DataTable(tf, 3+1);
+                v_measured_DT = DataTable(tf, 3+1);
             }
 
             if (json_flags.estimation_flag) {
-                p_est_DT = DataTable(tf, 3+1);
-                eul_est_DT = DataTable(tf, 3+1);
-                w_est_DT = DataTable(tf, 3+1);
-                v_est_DT = DataTable(tf, 3+1);
+                p_estimated_DT = DataTable(tf, 3+1);
+                eul_estimated_DT = DataTable(tf, 3+1);
+                w_estimated_DT = DataTable(tf, 3+1);
+                v_estimated_DT = DataTable(tf, 3+1);
             }
 
             if (json_flags.wind_flag) {
@@ -91,10 +91,10 @@ namespace io {
             u_propulsor_DT->insert(t, actuators::unpack_propulsor_actuator_inputs(context.u_propulsor));
             F_net_DT->insert(t, context.WB_net.F.data);
             M_net_DT->insert(t, context.WB_net.M.data);
-            F_aero_DT->insert(t, context.WB_aerodynamic.F.data);
-            M_aero_DT->insert(t, context.WB_aerodynamic.M.data);
-            F_prop_DT->insert(t, context.WB_propulsive.F.data);
-            M_prop_DT->insert(t, context.WB_propulsive.M.data);
+            F_aerodynamic_DT->insert(t, context.WB_aerodynamic.F.data);
+            M_aerodynamic_DT->insert(t, context.WB_aerodynamic.M.data);
+            F_propulsive_DT->insert(t, context.WB_propulsive.F.data);
+            M_propulsive_DT->insert(t, context.WB_propulsive.M.data);
 
             if (json_flags.control_flag) {
                 eul_setpoint_DT->insert(t, context.setpoint.eulIB.data);
@@ -103,21 +103,21 @@ namespace io {
             }
 
             if (json_flags.avionics_flag) {
-                dynamics::EulerAngles eul_meas_t;
-                eul_meas_t.set(context.Yt.q);
-                p_meas_DT->insert(t, context.Yt.p.data);
-                eul_meas_DT->insert(t, eul_meas_t.data);
-                w_meas_DT->insert(t, context.Yt.w.data);
-                v_meas_DT->insert(t, context.Yt.v.data);
+                dynamics::EulerAngles eul_measured_t;
+                eul_measured_t.set(context.Yt.q);
+                p_measured_DT->insert(t, context.Yt.p.data);
+                eul_measured_DT->insert(t, eul_measured_t.data);
+                w_measured_DT->insert(t, context.Yt.w.data);
+                v_measured_DT->insert(t, context.Yt.v.data);
             }
 
             if (json_flags.estimation_flag) {
-                dynamics::EulerAngles eul_est_t;
-                eul_est_t.set(context.Zt.q);
-                p_est_DT->insert(t, context.Zt.p.data);
-                eul_est_DT->insert(t, eul_est_t.data);
-                w_est_DT->insert(t, context.Zt.w.data);
-                v_est_DT->insert(t, context.Zt.v.data);
+                dynamics::EulerAngles eul_estimated_t;
+                eul_estimated_t.set(context.Zt.q);
+                p_estimated_DT->insert(t, context.Zt.p.data);
+                eul_estimated_DT->insert(t, eul_estimated_t.data);
+                w_estimated_DT->insert(t, context.Zt.w.data);
+                v_estimated_DT->insert(t, context.Zt.v.data);
             }
 
             if (json_flags.wind_flag) {
@@ -138,10 +138,10 @@ namespace io {
             write_csv(u_propulsor_DT->data, data_dir_path, "u_propulsor");
             write_csv(F_net_DT->data, data_dir_path, "F_net");
             write_csv(M_net_DT->data, data_dir_path, "M_net");
-            write_csv(F_aero_DT->data, data_dir_path, "F_aero");
-            write_csv(M_aero_DT->data, data_dir_path, "M_aero");
-            write_csv(F_prop_DT->data, data_dir_path, "F_prop");
-            write_csv(M_prop_DT->data, data_dir_path, "M_prop");
+            write_csv(F_aerodynamic_DT->data, data_dir_path, "F_aerodynamic");
+            write_csv(M_aerodynamic_DT->data, data_dir_path, "M_aerodynamic");
+            write_csv(F_propulsive_DT->data, data_dir_path, "F_propulsive");
+            write_csv(M_propulsive_DT->data, data_dir_path, "M_propulsive");
 
             if (json_flags.control_flag) {
                 write_csv(eul_setpoint_DT->data, data_dir_path, "eul_setpoint");
@@ -150,17 +150,17 @@ namespace io {
             }
 
             if (json_flags.avionics_flag) {
-                write_csv(p_meas_DT->data, data_dir_path, "p_meas");
-                write_csv(eul_meas_DT->data, data_dir_path, "eul_meas");
-                write_csv(w_meas_DT->data, data_dir_path, "w_meas");
-                write_csv(v_meas_DT->data, data_dir_path, "v_meas");
+                write_csv(p_measured_DT->data, data_dir_path, "p_measured");
+                write_csv(eul_measured_DT->data, data_dir_path, "eul_measured");
+                write_csv(w_measured_DT->data, data_dir_path, "w_measured");
+                write_csv(v_measured_DT->data, data_dir_path, "v_measured");
             }
 
             if (json_flags.estimation_flag) {
-                write_csv(p_est_DT->data, data_dir_path, "p_est");
-                write_csv(eul_est_DT->data, data_dir_path, "eul_est");
-                write_csv(w_est_DT->data, data_dir_path, "w_est");
-                write_csv(v_est_DT->data, data_dir_path, "v_est");
+                write_csv(p_estimated_DT->data, data_dir_path, "p_estimated");
+                write_csv(eul_estimated_DT->data, data_dir_path, "eul_estimated");
+                write_csv(w_estimated_DT->data, data_dir_path, "w_estimated");
+                write_csv(v_estimated_DT->data, data_dir_path, "v_estimated");
             }
 
             if (json_flags.wind_flag) {

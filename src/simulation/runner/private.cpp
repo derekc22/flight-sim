@@ -105,7 +105,7 @@ namespace runner {
         rerun_manager(json_options.flags, json_options.module_hz.log_hz),
         
         // create analysis manager
-        analysis_manager{.cli_flags=cli_options.flags, .json_flags=json_options.flags},
+        analysis_manager(cli_options.aircraft_id, cli_options.flags, json_options.flags, json_options.module_hz),
 
         // initialize udp connections
         udp_out(5510),
@@ -130,15 +130,14 @@ namespace runner {
         analysis_manager.save(data_dir_path, report_dir_path);
 
         // dump configs
-        json::dump_configs(log_dir_path);
+        json::dump_run_configs(log_dir_path);
+        json::dump_analyze_configs(log_dir_path);
     }
 
     void RunManager::run() {
         for (int t = 0; t < json_options.tf; ++t) {
             step(t);
         }
-
-        // cleanup
         cleanup();
     }
 
@@ -153,8 +152,12 @@ namespace runner {
         sensors::SensorProperties& sensor_properties = aircraft.sensor_properties;
         avionics::AvionicsProperties& avionics_properties = aircraft.avionics_properties;
 
+        // get flags
         CLIFlags& cli_flags = cli_options.flags;
         JSONFlags& json_flags = json_options.flags;
+
+        // initialize analysis context
+        io::AnalysisContext& analysis_context = analysis_manager.context;
 
         // fetch from FlightGear
         if (auto out_msg = udp_out.try_receive()) {
@@ -173,8 +176,8 @@ namespace runner {
             );
         }
 
-        // extract reuseable quantities
-        dynamics::Mass mass = structural_properties.mass;
+        // extract reusable quantities
+        dynamics::Mass& mass = structural_properties.mass;
 
         actuators::SurfaceActuators& surface_actuators = actuator_properties.surface_actuators;
         actuators::PropulsorActuators& propulsor_actuators = actuator_properties.propulsor_actuators;
@@ -198,11 +201,6 @@ namespace runner {
         // trim and linearization
         if (json_flags.trim_flag && !trim_sol.attempted) {
             trim_sol = trim::inspect_trim(aircraft, autodiff_model, windB);
-
-            // initialize analysis context
-            io::AnalysisContext analysis_context{
-                .aircraft_id=aircraft.id
-            };
 
             // update analysis context
             analysis_context.trim_sol = trim_sol;
@@ -254,9 +252,6 @@ namespace runner {
                 analysis_context.lin_sol = lin_sol;
                 analysis_context.eig_sol = eig_sol;
             }
-
-            // step analysis manager
-            analysis_manager.step(analysis_context);
         }
 
         // initialize measurements to ground truth

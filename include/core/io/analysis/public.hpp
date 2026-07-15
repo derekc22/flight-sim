@@ -8,8 +8,9 @@
 
 namespace io {
 
-    struct MatlabContext {
+    struct MATLABContext {
         std::string aircraft_id;
+        runner::ModuleRates module_hz;
         int state_dim = constants::state_dim;
         int input_dim = constants::input_dim;
         std::string A_csv;
@@ -19,7 +20,6 @@ namespace io {
     };
 
     struct AnalysisContext {
-        std::string aircraft_id;
         trim::TrimSolution trim_sol;
         linearization::LocalLinearization lin_sol;
         analysis::EigenAnalysis eig_sol;
@@ -29,12 +29,11 @@ namespace io {
         runner::CLIFlags cli_flags;
         runner::JSONFlags json_flags;
 
-        std::string aircraft_id;
-        trim::TrimSolution trim_sol;
-        linearization::LocalLinearization lin_sol;
-        analysis::EigenAnalysis eig_sol;
+        AnalysisContext context;
+        MATLABContext matlab_context;
 
-        void step(const AnalysisContext& context);
+        AnalysisManager(const std::string &aircraft_id, const runner::CLIFlags &cli_flags,
+                        const runner::JSONFlags &json_flags, const runner::ModuleRates &module_hz);
         void save(const std::string& data_dir_path, const std::string& report_dir_path);
     };
 }

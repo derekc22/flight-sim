@@ -24,18 +24,15 @@ namespace atmospheric {
 
     MachNumber mps_to_mach(const dynamics::TranslationalVelocity& v, const StaticAirTemperature& T) {
         double a = util::sqrt(constants::gamma_air * constants::R_air * T.data);
-        double M = v.data.norm()/a;
+        double M = v.data.norm() / a;
         return { M };
     }
 
     StagnationAtmosphericState static_to_stagnation(const StaticAtmosphericState& atm, const MachNumber& M) {
-        AirDensity rho = atm.rho;
-        DynamicViscosity mu = atm.mu;
-
         StagnationAirTemperature T0 = T0_from_T(atm.T, M);
         StagnationAirPressure P0 = P0_from_P(atm.P, M);
 
-        return { T0, P0, rho, mu };
+        return { T0, P0, atm.rho, atm.mu };
     };
 
     MachNumber compute_mach(const StagnationAirPressure& P0, const StaticAirPressure& P) {
@@ -45,13 +42,13 @@ namespace atmospheric {
 
     Wind build_wind(double heading_deg, double spd_kts) {
         double psi_wind = util::deg_to_rad(heading_deg);
-        double V_wind = util::kts_to_mps(spd_kts);
+        double v_wind = util::kts_to_mps(spd_kts);
 
-        double wind_N = -V_wind * util::cos(psi_wind);
-        double wind_E = -V_wind * util::sin(psi_wind);
-        double wind_D = 0.0;
+        double wind_n = -v_wind * util::cos(psi_wind);
+        double wind_e = -v_wind * util::sin(psi_wind);
+        double wind_d = 0.0;
 
-        return { Eigen::Vector3d(wind_N, wind_E, wind_D) };
+        return { Eigen::Vector3d(wind_n, wind_e, wind_d) };
     }
 
 }

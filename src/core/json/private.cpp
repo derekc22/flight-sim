@@ -8,10 +8,10 @@
 
 namespace json {
 
-    std::filesystem::path resolve_config_path(const std::filesystem::path& run_path, const std::string& config_path) {
+    std::filesystem::path resolve_config_path(const std::filesystem::path& entry_path, const std::string& config_path) {
         const std::filesystem::path path{ config_path };
         if (path.is_absolute()) { return path; }
-        return run_path.parent_path() / path;
+        return entry_path.parent_path() / path;
     }
 
     void write_json(const nlohmann::json& config, const std::string& dir_path, const std::string& fname) {
