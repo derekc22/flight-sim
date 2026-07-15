@@ -60,7 +60,6 @@ namespace runner {
         vehicles::Aircraft aircraft;
         io::DataManager data_manager;
         io::RerunManager rerun_manager;
-        io::AnalysisManager analysis_manager;
         failures::FailureManager failure_manager;
 
         actuators::ActuatorInputs_T<double> u_actual_t_1{};
@@ -91,6 +90,8 @@ namespace runner {
 
         // initialize scheduler
         Scheduler scheduler;
+
+        io::AnalysisManager analysis_manager;
 
         RunManager(const CLIOptions& cli_options, const JSONOptions& json_options);
         ~RunManager();

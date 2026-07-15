@@ -1,10 +1,9 @@
 {
-    "w_min_power": -2,
-    "w_max_power": 3,
+    "w_min_order": -2,
+    "w_max_order": 3,
     "num_points": 1000,
     "bode": true,
     "nyquist": true,
     "nichols": true,
-    "singular_value": true,
-    "frequency_response": true
+    "singular_value": true
 }

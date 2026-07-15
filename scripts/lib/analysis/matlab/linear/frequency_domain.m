@@ -1,10 +1,5 @@
-PROJ_PATH="/Users/derekchibuzor/Documents/VSCodeProjects/flight-sim";
-ANALYSIS_TYPE="frequency_domain";
-rel_path="analysis/linear/frequency_domain/default.json";
-OUT_DIR="2026Jun21_23-38-39";
-
 % clear workspace 
-% clearvars -except DATA_DIR_PATH DATA_MAT_PATH PLOT_DIR_PATH REPORT_DIR_PATH CONFIG_PATH; clc
+clearvars -except DATA_DIR_PATH DATA_MAT_PATH PLOT_DIR_PATH REPORT_DIR_PATH CONFIG_PATH; clc
 
 % add util to path
 addpath("../util")
@@ -27,18 +22,17 @@ matVarsExist(data_mat, [ ...
 
 % validate fields
 jsonFieldsExist(json_config, [ ...
-    "w_min_power", ...
-    "w_max_power", ...
+    "w_min_order", ...
+    "w_max_order", ...
     "num_points", ...
     "bode", ...
     "nyquist", ...
     "nichols", ...
-    "singular_value", ...
-    "frequency_response" ...
+    "singular_value" ...
 ])
 
 [n_outputs, n_inputs] = size(data_mat.sys);
-w = logspace(json_config.w_min_power, json_config.w_max_power, json_config.num_points);
+w = logspace(json_config.w_min_order, json_config.w_max_order, json_config.num_points);
 
 % bode response
 if json_config.bode
@@ -94,7 +88,7 @@ fprintf('Exit MATLAB script: %s.m\n', mfilename)
 function plotBodeResponse(G, w, n_outputs, n_inputs, plot_dir_path)
     for input_idx = 1:n_inputs
         for output_idx = 1:n_outputs
-            figure();
+            f = figure('visible','off');
     
             bode(G(output_idx, input_idx), w);
             grid on;
@@ -113,7 +107,7 @@ end
 function plotNyquistResponse(G, w, n_outputs, n_inputs, plot_dir_path)
     for input_idx = 1:n_inputs
         for output_idx = 1:n_outputs
-            figure();
+            f = figure('visible','off');
     
             nyquist(G(output_idx, input_idx), w);
             grid on;
@@ -132,7 +126,7 @@ end
 function plotNicholsResponse(G, w, n_outputs, n_inputs, plot_dir_path)
     for input_idx = 1:n_inputs
         for output_idx = 1:n_outputs
-            figure();
+            f = figure('visible','off');
     
             nichols(G(output_idx, input_idx), w);
             grid on;
@@ -149,7 +143,7 @@ function plotNicholsResponse(G, w, n_outputs, n_inputs, plot_dir_path)
 end
 
 function plotSingularValueResponse(G, w, plot_dir_path)
-    figure();
+    f = figure('visible','off');
     
     sigma(G, w);
     grid on;

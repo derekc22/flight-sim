@@ -119,7 +119,7 @@ function simulateAndPlotResponse(G, dt, t, n_outputs, n_inputs, plot_dir_path, i
         y = lsim(G, u, t);
     
         for output_idx = 1:n_outputs
-            figure();
+            f = figure('visible','off');
     
             plot(t, y(:, output_idx), 'LineWidth', 2);
             grid on;
