@@ -76,10 +76,6 @@ namespace io {
     }
 
     void RerunManager::step(int t, const DataContext& data_context) {
-        if (!json_flags.rerun_flag) {
-            return;
-        }
-
         cv::Mat image;
         {
             std::lock_guard<std::mutex> lock(camera_mutex);
@@ -154,8 +150,8 @@ namespace io {
         stream_vector(rec, "forces/net", context.data_context.WB_net.F.data, xyz_labels);
         stream_vector(rec, "moments/net", context.data_context.WB_net.M.data, xyz_labels);
 
-        stream_vector(rec, "forces/aero", context.data_context.WB_aerodynamic.F.data, xyz_labels);
-        stream_vector(rec, "moments/aero", context.data_context.WB_aerodynamic.M.data, xyz_labels);
+        stream_vector(rec, "forces/aerodynamic", context.data_context.WB_aerodynamic.F.data, xyz_labels);
+        stream_vector(rec, "moments/aerodynamic", context.data_context.WB_aerodynamic.M.data, xyz_labels);
 
         stream_vector(rec, "forces/propulsive", context.data_context.WB_propulsive.F.data, xyz_labels);
         stream_vector(rec, "moments/propulsive", context.data_context.WB_propulsive.M.data, xyz_labels);

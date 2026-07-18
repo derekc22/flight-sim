@@ -12,7 +12,7 @@
 namespace transforms {
 
 
-    // Recall that the premise of an "intrinsic" vector rotation (as opposed to an intrinsic frame rotations/coordinate transformations) is rejected
+    // Recall that the premise of an "intrinsic" vector rotation (as opposed to an intrinsic frame rotations) is rejected
     // Thus, the "intr" branch of `eul_to_quatR` and `quatquatR_to_eul` do not exist
     // That is, this function DOES NOT have a 'type' argument and appropriately ONLY calls `eul_to_quatR_extr` internally
     // Once again, the 'types' argument is omitted in eul_to_quatR and quatR_to_eul because including it would imply that active rotation matrices, R, can apply intrinsic rotations

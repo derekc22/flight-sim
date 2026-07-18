@@ -6,6 +6,7 @@
 #include "simulation/dynamics/public.hpp"
 #include "simulation/geography/public.hpp"
 #include "simulation/vehicles/public.hpp"
+#include "simulation/util/public.hpp"
 
 namespace json {
 
@@ -23,8 +24,8 @@ namespace json {
         if (frame_json.contains("eul_dot")) { fields.eul_dot = dynamics::EulerAngleRates{ parse_Vector3d(frame_json.at("eul_dot")) }; }
         if (frame_json.contains("wq")) { fields.wq = dynamics::AngularVelocityQuaternion{ parse_Quaterniond(frame_json.at("wq")) }; }
         if (frame_json.contains("v")) { fields.v = dynamics::TranslationalVelocity{ parse_Vector3d(frame_json.at("v")) }; }
-        if (frame_json.contains("lat")) { fields.lat = geography::Latitude{ frame_json.at("lat").get<double>() }; }
-        if (frame_json.contains("lon")) { fields.lon = geography::Longitude{ frame_json.at("lon").get<double>() }; }
+        if (frame_json.contains("lat")) { fields.lat = geography::Latitude{ util::deg_to_rad(frame_json.at("lat").get<double>()) }; }
+        if (frame_json.contains("lon")) { fields.lon = geography::Longitude{ util::deg_to_rad(frame_json.at("lon").get<double>()) }; }
         if (frame_json.contains("alt")) { fields.alt = geography::GeometricAltitude{ frame_json.at("alt").get<double>() }; }
         if (frame_json.contains("alpha")) { fields.alpha = aerodynamics::AngleOfAttack{ frame_json.at("alpha").get<double>() }; }
         if (frame_json.contains("beta")) { fields.beta = aerodynamics::SideslipAngle{ frame_json.at("beta").get<double>() }; }

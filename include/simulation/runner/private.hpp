@@ -32,7 +32,7 @@ namespace runner {
     };
 
     struct Scheduler {
-        ModuleRates module_hz;
+        ModuleRates module_rates;
 
         double sensor_tick = constants::hz;
         double avionics_tick = constants::hz;
@@ -46,9 +46,9 @@ namespace runner {
         int estimation_elapsed_ticks = 1;
         int control_elapsed_ticks = 1;
 
-        int guidance_kf; // total number of guidance steps
+        int guidance_tf; // total number of guidance steps
 
-        Scheduler(const ModuleRates& module_hz, int tf);
+        Scheduler(const ModuleRates& module_rates, int tf);
         void step();
     };
 

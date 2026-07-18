@@ -10,7 +10,7 @@ namespace io {
 
     struct MATLABContext {
         std::string aircraft_id;
-        runner::ModuleRates module_hz;
+        runner::ModuleRates module_rates;
         int state_dim = constants::state_dim;
         int input_dim = constants::input_dim;
         std::string A_csv;
@@ -26,14 +26,12 @@ namespace io {
     };
 
     struct AnalysisManager {
-        runner::CLIFlags cli_flags;
         runner::JSONFlags json_flags;
 
         AnalysisContext context;
         MATLABContext matlab_context;
 
-        AnalysisManager(const std::string &aircraft_id, const runner::CLIFlags &cli_flags,
-                        const runner::JSONFlags &json_flags, const runner::ModuleRates &module_hz);
+        AnalysisManager(const std::string& aircraft_id, const runner::JSONFlags& json_flags, const runner::ModuleRates& module_rates);
         void save(const std::string& data_dir_path, const std::string& report_dir_path);
     };
 }

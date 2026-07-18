@@ -63,7 +63,7 @@ namespace transforms {
         return normalize_and_canonicalize(q);
     }
 
-    // All vector rotations (as opposed to frame rotations/coordinate transformations) are, by definition, extrinsic. The concept of an "intrinsic" rotation only applies to frames
+    // All vector rotations (as opposed to frame rotations) are, by definition, extrinsic. The concept of an "intrinsic" rotation only applies to frames
     // That is, the concept of an "intrinsic" vector rotation is not defined
     // So, as with eul_to_R_intr, the function 'eul_to_quatR_intr' does not technically make sense
     // However, for consistency with the extrinsic case, it is still implemented since transposing the result of this function indeed gives the correct result for an intrinsic frame rotation/coordinate transformation
@@ -100,10 +100,10 @@ namespace transforms {
     }
 
     // Given the orientation (of the frame/vector) obtained via the nth rotation, how is the n+1 rotation applied
-    // Whether the net quaternion represents an intrinsic or extrinsic rotation depends on whether the quaternions passed to the function represent active rotations (ie vector rotations) or passive rotations (ie frame rotations/coordinate transformations/coordinate transformations)
-    // Active: extrinsic -> pre-multiply, intrinsic -> not defined
-    // Passive: extrinsic -> post-multiply, intrinsic -> pre-multiply
-    // All vector rotations (as opposed to frame rotations/coordinate transformations) are, by definition, extrinsic. The concept of an "intrinsic" rotation only applies to frames
+    // Whether the net quaternion represents an intrinsic or extrinsic rotation depends on whether the quaternions passed to the function represent active rotations (ie vector rotations) or passive rotations (ie frame rotations)
+    // Active: extrinsic -> pre-multiply; intrinsic -> not defined
+    // Passive: extrinsic -> post-multiply; intrinsic -> pre-multiply
+    // All vector rotations (as opposed to frame rotations) are, by definition, extrinsic. The concept of an "intrinsic" rotation only applies to frames
     // That is, the concept of an "intrinsic" vector rotation is not defined
     Eigen::Quaterniond chain_quat_post(const std::vector<Eigen::Quaterniond>& q_list) {
         Eigen::Quaterniond qtot = constants::qI;

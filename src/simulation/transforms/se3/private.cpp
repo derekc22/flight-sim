@@ -42,10 +42,10 @@ namespace transforms {
     }
 
     // Given the orientation (of the frame/vector) obtained via the nth rotation, how is the n+1 rotation applied
-    // Whether the net homogeneous transformation matrix represents an intrinsic or extrinsic rotation depends on whether the homogeneous transformation matrices passed to the function represent active rotations (ie vector rotations) or passive rotations (ie frame rotations/coordinate transformations/coordinate transformations)
-    // Active: extrinsic -> pre-multiply, intrinsic -> not defined
-    // Passive: extrinsic -> post-multiply, intrinsic -> pre-multiply
-    // All vector rotations (as opposed to frame rotations/coordinate transformations) are, by definition, extrinsic. The concept of an "intrinsic" rotation only applies to frames
+    // Whether the net homogeneous transformation matrix represents an intrinsic or extrinsic rotation depends on whether the homogeneous transformation matrices passed to the function represent active rotations (ie vector rotations) or passive rotations (ie frame rotations)
+    // Active: extrinsic -> pre-multiply; intrinsic -> not defined
+    // Passive: extrinsic -> post-multiply; intrinsic -> pre-multiply
+    // All vector rotations (as opposed to frame rotations) are, by definition, extrinsic. The concept of an "intrinsic" rotation only applies to frames
     // That is, the concept of an "intrinsic" vector rotation is not defined
     // Given the orientation (of the frame/vector) obtained via the nth transformation, how is the n+1 transformation applied
     Eigen::Matrix4d chain_hom_post(const std::vector<Eigen::Matrix4d>& H_list) {

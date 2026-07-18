@@ -19,11 +19,14 @@ namespace json {
     };
 
     ParsedStepOptions parse_step_options(const nlohmann::json& frame_json);
+
     vehicles::NEDFrameECEFStepOptions parse_NEDFrameECEF_step_options(const nlohmann::json& frame_json);
     vehicles::FRDFrameECEFStepOptions parse_FRDFrameECEF_step_options(const nlohmann::json& frame_json);
     vehicles::FRDFrameNEDStepOptions parse_FRDFrameNED_step_options(const nlohmann::json& frame_json);
+
     void validate_NEDFrameECEF_initialization(const nlohmann::json& frame_json);
     void validate_FRDFrameECEF_initialization(const nlohmann::json& frame_json);
     void validate_FRDFrameNED_initialization(const nlohmann::json& frame_json);
+
     void validate_initialization_config(const nlohmann::json& config, bool trim_flag);
 }

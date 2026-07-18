@@ -30,6 +30,6 @@ namespace runner {
     struct JSONOptions {
         int tf;
         JSONFlags flags;
-        ModuleRates module_hz;
+        ModuleRates module_rates;
     };
 }

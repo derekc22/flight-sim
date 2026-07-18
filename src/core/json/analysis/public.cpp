@@ -11,7 +11,7 @@ namespace json {
             {"aircraft_id", context.aircraft_id},
             {"hz", {
                 {"hz", constants::hz },
-                {"control_hz", context.module_hz.control_hz },
+                {"control_hz", context.module_rates.control_hz },
             }},
             {"state_dim", context.state_dim},
             {"input_dim", context.input_dim},

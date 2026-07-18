@@ -11,12 +11,12 @@
 
 namespace io {
 
-    struct DataTable {
+    struct DataMatrix {
         int n_rows;
         int n_cols;
         Eigen::MatrixXd data;
 
-        DataTable(int n_rows, int n_cols);
+        DataMatrix(int n_rows, int n_cols);
         void insert(int t, const Eigen::VectorXd& input);
     };
 
@@ -34,33 +34,32 @@ namespace io {
     };
 
     struct DataManager {
-        runner::CLIFlags cli_flags;
         runner::JSONFlags json_flags;
 
-        std::optional<DataTable> p_DT;
-        std::optional<DataTable> p_measured_DT;
-        std::optional<DataTable> p_estimated_DT;
-        std::optional<DataTable> eul_DT;
-        std::optional<DataTable> eul_measured_DT;
-        std::optional<DataTable> eul_estimated_DT;
-        std::optional<DataTable> eul_setpoint_DT;
-        std::optional<DataTable> w_DT;
-        std::optional<DataTable> w_measured_DT;
-        std::optional<DataTable> w_estimated_DT;
-        std::optional<DataTable> w_setpoint_DT;
-        std::optional<DataTable> v_DT;
-        std::optional<DataTable> v_measured_DT;
-        std::optional<DataTable> v_estimated_DT;
-        std::optional<DataTable> v_setpoint_DT;
-        std::optional<DataTable> u_surface_DT;
-        std::optional<DataTable> u_propulsor_DT;
-        std::optional<DataTable> F_net_DT;
-        std::optional<DataTable> M_net_DT;
-        std::optional<DataTable> F_aerodynamic_DT;
-        std::optional<DataTable> M_aerodynamic_DT;
-        std::optional<DataTable> F_propulsive_DT;
-        std::optional<DataTable> M_propulsive_DT;
-        std::optional<DataTable> windB_DT;
+        std::optional<DataMatrix> p_DM;
+        std::optional<DataMatrix> p_measured_DM;
+        std::optional<DataMatrix> p_estimated_DM;
+        std::optional<DataMatrix> eul_DM;
+        std::optional<DataMatrix> eul_measured_DM;
+        std::optional<DataMatrix> eul_estimated_DM;
+        std::optional<DataMatrix> eul_setpoint_DM;
+        std::optional<DataMatrix> w_DM;
+        std::optional<DataMatrix> w_measured_DM;
+        std::optional<DataMatrix> w_estimated_DM;
+        std::optional<DataMatrix> w_setpoint_DM;
+        std::optional<DataMatrix> v_DM;
+        std::optional<DataMatrix> v_measured_DM;
+        std::optional<DataMatrix> v_estimated_DM;
+        std::optional<DataMatrix> v_setpoint_DM;
+        std::optional<DataMatrix> u_surface_DM;
+        std::optional<DataMatrix> u_propulsor_DM;
+        std::optional<DataMatrix> F_net_DM;
+        std::optional<DataMatrix> M_net_DM;
+        std::optional<DataMatrix> F_aerodynamic_DM;
+        std::optional<DataMatrix> M_aerodynamic_DM;
+        std::optional<DataMatrix> F_propulsive_DM;
+        std::optional<DataMatrix> M_propulsive_DM;
+        std::optional<DataMatrix> windB_DM;
 
         void step(int t, const DataContext& context);
         void save(const std::string& data_dir_path);

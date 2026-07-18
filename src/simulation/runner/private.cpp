@@ -73,19 +73,19 @@ namespace runner {
         return aircraft;
     }
 
-    Scheduler::Scheduler(const ModuleRates& module_hz, int tf) : module_hz(module_hz) {
-        double frac_guidance_steps = module_hz.guidance_hz / constants::hz; // fraction of steps that will call guidance
-        guidance_kf = 1 + // for the immediate call at t=0
+    Scheduler::Scheduler(const ModuleRates& module_rates, int tf) : module_rates(module_rates) {
+        double frac_guidance_steps = module_rates.guidance_hz / constants::hz; // fraction of steps that will call guidance
+        guidance_tf = 1 + // for the immediate call at t=0
             std::floor((tf - 1) * frac_guidance_steps); // number of remaining steps that will call guidance
     }
 
     void Scheduler::step() {
-        sensor_tick += module_hz.sensor_hz;
-        avionics_tick += module_hz.avionics_hz;
-        estimation_tick += module_hz.estimation_hz;
-        guidance_tick += module_hz.guidance_hz;
-        control_tick += module_hz.control_hz;
-        log_tick += module_hz.log_hz;
+        sensor_tick += module_rates.sensor_hz;
+        avionics_tick += module_rates.avionics_hz;
+        estimation_tick += module_rates.estimation_hz;
+        guidance_tick += module_rates.guidance_hz;
+        control_tick += module_rates.control_hz;
+        log_tick += module_rates.log_hz;
 
         ++sensor_elapsed_ticks;
         ++avionics_elapsed_ticks;
@@ -102,17 +102,17 @@ namespace runner {
 
         // create data manager
         data_manager(json_options.tf, cli_options.flags, json_options.flags),
-        rerun_manager(json_options.flags, json_options.module_hz.log_hz),
+        rerun_manager(json_options.flags, json_options.module_rates.log_hz),
         
         // create analysis manager
-        analysis_manager(cli_options.aircraft_id, cli_options.flags, json_options.flags, json_options.module_hz),
+        analysis_manager(cli_options.aircraft_id, json_options.flags, json_options.module_rates),
 
         // initialize udp connections
         udp_out(5510),
         udp_in("127.0.0.1", 5511),
 
         // initialize scheduler
-        scheduler(json_options.module_hz, json_options.tf),   
+        scheduler(json_options.module_rates, json_options.tf),
 
         // start timer
         next(std::chrono::steady_clock::now()) 
@@ -125,13 +125,19 @@ namespace runner {
         std::string log_dir_path = cli_options.log_dir_path;
         std::string report_dir_path = cli_options.report_dir_path;
 
-        // save data
-        data_manager.save(data_dir_path);
-        analysis_manager.save(data_dir_path, report_dir_path);
-
         // dump configs
         json::dump_run_configs(log_dir_path);
-        json::dump_analyze_configs(log_dir_path);
+
+        // save data
+        if (cli_options.flags.data_flag) {
+            data_manager.save(data_dir_path);
+        }
+
+        // save analysis data
+        if (cli_options.flags.analysis_flag) {
+            analysis_manager.save(data_dir_path, report_dir_path);
+            json::dump_analyze_configs(log_dir_path);
+        }
     }
 
     void RunManager::run() {
@@ -370,7 +376,7 @@ namespace runner {
         guidance::GuidanceSetpoint setpoint{};
         if (json_flags.control_flag) {
             if (scheduler.guidance_tick >= constants::hz) {
-                setpoint = guidance_properties.step(scheduler.guidance_kf);
+                setpoint = guidance_properties.step(scheduler.guidance_tf);
                 setpoint_t_1 = setpoint;
 
                 scheduler.guidance_tick -= constants::hz;
@@ -470,11 +476,15 @@ namespace runner {
         };
 
         // step data manager
-        data_manager.step(t, data_context);
+        if (cli_flags.data_flag) {
+            data_manager.step(t, data_context);
+        }
 
         if (scheduler.log_tick >= constants::hz) {
             // step rerun manager
-            rerun_manager.step(t, data_context);
+            if (json_flags.rerun_flag) {
+                rerun_manager.step(t, data_context);
+            }
 
             // log state
             if (json_flags.verbose_flag) {

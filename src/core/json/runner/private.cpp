@@ -138,7 +138,7 @@ namespace json {
 
 		const auto& logging_enable_json = logging_json.at("enable");
 
-		runner::ModuleRates module_hz {
+		runner::ModuleRates module_rates {
 			.sensor_hz = simulation_enable_json.at("avionics").get<bool>() ? 
 							simulation_hz_json.at("sensors").get<double>() : 
 							0.0,
@@ -172,7 +172,7 @@ namespace json {
 		return {
 			.tf=tf,
 			.flags=json_flags,
-			.module_hz=module_hz
+			.module_rates=module_rates
 		};
 
     }

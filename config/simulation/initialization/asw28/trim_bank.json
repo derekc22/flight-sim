@@ -1,7 +1,7 @@
 {
     "NEDFrameECEF": {
-        "lat": 1.117011,
-        "lon": -0.383972,
+        "lat": 64.0,
+        "lon": -22.0,
         "alt": 0.0
     },
     "FRDFrameNED": {
