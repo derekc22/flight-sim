@@ -35,7 +35,7 @@ namespace io {
         rerun::RecordingStream rec;
 
         Eigen::Quaterniond q_model_to_body = transforms::eul_to_quatR(
-            -constants::pi/2, constants::pi/2, 0.0, "ZYX"
+            -constants::pi/2, constants::pi/2, 0.0, transforms::EulerOrder::ZYX
         );
 
         std::vector<rerun::Vec3D> trajectory;

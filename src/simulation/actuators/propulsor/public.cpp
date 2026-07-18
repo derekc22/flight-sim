@@ -14,7 +14,7 @@ namespace actuators {
         p_propulsor_cg(p_propulsor_cg),
         propellers(propellers)
     {
-        Eigen::Matrix3d RBP = transforms::eul_to_R(toe_angle, inclination_angle, 0.0, "ZYX");
+        Eigen::Matrix3d RBP = transforms::eul_to_R(toe_angle, inclination_angle, 0.0, transforms::EulerOrder::ZYX);
         n_prop = RBP * constants::ei;
     }
 

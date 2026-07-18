@@ -14,7 +14,7 @@ namespace dynamics {
         data = transforms::quat_to_rot(q.data); 
     }
     void OrientationMatrix::set(const EulerAngles& eul) { 
-        data = transforms::eul_to_C(eul.psi(), eul.theta(), eul.phi(), "ZYX", "intr"); 
+        data = transforms::eul_to_C(eul.psi(), eul.theta(), eul.phi(), transforms::EulerOrder::ZYX, transforms::RotationType::Intrinsic); 
     }
 
     OrientationMatrix HomogeneousTransformationMatrix::C() const { 
@@ -24,20 +24,20 @@ namespace dynamics {
         return Position{ transforms::p_from_H(data) }; 
     }
     void HomogeneousTransformationMatrix::set(const OrientationMatrix& C, const Position& p) { 
-        data = transforms::make_HC(C.data, p.data, "translate"); 
+        data = transforms::make_HC(C.data, p.data, transforms::TransformationOrder::TranslateFirst); 
     }
     void HomogeneousTransformationMatrix::set(const OrientationMatrix& C) {
-        data = transforms::make_HC(C.data, p().data, "translate"); 
+        data = transforms::make_HC(C.data, p().data, transforms::TransformationOrder::TranslateFirst); 
     }
     void HomogeneousTransformationMatrix::set(const Position& p) {
-        data = transforms::make_HC(C().data, p.data, "translate"); 
+        data = transforms::make_HC(C().data, p.data, transforms::TransformationOrder::TranslateFirst); 
     }
     void HomogeneousTransformationMatrix::set(const OrientationQuaternion& q) {
-        data = transforms::make_HC(transforms::quat_to_rot(q.data), p().data, "translate"); 
+        data = transforms::make_HC(transforms::quat_to_rot(q.data), p().data, transforms::TransformationOrder::TranslateFirst); 
     }
     void HomogeneousTransformationMatrix::set(const EulerAngles& eul) {
         data = transforms::make_HC(
-            transforms::eul_to_C(eul.psi(), eul.theta(), eul.phi(), "ZYX", "intr"), p().data, "translate"); 
+            transforms::eul_to_C(eul.psi(), eul.theta(), eul.phi(), transforms::EulerOrder::ZYX, transforms::RotationType::Intrinsic), p().data, transforms::TransformationOrder::TranslateFirst); 
     }
 
     void OrientationQuaternion::set(const OrientationMatrix& C) {
@@ -45,7 +45,7 @@ namespace dynamics {
     }
     void OrientationQuaternion::set(const EulerAngles& eul) {
         data = transforms::normalize_and_canonicalize(
-            transforms::eul_to_quatC(eul.psi(), eul.theta(), eul.phi(), "ZYX", "intr")
+            transforms::eul_to_quatC(eul.psi(), eul.theta(), eul.phi(), transforms::EulerOrder::ZYX, transforms::RotationType::Intrinsic)
         ); 
     }
 
@@ -59,10 +59,10 @@ namespace dynamics {
         return data[2]; 
     }
     void EulerAngles::set(const OrientationMatrix& C) {
-        data = transforms::C_to_eul(C.data, "ZYX", "intr"); 
+        data = transforms::C_to_eul(C.data, transforms::EulerOrder::ZYX, transforms::RotationType::Intrinsic); 
     }
     void EulerAngles::set(const OrientationQuaternion& q) { 
-        data = transforms::quatC_to_eul(q.data, "ZYX", "intr"); 
+        data = transforms::quatC_to_eul(q.data, transforms::EulerOrder::ZYX, transforms::RotationType::Intrinsic); 
     }
 
     void OrientationMatrixRate::set(const OrientationQuaternionRate& q_dot, const OrientationQuaternion& q, const OrientationMatrix& C) {

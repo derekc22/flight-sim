@@ -58,7 +58,7 @@ namespace geography {
         return { qEB.data * gE(pE).data };
     };
     dynamics::Gravity gB(const dynamics::Position& pE, const dynamics::EulerAngles& eulEB) { 
-        return { transforms::eul_to_C(eulEB.psi(), eulEB.theta(), eulEB.phi(), "ZYX", "intr") * gE(pE).data }; 
+        return { transforms::eul_to_C(eulEB.psi(), eulEB.theta(), eulEB.phi(), transforms::EulerOrder::ZYX, transforms::RotationType::Intrinsic) * gE(pE).data };
     };
 
     dynamics::Gravity gB(const dynamics::HomogeneousTransformationMatrix& HNB) { 
@@ -71,7 +71,7 @@ namespace geography {
         return { qNB.data * gN().data };
     };
     dynamics::Gravity gB(const dynamics::EulerAngles& eulNB) { 
-        return { transforms::eul_to_C(eulNB.psi(), eulNB.theta(), eulNB.phi(), "ZYX", "intr") * gN().data }; 
+        return { transforms::eul_to_C(eulNB.psi(), eulNB.theta(), eulNB.phi(), transforms::EulerOrder::ZYX, transforms::RotationType::Intrinsic) * gN().data }; 
     };
 
     dynamics::Gravity gS(const dynamics::Gravity& gB, const dynamics::OrientationMatrix& CBS) { 

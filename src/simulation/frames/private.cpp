@@ -26,7 +26,7 @@ namespace frames {
     }
 
     Eigen::Matrix4d HRF(const Frame& F) {
-        return transforms::make_HC(CRF(F), pRF(F), "translate");
+        return transforms::make_HC(CRF(F), pRF(F), transforms::TransformationOrder::TranslateFirst);
     }
 
 }

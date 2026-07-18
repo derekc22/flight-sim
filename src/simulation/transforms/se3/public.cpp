@@ -1,7 +1,6 @@
 #include <Eigen/Dense>
 #include <stdexcept>
 #include <algorithm>
-#include <string>
 #include <vector>
 #include "simulation/constants/public.hpp"
 #include "simulation/transforms/se3/public.hpp"
@@ -27,18 +26,18 @@ namespace transforms {
         return C.transpose() * Cd;
     }
  
-    Eigen::Matrix4d make_HR(const Eigen::Matrix3d& R, const Eigen::Vector3d& d, const std::string& first) {
+    Eigen::Matrix4d make_HR(const Eigen::Matrix3d& R, const Eigen::Vector3d& d, TransformationOrder order) {
         // d is initially provided in the fixed frame (ie the only frame) and stays in the fixed frame (again, the only frame)
-        if (first == "rotate") return make_HR_rotate_first(R, d);
-        if (first == "translate") return make_HR_translate_first(R, d);
-        throw std::invalid_argument("Unsupported argument value: " + first);
+        if (order == TransformationOrder::RotateFirst) return make_HR_rotate_first(R, d);
+        if (order == TransformationOrder::TranslateFirst) return make_HR_translate_first(R, d);
+        throw std::invalid_argument("Unsupported transformation order");
     };
 
-    Eigen::Matrix4d make_HC(const Eigen::Matrix3d& C, const Eigen::Vector3d& d, const std::string& first) {
+    Eigen::Matrix4d make_HC(const Eigen::Matrix3d& C, const Eigen::Vector3d& d, TransformationOrder order) {
         // d is initially provided in frame {0} and stays in/attached to frame {0}
-        if (first == "rotate") return make_HC_rotate_first(C, d);
-        if (first == "translate") return make_HC_translate_first(C, d);
-        throw std::invalid_argument("Unsupported argument value: " + first);
+        if (order == TransformationOrder::RotateFirst) return make_HC_rotate_first(C, d);
+        if (order == TransformationOrder::TranslateFirst) return make_HC_translate_first(C, d);
+        throw std::invalid_argument("Unsupported transformation order");
     }
 
     Eigen::Matrix4d make_Hinv(const Eigen::Matrix4d& H) {

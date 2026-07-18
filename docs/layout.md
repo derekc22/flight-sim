@@ -1,5 +1,15 @@
 # C++ Layout Rules
 
+## Glossary
+
+- **Symbol:** A named C++ item, such as a function, type, variable, alias, or constant.
+- **Owner:** The smallest module or submodule responsible for a symbol.
+- **Public API:** Declarations in `public.*` that code outside the owner may use.
+- **Public interface type:** A type named in a public declaration, such as a parameter, return type, field, or alias. Callers need its declaration to compile.
+- **Implementation detail:** A symbol used only inside `.cpp` or private files. Callers do not need its declaration.
+- **Shared public type:** A public interface type named by multiple sibling public APIs that has no natural single sibling owner.
+- **Aggregate header:** A parent `public.hpp` that collects child public headers for convenient inclusion.
+
 Rules for active C++ code under these roots:
 
 ```text
@@ -617,6 +627,33 @@ Sibling submodules under the same immediate parent may include each other's
 placement only if the helper is declared by the parent public header, a file
 outside the parent names it, or it appears in a public signature/data layout. Do
 not create an ad hoc `shared.*` file for sibling implementation sharing.
+
+### Public Interface Types Shared Across Sibling Submodules
+
+Use a real `shared` submodule for a public interface type that is named in
+multiple sibling public headers or signatures and has no natural single sibling
+owner.
+
+“Exposed or named” means it appears in a public header, so callers need its
+declaration:
+
+```cpp
+// include/simulation/transforms/so3/public.hpp
+Eigen::Matrix3d eul_to_R(double a, double b, double c, EulerOrder order);
+```
+
+`EulerOrder` is named in the public API.
+
+“Called” means a function is only used inside a `.cpp` implementation:
+
+```cpp
+// src/simulation/transforms/so3/public.cpp
+return normalize_and_canonicalize(q);
+```
+
+Users of SO3 never need to know that `normalize_and_canonicalize()` was called
+internally. A function merely called by a sibling implementation remains owned
+by its natural submodule; that call alone does not make the function shared.
 
 ### Aggregates
 

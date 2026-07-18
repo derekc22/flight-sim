@@ -98,7 +98,7 @@ target_link_libraries(${PROJECT_NAME} flight_sim_core flight_sim_cv2 control_car
 # Test executable
 add_executable(flight_sim_tests ${TEST_SOURCES})
 target_include_directories(flight_sim_tests SYSTEM BEFORE PRIVATE ${GTEST_INCLUDE_DIRS})
-target_include_directories(flight_sim_tests PRIVATE ${CMAKE_SOURCE_DIR}/include ${OpenCV_INCLUDE_DIRS})
+target_include_directories(flight_sim_tests PRIVATE ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/tests ${OpenCV_INCLUDE_DIRS})
 target_link_libraries(flight_sim_tests PRIVATE flight_sim_core control_care Eigen3::Eigen PkgConfig::CPPAD nlohmann_json::nlohmann_json rerun_sdk spdlog::spdlog GTest::gtest GTest::gtest_main)
 set_target_properties(flight_sim_tests PROPERTIES BUILD_RPATH "$<TARGET_FILE_DIR:GTest::gtest>;$<TARGET_FILE_DIR:GTest::gtest_main>")
 gtest_discover_tests(flight_sim_tests)

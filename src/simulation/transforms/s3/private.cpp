@@ -40,25 +40,27 @@ namespace transforms {
         return Eigen::Quaterniond(util::cos(h), 0.0, 0.0, util::sin(h));
     }
 
-    Eigen::Quaterniond eul_to_quatR_extr(double a, double b, double c, const std::string& order) {
+    Eigen::Quaterniond eul_to_quatR_extr(double a, double b, double c, EulerOrder order) {
         Eigen::Quaterniond q;
 
-        if      (order == "ZYX") q = qx(c) * qy(b) * qz(a);
-        else if (order == "ZXY") q = qy(c) * qx(b) * qz(a);
-        else if (order == "YZX") q = qx(c) * qz(b) * qy(a);
-        else if (order == "YXZ") q = qz(c) * qx(b) * qy(a);
-        else if (order == "XZY") q = qy(c) * qz(b) * qx(a);
-        else if (order == "XYZ") q = qz(c) * qy(b) * qx(a);
+        switch (order) {
+            case EulerOrder::ZYX: q = qx(c) * qy(b) * qz(a); break;
+            case EulerOrder::ZXY: q = qy(c) * qx(b) * qz(a); break;
+            case EulerOrder::YZX: q = qx(c) * qz(b) * qy(a); break;
+            case EulerOrder::YXZ: q = qz(c) * qx(b) * qy(a); break;
+            case EulerOrder::XZY: q = qy(c) * qz(b) * qx(a); break;
+            case EulerOrder::XYZ: q = qz(c) * qy(b) * qx(a); break;
 
-        // Proper Euler (repeated axis)
-        else if (order == "ZXZ") q = qz(c) * qx(b) * qz(a);
-        else if (order == "ZYZ") q = qz(c) * qy(b) * qz(a);
-        else if (order == "XYX") q = qx(c) * qy(b) * qx(a);
-        else if (order == "XZX") q = qx(c) * qz(b) * qx(a);
-        else if (order == "YXY") q = qy(c) * qx(b) * qy(a);
-        else if (order == "YZY") q = qy(c) * qz(b) * qy(a);
+            // Proper Euler (repeated axis)
+            case EulerOrder::ZYZ: q = qz(c) * qy(b) * qz(a); break;
+            case EulerOrder::ZXZ: q = qz(c) * qx(b) * qz(a); break;
+            case EulerOrder::XZX: q = qx(c) * qz(b) * qx(a); break;
+            case EulerOrder::XYX: q = qx(c) * qy(b) * qx(a); break;
+            case EulerOrder::YZY: q = qy(c) * qz(b) * qy(a); break;
+            case EulerOrder::YXY: q = qy(c) * qx(b) * qy(a); break;
 
-        else throw std::invalid_argument("Unsupported Euler order: " + order);
+            default: throw std::invalid_argument("Unsupported Euler order");
+        }
 
         return normalize_and_canonicalize(q);
     }
@@ -67,34 +69,34 @@ namespace transforms {
     // That is, the concept of an "intrinsic" vector rotation is not defined
     // So, as with eul_to_R_intr, the function 'eul_to_quatR_intr' does not technically make sense
     // However, for consistency with the extrinsic case, it is still implemented since transposing the result of this function indeed gives the correct result for an intrinsic frame rotation/coordinate transformation
-    Eigen::Quaterniond eul_to_quatR_intr(double a, double b, double c, const std::string& order) {
+    Eigen::Quaterniond eul_to_quatR_intr(double a, double b, double c, EulerOrder order) {
         return normalize_and_canonicalize(eul_to_quatR_extr(-a, -b, -c, order).conjugate());
     }
 
-    Eigen::Quaterniond eul_to_quatC_extr(double a, double b, double c, const std::string& order) {
+    Eigen::Quaterniond eul_to_quatC_extr(double a, double b, double c, EulerOrder order) {
         return normalize_and_canonicalize(eul_to_quatR_extr(a,b,c,order).conjugate());
     }
 
-    Eigen::Quaterniond eul_to_quatC_intr(double a, double b, double c, const std::string& order) {
+    Eigen::Quaterniond eul_to_quatC_intr(double a, double b, double c, EulerOrder order) {
         return normalize_and_canonicalize(eul_to_quatR_intr(a,b,c,order).conjugate());
     }
 
-    Eigen::Vector3d quatR_to_eul_intr(const Eigen::Quaterniond& q, const std::string& order) {
+    Eigen::Vector3d quatR_to_eul_intr(const Eigen::Quaterniond& q, EulerOrder order) {
         Eigen::Matrix3d R = quat_to_rot(q);
         return R_to_eul_intr(R, order);
     }
 
-    Eigen::Vector3d quatC_to_eul_intr(const Eigen::Quaterniond& q, const std::string& order) {
+    Eigen::Vector3d quatC_to_eul_intr(const Eigen::Quaterniond& q, EulerOrder order) {
         Eigen::Matrix3d C = quat_to_rot(q);
         return C_to_eul_intr(C, order);
     }
 
-    Eigen::Vector3d quatR_to_eul_extr(const Eigen::Quaterniond& q, const std::string& order) {
+    Eigen::Vector3d quatR_to_eul_extr(const Eigen::Quaterniond& q, EulerOrder order) {
         Eigen::Matrix3d R = quat_to_rot(q);
         return R_to_eul_extr(R, order);
     }
 
-    Eigen::Vector3d quatC_to_eul_extr(const Eigen::Quaterniond& q, const std::string& order) {
+    Eigen::Vector3d quatC_to_eul_extr(const Eigen::Quaterniond& q, EulerOrder order) {
         Eigen::Matrix3d C = quat_to_rot(q);
         return C_to_eul_extr(C, order);
     }
