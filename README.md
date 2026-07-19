@@ -22,10 +22,10 @@ conda activate ame532
 Install C++ dependencies:
 ```bash
 # Ubuntu
-sudo apt install pkg-config libeigen3-dev cppad nlohmann-json3-dev libslicot-dev gcc g++ libgtest-dev libopencv-dev
+sudo apt install pkg-config libeigen3-dev cppad nlohmann-json3-dev libslicot-dev gcc g++ libgtest-dev libopencv-dev libsdl3-dev
 
 # macOS
-brew install pkgconf eigen cppad nlohmann-json slicot gcc googletest opencv
+brew install pkgconf eigen cppad nlohmann-json slicot gcc googletest opencv sdl3
 ```
 
 Install MATLAB Runtime:
@@ -105,6 +105,16 @@ Post-run analysis is implemented with MATLAB and configured via `config/analyze.
 scripts/bin/analyze.sh <OUT_DIR>
 ```
 The current analysis implementation requires an active MATLAB license. A planned transition to pre-compiled binaries will remove this requirement, requiring only the MATLAB Runtime instead
+
+## Devices
+The simulator supports the Sony Dualshock PlayStation 4 Wireless Controller as an input device for manual flight. The flight controls are mapped as follows:
+- `Elevator`: left stick up/down
+- `Ailerons`: left stick left/right
+- `Rudder`: right stick left/right
+- `Left propulsor`: directional pad up to increase, down to decrease
+- `Right propulsor`: triangle to increase, cross to decrease
+- `Front propulsor`: R2 to increase, L2 to decrease
+- `Manual mode`: touchpad to toggle
 
 ## Tests
 Unit tests are implemented with Google Test:

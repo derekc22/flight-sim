@@ -32,28 +32,25 @@ namespace io {
           )), 
           rec("flight-sim")
     {
-        if (json_flags.rerun_flag) {
+        rerun::SpawnOptions options;
+        options.port = 9876;
+        const auto result = rec.spawn(options);
 
-            rerun::SpawnOptions options;
-            options.port = 9876;
-            const auto result = rec.spawn(options);
-
-            if (result.is_err()) {
-                std::string err_msg = std::format("Failed to spawn Rerun Viewer: {}", result.description);
-                throw std::runtime_error(err_msg);
-            }
-
-            rec.log_file_from_path("assets/default.rbl");
-
-            rec.log_static("/", rerun::ViewCoordinates::FRD);
-            stream_vehicle_model(rec, q_model_to_body, "world/vehicle/frame");
-            if (json_flags.estimation_flag) {
-                stream_vehicle_model(rec, q_model_to_body, "world/estimated_vehicle/frame");
-            }
-
-            camera_worker = std::thread(&RerunManager::run_camera_worker, this);
-            worker = std::thread(&RerunManager::run_worker, this);
+        if (result.is_err()) {
+            std::string err_msg = std::format("Failed to spawn Rerun Viewer: {}", result.description);
+            throw std::runtime_error(err_msg);
         }
+
+        rec.log_file_from_path("assets/default.rbl");
+
+        rec.log_static("/", rerun::ViewCoordinates::FRD);
+        stream_vehicle_model(rec, q_model_to_body, "world/vehicle/frame");
+        if (json_flags.estimation_flag) {
+            stream_vehicle_model(rec, q_model_to_body, "world/estimated_vehicle/frame");
+        }
+
+        camera_worker = std::thread(&RerunManager::run_camera_worker, this);
+        worker = std::thread(&RerunManager::run_worker, this);
     }
 
     RerunManager::~RerunManager() {
@@ -144,8 +141,10 @@ namespace io {
         stream_vector(rec, "state/w", context.data_context.Xt.w.data, angular_rate_labels);
         stream_vector(rec, "state/v", context.data_context.Xt.v.data, velocity_labels);
 
-        stream_vector(rec, "actuators/surface", actuators::unpack_surface_actuator_inputs(context.data_context.u_surface), surface_labels);
-        stream_vector(rec, "actuators/propulsor", actuators::unpack_propulsor_actuator_inputs(context.data_context.u_propulsor), propulsor_labels);
+        stream_vector(rec, "actuators/surface/actual", actuators::unpack_surface_actuator_inputs(context.data_context.u_surface), surface_labels);
+        stream_vector(rec, "actuators/surface/commanded", actuators::unpack_surface_actuator_inputs(context.data_context.u_surface_commanded), surface_labels);
+        stream_vector(rec, "actuators/propulsor/actual", actuators::unpack_propulsor_actuator_inputs(context.data_context.u_propulsor), propulsor_labels);
+        stream_vector(rec, "actuators/propulsor/commanded", actuators::unpack_propulsor_actuator_inputs(context.data_context.u_propulsor_commanded), propulsor_labels);
 
         stream_vector(rec, "forces/net", context.data_context.WB_net.F.data, xyz_labels);
         stream_vector(rec, "moments/net", context.data_context.WB_net.M.data, xyz_labels);

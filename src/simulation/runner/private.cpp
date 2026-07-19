@@ -27,6 +27,7 @@
 #include "simulation/failures/public.hpp"
 #include "simulation/settings/public.hpp"
 #include "core/connection/public.hpp"
+#include "core/devices/public.hpp"
 #include "core/json/actuators/public.hpp"
 #include "core/json/aerodynamics/public.hpp"
 #include "core/json/avionics/public.hpp"
@@ -79,18 +80,22 @@ namespace runner {
             std::floor((tf - 1) * frac_guidance_steps); // number of remaining steps that will call guidance
     }
 
-    void Scheduler::step() {
+    void Scheduler::step(bool manual_mode) {
         sensor_tick += module_rates.sensor_hz;
         avionics_tick += module_rates.avionics_hz;
         estimation_tick += module_rates.estimation_hz;
-        guidance_tick += module_rates.guidance_hz;
-        control_tick += module_rates.control_hz;
+        if (!manual_mode) {
+            guidance_tick += module_rates.guidance_hz;
+            control_tick += module_rates.control_hz;
+        }
         log_tick += module_rates.log_hz;
 
         ++sensor_elapsed_ticks;
         ++avionics_elapsed_ticks;
         ++estimation_elapsed_ticks;
-        ++control_elapsed_ticks;
+        if (!manual_mode) {
+            ++control_elapsed_ticks;
+        }
     }
 
     RunManager::RunManager(const CLIOptions& cli_options, const JSONOptions& json_options) : 
@@ -100,13 +105,6 @@ namespace runner {
         // load vehicle
         aircraft(load_vehicle(cli_options.aircraft_id, json_options.flags)),
 
-        // create data manager
-        data_manager(json_options.tf, cli_options.flags, json_options.flags),
-        rerun_manager(json_options.flags, json_options.module_rates.log_hz),
-        
-        // create analysis manager
-        analysis_manager(cli_options.aircraft_id, json_options.flags, json_options.module_rates),
-
         // initialize udp connections
         udp_out(5510),
         udp_in("127.0.0.1", 5511),
@@ -115,8 +113,31 @@ namespace runner {
         scheduler(json_options.module_rates, json_options.tf),
 
         // start timer
-        next(std::chrono::steady_clock::now()) 
-    {}
+        next(std::chrono::steady_clock::now())
+    {
+        // create data manager
+        if (cli_options.flags.data_flag) {
+            data_manager.emplace(json_options.tf, json_options.flags);
+        }
+        if (json_options.flags.rerun_flag) {
+            rerun_manager.emplace(json_options.flags, json_options.module_rates.log_hz);
+        }
+
+        // create analysis manager
+        if (cli_options.flags.analysis_flag) {
+            // initialize analysis context
+            analysis_manager.emplace(cli_options.aircraft_id, json_options.flags, json_options.module_rates);
+        }
+
+        // create joystick manager
+        if (json_options.flags.joystick_flag) {
+            actuators::ActuatorLimits actuator_limits = actuators::pack_actuator_limits(
+                aircraft.actuator_properties.surface_actuators,
+                aircraft.actuator_properties.propulsor_actuators
+            );
+            joystick_manager.emplace(actuator_limits);
+        }
+    }
 
     RunManager::~RunManager() = default;
 
@@ -129,13 +150,13 @@ namespace runner {
         json::dump_run_configs(log_dir_path);
 
         // save data
-        if (cli_options.flags.data_flag) {
-            data_manager.save(data_dir_path);
+        if (data_manager) {
+            data_manager->save(data_dir_path);
         }
 
         // save analysis data
-        if (cli_options.flags.analysis_flag) {
-            analysis_manager.save(data_dir_path, report_dir_path);
+        if (analysis_manager) {
+            analysis_manager->save(data_dir_path, report_dir_path);
             json::dump_analyze_configs(log_dir_path);
         }
     }
@@ -161,9 +182,6 @@ namespace runner {
         // get flags
         CLIFlags& cli_flags = cli_options.flags;
         JSONFlags& json_flags = json_options.flags;
-
-        // initialize analysis context
-        io::AnalysisContext& analysis_context = analysis_manager.context;
 
         // fetch from FlightGear
         if (auto out_msg = udp_out.try_receive()) {
@@ -209,7 +227,7 @@ namespace runner {
             trim_sol = trim::inspect_trim(aircraft, autodiff_model, windB);
 
             // update analysis context
-            analysis_context.trim_sol = trim_sol;
+            if (analysis_manager) { analysis_manager->context.trim_sol = trim_sol; }
 
             if (trim_sol.converged) {
                 // obtain full state from trim solution
@@ -255,8 +273,10 @@ namespace runner {
                 analysis::EigenAnalysis eig_sol = analysis::linearization_eigen_analysis(lin_sol);
 
                 // update analysis context
-                analysis_context.lin_sol = lin_sol;
-                analysis_context.eig_sol = eig_sol;
+                if (analysis_manager) {
+                    analysis_manager->context.lin_sol = lin_sol;
+                    analysis_manager->context.eig_sol = eig_sol;
+                }
             }
         }
 
@@ -369,12 +389,26 @@ namespace runner {
                 scheduler.estimation_tick -= constants::hz;
                 scheduler.estimation_elapsed_ticks = 0;
             }
-            else Zt = Zt_1; // peform ZOH
+            else Zt = Zt_1; // perform ZOH
+        }
+
+        // initialize control commands
+        control::ControlOutput u_cmd{};
+
+        // fetch from joystick
+        bool manual_mode = false;
+        if (joystick_manager) {
+            devices::JoystickOutput joystick_output = joystick_manager->step(u_cmd_t_1);
+            manual_mode = joystick_output.manual_mode;
+            if (manual_mode) {
+                u_cmd = joystick_output.u_cmd;
+                u_cmd_t_1 = u_cmd;
+            }
         }
 
         // specify guidance setpoint
         guidance::GuidanceSetpoint setpoint{};
-        if (json_flags.control_flag) {
+        if (json_flags.control_flag && !manual_mode) {
             if (scheduler.guidance_tick >= constants::hz) {
                 setpoint = guidance_properties.step(scheduler.guidance_tf);
                 setpoint_t_1 = setpoint;
@@ -384,14 +418,11 @@ namespace runner {
             else setpoint = setpoint_t_1; // perform ZOH
         }
 
-        // specify control commands
-        control::ControlOutput u_cmd{};
-
-        if (json_flags.trim_flag && !json_flags.control_flag) {
+        if (json_flags.trim_flag && !json_flags.control_flag && !manual_mode) {
             u_cmd = trim::set_control_inputs_from_trim(trim_sol.operating_point.input);
         }
 
-        if (json_flags.control_flag) {
+        if (json_flags.control_flag && !manual_mode) {
             if (scheduler.control_tick >= constants::hz) {
                 double control_dt = scheduler.control_elapsed_ticks * constants::dt;
                 control::ControllerInputs controller_inputs {
@@ -457,7 +488,13 @@ namespace runner {
         };
 
         // compute forces, moments, and next-step rigid body state
-        integrators::RK4Output rk4_out = integrators::step_rigid_body_rk4(Xt, rk4_model, rk4_conditions, u_actual, constants::dt);
+        integrators::RK4Output rk4_out = integrators::step_rigid_body_rk4(
+            Xt,
+            rk4_model,
+            rk4_conditions,
+            u_actual,
+            constants::dt
+        );
         dynamics::RigidBodyState Xt1 = rk4_out.Xt1;
         dynamics::Wrench WB_net = rk4_out.WB_set.net;
 
@@ -468,6 +505,8 @@ namespace runner {
             .Zt=Zt,
             .u_surface=u_actual.surface_inputs,
             .u_propulsor=u_actual.propulsor_inputs,
+            .u_surface_commanded=u_cmd.surface_inputs,
+            .u_propulsor_commanded=u_cmd.propulsor_inputs,
             .WB_net=WB_net,
             .WB_aerodynamic=rk4_out.WB_set.aerodynamic,
             .WB_propulsive=rk4_out.WB_set.propulsive,
@@ -476,15 +515,13 @@ namespace runner {
         };
 
         // step data manager
-        if (cli_flags.data_flag) {
-            data_manager.step(t, data_context);
+        if (data_manager) {
+            data_manager->step(t, data_context);
         }
 
         if (scheduler.log_tick >= constants::hz) {
             // step rerun manager
-            if (json_flags.rerun_flag) {
-                rerun_manager.step(t, data_context);
-            }
+            if (rerun_manager) { rerun_manager->step(t, data_context); }
 
             // log state
             if (json_flags.verbose_flag) {
@@ -528,7 +565,7 @@ namespace runner {
         udp_in.send(in_msg);
 
         // step scheduler
-        scheduler.step();
+        scheduler.step(manual_mode);
 
         // step timer by dt
         next += std::chrono::duration_cast<std::chrono::steady_clock::duration>(

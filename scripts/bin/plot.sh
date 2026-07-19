@@ -101,13 +101,13 @@ if [ -f "$DATA_DIR_PATH/v_estimated.csv" ]; then
 	-t "linear velocity estimate vs linear velocity"
 fi
 
-python "$PLOT_2D_PATH" -d "$DATA_DIR_PATH/u_surface.csv" -s "$PLOT_DIR_PATH" \
+python "$PLOT_2D_PATH" -d "$DATA_DIR_PATH/u_surface.csv" -r "$DATA_DIR_PATH/u_surface_commanded.csv" -s "$PLOT_DIR_PATH" \
 -l "elevator(t) [rad]" "aileron(t) [rad]" "rudder(t) [rad]" "flap(t) [rad]" "spoiler(t) [rad]" \
--t "surface inputs"
+-t "surface inputs vs commanded surface inputs"
 
-python "$PLOT_2D_PATH" -d "$DATA_DIR_PATH/u_propulsor.csv" -s "$PLOT_DIR_PATH" \
+python "$PLOT_2D_PATH" -d "$DATA_DIR_PATH/u_propulsor.csv" -r "$DATA_DIR_PATH/u_propulsor_commanded.csv" -s "$PLOT_DIR_PATH" \
 -l "front(t) [N]" "left(t) [N]" "right(t) [N]" \
--t "propulsor inputs"
+-t "propulsor inputs commanded propulsor inputs"
 
 python "$PLOT_2D_PATH" -d "$DATA_DIR_PATH/F_net.csv" -s "$PLOT_DIR_PATH" \
 -l "Fx_net(t) [N]" "Fy_net(t) [N]" "Fz_net(t) [N]" \

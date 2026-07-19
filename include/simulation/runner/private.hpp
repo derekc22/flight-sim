@@ -1,5 +1,6 @@
 #pragma once
 #include <chrono>
+#include <optional>
 #include <string>
 #include "simulation/runner/public.hpp"
 #include "simulation/aerodynamics/public.hpp"
@@ -20,6 +21,7 @@
 #include "core/io/analysis/public.hpp"
 #include "core/io/data/public.hpp"
 #include "core/io/rerun/public.hpp"
+#include "core/devices/public.hpp"
 
 namespace runner {
 
@@ -49,7 +51,7 @@ namespace runner {
         int guidance_tf; // total number of guidance steps
 
         Scheduler(const ModuleRates& module_rates, int tf);
-        void step();
+        void step(bool manual_mode);
     };
 
     vehicles::Aircraft load_vehicle(const std::string& aircraft_id, const JSONFlags& json_flags);
@@ -58,9 +60,11 @@ namespace runner {
         CLIOptions cli_options;
         JSONOptions json_options;
         vehicles::Aircraft aircraft;
-        io::DataManager data_manager;
-        io::RerunManager rerun_manager;
+        std::optional<io::DataManager> data_manager;
+        std::optional<io::RerunManager> rerun_manager;
         failures::FailureManager failure_manager;
+        std::optional<io::AnalysisManager> analysis_manager;
+        std::optional<devices::JoystickManager> joystick_manager;
 
         actuators::ActuatorInputs_T<double> u_actual_t_1{};
 
@@ -90,8 +94,6 @@ namespace runner {
 
         // initialize scheduler
         Scheduler scheduler;
-
-        io::AnalysisManager analysis_manager;
 
         RunManager(const CLIOptions& cli_options, const JSONOptions& json_options);
         ~RunManager();

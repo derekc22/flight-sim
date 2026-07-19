@@ -26,6 +26,8 @@ namespace io {
         dynamics::RigidBodyState Zt;
         actuators::SurfaceActuatorInputs_T<double> u_surface;
         actuators::PropulsorActuatorInputs_T<double> u_propulsor;
+        actuators::SurfaceActuatorInputs_T<double> u_surface_commanded;
+        actuators::PropulsorActuatorInputs_T<double> u_propulsor_commanded;
         dynamics::Wrench WB_net;
         dynamics::Wrench WB_aerodynamic;
         dynamics::Wrench WB_propulsive;
@@ -53,6 +55,8 @@ namespace io {
         std::optional<DataMatrix> v_setpoint_DM;
         std::optional<DataMatrix> u_surface_DM;
         std::optional<DataMatrix> u_propulsor_DM;
+        std::optional<DataMatrix> u_surface_commanded_DM;
+        std::optional<DataMatrix> u_propulsor_commanded_DM;
         std::optional<DataMatrix> F_net_DM;
         std::optional<DataMatrix> M_net_DM;
         std::optional<DataMatrix> F_aerodynamic_DM;
@@ -63,7 +67,7 @@ namespace io {
 
         void step(int t, const DataContext& context);
         void save(const std::string& data_dir_path);
-        DataManager(int tf, const runner::CLIFlags& cli_flags, const runner::JSONFlags& json_flags);
+        DataManager(int tf, const runner::JSONFlags& json_flags);
 
     };
 }
