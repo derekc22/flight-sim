@@ -13,7 +13,8 @@
 			"avionics": true,
 			"estimation": true,
 			"control": true,
-			"wind": true
+			"wind": true,
+			"joystick": false
 		}
 	},
 	"logging": {

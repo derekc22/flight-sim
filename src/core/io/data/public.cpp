@@ -33,46 +33,46 @@ namespace io {
     }
 
 
-    DataManager::DataManager(int tf, const runner::CLIFlags& cli_flags, const runner::JSONFlags& json_flags) :
+    DataManager::DataManager(int tf, const runner::JSONFlags& json_flags) :
         json_flags(json_flags)
     {
-        if (cli_flags.data_flag) {
-            p_DM = DataMatrix(tf, 3+1);
-            eul_DM = DataMatrix(tf, 3+1);
-            w_DM = DataMatrix(tf, 3+1);
-            v_DM = DataMatrix(tf, 3+1);
-            u_surface_DM = DataMatrix(tf, 5+1);
-            u_propulsor_DM = DataMatrix(tf, 3+1);
-            F_net_DM = DataMatrix(tf, 3+1);
-            M_net_DM = DataMatrix(tf, 3+1);
-            F_aerodynamic_DM = DataMatrix(tf, 3+1);
-            M_aerodynamic_DM = DataMatrix(tf, 3+1);
-            F_propulsive_DM = DataMatrix(tf, 3+1);
-            M_propulsive_DM = DataMatrix(tf, 3+1);
+        p_DM = DataMatrix(tf, 3+1);
+        eul_DM = DataMatrix(tf, 3+1);
+        w_DM = DataMatrix(tf, 3+1);
+        v_DM = DataMatrix(tf, 3+1);
+        u_surface_DM = DataMatrix(tf, 5+1);
+        u_propulsor_DM = DataMatrix(tf, 3+1);
+        u_surface_commanded_DM = DataMatrix(tf, 5+1);
+        u_propulsor_commanded_DM = DataMatrix(tf, 3+1);
+        F_net_DM = DataMatrix(tf, 3+1);
+        M_net_DM = DataMatrix(tf, 3+1);
+        F_aerodynamic_DM = DataMatrix(tf, 3+1);
+        M_aerodynamic_DM = DataMatrix(tf, 3+1);
+        F_propulsive_DM = DataMatrix(tf, 3+1);
+        M_propulsive_DM = DataMatrix(tf, 3+1);
 
-            if (json_flags.control_flag) {
-                eul_setpoint_DM = DataMatrix(tf, 3+1);
-                w_setpoint_DM = DataMatrix(tf, 3+1);
-                v_setpoint_DM = DataMatrix(tf, 3+1);
-            }
+        if (json_flags.control_flag) {
+            eul_setpoint_DM = DataMatrix(tf, 3+1);
+            w_setpoint_DM = DataMatrix(tf, 3+1);
+            v_setpoint_DM = DataMatrix(tf, 3+1);
+        }
 
-            if (json_flags.avionics_flag) {
-                p_measured_DM = DataMatrix(tf, 3+1);
-                eul_measured_DM = DataMatrix(tf, 3+1);
-                w_measured_DM = DataMatrix(tf, 3+1);
-                v_measured_DM = DataMatrix(tf, 3+1);
-            }
+        if (json_flags.avionics_flag) {
+            p_measured_DM = DataMatrix(tf, 3+1);
+            eul_measured_DM = DataMatrix(tf, 3+1);
+            w_measured_DM = DataMatrix(tf, 3+1);
+            v_measured_DM = DataMatrix(tf, 3+1);
+        }
 
-            if (json_flags.estimation_flag) {
-                p_estimated_DM = DataMatrix(tf, 3+1);
-                eul_estimated_DM = DataMatrix(tf, 3+1);
-                w_estimated_DM = DataMatrix(tf, 3+1);
-                v_estimated_DM = DataMatrix(tf, 3+1);
-            }
+        if (json_flags.estimation_flag) {
+            p_estimated_DM = DataMatrix(tf, 3+1);
+            eul_estimated_DM = DataMatrix(tf, 3+1);
+            w_estimated_DM = DataMatrix(tf, 3+1);
+            v_estimated_DM = DataMatrix(tf, 3+1);
+        }
 
-            if (json_flags.wind_flag) {
-                windB_DM = DataMatrix(tf, 3+1);
-            }
+        if (json_flags.wind_flag) {
+            windB_DM = DataMatrix(tf, 3+1);
         }
     }
 
@@ -87,6 +87,8 @@ namespace io {
         v_DM->insert(t, context.Xt.v.data);
         u_surface_DM->insert(t, actuators::unpack_surface_actuator_inputs(context.u_surface));
         u_propulsor_DM->insert(t, actuators::unpack_propulsor_actuator_inputs(context.u_propulsor));
+        u_surface_commanded_DM->insert(t, actuators::unpack_surface_actuator_inputs(context.u_surface_commanded));
+        u_propulsor_commanded_DM->insert(t, actuators::unpack_propulsor_actuator_inputs(context.u_propulsor_commanded));
         F_net_DM->insert(t, context.WB_net.F.data);
         M_net_DM->insert(t, context.WB_net.M.data);
         F_aerodynamic_DM->insert(t, context.WB_aerodynamic.F.data);
@@ -132,6 +134,8 @@ namespace io {
         write_csv(v_DM->data, data_dir_path, "v");
         write_csv(u_surface_DM->data, data_dir_path, "u_surface");
         write_csv(u_propulsor_DM->data, data_dir_path, "u_propulsor");
+        write_csv(u_surface_commanded_DM->data, data_dir_path, "u_surface_commanded");
+        write_csv(u_propulsor_commanded_DM->data, data_dir_path, "u_propulsor_commanded");
         write_csv(F_net_DM->data, data_dir_path, "F_net");
         write_csv(M_net_DM->data, data_dir_path, "M_net");
         write_csv(F_aerodynamic_DM->data, data_dir_path, "F_aerodynamic");

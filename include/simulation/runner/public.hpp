@@ -16,6 +16,7 @@ namespace runner {
         bool wind_flag;
         bool verbose_flag;
         bool rerun_flag;
+        bool joystick_flag;
     };
 
     struct ModuleRates {

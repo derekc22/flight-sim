@@ -166,7 +166,8 @@ namespace json {
 			.estimation_flag=simulation_enable_json.at("estimation").get<bool>(),
 			.wind_flag=simulation_enable_json.at("wind").get<bool>(),
 			.verbose_flag=logging_enable_json.at("verbose").get<bool>(),
-			.rerun_flag=logging_enable_json.at("rerun").get<bool>()
+			.rerun_flag=logging_enable_json.at("rerun").get<bool>(),
+			.joystick_flag=simulation_enable_json.at("joystick").get<bool>()
 		};
 
 		return {
