@@ -16,6 +16,7 @@
 #include "simulation/sensors/public.hpp"
 #include "simulation/guidance/public.hpp"
 #include "simulation/control/public.hpp"
+#include "simulation/fsm/public.hpp"
 #include "core/messages/public.hpp"
 #include "core/connection/public.hpp"
 #include "core/io/analysis/public.hpp"
@@ -51,7 +52,7 @@ namespace runner {
         int guidance_tf; // total number of guidance steps
 
         Scheduler(const ModuleRates& module_rates, int tf);
-        void step(bool manual_mode);
+        void step(fsm::FiniteState current_mode);
     };
 
     vehicles::Aircraft load_vehicle(const std::string& aircraft_id, const JSONFlags& json_flags);
@@ -78,7 +79,7 @@ namespace runner {
             .M = dynamics::Moment{ constants::Zero3 } 
         };
 
-        // initialize prior-tick values to perform ZOH
+        // initialize prior-step values to perform ZOH
         sensors::SensorMeasurements sensor_meas_t_1;
         dynamics::RigidBodyState Yt_1;
         dynamics::RigidBodyState Zt_1;
@@ -94,6 +95,10 @@ namespace runner {
 
         // initialize scheduler
         Scheduler scheduler;
+
+        // initialize state machine
+        fsm::FiniteStateMachine state_machine;
+
 
         RunManager(const CLIOptions& cli_options, const JSONOptions& json_options);
         ~RunManager();

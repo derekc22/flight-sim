@@ -3,7 +3,6 @@
 #include <stdexcept>
 #include <string>
 #include <SDL3/SDL.h>
-#include <spdlog/spdlog.h>
 #include "core/devices/public.hpp"
 #include "simulation/constants/public.hpp"
 
@@ -74,12 +73,13 @@ namespace devices {
     JoystickOutputRaw JoystickManager::poll() {
         SDL_PumpEvents();
         SDL_UpdateGamepads();
-        if (!SDL_GamepadConnected(gamepad)) { throw std::runtime_error("devices::JoystickManager: DualShock 4 disconnected"); }
+        if (!SDL_GamepadConnected(gamepad)) { 
+            throw std::runtime_error("devices::JoystickManager: DualShock 4 disconnected"); 
+        }
 
         bool touchpad_down = SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_TOUCHPAD);
         if (touchpad_down && !prev_touchpad_down) {
-            manual_mode = !manual_mode;
-            spdlog::info("JoystickManager: Manual mode {}", manual_mode ? "enabled" : "disabled");
+            mode_toggled = true;
         }
         prev_touchpad_down = touchpad_down;
 
@@ -135,7 +135,10 @@ namespace devices {
             limit_max.propulsor_inputs.right_propulsor_cmd
         );
 
-        return { .u_cmd = u_cmd, .manual_mode = manual_mode };
+        JoystickOutput joystick_output{ .u_cmd = u_cmd, .mode_toggled = mode_toggled };
+        mode_toggled = false;
+
+        return joystick_output;
     }
 
 }

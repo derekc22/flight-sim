@@ -95,7 +95,7 @@ cmake --build "$PROJ_PATH/build"
 	"$FAST_FLAG" \
 	"$LOG_DIR_PATH" \
 	"$DATA_DIR_PATH" \
-	"$REPORT_DIR_PATH"
+	"$REPORT_DIR_PATH" 2>&1 | tee "$LOG_DIR_PATH/log.log"
 
 if [ "$PLOT_FLAG" -eq 1 ]; then
 	"$PROJ_PATH/scripts/bin/plot.sh" "$OUT_DIR"

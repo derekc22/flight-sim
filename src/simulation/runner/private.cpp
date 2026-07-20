@@ -26,6 +26,7 @@
 #include "simulation/vehicles/public.hpp"
 #include "simulation/failures/public.hpp"
 #include "simulation/settings/public.hpp"
+#include "simulation/fsm/public.hpp"
 #include "core/connection/public.hpp"
 #include "core/devices/public.hpp"
 #include "core/json/actuators/public.hpp"
@@ -80,22 +81,23 @@ namespace runner {
             std::floor((tf - 1) * frac_guidance_steps); // number of remaining steps that will call guidance
     }
 
-    void Scheduler::step(bool manual_mode) {
+    void Scheduler::step(fsm::FiniteState current_mode) {
         sensor_tick += module_rates.sensor_hz;
+        ++sensor_elapsed_ticks;
+
         avionics_tick += module_rates.avionics_hz;
+        ++avionics_elapsed_ticks;
+
         estimation_tick += module_rates.estimation_hz;
-        if (!manual_mode) {
+        ++estimation_elapsed_ticks;
+
+        if (current_mode == fsm::FiniteState::AutopilotMode) {
             guidance_tick += module_rates.guidance_hz;
             control_tick += module_rates.control_hz;
-        }
-        log_tick += module_rates.log_hz;
-
-        ++sensor_elapsed_ticks;
-        ++avionics_elapsed_ticks;
-        ++estimation_elapsed_ticks;
-        if (!manual_mode) {
             ++control_elapsed_ticks;
         }
+
+        log_tick += module_rates.log_hz;
     }
 
     RunManager::RunManager(const CLIOptions& cli_options, const JSONOptions& json_options) : 
@@ -113,7 +115,10 @@ namespace runner {
         scheduler(json_options.module_rates, json_options.tf),
 
         // start timer
-        next(std::chrono::steady_clock::now())
+        next(std::chrono::steady_clock::now()),
+
+        // create state machine
+        state_machine(json_options.flags)
     {
         // create data manager
         if (cli_options.flags.data_flag) {
@@ -395,20 +400,31 @@ namespace runner {
         // initialize control commands
         control::ControlOutput u_cmd{};
 
+        // declare for state machine
+        bool mode_toggled = false;
+        devices::JoystickOutput joystick_output;
+
         // fetch from joystick
-        bool manual_mode = false;
         if (joystick_manager) {
-            devices::JoystickOutput joystick_output = joystick_manager->step(u_cmd_t_1);
-            manual_mode = joystick_output.manual_mode;
-            if (manual_mode) {
-                u_cmd = joystick_output.u_cmd;
-                u_cmd_t_1 = u_cmd;
-            }
+            joystick_output = joystick_manager->step(u_cmd_t_1);
+            mode_toggled = joystick_output.mode_toggled;
+        }
+
+        // step state machine
+        fsm::FiniteState current_mode = state_machine.step(mode_toggled);
+
+        if (current_mode == fsm::FiniteState::ManualMode) {
+            u_cmd = joystick_output.u_cmd;
+        }
+
+        // no need to rate-limit as the trim command is fixed
+        if (current_mode == fsm::FiniteState::AutopilotTrimMode) {
+            u_cmd = trim::set_control_inputs_from_trim(trim_sol.operating_point.input);
         }
 
         // specify guidance setpoint
         guidance::GuidanceSetpoint setpoint{};
-        if (json_flags.control_flag && !manual_mode) {
+        if (current_mode == fsm::FiniteState::AutopilotMode) {
             if (scheduler.guidance_tick >= constants::hz) {
                 setpoint = guidance_properties.step(scheduler.guidance_tf);
                 setpoint_t_1 = setpoint;
@@ -418,11 +434,7 @@ namespace runner {
             else setpoint = setpoint_t_1; // perform ZOH
         }
 
-        if (json_flags.trim_flag && !json_flags.control_flag && !manual_mode) {
-            u_cmd = trim::set_control_inputs_from_trim(trim_sol.operating_point.input);
-        }
-
-        if (json_flags.control_flag && !manual_mode) {
+        if (current_mode == fsm::FiniteState::AutopilotMode) {
             if (scheduler.control_tick >= constants::hz) {
                 double control_dt = scheduler.control_elapsed_ticks * constants::dt;
                 control::ControllerInputs controller_inputs {
@@ -453,7 +465,6 @@ namespace runner {
                     }
                 };
                 u_cmd = control_properties.step(controller_inputs, control_dt, json_flags.trim_flag);
-                u_cmd_t_1 = u_cmd;
 
                 scheduler.control_tick -= constants::hz;
                 scheduler.control_elapsed_ticks = 0;
@@ -466,6 +477,9 @@ namespace runner {
         u_cmd.surface_inputs.flap_cmd = fixed_inputs.flap;
         u_cmd.surface_inputs.spoiler_cmd = fixed_inputs.spoiler;
 
+        // update prior-step control command
+        u_cmd_t_1 = u_cmd;
+
         actuators::ActuatorInputs_T<double> u_actual{};
 
         // apply surface actuator dynamics
@@ -473,6 +487,8 @@ namespace runner {
 
         // apply propulsor actuator dynamics
         u_actual.propulsor_inputs = actuator_properties.step(u_cmd.propulsor_inputs, constants::dt);
+
+        // update prior-step actual control
         u_actual_t_1 = u_actual;
 
         integrators::RK4Model rk4_model{
@@ -521,7 +537,9 @@ namespace runner {
 
         if (scheduler.log_tick >= constants::hz) {
             // step rerun manager
-            if (rerun_manager) { rerun_manager->step(t, data_context); }
+            if (rerun_manager) { 
+                rerun_manager->step(t, data_context); 
+            }
 
             // log state
             if (json_flags.verbose_flag) {
@@ -565,7 +583,7 @@ namespace runner {
         udp_in.send(in_msg);
 
         // step scheduler
-        scheduler.step(manual_mode);
+        scheduler.step(current_mode);
 
         // step timer by dt
         next += std::chrono::duration_cast<std::chrono::steady_clock::duration>(
