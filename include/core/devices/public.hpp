@@ -20,13 +20,13 @@ namespace devices {
 
     struct JoystickOutput {
         control::ControlOutput u_cmd;
-        bool manual_mode;
+        bool mode_toggled;
     };
 
     struct JoystickManager {
         SDL_Gamepad* gamepad = nullptr;
         bool prev_touchpad_down = false;
-        bool manual_mode = true;
+        bool mode_toggled = false;
         actuators::ActuatorLimits actuator_limits;
 
         JoystickManager(const actuators::ActuatorLimits& actuator_limits);
