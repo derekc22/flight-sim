@@ -4,9 +4,9 @@
 namespace fsm {
 
 	enum class FiniteState {
-		ManualMode,
-		AutopilotTrimMode,
-		AutopilotMode,
+		Manual,
+		AutopilotTrim,
+		Autopilot,
 		None
 	};
 

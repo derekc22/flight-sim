@@ -1,22 +1,22 @@
 #include <stdexcept>
-#include <string>
+#include <string_view>
 #include "simulation/fsm/public.hpp"
 
 namespace fsm {
 
 	std::string_view mode_to_string(FiniteState mode) {
 		switch (mode) {
-			case FiniteState::ManualMode: 
+			case FiniteState::Manual:
 				return "Manual";
-			case FiniteState::AutopilotTrimMode: 
+			case FiniteState::AutopilotTrim:
 				return "AutopilotTrim";
-			case FiniteState::AutopilotMode: 
+			case FiniteState::Autopilot:
 				return "Autopilot";
 			case FiniteState::None: 
 				return "None";
 
 			default:
-				throw std::runtime_error("fsm::FiniteStateMachine::step Unknown mode");
+				throw std::runtime_error("fsm::FiniteStateMachine::mode_to_string Unknown mode");
 		}
 	}
 

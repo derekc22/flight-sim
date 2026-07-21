@@ -91,7 +91,7 @@ namespace runner {
         estimation_tick += module_rates.estimation_hz;
         ++estimation_elapsed_ticks;
 
-        if (current_mode == fsm::FiniteState::AutopilotMode) {
+        if (current_mode == fsm::FiniteState::Autopilot) {
             guidance_tick += module_rates.guidance_hz;
             control_tick += module_rates.control_hz;
             ++control_elapsed_ticks;
@@ -413,18 +413,18 @@ namespace runner {
         // step state machine
         fsm::FiniteState current_mode = state_machine.step(mode_toggled);
 
-        if (current_mode == fsm::FiniteState::ManualMode) {
+        if (current_mode == fsm::FiniteState::Manual) {
             u_cmd = joystick_output.u_cmd;
         }
 
         // no need to rate-limit as the trim command is fixed
-        if (current_mode == fsm::FiniteState::AutopilotTrimMode) {
+        if (current_mode == fsm::FiniteState::AutopilotTrim) {
             u_cmd = trim::set_control_inputs_from_trim(trim_sol.operating_point.input);
         }
 
         // specify guidance setpoint
         guidance::GuidanceSetpoint setpoint{};
-        if (current_mode == fsm::FiniteState::AutopilotMode) {
+        if (current_mode == fsm::FiniteState::Autopilot) {
             if (scheduler.guidance_tick >= constants::hz) {
                 setpoint = guidance_properties.step(scheduler.guidance_tf);
                 setpoint_t_1 = setpoint;
@@ -434,7 +434,7 @@ namespace runner {
             else setpoint = setpoint_t_1; // perform ZOH
         }
 
-        if (current_mode == fsm::FiniteState::AutopilotMode) {
+        if (current_mode == fsm::FiniteState::Autopilot) {
             if (scheduler.control_tick >= constants::hz) {
                 double control_dt = scheduler.control_elapsed_ticks * constants::dt;
                 control::ControllerInputs controller_inputs {

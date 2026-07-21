@@ -126,7 +126,6 @@ namespace avionics {
     ) {
 
         atmospheric::MachNumber Mach = atmospheric::mps_to_mach(Xt.v, atm_t.T);
-        atmospheric::StagnationAtmosphericState atm0_t = atmospheric::static_to_stagnation(atm_t, Mach);
 
         dynamics::TranslationalVelocity vE_BE{ XEt.q.data.conjugate() * XEt.v.data };
         double alt_BE_dot = vE_BE.data.dot(XEt.p.data.normalized());

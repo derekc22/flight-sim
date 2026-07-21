@@ -9,14 +9,14 @@ namespace fsm {
 	FiniteStateMachine::FiniteStateMachine(const runner::JSONFlags& json_flags)
 	{
 		if (json_flags.trim_flag) {
-			autopilot_mode = FiniteState::AutopilotTrimMode;
+			autopilot_mode = FiniteState::AutopilotTrim;
 		}
 		if (json_flags.control_flag) {
-			autopilot_mode = FiniteState::AutopilotMode;
+			autopilot_mode = FiniteState::Autopilot;
 		}
 
 		if (json_flags.joystick_flag) {	
-			current_mode = FiniteState::ManualMode;
+			current_mode = FiniteState::Manual;
 		}
 		else {
 			current_mode = autopilot_mode;
@@ -29,15 +29,15 @@ namespace fsm {
 
 		if (mode_toggled) {
 			switch (current_mode) {
-				case FiniteState::ManualMode: {
+				case FiniteState::Manual: {
 					current_mode = autopilot_mode;
 					break;
 				}
 
-				case FiniteState::AutopilotTrimMode:
-				case FiniteState::AutopilotMode:
+				case FiniteState::AutopilotTrim:
+				case FiniteState::Autopilot:
 				case FiniteState::None: {
-					current_mode = FiniteState::ManualMode;
+					current_mode = FiniteState::Manual;
 					break;
 				}
 

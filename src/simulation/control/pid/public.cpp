@@ -13,7 +13,7 @@ namespace control {
                         ? input.x_dot.value()    // PI-D
                         : (prev_err - err) / dt; // PID
 
-        // filtered deriative
+        // filtered derivative
         d_filtered = util::first_order_lag(d_term, d_filtered, params.tau, dt);
 
         // integral candidate
