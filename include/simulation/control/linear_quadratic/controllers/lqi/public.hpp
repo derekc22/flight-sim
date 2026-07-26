@@ -8,8 +8,8 @@
 namespace control {
 
     inline constexpr std::size_t integrated_state_dim = 3;  // p, q, r are the integrated states
-    using IntegratedStateVector = Eigen::Matrix<double, integrated_state_dim, 1>;
-    using AugmentedStateVector = Eigen::Matrix<double, constants::state_dim + integrated_state_dim, 1>;
+    using IntegratedStateVector = constants::MatrixX_T<double, integrated_state_dim, 1>;
+    using AugmentedStateVector = constants::MatrixX_T<double, constants::state_dim + integrated_state_dim, 1>;
 
     struct LinearQuadraticIntegratorParameters : LinearQuadraticRegulatorParameters {
         Eigen::MatrixXd Qi;
@@ -22,7 +22,7 @@ namespace control {
         ControlOutput step(const LinearQuadraticControllerInput& input, double dt);
 
         LinearQuadraticPolicyInput make_linear_quadratic_policy_input(const LinearQuadraticControllerInput& input, const IntegratedStateVector& integral_candidate);
-        IntegratedStateVector integrate_state_err(const dynamics::StateVector& zt, const dynamics::StateVector& zt_des, double dt);
+        IntegratedStateVector integrate_state_err(const dynamics::StateVector_T<double>& zt, const dynamics::StateVector_T<double>& zt_des, double dt);
     };
 
 }

@@ -7,11 +7,11 @@
 
 namespace control {
 
-    ControlOutput make_control_output(const actuators::ActuatorInputsVector& u_cmd) {
-        return actuators::pack_actuator_inputs(u_cmd);
+    ControlOutput make_control_output(const actuators::ActuatorInputsVector_T<double>& u_cmd) {
+        return actuators::pack_actuator_inputs_T(u_cmd);
     }
 
-    dynamics::StateVector unpack_state(const guidance::LinearQuadraticSetpoint& setpoint) {
+    dynamics::StateVector_T<double> unpack_state(const guidance::LinearQuadraticSetpoint& setpoint) {
         dynamics::TranslationalVelocity vB_BI = setpoint.vB_BI;
         dynamics::AngularVelocity wB_BI = setpoint.wB_BI;
         dynamics::EulerAngles eulIB = setpoint.eulIB;
@@ -26,7 +26,7 @@ namespace control {
             .phi = eulIB.phi(),
             .theta = eulIB.theta(),
         };
-        return dynamics::unpack_state(setpoint_packed);
+        return dynamics::unpack_state_T(setpoint_packed);
     }
 
 }

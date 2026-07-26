@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Find Eigen3
 find_package(Eigen3 CONFIG REQUIRED)
+find_package(proxsuite CONFIG REQUIRED)
 find_package(Threads REQUIRED)
 
 # Find pkg-config packages
@@ -92,7 +93,7 @@ add_executable(${PROJECT_NAME} src/main.cpp)
 target_include_directories(flight_sim_core PRIVATE ${CMAKE_SOURCE_DIR}/include ${OpenCV_INCLUDE_DIRS})
 target_include_directories(flight_sim_cv2 PRIVATE ${CMAKE_SOURCE_DIR}/include ${OpenCV_INCLUDE_DIRS})
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include ${OpenCV_INCLUDE_DIRS})
-target_link_libraries(flight_sim_core PRIVATE control_care Eigen3::Eigen PkgConfig::CPPAD nlohmann_json::nlohmann_json SDL3::SDL3 rerun_sdk spdlog::spdlog Threads::Threads ${OpenCV_LIBS})
+target_link_libraries(flight_sim_core PRIVATE control_care Eigen3::Eigen proxsuite::proxsuite PkgConfig::CPPAD nlohmann_json::nlohmann_json SDL3::SDL3 rerun_sdk spdlog::spdlog Threads::Threads ${OpenCV_LIBS})
 target_link_libraries(flight_sim_cv2 PRIVATE ${OpenCV_LIBS})
 
 # Link Eigen, CppAD/Ipopt, and nlohmann_json to the executable

@@ -261,7 +261,6 @@ namespace runner {
 
                 // overwrite internal state with trim state
                 WB_net_t_1 = WB_net_trim;
-                u_actual_t_1 = trim::set_actuator_inputs_from_trim(u_actual_t_1, trim_sol.operating_point.input);
 
                 /** @deprecated */
                 // overwrite actuator lag state with trim controls
@@ -352,13 +351,6 @@ namespace runner {
                 operating::OperatingConditions estimator_conditions;
 
                 if (estimation_properties.extended_kalman_estimator_type == estimation::EstimatorType::ExtendedKalmanFilter) {
-                    dynamics::State_T<double> yt = dynamics::pack_state(Yt);
-
-                    estimator_operating_point = operating::OperatingPoint {
-                        .state = yt,
-                        .input = u_actual_t_1
-                    };
-
                     estimator_conditions = {
                         .atm = atm_t,
                         .windB = windB,
@@ -376,12 +368,11 @@ namespace runner {
                         .Yt = Yt,
                         .operating_point = estimator_operating_point,
                         .lin_sol = estimator_lin_sol,
-                        .u_actual_t_1 = u_actual_t_1,
+                        .u_cmd_t_1 = u_cmd_t_1,
                     },
                     .extended_kalman_estimator_input = estimation::ExtendedKalmanEstimatorInput {
                         .Yt = Yt,
-                        .operating_point = estimator_operating_point,
-                        .u_actual_t_1 = u_actual_t_1,
+                        .u_cmd_t_1 = u_cmd_t_1,
                         .model = autodiff_model,
                         .conditions = estimator_conditions
                     }
@@ -396,6 +387,9 @@ namespace runner {
             }
             else Zt = Zt_1; // perform ZOH
         }
+
+        // initialize guidance setpoint
+        guidance::GuidanceSetpoint setpoint{};
 
         // initialize control commands
         control::ControlOutput u_cmd{};
@@ -418,13 +412,11 @@ namespace runner {
         }
 
         // no need to rate-limit as the trim command is fixed
-        if (current_mode == fsm::FiniteState::AutopilotTrim) {
+        else if (current_mode == fsm::FiniteState::AutopilotTrim) {
             u_cmd = trim::set_control_inputs_from_trim(trim_sol.operating_point.input);
         }
 
-        // specify guidance setpoint
-        guidance::GuidanceSetpoint setpoint{};
-        if (current_mode == fsm::FiniteState::Autopilot) {
+        else if (current_mode == fsm::FiniteState::Autopilot) {
             if (scheduler.guidance_tick >= constants::hz) {
                 setpoint = guidance_properties.step(scheduler.guidance_tf);
                 setpoint_t_1 = setpoint;
@@ -432,9 +424,7 @@ namespace runner {
                 scheduler.guidance_tick -= constants::hz;
             }
             else setpoint = setpoint_t_1; // perform ZOH
-        }
 
-        if (current_mode == fsm::FiniteState::Autopilot) {
             if (scheduler.control_tick >= constants::hz) {
                 double control_dt = scheduler.control_elapsed_ticks * constants::dt;
                 control::ControllerInputs controller_inputs {
@@ -487,9 +477,6 @@ namespace runner {
 
         // apply propulsor actuator dynamics
         u_actual.propulsor_inputs = actuator_properties.step(u_cmd.propulsor_inputs, constants::dt);
-
-        // update prior-step actual control
-        u_actual_t_1 = u_actual;
 
         integrators::RK4Model rk4_model{
             .structural = structural_properties,

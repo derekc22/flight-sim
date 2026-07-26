@@ -16,9 +16,9 @@ namespace trim {
     inline constexpr std::size_t trim_residual_dim = constants::state_input_dim;
 
     template <typename T>
-    using TrimResidualVector_T = Eigen::Matrix<T, trim_residual_dim, 1>;
+    using TrimResidualVector_T = constants::MatrixX_T<T, trim_residual_dim, 1>;
 
-    using TrimResidualJacobian = Eigen::Matrix<double, trim_residual_dim, constants::state_input_dim>;
+    using TrimResidualJacobian = constants::MatrixX_T<double, trim_residual_dim, constants::state_input_dim>;
 
     struct TrimTarget {
         double beta = 0.0;
@@ -54,14 +54,13 @@ namespace trim {
     TrimResidual_T<T> compute_trim_residual_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u, autodiff::AutoDiffModel& model, const TrimTarget& target, const operating::OperatingConditions& conditions);
 
     template <typename T>
+    TrimResidual_T<T> pack_trim_residual_T(const TrimResidualVector_T<T>& residual);
+
+    template <typename T>
     TrimResidualVector_T<T> unpack_trim_residual_T(const TrimResidual_T<T>& residual);
 
     template <typename T>
-    TrimResidualVector_T<T> compute_trim_residual_vector_T(const operating::StateInputVector_T<T>& xu, autodiff::AutoDiffModel& model, const TrimTarget& target, const operating::OperatingConditions& conditions, bool physical_controls);
-
-    double send_control_to_solver_space(double u, double limit_min, double limit_max);
-
-    operating::StateInputVector_T<double> unpack_trim_solver_variables(const operating::OperatingPoint& initial_guess, const actuators::ActuatorLimits& actuator_limits);
+    TrimResidualVector_T<T> compute_trim_residual_vector_T(const operating::StateInputVector_T<T>& xu, autodiff::AutoDiffModel& model, const TrimTarget& target, const operating::OperatingConditions& conditions);
 
     TrimResidualVector_T<double> fetch_trim_residual_weights(const TrimSolveOptions& options);
 
@@ -73,7 +72,7 @@ namespace trim {
 
     TrimSolution build_trim_solution(const operating::StateInputVector_T<double>& xu, const TrimResidualVector_T<double>& residual, const TrimResidualVector_T<double>& weighted_residual, autodiff::AutoDiffModel& model, const operating::OperatingConditions& conditions, bool converged, std::size_t iterations);
 
-    TrimResidualJacobian compute_trim_residual_jac(const operating::StateInputVector_T<double>& xu, autodiff::AutoDiffModel& model, const TrimTarget& target, const operating::OperatingConditions& conditions, bool physical_controls);
+    TrimResidualJacobian compute_trim_residual_jac(const operating::StateInputVector_T<double>& xu, autodiff::AutoDiffModel& model, const TrimTarget& target, const operating::OperatingConditions& conditions);
 
     TrimSolution solve_trim(const TrimProblem& problem, autodiff::AutoDiffModel& model, TrimSolveOptions options = {});
 

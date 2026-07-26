@@ -7,23 +7,23 @@
 
 namespace linearization {
 
-    using StateJacobian = Eigen::Matrix<double, constants::state_dim, constants::state_dim>;
-    using InputJacobian = Eigen::Matrix<double, constants::state_dim, constants::input_dim>;
+    using StateJacobian = constants::MatrixX_T<double, constants::state_dim, constants::state_dim>;
+    using InputJacobian = constants::MatrixX_T<double, constants::state_dim, constants::input_dim>;
 
-    using OutputJacobian = Eigen::Matrix<double, constants::state_dim, constants::state_dim>;
-    using DirectFeedthroughJacobian = Eigen::Matrix<double, constants::state_dim, constants::input_dim>;
+    using OutputJacobian = constants::MatrixX_T<double, constants::state_dim, constants::state_dim>;
+    using DirectFeedthroughJacobian = constants::MatrixX_T<double, constants::state_dim, constants::input_dim>;
 
     struct LocalLinearization {
         StateJacobian A = StateJacobian::Zero();
         InputJacobian B = InputJacobian::Zero();
-        OutputJacobian C = OutputJacobian::Identity();
+        OutputJacobian C = constants::IX_T<double, constants::state_dim>;
         DirectFeedthroughJacobian D = DirectFeedthroughJacobian::Zero();
     };
 
     struct DiscretizedLocalLinearization {
         StateJacobian A = StateJacobian::Zero();
         InputJacobian B = InputJacobian::Zero();
-        OutputJacobian C = OutputJacobian::Identity();
+        OutputJacobian C = constants::IX_T<double, constants::state_dim>;
         DirectFeedthroughJacobian D = DirectFeedthroughJacobian::Zero();
     };
 

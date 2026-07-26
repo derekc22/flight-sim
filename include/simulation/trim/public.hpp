@@ -52,10 +52,7 @@ namespace trim {
     };
 
     template <typename T>
-    T get_control_from_solver_space_T(const T& u_solver, double limit_min, double limit_max);
-
-    template <typename T>
-    actuators::ActuatorInputs_T<T> pack_trim_actuator_inputs_T(const operating::StateInputVector_T<T>& xu, const actuators::ActuatorLimits& actuator_limits, const actuators::FixedActuatorInputs& fixed_actuator_inputs);
+    actuators::ActuatorInputs_T<T> pack_trim_actuator_inputs_T(const operating::StateInputVector_T<T>& xu, const actuators::FixedActuatorInputs& fixed_actuator_inputs);
 
     TrimSolution inspect_trim(vehicles::Aircraft& aircraft, autodiff::AutoDiffModel& model, const atmospheric::Wind& wind);
 
@@ -68,7 +65,8 @@ namespace trim {
     /** @deprecated */
     // void update_actuators_lag_from_trim(actuators::SurfaceActuators& surface_actuators, actuators::PropulsorActuators& propulsor_actuators, const TrimSolution& trim_sol);
 
-    actuators::ActuatorInputs_T<double> set_actuator_inputs_from_trim(actuators::ActuatorInputs_T<double> actuator_inputs, const actuators::ActuatorInputs_T<double>& trim_inputs);
+    /** @deprecated */
+    // actuators::ActuatorInputs_T<double> set_actuator_inputs_from_trim(actuators::ActuatorInputs_T<double> actuator_inputs, const actuators::ActuatorInputs_T<double>& trim_inputs);
 
 }
 

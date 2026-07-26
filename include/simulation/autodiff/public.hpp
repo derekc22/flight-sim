@@ -33,16 +33,22 @@ namespace autodiff {
     dynamics::StateDot_T<T> compute_state_dot_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u, AutoDiffModel& model, const operating::OperatingConditions& conditions, T dt);
 
     template <typename T, std::size_t rows>
-    Eigen::Matrix<T, rows, 1> eigen_vector_from_cppad_vector(const CppAD::eigen_vector<T>& x);
+    constants::MatrixX_T<T, rows, 1> eigen_vector_from_cppad_vector(const CppAD::eigen_vector<T>& x);
 
     template <typename T, int rows>
-    CppAD::eigen_vector<T> cppad_vector_from_eigen_vector(const Eigen::Matrix<T, rows, 1>& x);
+    CppAD::eigen_vector<T> cppad_vector_from_eigen_vector(const constants::MatrixX_T<T, rows, 1>& x);
 
     template <int rows>
-    CppAD::eigen_vector<CppAD::AD<double>> start_autodiff_tracking(const Eigen::Matrix<double, rows, 1>& x);
+    constants::MatrixX_T<CppAD::AD<double>, rows, 1> double_to_cppad_double(const constants::MatrixX_T<double, rows, 1>& x);
+
+    template <int rows>
+    CppAD::eigen_vector<CppAD::AD<double>> start_autodiff_tracking(const constants::MatrixX_T<double, rows, 1>& x);
 
     template <int output_rows, int input_rows>
-    Eigen::Matrix<double, output_rows, input_rows> compute_jac(CppAD::ADFun<double>& f, const Eigen::Matrix<double, input_rows, 1>& x);
+    constants::MatrixX_T<double, output_rows, 1> evaluate_tracked_vector(CppAD::ADFun<double>& f, const constants::MatrixX_T<double, input_rows, 1>& x);
+
+    template <int output_rows, int input_rows>
+    constants::MatrixX_T<double, output_rows, input_rows> compute_jac(CppAD::ADFun<double>& f, const constants::MatrixX_T<double, input_rows, 1>& x);
 
 }
 

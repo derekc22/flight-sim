@@ -24,6 +24,14 @@ namespace operating {
     }
 
     template <typename T>
+    std::tuple<dynamics::StateVector_T<T>, actuators::ActuatorInputsVector_T<T>> split_state_input_vector_T(const StateInputVector_T<T>& xu) {
+        return {
+            dynamics::StateVector_T<T>(xu.template head<constants::state_dim>()),
+            actuators::ActuatorInputsVector_T<T>(xu.template tail<constants::input_dim>())
+        };
+    }
+
+    template <typename T>
     dynamics::State_T<T> pack_state_T(const StateInputVector_T<T>& xu) {
         return {
             .vx = xu(0),

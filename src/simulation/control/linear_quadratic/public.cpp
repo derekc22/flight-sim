@@ -8,14 +8,14 @@ namespace control {
 
     LinearQuadraticPolicy::LinearQuadraticPolicy(const LinearQuadraticPolicyParameters& params) : params(params) {}
 
-    actuators::ActuatorInputsVector LinearQuadraticPolicy::step(const LinearQuadraticPolicyInput& input) {
+    actuators::ActuatorInputsVector_T<double> LinearQuadraticPolicy::step(const LinearQuadraticPolicyInput& input) {
 
         if (!params.K.has_value()) {
             const CareSolution care_sol = solve_care(input.A, input.B, params.Q, params.R);
             params.K = lqr_gain(input.B, params.R, care_sol.P);
         }
 
-        actuators::ActuatorInputsVector u_deviation;
+        actuators::ActuatorInputsVector_T<double> u_deviation;
         u_deviation = -params.K.value() * input.zt;
 
         return u_deviation;

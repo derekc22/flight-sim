@@ -4,7 +4,7 @@
 
 namespace estimation {
 
-    dynamics::RigidBodyState make_kalman_state_estimate(const dynamics::RigidBodyState& Yt, const dynamics::StateVector& zt) {
+    dynamics::RigidBodyState make_kalman_state_estimate(const dynamics::RigidBodyState& Yt, const dynamics::StateVector_T<double>& zt) {
         dynamics::RigidBodyState Zt = Yt;
 
         dynamics::EulerAngles eul_meas;

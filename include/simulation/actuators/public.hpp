@@ -6,9 +6,10 @@
 
 namespace actuators {
 
-    using ActuatorInputsVector = Eigen::Matrix<double, constants::input_dim, 1>;
+    template <typename T>
+    using ActuatorInputsVector_T = constants::MatrixX_T<T, constants::input_dim, 1>;
 
-    using ActuatorLimitsVector = Eigen::Matrix<double, constants::input_dim, 2>;
+    using ActuatorLimitsVector = constants::MatrixX_T<double, constants::input_dim, 2>;
 
     struct FixedActuatorInputs {
         double flap = 0.0;
@@ -26,17 +27,21 @@ namespace actuators {
         ActuatorInputs_T<double> limit_max;
     };
 
-    ActuatorInputs_T<double> pack_actuator_inputs(const ActuatorInputsVector& u);
+    template <typename T>
+    ActuatorInputs_T<T> pack_actuator_inputs_T(const ActuatorInputsVector_T<T>& u);
 
-    ActuatorInputsVector unpack_actuator_inputs(const ActuatorInputs_T<double>& u);
+    template <typename T>
+    ActuatorInputsVector_T<T> unpack_actuator_inputs_T(const ActuatorInputs_T<T>& u);
 
     ActuatorLimits pack_actuator_limits(const ActuatorLimitsVector& limits);
 
     ActuatorLimitsVector unpack_actuator_limits(const ActuatorLimits& limits);
 
-    ActuatorInputs_T<double> pack_actuator_inputs(const SurfaceActuatorInputs_T<double>& u_surface, const PropulsorActuatorInputs_T<double>& u_propulsor);
+    template <typename T>
+    ActuatorInputs_T<T> pack_actuator_inputs_T(const SurfaceActuatorInputs_T<T>& u_surface, const PropulsorActuatorInputs_T<T>& u_propulsor);
 
-    ActuatorInputsVector unpack_actuator_inputs(const SurfaceActuatorInputs_T<double>& u_surface, const PropulsorActuatorInputs_T<double>& u_propulsor);
+    template <typename T>
+    ActuatorInputsVector_T<T> unpack_actuator_inputs_T(const SurfaceActuatorInputs_T<T>& u_surface, const PropulsorActuatorInputs_T<T>& u_propulsor);
 
     ActuatorLimits pack_actuator_limits(const SurfaceActuators& surface_actuators, const PropulsorActuators& propulsor_actuators);
 
@@ -58,3 +63,5 @@ namespace actuators {
     };
 
 }
+
+#include "simulation/actuators/public.tpp"

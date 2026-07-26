@@ -22,7 +22,6 @@ namespace control {
 
     struct AttitudePID {
         enum ControlAxis { Longitudinal, Lateral, Vertical };
-        AttitudePIDParameters params;
         PIDPolicy lateral_policy;
         PIDPolicy longitudinal_policy;
         PIDPolicy vertical_policy;

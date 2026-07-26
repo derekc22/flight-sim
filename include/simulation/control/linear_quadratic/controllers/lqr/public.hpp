@@ -8,7 +8,6 @@ namespace control {
     struct LinearQuadraticRegulatorParameters : LinearQuadraticPolicyParameters {};
 
     struct LinearQuadraticRegulator {
-        LinearQuadraticRegulatorParameters params;
         LinearQuadraticPolicy policy;
 
         LinearQuadraticRegulator(const LinearQuadraticRegulatorParameters& params);

@@ -8,7 +8,7 @@ namespace control {
     struct LinearQuadraticPolicyInput {
         Eigen::VectorXd zt;
         Eigen::MatrixXd A;
-        Eigen::Matrix<double, Eigen::Dynamic, constants::input_dim> B;
+        constants::MatrixX_T<double, Eigen::Dynamic, constants::input_dim> B;
     };
 
     struct LinearQuadraticPolicyParameters {
@@ -21,6 +21,6 @@ namespace control {
         LinearQuadraticPolicyParameters params;
 
         LinearQuadraticPolicy(const LinearQuadraticPolicyParameters& params);
-        actuators::ActuatorInputsVector step(const LinearQuadraticPolicyInput& input);
+        actuators::ActuatorInputsVector_T<double> step(const LinearQuadraticPolicyInput& input);
     };
 }

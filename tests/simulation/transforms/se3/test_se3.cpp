@@ -22,7 +22,7 @@ static void expect_vector_near(const Eigen::Vector3d& a, const Eigen::Vector3d& 
 
 static void expect_valid_homogeneous_matrix(const Eigen::Matrix4d& H) {
     EXPECT_TRUE(H.row(3).isApprox(Eigen::RowVector4d(0.0, 0.0, 0.0, 1.0), constants::eps_strict));
-    EXPECT_TRUE((H.block<3,3>(0,0).transpose() * H.block<3,3>(0,0)).isApprox(Eigen::Matrix3d::Identity(), constants::eps_strict));
+    EXPECT_TRUE((H.block<3,3>(0,0).transpose() * H.block<3,3>(0,0)).isApprox(constants::IX_T<double, 3>, constants::eps_strict));
     EXPECT_NEAR((H.block<3,3>(0,0).determinant()), 1.0, constants::eps_strict);
 }
 

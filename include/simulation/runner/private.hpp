@@ -67,8 +67,6 @@ namespace runner {
         std::optional<io::AnalysisManager> analysis_manager;
         std::optional<devices::JoystickManager> joystick_manager;
 
-        actuators::ActuatorInputs_T<double> u_actual_t_1{};
-
         // initialize trim and linearization solutions
         trim::TrimSolution trim_sol;
         linearization::LocalLinearization lin_sol;

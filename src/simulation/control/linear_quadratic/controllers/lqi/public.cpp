@@ -25,7 +25,7 @@ namespace control {
         });
     };
 
-    IntegratedStateVector LinearQuadraticIntegrator::integrate_state_err(const dynamics::StateVector& zt, const dynamics::StateVector& zt_des, double dt) {
+    IntegratedStateVector LinearQuadraticIntegrator::integrate_state_err(const dynamics::StateVector_T<double>& zt, const dynamics::StateVector_T<double>& zt_des, double dt) {
         IntegratedStateVector zt_pqr = zt.segment<integrated_state_dim>(3);  // grab p, q, r
         IntegratedStateVector zt_des_pqr = zt_des.segment<integrated_state_dim>(3);
 
@@ -43,14 +43,14 @@ namespace control {
 
         // Ci selects the integrated states p, q, r from the state vector for the LQI controller - it is not the system-wide output matrix C
         Eigen::MatrixXd Ci = Eigen::MatrixXd::Zero(integrated_state_dim, constants::state_dim);
-        Ci.block<integrated_state_dim, integrated_state_dim>(0, 3) = Eigen::Matrix<double, integrated_state_dim, integrated_state_dim>::Identity();
+        Ci.block<integrated_state_dim, integrated_state_dim>(0, 3) = constants::IX_T<double, integrated_state_dim>;
         A_aug.block(n, 0, i, n) = -Ci;
 
         Eigen::MatrixXd B_aug = Eigen::MatrixXd::Zero(n + i, m);
         B_aug.block(0, 0, n, m) = input.B;
 
-        dynamics::StateVector zt = dynamics::unpack_state(input.Zt);
-        dynamics::StateVector zt_des = unpack_state(input.setpoint);
+        dynamics::StateVector_T<double> zt = dynamics::unpack_state(input.Zt);
+        dynamics::StateVector_T<double> zt_des = unpack_state(input.setpoint);
 
         AugmentedStateVector zt_aug;
         zt_aug << zt, integral_new;
@@ -76,17 +76,17 @@ namespace control {
             dt
         );
 
-        actuators::ActuatorInputsVector u_deviation = policy.step(
+        actuators::ActuatorInputsVector_T<double> u_deviation = policy.step(
             make_linear_quadratic_policy_input(input, integral_new)
         );
 
         // unsaturated control
-        actuators::ActuatorInputsVector u_trim = actuators::unpack_actuator_inputs(input.u_sol_trim);
-        actuators::ActuatorInputsVector u_unsat = u_deviation + u_trim;
+        actuators::ActuatorInputsVector_T<double> u_trim = actuators::unpack_actuator_inputs_T(input.u_sol_trim);
+        actuators::ActuatorInputsVector_T<double> u_unsat = u_deviation + u_trim;
 
         // saturate
         actuators::ActuatorLimitsVector limits = actuators::unpack_actuator_limits(input.surface_actuators, input.propulsor_actuators);
-        actuators::ActuatorInputsVector u = util::vec_clamp(u_unsat, limits.col(0), limits.col(1));
+        actuators::ActuatorInputsVector_T<double> u = util::vec_clamp(u_unsat, limits.col(0), limits.col(1));
 
         // anti-windup
         if (util::vec_is_close(u, u_unsat)) { integral = integral_new; }

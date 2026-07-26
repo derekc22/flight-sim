@@ -46,7 +46,7 @@ namespace actuators {
         T right_propulsor_cmd = T(0.0);
     };
 
-    using PropulsorActuatorInputsVector = Eigen::Matrix<double, constants::full_propulsor_input_dim, 1>;
+    using PropulsorActuatorInputsVector = constants::MatrixX_T<double, constants::full_propulsor_input_dim, 1>;
 
     PropulsorActuatorInputsVector unpack_propulsor_actuator_inputs(const PropulsorActuatorInputs_T<double>& u_propulsor);
 

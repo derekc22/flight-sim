@@ -10,7 +10,6 @@
 namespace control {
 
     AttitudePID::AttitudePID(const AttitudePIDParameters& params) :
-        params(params),
         lateral_policy({
                 .Kp = params.Kp_roll,
                 .Ki = params.Ki_roll,
@@ -36,7 +35,6 @@ namespace control {
 
     PIDPolicyInput AttitudePID::make_pid_policy_input(const AttitudeControllerInput& input, ControlAxis axis) {
         dynamics::RigidBodyState Zt = input.Zt;
-        actuators::SurfaceActuators surface_actuators = input.surface_actuators;
         guidance::AttitudeSetpoint setpoint = input.setpoint;
 
         dynamics::EulerAngles eul_est_t;
@@ -47,27 +45,21 @@ namespace control {
                 return {
                     .x = eul_est_t.phi(),
                     .x_des = setpoint.eulIB.phi(),
-                    .x_dot = Zt.w.p(),
-                    .limit_min = surface_actuators.aileron.limit_min,
-                    .limit_max = surface_actuators.aileron.limit_max
+                    .x_dot = Zt.w.p()
                 };
 
             case ControlAxis::Longitudinal:
                 return {
                     .x = eul_est_t.theta(),
                     .x_des = setpoint.eulIB.theta(),
-                    .x_dot = Zt.w.q(),
-                    .limit_min = surface_actuators.elevator.limit_min,
-                    .limit_max = surface_actuators.elevator.limit_max
+                    .x_dot = Zt.w.q()
                 };
 
             case ControlAxis::Vertical:
                 return {
                     .x = eul_est_t.psi(),
                     .x_des = setpoint.eulIB.psi(),
-                    .x_dot = Zt.w.r(),
-                    .limit_min = surface_actuators.rudder.limit_min,
-                    .limit_max = surface_actuators.rudder.limit_max
+                    .x_dot = Zt.w.r()
                 };
 
             default:
