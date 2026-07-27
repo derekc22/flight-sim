@@ -10,7 +10,7 @@
 #include "simulation/dynamics/public.hpp"
 #include "simulation/trim/public.hpp"
 #include "simulation/trim/private.hpp"
-#include "simulation/util/public.hpp"
+#include "simulation/util/trig/public.hpp"
 #include "simulation/vehicles/public.hpp"
 #include "simulation/autodiff/public.hpp"
 #include "simulation/operating/public.hpp"
@@ -38,7 +38,7 @@ namespace trim {
                 .windB = wind,
                 .steady_state = true
             },
-            .initial_guess = operating::OperatingPoint{
+            .initial_guess = operating::OperatingPoint_T<double>{
                 .state = dynamics::State_T<double>{
                     .vx = aircraft.FRDFrameNED.vB_BN.data.x(),
                     .vy = aircraft.FRDFrameNED.vB_BN.data.y(),
@@ -85,11 +85,13 @@ namespace trim {
 
 
     std::string print_trim_solution(const TrimSolution& trim_sol) {
-        const operating::OperatingPoint& operating_point = trim_sol.operating_point;
+        const operating::OperatingPoint_T<double>& operating_point = trim_sol.operating_point;
         const dynamics::State_T<double>& state = operating_point.state;
-        const dynamics::Wrench& wrench = trim_sol.wrench;
-        const Eigen::Vector3d& F = wrench.F.data;
-        const Eigen::Vector3d& M = wrench.M.data;
+
+        const dynamics::Wrench_T<double>& wrench = trim_sol.wrench;
+        const Eigen::Vector3d& F = wrench.F;
+        const Eigen::Vector3d& M = wrench.M;
+
         const TrimResidual_T<double>& residual = trim_sol.residual;
         const TrimResidual_T<double>& weighted_residual = trim_sol.weighted_residual;
 
@@ -208,10 +210,6 @@ namespace trim {
             };
 
         return Xt_trim;
-    }
-
-    control::ControlOutput set_control_inputs_from_trim(const actuators::ActuatorInputs_T<double>& trim_inputs) {
-        return trim_inputs;
     }
 
     /** @deprecated */

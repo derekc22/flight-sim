@@ -27,10 +27,16 @@ namespace autodiff {
     AutoDiffModel build_autodiff_model(vehicles::Aircraft& aircraft);
 
     template <typename T>
-    dynamics::Wrench_T<T> compute_net_wrench_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u, AutoDiffModel& model, const operating::OperatingConditions& conditions, T dt);
+    dynamics::Wrench_T<T> compute_net_wrench_T(const operating::OperatingPoint_T<T>& operating_point, AutoDiffModel& model, const operating::OperatingConditions& conditions, T dt);
 
     template <typename T>
-    dynamics::StateDot_T<T> compute_state_dot_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u, AutoDiffModel& model, const operating::OperatingConditions& conditions, T dt);
+    dynamics::StateDot_T<T> compute_state_dot_T(const operating::OperatingPoint_T<T>& operating_point, AutoDiffModel& model, const operating::OperatingConditions& conditions, T dt);
+
+    template <typename T>
+    dynamics::StateDot_T<T> compute_state_dot_T(const operating::VirtualOperatingPoint_T<T>& operating_point, AutoDiffModel& model);
+
+    template <typename T>
+    dynamics::StateDot_T<T> compute_state_dot_from_net_wrench_T(const dynamics::State_T<T>& x, AutoDiffModel& model, const dynamics::Wrench_T<T>& net_wrench);
 
     template <typename T, std::size_t rows>
     constants::MatrixX_T<T, rows, 1> eigen_vector_from_cppad_vector(const CppAD::eigen_vector<T>& x);

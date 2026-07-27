@@ -3,7 +3,6 @@
 #include <thread>
 #include <iomanip>
 #include <sstream>
-#include <spdlog/spdlog.h>
 #include "simulation/runner/public.hpp"
 #include "simulation/runner/private.hpp"
 #include "simulation/actuators/public.hpp"
@@ -15,6 +14,7 @@
 #include "simulation/dynamics/public.hpp"
 #include "simulation/geography/public.hpp"
 #include "simulation/util/trig/public.hpp"
+#include "simulation/util/print/public.hpp"
 #include "simulation/estimation/public.hpp"
 #include "simulation/frames/public.hpp"
 #include "simulation/guidance/public.hpp"
@@ -27,6 +27,7 @@
 #include "simulation/failures/public.hpp"
 #include "simulation/settings/public.hpp"
 #include "simulation/fsm/public.hpp"
+#include "simulation/allocator/public.hpp"
 #include "core/connection/public.hpp"
 #include "core/devices/public.hpp"
 #include "core/json/actuators/public.hpp"
@@ -227,6 +228,12 @@ namespace runner {
         // build autodiff model
         autodiff::AutoDiffModel autodiff_model = autodiff::build_autodiff_model(aircraft);
 
+        operating::OperatingConditions transient_conditions{
+            .atm = atm_t,
+            .windB = windB,
+            .steady_state = false
+        };
+
         // trim and linearization
         if (json_flags.trim_flag && !trim_sol.attempted) {
             trim_sol = trim::inspect_trim(aircraft, autodiff_model, windB);
@@ -238,8 +245,6 @@ namespace runner {
                 // obtain full state from trim solution
                 dynamics::RigidBodyState Xt_trim = trim::update_state_from_trim(Xt, trim_sol.operating_point.state);
                 aerodynamics::AerodynamicState aero_t_trim = aerodynamics::compute_aerodynamic_state(Xt_trim, trim_sol.conditions.windB);
-
-                dynamics::Wrench WB_net_trim = trim_sol.wrench;
 
                 // define TrimStepOptions
                 vehicles::StepOptions TrimStepOptions;
@@ -258,6 +263,11 @@ namespace runner {
                 aero_t = aerodynamics::compute_aerodynamic_state(Xt, windB);
                 geo_t = geography::compute_geographic_state(aircraft.FRDFrameECEF);
                 atm_t = atmospheric::compute_static_atmospheric_state(aircraft.FRDFrameECEF);
+
+                dynamics::Wrench WB_net_trim = {
+                    .F = dynamics::Force{ trim_sol.wrench.F },
+                    .M = dynamics::Moment{ trim_sol.wrench.M },
+                };
 
                 // overwrite internal state with trim state
                 WB_net_t_1 = WB_net_trim;
@@ -346,37 +356,14 @@ namespace runner {
         if (json_flags.estimation_flag) {
             if (scheduler.estimation_tick >= constants::hz) {
                 double estimation_dt = scheduler.estimation_elapsed_ticks * constants::dt;
-                linearization::LocalLinearization estimator_lin_sol;
-                operating::OperatingPoint estimator_operating_point;
-                operating::OperatingConditions estimator_conditions;
 
-                if (estimation_properties.extended_kalman_estimator_type == estimation::EstimatorType::ExtendedKalmanFilter) {
-                    estimator_conditions = {
-                        .atm = atm_t,
-                        .windB = windB,
-                        .steady_state = false
-                    };
-
-                } else if (estimation_properties.linear_kalman_estimator_type == estimation::EstimatorType::LinearKalmanFilter) {
-                    estimator_lin_sol = lin_sol;
-                    estimator_operating_point = trim_sol.operating_point;
-                }
-
-                estimation::EstimatorInputs estimator_inputs {
-                    .Yt = Yt,
-                    .linear_kalman_estimator_input = estimation::LinearKalmanEstimatorInput {
-                        .Yt = Yt,
-                        .operating_point = estimator_operating_point,
-                        .lin_sol = estimator_lin_sol,
-                        .u_cmd_t_1 = u_cmd_t_1,
-                    },
-                    .extended_kalman_estimator_input = estimation::ExtendedKalmanEstimatorInput {
-                        .Yt = Yt,
-                        .u_cmd_t_1 = u_cmd_t_1,
-                        .model = autodiff_model,
-                        .conditions = estimator_conditions
-                    }
-                };
+                estimation::EstimatorInputs estimator_inputs = estimation::build_estimator_inputs(
+                    Yt,
+                    trim_sol, lin_sol,
+                    autodiff_model,
+                    u_cmd_t_1,
+                    transient_conditions
+                );
 
                 // overwrite local estimated state with estimator result
                 Zt = estimation_properties.step(estimator_inputs, estimation_dt, json_flags.trim_flag).Zt;
@@ -391,7 +378,10 @@ namespace runner {
         // initialize guidance setpoint
         guidance::GuidanceSetpoint setpoint{};
 
-        // initialize control commands
+        // initialize virtual control command
+        control::VirtualControlOutput_T<double> mu_cmd{};
+
+        // initialize control command
         control::ControlOutput u_cmd{};
 
         // declare for state machine
@@ -413,7 +403,7 @@ namespace runner {
 
         // no need to rate-limit as the trim command is fixed
         else if (current_mode == fsm::FiniteState::AutopilotTrim) {
-            u_cmd = trim::set_control_inputs_from_trim(trim_sol.operating_point.input);
+            mu_cmd = trim_sol.wrench;
         }
 
         else if (current_mode == fsm::FiniteState::Autopilot) {
@@ -427,39 +417,33 @@ namespace runner {
 
             if (scheduler.control_tick >= constants::hz) {
                 double control_dt = scheduler.control_elapsed_ticks * constants::dt;
-                control::ControllerInputs controller_inputs {
-                    .attitude_controller_input = control::AttitudeControllerInput{
-                        .Zt = Zt,
-                        .surface_actuators = surface_actuators,
-                        .setpoint = guidance::AttitudeSetpoint{ setpoint }
-                    },
-                    .velocity_controller_input = control::VelocityControllerInput{
-                        .Zt = Zt,
-                        .propulsor_actuators = propulsor_actuators,
-                        .setpoint = guidance::VelocitySetpoint{ setpoint }
-                    },
-                    .linear_quadratic_controller_input = control::LinearQuadraticControllerInput{
-                        .Zt = Zt,
-                        .u_sol_trim = trim_sol.operating_point.input,
-                        .surface_actuators = surface_actuators,
-                        .propulsor_actuators = propulsor_actuators,
-                        .A = lin_sol.A,
-                        .B = lin_sol.B,
-                        .setpoint = guidance::LinearQuadraticSetpoint{ setpoint }
-                    },
-                    .nonlinear_controller_input = control::NonlinearControllerInput{
-                        .Zt = Zt,
-                        .surface_actuators = surface_actuators,
-                        .propulsor_actuators = propulsor_actuators,
-                        .setpoint = guidance::NonlinearSetpoint{ setpoint }
-                    }
-                };
-                u_cmd = control_properties.step(controller_inputs, control_dt, json_flags.trim_flag);
+
+                linearization::VirtualLocalLinearization virtual_lin_sol = linearization::linearize_virtual_operating_point(
+                    autodiff_model,
+                    operating::VirtualOperatingPoint_T<double>(
+                        trim_sol.operating_point.state,
+                        trim_sol.wrench
+                    )
+                );
+
+                control::ControllerInputs controller_inputs = control::build_controller_inputs(
+                    Zt, 
+                    trim_sol, virtual_lin_sol, 
+                    surface_actuators, propulsor_actuators, 
+                    setpoint
+                );
+
+                mu_cmd = control_properties.step(controller_inputs, control_dt, json_flags.trim_flag);
 
                 scheduler.control_tick -= constants::hz;
                 scheduler.control_elapsed_ticks = 0;
             }
-            else u_cmd = u_cmd_t_1; // perform ZOH
+            else mu_cmd = u_cmd_t_1; // perform ZOH
+        }
+
+        // step control allocator
+        if (current_mode == fsm::FiniteState::AutopilotTrim || current_mode == fsm::FiniteState::Autopilot) {
+            u_cmd = allocator.step();
         }
 
         // apply fixed actuator inputs
@@ -530,7 +514,7 @@ namespace runner {
 
             // log state
             if (json_flags.verbose_flag) {
-                log_state(t, Xt, geo_t, aero_t, windI);
+                util::print_state(t, Xt, geo_t, aero_t, windI);
             }
             scheduler.log_tick -= constants::hz;
         }
@@ -581,86 +565,6 @@ namespace runner {
         if (!cli_flags.fast_flag) {
             std::this_thread::sleep_until(next);
         }
-    }
-
-    std::string print_vec(const char* name, const Eigen::Vector3d& x, const char* unit) {
-        std::ostringstream ss;
-        ss << std::fixed << std::setprecision(3);
-
-        ss
-            << std::left << std::setw(8) << name
-            << "[ "
-            << std::right << std::setw(10) << x.x() << ", "
-            << std::right << std::setw(10) << x.y() << ", "
-            << std::right << std::setw(10) << x.z()
-            << " ] " << unit << '\n';
-
-        return ss.str();
-    }
-
-    void log_state(
-        int t,
-        const dynamics::RigidBodyState& Xt,
-        const geography::GeographicState& geo,
-        const aerodynamics::AerodynamicState& aero,
-        const atmospheric::Wind& windI
-    ) {
-        const Eigen::Vector3d& p = Xt.p.data;
-
-        dynamics::EulerAngles eul;
-        eul.set(Xt.q);
-
-        const Eigen::Vector3d& v = Xt.v.data;
-        const Eigen::Vector3d& w = Xt.w.data;
-        const Eigen::Vector3d& g = geography::gB(Xt.q).data;
-        const Eigen::Vector3d& wind = windI.data;
-
-        std::ostringstream ss;
-        ss << std::fixed << std::setprecision(3);
-
-        ss
-            << "\n"
-            << "t       " << t * constants::dt << " [s]\n"
-            << "---------------------------------------------------------------------------------\n";
-
-        ss << print_vec("p", p, "[m]");
-
-        ss
-            << std::left << std::setw(8) << "eul"
-            << "[ "
-            << std::right << std::setw(10) << util::rad_to_deg(eul.psi()) << ", "
-            << std::right << std::setw(10) << util::rad_to_deg(eul.theta()) << ", "
-            << std::right << std::setw(10) << util::rad_to_deg(eul.phi())
-            << " ] [deg]\n";
-
-        ss << print_vec("v", v, "[m/s]");
-
-        ss
-            << std::left << std::setw(8) << "w"
-            << "[ "
-            << std::right << std::setw(10) << util::rad_to_deg(w.x()) << ", "
-            << std::right << std::setw(10) << util::rad_to_deg(w.y()) << ", "
-            << std::right << std::setw(10) << util::rad_to_deg(w.z())
-            << " ] [deg/s]\n";
-
-        ss << print_vec("g", g, "[m/s^2]");
-        ss << print_vec("wind", wind, "[m/s]");
-
-        ss
-            << std::left << std::setw(8) << "geo"
-            << "lat: " << std::right << std::setw(10) << util::rad_to_deg(geo.lat.data) << " [deg], "
-            << "lon: " << std::right << std::setw(10) << util::rad_to_deg(geo.lon.data) << " [deg], "
-            << "alt: " << std::right << std::setw(10) << geo.alt.data << " [m]\n";
-
-        ss
-            << std::left << std::setw(8) << "aero"
-            << "alpha: " << std::right << std::setw(10) << util::rad_to_deg(aero.alpha.data) << " [deg], "
-            << "beta: "  << std::right << std::setw(10) << util::rad_to_deg(aero.beta.data)  << " [deg]\n";
-
-        ss
-            << "---------------------------------------------------------------------------------\n";
-
-        spdlog::info(ss.str());
     }
 
 }

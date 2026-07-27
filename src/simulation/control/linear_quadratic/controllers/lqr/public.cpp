@@ -1,4 +1,3 @@
-#include "simulation/actuators/public.hpp"
 #include "simulation/control/linear_quadratic/controllers/lqr/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/guidance/public.hpp"
@@ -18,19 +17,19 @@ namespace control {
 
         return {
             .zt = zt_deviation,
-            .A = input.A,
-            .B = input.B
+            .A_virtual = input.virtual_linearization.A_virtual,
+            .B_virtual = input.virtual_linearization.B_virtual
         };
     }
 
-    ControlOutput LinearQuadraticRegulator::step(const LinearQuadraticControllerInput& input, double dt) {
-        actuators::ActuatorInputsVector_T<double> u_deviation = policy.step(
+    VirtualControlOutput_T<double> LinearQuadraticRegulator::step(const LinearQuadraticControllerInput& input, double) {
+        VirtualControlOutputVector_T<double> mu_deviation = policy.step(
             make_linear_quadratic_policy_input(input)
         );
-        actuators::ActuatorInputsVector_T<double> u_trim = actuators::unpack_actuator_inputs_T(input.u_sol_trim);
-        actuators::ActuatorInputsVector_T<double> u_cmd = u_deviation + u_trim;
+        VirtualControlOutputVector_T<double> mu_trim = dynamics::unpack_wrench_T(input.mu_sol_trim);
+        VirtualControlOutputVector_T<double> mu = mu_deviation + mu_trim;
 
-        return make_control_output(u_cmd);
+        return dynamics::pack_wrench(mu);
     }
 
 }

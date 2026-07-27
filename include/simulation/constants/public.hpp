@@ -77,4 +77,5 @@ namespace constants {
     inline constexpr std::size_t state_input_dim = state_dim + input_dim;
 
     inline constexpr std::size_t virtual_input_dim = 6;
+    inline constexpr std::size_t virtual_state_input_dim = state_dim + virtual_input_dim;
 }

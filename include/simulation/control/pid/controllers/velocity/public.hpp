@@ -12,7 +12,7 @@ namespace control {
         PIDPolicy policy;
 
         VelocityPID(const VelocityPIDParameters& params);
-        ControlOutput step(const VelocityControllerInput& input, double dt);
+        VirtualControlOutput_T<double> step(const VelocityControllerInput& input, double dt);
 
         PIDPolicyInput make_pid_policy_input(const VelocityControllerInput& input);
     };

@@ -67,7 +67,7 @@ namespace control {
         }
     }
 
-    ControlOutput AttitudePID::step(const AttitudeControllerInput& input, double dt) {
+    VirtualControlOutput_T<double> AttitudePID::step(const AttitudeControllerInput& input, double dt) {
         actuators::SurfaceActuatorInputs_T<double> u_surface{};
         actuators::PropulsorActuatorInputs_T<double> u_propulsor{};
 

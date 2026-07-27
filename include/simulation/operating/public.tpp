@@ -24,6 +24,16 @@ namespace operating {
     }
 
     template <typename T>
+    VirtualStateInputVector_T<T> unpack_virtual_state_input_T(const dynamics::State_T<T>& x, const dynamics::Wrench_T<T>& u) {
+        VirtualStateInputVector_T<T> out;
+        out << x.vx, x.vy, x.vz,
+               x.p, x.q, x.r,
+               x.phi, x.theta,
+               u.F, u.M;
+        return out;
+    }
+
+    template <typename T>
     std::tuple<dynamics::StateVector_T<T>, actuators::ActuatorInputsVector_T<T>> split_state_input_vector_T(const StateInputVector_T<T>& xu) {
         return {
             dynamics::StateVector_T<T>(xu.template head<constants::state_dim>()),
@@ -58,6 +68,46 @@ namespace operating {
                 .left_propulsor_cmd = xu(12),
                 .right_propulsor_cmd = xu(13),
             }
+        };
+    }
+
+    template <typename T>
+    dynamics::Wrench_T<T> pack_virtual_inputs_T(const VirtualStateInputVector_T<T>& xu) {
+        return {
+            .F = constants::Vector3_T<T>(xu(8), xu(9), xu(10)),
+            .M = constants::Vector3_T<T>(xu(11), xu(12), xu(13))
+        };
+    }
+
+    template <typename T>
+    actuators::ActuatorInputs_T<T> pack_actuator_inputs_T(const StateInputVector_T<T>& xu, const actuators::FixedActuatorInputs& fixed_actuator_inputs) {
+        actuators::ActuatorInputs_T<T> u = pack_actuator_inputs_T<T>(xu);
+        u.surface_inputs.flap_cmd = T(fixed_actuator_inputs.flap);
+        u.surface_inputs.spoiler_cmd = T(fixed_actuator_inputs.spoiler);
+        return u;
+    }
+
+    template <typename T>
+    OperatingPoint_T<T> pack_state_input_T(const StateInputVector_T<T>& xu) {
+        return { 
+            pack_state_T(xu), 
+            pack_actuator_inputs_T(xu) 
+        };
+    }
+
+    template <typename T>
+    OperatingPoint_T<T> pack_state_input_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u) {
+        return {
+            .state = x,
+            .input = u,
+        };
+    }
+
+    template <typename T>
+    VirtualOperatingPoint_T<T> pack_virtual_state_input_T(const VirtualStateInputVector_T<T>& xu) {
+        return { 
+            pack_state_T(xu), 
+            pack_virtual_inputs_T(xu) 
         };
     }
 

@@ -1,5 +1,6 @@
 #include <stdexcept>
 #include "simulation/estimation/public.hpp"
+#include "simulation/control/shared/public.hpp"
 
 namespace estimation {
 
@@ -23,5 +24,26 @@ namespace estimation {
         }
 
         return out;
+    }
+
+    EstimatorInputs build_estimator_inputs(const dynamics::RigidBodyState& Yt, const trim::TrimSolution& trim_sol, const linearization::LocalLinearization& lin_sol, autodiff::AutoDiffModel& model, const control::ControlOutput& u_cmd_t_1, const operating::OperatingConditions& conditions) {
+
+        EstimatorInputs estimator_inputs {
+            .Yt = Yt,
+            .linear_kalman_estimator_input = LinearKalmanEstimatorInput {
+                .Yt = Yt,
+                .operating_point = trim_sol.operating_point,
+                .lin_sol = lin_sol,
+                .u_cmd_t_1 = u_cmd_t_1
+            },
+            .extended_kalman_estimator_input = ExtendedKalmanEstimatorInput {
+                .Yt = Yt,
+                .u_cmd_t_1 = u_cmd_t_1,
+                .model = model,
+                .conditions = conditions
+            }
+        };
+
+        return estimator_inputs;
     }
 }

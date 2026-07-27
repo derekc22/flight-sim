@@ -16,13 +16,13 @@ namespace estimation {
 
         dynamics::State_T<double> zt_1 = dynamics::pack_state_T(prev.zt);
         actuators::ActuatorInputs_T<double> ut_1 = actuators::pack_actuator_inputs_T(input.ut_1);
+        operating::OperatingPoint_T<double> operating_point{ .state = zt_1, .input = ut_1 };
 
         // A @ zt_1 + B @ ut_1 -> f(zt_1, ut_1)
-        dynamics::StateDot_T<double> zt_1_dot = autodiff::compute_state_dot_T(zt_1, ut_1, input.model, input.conditions, dt);
+        dynamics::StateDot_T<double> zt_1_dot = autodiff::compute_state_dot_T(operating_point, input.model, input.conditions, dt);
         dynamics::StateVector_T<double> zt_bar = prev.zt + dynamics::unpack_state_dot_T(zt_1_dot) * dt;
 
         // A -> Ft
-        operating::OperatingPoint operating_point{ .state = zt_1, .input = ut_1 };
         linearization::LocalLinearization lin_sol = linearization::linearize_operating_point(input.model, operating_point, input.conditions);
         linearization::StateJacobian Ft = linearization::discretize_euler(lin_sol, dt).A;
 

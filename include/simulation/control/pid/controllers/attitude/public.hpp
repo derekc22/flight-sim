@@ -27,7 +27,7 @@ namespace control {
         PIDPolicy vertical_policy;
 
         AttitudePID(const AttitudePIDParameters& params);
-        ControlOutput step(const AttitudeControllerInput& input, double dt);
+        VirtualControlOutput_T<double> step(const AttitudeControllerInput& input, double dt);
 
         virtual PIDPolicyInput make_pid_policy_input(const AttitudeControllerInput& input, ControlAxis axis);
     };

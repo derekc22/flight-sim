@@ -52,22 +52,12 @@ namespace trim {
         if (options.min_step_scale <= 0.0 || options.min_step_scale > 1.0) throw std::invalid_argument("trim::validate_trim_solve_options: min_step_scale must be in (0, 1]");
     }
 
-    dynamics::Wrench compute_trim_wrench(const operating::OperatingPoint& operating_point, autodiff::AutoDiffModel& model, const operating::OperatingConditions& conditions) {
-        const dynamics::Wrench_T<double> net_wrench = autodiff::compute_net_wrench_T<double>(operating_point.state, operating_point.input, model, conditions, constants::dt);
-
-        return {
-            .F = dynamics::Force{ net_wrench.F },
-            .M = dynamics::Moment{ net_wrench.M },
-        };
-    }
-
     TrimSolution build_trim_solution(const operating::StateInputVector_T<double>& xu, const TrimResidualVector_T<double>& residual, const TrimResidualVector_T<double>& weighted_residual, autodiff::AutoDiffModel& model, const operating::OperatingConditions& conditions, bool converged, std::size_t iterations) {
         TrimSolution out;
         out.operating_point.state = operating::pack_state_T<double>(xu);
-        out.operating_point.input = pack_trim_actuator_inputs_T<double>(xu, model.fixed_actuator_inputs);
+        out.operating_point.input = operating::pack_actuator_inputs_T<double>(xu, model.fixed_actuator_inputs);
         out.conditions = conditions;
-        out.wrench = compute_trim_wrench(out.operating_point, model, out.conditions);
-        out.variables = operating::unpack_state_input_T<double>(out.operating_point.state, out.operating_point.input);
+        out.wrench = autodiff::compute_net_wrench_T<double>(out.operating_point, model, conditions, constants::dt);
         out.attempted = true;
         out.converged = converged;
         out.iterations = iterations;

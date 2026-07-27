@@ -43,6 +43,20 @@ namespace dynamics {
         return out;
     }
 
+  Wrench pack_wrench(const WrenchVector_T<double>& wrench) {
+      return {
+          .F = Force{ Eigen::Vector3d(wrench(0), wrench(1), wrench(2)) },
+          .M = Moment{ Eigen::Vector3d(wrench(3), wrench(4), wrench(5)) }
+      };
+  }
+
+  Wrench pack_wrench(const Wrench_T<double>& wrench) {
+      return {
+        .F = dynamics::Force{ wrench.F },
+        .M = dynamics::Moment{ wrench.M },
+      };
+  }
+
     template <typename T>
     Twist_T<T> build_twist_from_state_T(const State_T<T>& x) {
         Twist_T<T> twist;

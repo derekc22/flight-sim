@@ -1,9 +1,5 @@
 #pragma once
 #include <Eigen/Dense>
-#include "simulation/util/cppad/public.hpp"
-#include "simulation/util/linalg/public.hpp"
-#include "simulation/util/trig/public.hpp"
-#include "simulation/util/units/public.hpp"
 
 namespace util {
 

@@ -11,7 +11,7 @@ namespace control {
         LinearQuadraticPolicy policy;
 
         LinearQuadraticRegulator(const LinearQuadraticRegulatorParameters& params);
-        ControlOutput step(const LinearQuadraticControllerInput& input, double dt);
+        VirtualControlOutput_T<double> step(const LinearQuadraticControllerInput& input, double);
 
         LinearQuadraticPolicyInput make_linear_quadratic_policy_input(const LinearQuadraticControllerInput& input);
     };

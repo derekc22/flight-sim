@@ -1,6 +1,4 @@
 #pragma once
-#include <Eigen/Dense>
-#include <optional>
 #include "simulation/dynamics/public.hpp"
 #include "simulation/estimation/shared/public.hpp"
 #include "simulation/estimation/kalman/linear_kalman/public.hpp"

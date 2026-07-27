@@ -10,6 +10,14 @@ namespace control {
 
     using ControlOutput = actuators::ActuatorInputs_T<double>;
 
+	using VirtualControlOutput = dynamics::Wrench;
+
+	template <typename T>
+	using VirtualControlOutputVector_T = dynamics::WrenchVector_T<T>;
+
+	template <typename T>
+    using VirtualControlOutput_T = dynamics::Wrench_T<T>;
+
     struct AttitudeControllerInput {
         const dynamics::RigidBodyState& Zt;
         const actuators::SurfaceActuators& surface_actuators;
@@ -24,11 +32,10 @@ namespace control {
 
     struct LinearQuadraticControllerInput {
         const dynamics::RigidBodyState& Zt;
-        const actuators::ActuatorInputs_T<double>& u_sol_trim;
+        const VirtualControlOutput_T<double>& mu_sol_trim;
         const actuators::SurfaceActuators& surface_actuators;
         const actuators::PropulsorActuators& propulsor_actuators;
-        const linearization::StateJacobian& A;
-        const linearization::InputJacobian& B;
+        const linearization::VirtualLocalLinearization& virtual_linearization;
         const guidance::LinearQuadraticSetpoint& setpoint;
     };
 

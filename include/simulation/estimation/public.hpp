@@ -16,9 +16,9 @@ namespace estimation {
     using ExtendedKalmanEstimator = std::function<EstimationOutput(const ExtendedKalmanEstimatorInput&, double dt)>;
 
     struct EstimatorInputs {
-        const dynamics::RigidBodyState& Yt;
-        const LinearKalmanEstimatorInput& linear_kalman_estimator_input;
-        const ExtendedKalmanEstimatorInput& extended_kalman_estimator_input;
+        const dynamics::RigidBodyState Yt;
+        const LinearKalmanEstimatorInput linear_kalman_estimator_input;
+        const ExtendedKalmanEstimatorInput extended_kalman_estimator_input;
     };
 
     struct EstimationProperties {
@@ -30,4 +30,7 @@ namespace estimation {
 
         EstimationOutput step(const EstimatorInputs& inputs, double dt, bool trim_flag);
     };
+
+    EstimatorInputs build_estimator_inputs(const dynamics::RigidBodyState& Yt, const trim::TrimSolution& trim_sol, const linearization::LocalLinearization& lin_sol, autodiff::AutoDiffModel& model, const control::ControlOutput& u_cmd_t_1, const operating::OperatingConditions& conditions);
+
 }

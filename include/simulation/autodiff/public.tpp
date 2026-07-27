@@ -17,11 +17,14 @@
 namespace autodiff {
 
     template <typename T>
-    dynamics::Wrench_T<T> compute_net_wrench_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u, AutoDiffModel& model, const operating::OperatingConditions& conditions, T dt) {
+    dynamics::Wrench_T<T> compute_net_wrench_T(const operating::OperatingPoint_T<T>& operating_point, AutoDiffModel& model, const operating::OperatingConditions& conditions, T dt) {
+        const dynamics::State_T<T> x = operating_point.state;
+        actuators::ActuatorInputs_T<T> u = operating_point.input;
+
         const dynamics::Twist_T<T> twist = dynamics::build_twist_from_state_T(x);
-        actuators::ActuatorInputs_T<T> inputs = u;
-        inputs.surface_inputs.flap_cmd = T(model.fixed_actuator_inputs.flap);
-        inputs.surface_inputs.spoiler_cmd = T(model.fixed_actuator_inputs.spoiler);
+
+        u.surface_inputs.flap_cmd = T(model.fixed_actuator_inputs.flap);
+        u.surface_inputs.spoiler_cmd = T(model.fixed_actuator_inputs.spoiler);
 
         // recall, the definition of steady trim is ẋ = f(x, u) = 0
         // that is, for trim, d/dt(·) = 0 must be enforced for all modelled state variables
@@ -36,7 +39,7 @@ namespace autodiff {
             propulsion::PropellerOmegaDotSet_T<T>{} : // set omega_dot = 0 if computing gradients for trim (steady state)
             propulsion::compute_propeller_omega_dot_set_T<T>(
                 model.propulsor_actuators, 
-                inputs.propulsor_inputs,
+                u.propulsor_inputs,
                 conditions.atm, 
                 dt
         );
@@ -47,7 +50,7 @@ namespace autodiff {
             model,
             twist,
             conditions.atm,
-            inputs,
+            u,
             propeller_omega_dot_set,
             conditions.windB,
             gB
@@ -57,9 +60,19 @@ namespace autodiff {
     }
 
     template <typename T>
-    dynamics::StateDot_T<T> compute_state_dot_T(const dynamics::State_T<T>& x, const actuators::ActuatorInputs_T<T>& u, AutoDiffModel& model, const operating::OperatingConditions& conditions, T dt) {
+    dynamics::StateDot_T<T> compute_state_dot_T(const operating::OperatingPoint_T<T>& operating_point, AutoDiffModel& model, const operating::OperatingConditions& conditions, T dt) {
+        const dynamics::Wrench_T<T> net_wrench = compute_net_wrench_T<T>(operating_point, model, conditions, dt);
+        return compute_state_dot_from_net_wrench_T(operating_point.state, model, net_wrench);
+    }
+
+    template <typename T>
+    dynamics::StateDot_T<T> compute_state_dot_T(const operating::VirtualOperatingPoint_T<T>& operating_point, AutoDiffModel& model) {
+        return compute_state_dot_from_net_wrench_T(operating_point.state, model, operating_point.input);
+    }
+
+    template <typename T>
+    dynamics::StateDot_T<T> compute_state_dot_from_net_wrench_T(const dynamics::State_T<T>& x, AutoDiffModel& model, const dynamics::Wrench_T<T>& net_wrench) {
         const dynamics::Twist_T<T> twist = dynamics::build_twist_from_state_T(x);
-        const dynamics::Wrench_T<T> net_wrench = compute_net_wrench_T<T>(x, u, model, conditions, dt);
         const constants::Vector3_T<T> v_dot = dynamics::ddtB_vB_BI_T<T>(twist.v, twist.w, model.structural.mass.data, net_wrench.F);
         const constants::Vector3_T<T> w_dot = dynamics::ddtB_wB_BI_T<T>(twist.w, model.structural.JB.data, net_wrench.M);
         const constants::Vector3_T<T> eul_dot = dynamics::wB_BI_to_eul_dot_T<T>(twist.w, x.theta, x.phi);

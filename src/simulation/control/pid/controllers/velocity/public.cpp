@@ -15,7 +15,6 @@ namespace control {
 
     PIDPolicyInput VelocityPID::make_pid_policy_input(const VelocityControllerInput& input) {
         dynamics::RigidBodyState Zt = input.Zt;
-        actuators::PropulsorActuators propulsor_actuators = input.propulsor_actuators;
         guidance::VelocitySetpoint setpoint = input.setpoint;
 
         return {
@@ -24,7 +23,7 @@ namespace control {
         };
     }
 
-    ControlOutput VelocityPID::step(const VelocityControllerInput& input, double dt) {
+    VirtualControlOutput_T<double> VelocityPID::step(const VelocityControllerInput& input, double dt) {
         actuators::SurfaceActuatorInputs_T<double> u_surface{};
         actuators::PropulsorActuatorInputs_T<double> u_propulsor{};
 

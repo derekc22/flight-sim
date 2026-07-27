@@ -1,20 +1,17 @@
 #pragma once
-#include "Eigen/Dense"
 #include <tuple>
 #include "simulation/control/public.hpp"
 #include "simulation/dynamics/public.hpp"
+#include "simulation/linearization/public.hpp"
 #include "simulation/qp/public.hpp"
 
 namespace allocator {
 
 	using EffectivenessMatrix = constants::MatrixX_T<double, constants::virtual_input_dim, constants::input_dim>;
 
-	template <typename T>
-	using VirtualControlOutputVector_T = dynamics::WrenchVector_T<T>;
-
 	struct AllocatorInput {
-		VirtualControlOutputVector_T<double> mu;
-		operating::OperatingPoint operating_point;	// (xt, ut_1)
+		control::VirtualControlOutputVector_T<double> mu;
+		operating::OperatingPoint_T<double> operating_point;	// (xt, ut_1)
         operating::OperatingConditions conditions;
         autodiff::AutoDiffModel& model;
     };
@@ -27,7 +24,6 @@ namespace allocator {
         control::ControlOutput step(const AllocatorInput& input);
     };
 
-	std::tuple<EffectivenessMatrix, dynamics::WrenchVector_T<double>> linearize_operating_point(autodiff::AutoDiffModel& model, const operating::OperatingPoint& operating_point, const operating::OperatingConditions& conditions);
-
+	std::tuple<EffectivenessMatrix, dynamics::WrenchVector_T<double>> compute_effectiveness_matrix(autodiff::AutoDiffModel& model, const operating::OperatingPoint_T<double>& operating_point, const operating::OperatingConditions& conditions);
 
 }
