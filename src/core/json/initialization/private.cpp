@@ -6,7 +6,7 @@
 #include "simulation/dynamics/public.hpp"
 #include "simulation/geography/public.hpp"
 #include "simulation/vehicles/public.hpp"
-#include "simulation/util/public.hpp"
+#include "simulation/util/trig/public.hpp"
 
 namespace json {
 

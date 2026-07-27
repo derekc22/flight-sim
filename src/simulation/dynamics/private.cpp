@@ -3,7 +3,8 @@
 #include "simulation/dynamics/private.hpp"
 #include "simulation/constants/public.hpp"
 #include "simulation/integrators/public.hpp"
-#include "simulation/util/public.hpp"
+#include "simulation/util/linalg/public.hpp"
+#include "simulation/util/trig/public.hpp"
 
 namespace dynamics {
 

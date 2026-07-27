@@ -1,11 +1,7 @@
 
-#include <tuple>
-#include "simulation/actuators/propulsor/public.hpp"
-#include "simulation/actuators/surface/public.hpp"
 #include "simulation/control/pid/controllers/velocity/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/guidance/public.hpp"
-#include "simulation/util/public.hpp"
 
 namespace control {
 
@@ -24,20 +20,13 @@ namespace control {
     }
 
     VirtualControlOutput_T<double> VelocityPID::step(const VelocityControllerInput& input, double dt) {
-        actuators::SurfaceActuatorInputs_T<double> u_surface{};
-        actuators::PropulsorActuatorInputs_T<double> u_propulsor{};
+        VirtualControlOutput_T<double> out{};
 
-        double T_tot = policy.step(
+        out.F.x() = policy.step(
             make_pid_policy_input(input),
             dt
         );
 
-        auto [T_front, T_left, T_right] = allocate_thrust(T_tot, input.propulsor_actuators);
-
-        u_propulsor.front_propulsor_cmd = T_front;
-        u_propulsor.left_propulsor_cmd = T_left;
-        u_propulsor.right_propulsor_cmd = T_right;
-
-        return { u_surface, u_propulsor };
+        return out;
     }
 }

@@ -625,7 +625,8 @@ namespace vehicles {
         const sensors::SensorProperties& sensor_properties,
         const avionics::AvionicsProperties& avionics_properties,
         const guidance::GuidanceProperties& guidance_properties,
-        const estimation::EstimationProperties& estimation_properties
+        const estimation::EstimationProperties& estimation_properties,
+        const allocator::AllocatorProperties& allocator_properties
     ) :
         id(id),
         NEDFrameECEF{},
@@ -640,7 +641,8 @@ namespace vehicles {
         sensor_properties(sensor_properties),
         avionics_properties(avionics_properties),
         guidance_properties(guidance_properties),
-        estimation_properties(estimation_properties)
+        estimation_properties(estimation_properties),
+        allocator_properties(allocator_properties)
     {
         init_frames();
     }

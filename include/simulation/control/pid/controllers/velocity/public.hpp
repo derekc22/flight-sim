@@ -1,6 +1,4 @@
 #pragma once
-#include <tuple>
-#include "simulation/actuators/propulsor/public.hpp"
 #include "simulation/control/shared/public.hpp"
 #include "simulation/control/pid/public.hpp"
 

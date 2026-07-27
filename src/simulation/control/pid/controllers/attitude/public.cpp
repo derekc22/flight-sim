@@ -1,7 +1,5 @@
 
 #include <stdexcept>
-#include "simulation/actuators/propulsor/public.hpp"
-#include "simulation/actuators/surface/public.hpp"
 #include "simulation/control/pid/controllers/attitude/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/guidance/public.hpp"
@@ -33,7 +31,7 @@ namespace control {
         )
     {};
 
-    PIDPolicyInput AttitudePID::make_pid_policy_input(const AttitudeControllerInput& input, ControlAxis axis) {
+    PIDPolicyInput AttitudePID::make_pid_policy_input(const AttitudeControllerInput& input, AttitudeAxis axis) {
         dynamics::RigidBodyState Zt = input.Zt;
         guidance::AttitudeSetpoint setpoint = input.setpoint;
 
@@ -41,21 +39,21 @@ namespace control {
         eul_est_t.set(Zt.q);
 
         switch (axis) {
-            case ControlAxis::Lateral:
+            case AttitudeAxis::Lateral:
                 return {
                     .x = eul_est_t.phi(),
                     .x_des = setpoint.eulIB.phi(),
                     .x_dot = Zt.w.p()
                 };
 
-            case ControlAxis::Longitudinal:
+            case AttitudeAxis::Longitudinal:
                 return {
                     .x = eul_est_t.theta(),
                     .x_des = setpoint.eulIB.theta(),
                     .x_dot = Zt.w.q()
                 };
 
-            case ControlAxis::Vertical:
+            case AttitudeAxis::Vertical:
                 return {
                     .x = eul_est_t.psi(),
                     .x_des = setpoint.eulIB.psi(),
@@ -68,25 +66,24 @@ namespace control {
     }
 
     VirtualControlOutput_T<double> AttitudePID::step(const AttitudeControllerInput& input, double dt) {
-        actuators::SurfaceActuatorInputs_T<double> u_surface{};
-        actuators::PropulsorActuatorInputs_T<double> u_propulsor{};
+        VirtualControlOutput_T<double> out{};
 
-        u_surface.aileron_cmd = lateral_policy.step(
-            make_pid_policy_input(input, ControlAxis::Lateral),
+        out.M.x() = lateral_policy.step(
+            make_pid_policy_input(input, AttitudeAxis::Lateral),
             dt
         );
 
-        u_surface.elevator_cmd = longitudinal_policy.step(
-            make_pid_policy_input(input, ControlAxis::Longitudinal),
+        out.M.y() = longitudinal_policy.step(
+            make_pid_policy_input(input, AttitudeAxis::Longitudinal),
             dt
         );
 
-        u_surface.rudder_cmd = vertical_policy.step(
-            make_pid_policy_input(input, ControlAxis::Vertical),
+        out.M.z() = vertical_policy.step(
+            make_pid_policy_input(input, AttitudeAxis::Vertical),
             dt
         );
 
-        return { u_surface, u_propulsor };
+        return out;
     }
 
 }

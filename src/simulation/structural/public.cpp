@@ -8,7 +8,7 @@
 #include "simulation/structural/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/constants/public.hpp"
-#include "simulation/util/public.hpp"
+#include "simulation/util/linalg/public.hpp"
 
 namespace structural {
 

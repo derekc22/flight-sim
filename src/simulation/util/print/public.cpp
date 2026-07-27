@@ -5,6 +5,7 @@
 #include "simulation/geography/public.hpp"
 #include "simulation/aerodynamics/public.hpp"
 #include "simulation/atmospheric/public.hpp"
+#include "simulation/util/trig/public.hpp"
 
 namespace util {
 

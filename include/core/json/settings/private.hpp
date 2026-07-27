@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
 #include <nlohmann/json.hpp>
-#include "core/json/settings/public.hpp"
 #include "simulation/actuators/actuator/public.hpp"
 #include "simulation/actuators/public.hpp"
 #include "simulation/settings/public.hpp"

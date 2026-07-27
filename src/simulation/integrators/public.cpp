@@ -6,6 +6,7 @@
 #include "simulation/propulsion/public.hpp"
 #include "simulation/structural/public.hpp"
 #include "simulation/transforms/public.hpp"
+#include "simulation/util/trig/public.hpp"
 
 namespace integrators {
 

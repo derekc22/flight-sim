@@ -1,8 +1,6 @@
 #include <chrono>
 #include <string>
 #include <thread>
-#include <iomanip>
-#include <sstream>
 #include "simulation/runner/public.hpp"
 #include "simulation/runner/private.hpp"
 #include "simulation/actuators/public.hpp"
@@ -13,7 +11,6 @@
 #include "simulation/control/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/geography/public.hpp"
-#include "simulation/util/trig/public.hpp"
 #include "simulation/util/print/public.hpp"
 #include "simulation/estimation/public.hpp"
 #include "simulation/frames/public.hpp"
@@ -32,6 +29,7 @@
 #include "core/devices/public.hpp"
 #include "core/json/actuators/public.hpp"
 #include "core/json/aerodynamics/public.hpp"
+#include "core/json/allocator/public.hpp"
 #include "core/json/avionics/public.hpp"
 #include "core/json/sensors/public.hpp"
 #include "core/json/control/public.hpp"
@@ -49,7 +47,7 @@ namespace runner {
     vehicles::Aircraft load_vehicle(const std::string& aircraft_id, const JSONFlags& json_flags) {
         structural::StructuralProperties structural_properties = json::parse_structural_config();
         actuators::ActuatorProperties actuator_properties = json::parse_actuator_config(structural_properties);
-        control::ControlProperties control_properties = json::parse_control_config();
+        control::ControlProperties control_properties = json::parse_control_config(json_flags.trim_flag);
 
         // create vehicle from config
         vehicles::Aircraft aircraft {
@@ -61,7 +59,8 @@ namespace runner {
             json::parse_sensors_config(),
             json::parse_avionics_config(),
             json::parse_guidance_config(control_properties),
-            json::parse_estimation_config()
+            json::parse_estimation_config(json_flags.trim_flag),
+            json::parse_allocator_config()
         };
 
         // set initial conditions from config
@@ -184,6 +183,7 @@ namespace runner {
         guidance::GuidanceProperties& guidance_properties = aircraft.guidance_properties;
         sensors::SensorProperties& sensor_properties = aircraft.sensor_properties;
         avionics::AvionicsProperties& avionics_properties = aircraft.avionics_properties;
+        allocator::AllocatorProperties& allocator_properties = aircraft.allocator_properties;
 
         // get flags
         CLIFlags& cli_flags = cli_options.flags;
@@ -276,11 +276,20 @@ namespace runner {
                 // overwrite actuator lag state with trim controls
                 // trim::update_actuators_lag_from_trim(surface_actuators, propulsor_actuators, trim_sol);
 
-                // linearize
+                // compute linearization
                 lin_sol = linearization::linearize_operating_point(
                     autodiff_model,
                     trim_sol.operating_point,
                     trim_sol.conditions
+                );
+
+                // compute virtual linearization
+                virtual_lin_sol = linearization::linearize_virtual_operating_point(
+                    autodiff_model,
+                    operating::VirtualOperatingPoint_T<double>{
+                        .state=trim_sol.operating_point.state,
+                        .input=trim_sol.wrench
+                    }
                 );
 
                 // perform eigenanalysis
@@ -357,7 +366,7 @@ namespace runner {
             if (scheduler.estimation_tick >= constants::hz) {
                 double estimation_dt = scheduler.estimation_elapsed_ticks * constants::dt;
 
-                estimation::EstimatorInputs estimator_inputs = estimation::build_estimator_inputs(
+                estimation::EstimatorInputs estimator_inputs = estimation_properties.build_estimator_inputs(
                     Yt,
                     trim_sol, lin_sol,
                     autodiff_model,
@@ -366,7 +375,7 @@ namespace runner {
                 );
 
                 // overwrite local estimated state with estimator result
-                Zt = estimation_properties.step(estimator_inputs, estimation_dt, json_flags.trim_flag).Zt;
+                Zt = estimation_properties.step(estimator_inputs, estimation_dt).Zt;
                 Zt_1 = Zt;
 
                 scheduler.estimation_tick -= constants::hz;
@@ -379,7 +388,7 @@ namespace runner {
         guidance::GuidanceSetpoint setpoint{};
 
         // initialize virtual control command
-        control::VirtualControlOutput_T<double> mu_cmd{};
+        control::VirtualControlOutput mu_cmd{};
 
         // initialize control command
         control::ControlOutput u_cmd{};
@@ -403,7 +412,7 @@ namespace runner {
 
         // no need to rate-limit as the trim command is fixed
         else if (current_mode == fsm::FiniteState::AutopilotTrim) {
-            mu_cmd = trim_sol.wrench;
+            mu_cmd = dynamics::pack_wrench(trim_sol.wrench);
         }
 
         else if (current_mode == fsm::FiniteState::Autopilot) {
@@ -418,32 +427,31 @@ namespace runner {
             if (scheduler.control_tick >= constants::hz) {
                 double control_dt = scheduler.control_elapsed_ticks * constants::dt;
 
-                linearization::VirtualLocalLinearization virtual_lin_sol = linearization::linearize_virtual_operating_point(
-                    autodiff_model,
-                    operating::VirtualOperatingPoint_T<double>(
-                        trim_sol.operating_point.state,
-                        trim_sol.wrench
-                    )
-                );
-
-                control::ControllerInputs controller_inputs = control::build_controller_inputs(
+                control::ControllerInputs controller_inputs = control_properties.build_controller_inputs(
                     Zt, 
                     trim_sol, virtual_lin_sol, 
                     surface_actuators, propulsor_actuators, 
                     setpoint
                 );
 
-                mu_cmd = control_properties.step(controller_inputs, control_dt, json_flags.trim_flag);
+                mu_cmd = control_properties.step(controller_inputs, control_dt);
+                mu_cmd_t_1 = mu_cmd;
 
                 scheduler.control_tick -= constants::hz;
                 scheduler.control_elapsed_ticks = 0;
             }
-            else mu_cmd = u_cmd_t_1; // perform ZOH
+            else mu_cmd = mu_cmd_t_1; // perform ZOH
         }
 
         // step control allocator
         if (current_mode == fsm::FiniteState::AutopilotTrim || current_mode == fsm::FiniteState::Autopilot) {
-            u_cmd = allocator.step();
+            u_cmd = allocator_properties.step(
+                allocator::build_allocator_input(
+                    mu_cmd, Zt, u_cmd_t_1, 
+                    transient_conditions, 
+                    autodiff_model
+                )
+            );
         }
 
         // apply fixed actuator inputs

@@ -1,6 +1,7 @@
 #pragma once
 #include "simulation/constants/public.hpp"
 #include "simulation/propulsion/public.hpp"
+#include "simulation/util/cppad/public.hpp"
 #include "simulation/util/public.hpp"
 
 namespace propulsion {

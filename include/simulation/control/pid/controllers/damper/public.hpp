@@ -8,6 +8,6 @@ namespace control {
     struct DamperPID : AttitudePID {
         using AttitudePID::AttitudePID;
 
-        PIDPolicyInput make_pid_policy_input(const AttitudeControllerInput& input, ControlAxis axis) override;
+        PIDPolicyInput make_pid_policy_input(const AttitudeControllerInput& input, AttitudeAxis axis) override;
     };
 }

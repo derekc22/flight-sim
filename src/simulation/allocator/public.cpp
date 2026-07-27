@@ -65,4 +65,24 @@ namespace allocator {
         return { jac_full, W_net_vec_double };
     }
 
+
+
+    AllocatorInput build_allocator_input(
+        const control::VirtualControlOutput& mu_cmd, 
+        const dynamics::RigidBodyState& Zt, 
+        const control::ControlOutput& u_cmd_t_1, 
+        const operating::OperatingConditions& conditions, 
+        autodiff::AutoDiffModel& model
+    ) {
+        return {
+            .mu = dynamics::unpack_wrench(mu_cmd),
+            .operating_point = {
+                .state = dynamics::pack_state(Zt),
+                .input = u_cmd_t_1
+            },
+            .conditions = conditions,
+            .model = model
+        };
+    }
+
 }

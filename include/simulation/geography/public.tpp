@@ -1,5 +1,6 @@
 #pragma once
-#include "simulation/util/public.hpp"
+#include "simulation/util/cppad/public.hpp"
+#include "simulation/util/trig/public.hpp"
 
 namespace geography {
 

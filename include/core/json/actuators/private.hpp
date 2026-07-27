@@ -2,7 +2,6 @@
 #include <string>
 #include <Eigen/Dense>
 #include <nlohmann/json.hpp>
-#include "core/json/actuators/public.hpp"
 #include "simulation/actuators/public.hpp"
 #include "simulation/structural/public.hpp"
 

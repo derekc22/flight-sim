@@ -19,14 +19,31 @@ namespace json {
         if (!parameters_json.is_object()) { 
             throw std::runtime_error("json::parse_damper_pid_parameters expected parameters object"); 
         }
-        if (!parameters_json.contains("Kp_roll") || !parameters_json.contains("Kp_pitch") || !parameters_json.contains("Kp_yaw")) {
-            throw std::runtime_error("json::parse_damper_pid_parameters requires Kp_roll, Kp_pitch, Kp_yaw");
+        if (
+            !parameters_json.contains("Kp_roll") || !parameters_json.contains("Ki_roll") || !parameters_json.contains("Kd_roll") ||
+            !parameters_json.contains("Kp_pitch") || !parameters_json.contains("Ki_pitch") || !parameters_json.contains("Kd_pitch") ||
+            !parameters_json.contains("Kp_yaw") || !parameters_json.contains("Ki_yaw") || !parameters_json.contains("Kd_yaw")
+        ) {
+            throw std::runtime_error("json::parse_damper_pid_parameters requires Kp, Ki, and Kd for the lateral, longitudinal, and vertical axes");
+        }
+        if (!parameters_json.contains("tau")) {
+            throw std::runtime_error("json::parse_damper_pid_parameters requires tau");
+        }
+        if (parameters_json.at("tau").get<double>() < 0.0) {
+            throw std::runtime_error("json::parse_damper_pid_parameters requires non-negative tau");
         }
 
         control::AttitudePIDParameters params{};
         params.Kp_roll = parameters_json.at("Kp_roll").get<double>();
+        params.Ki_roll = parameters_json.at("Ki_roll").get<double>();
+        params.Kd_roll = parameters_json.at("Kd_roll").get<double>();
         params.Kp_pitch = parameters_json.at("Kp_pitch").get<double>();
+        params.Ki_pitch = parameters_json.at("Ki_pitch").get<double>();
+        params.Kd_pitch = parameters_json.at("Kd_pitch").get<double>();
         params.Kp_yaw = parameters_json.at("Kp_yaw").get<double>();
+        params.Ki_yaw = parameters_json.at("Ki_yaw").get<double>();
+        params.Kd_yaw = parameters_json.at("Kd_yaw").get<double>();
+        params.tau = parameters_json.at("tau").get<double>();
         return params;
     }
 
@@ -220,11 +237,15 @@ namespace json {
         controller = make_nonlinear_controller(controller_type, controller_json);
     }
 
-    void validate_controllers(const nlohmann::json& controllers_json) {
+    void validate_controllers(const nlohmann::json& controllers_json, bool trim_flag) {
         bool has_attitude = controllers_json.contains("attitude");
         bool has_velocity = controllers_json.contains("velocity");
         bool has_linear_quadratic = controllers_json.contains("linear_quadratic");
         bool has_nonlinear = controllers_json.contains("nonlinear");
+
+        if (has_linear_quadratic && !trim_flag) {
+            throw std::runtime_error("json::validate_controllers: linear_quadratic control requires trim");
+        }
 
         if (has_attitude && has_linear_quadratic) { 
             throw std::runtime_error("json::validate_controllers: attitude and linear_quadratic control laws cannot both be present"); 
@@ -245,8 +266,8 @@ namespace json {
         }
     }
 
-    control::ControlProperties parse_control_properties(const nlohmann::json& config) {
-        validate_controllers(config);
+    control::ControlProperties parse_control_properties(const nlohmann::json& config, bool trim_flag) {
+        validate_controllers(config, trim_flag);
         control::ControlProperties control_properties;
 
         if (config.contains("attitude")) {

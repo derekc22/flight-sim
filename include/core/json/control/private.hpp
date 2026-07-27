@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
 #include <nlohmann/json.hpp>
-#include "core/json/control/public.hpp"
 #include "simulation/control/public.hpp"
 #include "simulation/control/linear_quadratic/controllers/lqi/public.hpp"
 #include "simulation/control/linear_quadratic/controllers/lqr/public.hpp"
@@ -34,9 +33,9 @@ namespace json {
     void parse_linear_quadratic_controller(const nlohmann::json& controller_json, control::LinearQuadraticController& controller, control::ControllerType& controller_type);
     void parse_nonlinear_controller(const nlohmann::json& controller_json, control::NonlinearController& controller, control::ControllerType& controller_type);
 
-    void validate_controllers(const nlohmann::json& controllers_json);
+    void validate_controllers(const nlohmann::json& controllers_json, bool trim_flag);
 
-    control::ControlProperties parse_control_properties(const nlohmann::json& config);
+    control::ControlProperties parse_control_properties(const nlohmann::json& config, bool trim_flag);
 }
 
 #include "core/json/control/private.tpp"

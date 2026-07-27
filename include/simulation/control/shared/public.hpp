@@ -20,13 +20,11 @@ namespace control {
 
     struct AttitudeControllerInput {
         const dynamics::RigidBodyState& Zt;
-        const actuators::SurfaceActuators& surface_actuators;
         const guidance::AttitudeSetpoint& setpoint;
     };
 
     struct VelocityControllerInput {
         const dynamics::RigidBodyState& Zt;
-        const actuators::PropulsorActuators& propulsor_actuators;
         const guidance::VelocitySetpoint& setpoint;
     };
 

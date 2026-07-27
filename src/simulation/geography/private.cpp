@@ -3,6 +3,7 @@
 #include "simulation/constants/public.hpp"
 #include "simulation/geography/private.hpp"
 #include "simulation/util/public.hpp"
+#include "simulation/util/trig/public.hpp"
 
 namespace geography {
 

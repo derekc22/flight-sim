@@ -3,7 +3,10 @@
 #include "simulation/atmospheric/public.hpp"
 #include "simulation/constants/public.hpp"
 #include "simulation/dynamics/public.hpp"
+#include "simulation/util/cppad/public.hpp"
+#include "simulation/util/linalg/public.hpp"
 #include "simulation/util/public.hpp"
+#include "simulation/util/trig/public.hpp"
 
 namespace aerodynamics {
 

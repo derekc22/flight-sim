@@ -3,11 +3,8 @@
 #include <optional>
 #include <string>
 #include "simulation/runner/public.hpp"
-#include "simulation/aerodynamics/public.hpp"
 #include "simulation/actuators/public.hpp"
-#include "simulation/atmospheric/public.hpp"
 #include "simulation/dynamics/public.hpp"
-#include "simulation/geography/public.hpp"
 #include "simulation/linearization/public.hpp"
 #include "simulation/trim/public.hpp"
 #include "simulation/vehicles/public.hpp"
@@ -71,6 +68,9 @@ namespace runner {
         trim::TrimSolution trim_sol;
         linearization::LocalLinearization lin_sol;
 
+        // initialize virtual linearization solution
+        linearization::VirtualLocalLinearization virtual_lin_sol;
+
         // initialize prior-step net wrench
         dynamics::Wrench WB_net_t_1{ 
             .F = dynamics::Force { constants::Zero3 }, 
@@ -82,6 +82,7 @@ namespace runner {
         dynamics::RigidBodyState Yt_1;
         dynamics::RigidBodyState Zt_1;
         guidance::GuidanceSetpoint setpoint_t_1;
+        control::VirtualControlOutput mu_cmd_t_1;
         control::ControlOutput u_cmd_t_1;
 
         // initialize udp out cache

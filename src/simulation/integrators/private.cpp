@@ -7,6 +7,8 @@
 #include "simulation/integrators/private.hpp"
 #include "simulation/operating/public.hpp"
 #include "simulation/propulsion/public.hpp"
+#include "simulation/util/linalg/public.hpp"
+#include "simulation/util/trig/public.hpp"
 
 namespace integrators {
 

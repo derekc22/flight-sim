@@ -6,7 +6,7 @@
 #include "simulation/frames/public.hpp"
 #include "simulation/integrators/public.hpp"
 #include "simulation/transforms/public.hpp"
-#include "simulation/util/public.hpp"
+#include "simulation/util/linalg/public.hpp"
 
 namespace dynamics {
 
@@ -167,6 +167,26 @@ namespace dynamics {
         double theta = eul.theta();
         double phi = eul.phi();
         return { eul_dot_to_wB_BI_mat(theta, phi) * eul_dot.data };
+    }
+
+    WrenchVector_T<double> unpack_wrench(const Wrench& wrench) {
+        WrenchVector_T<double> out;
+        out << wrench.F.data, wrench.M.data;
+        return out;
+    }
+
+    Wrench pack_wrench(const WrenchVector_T<double>& wrench) {
+        return {
+            .F = Force{ Eigen::Vector3d(wrench(0), wrench(1), wrench(2)) },
+            .M = Moment{ Eigen::Vector3d(wrench(3), wrench(4), wrench(5)) }
+        };
+    }
+
+    Wrench pack_wrench(const Wrench_T<double>& wrench) {
+        return {
+            .F = dynamics::Force{ wrench.F },
+            .M = dynamics::Moment{ wrench.M },
+        };
     }
 
     State_T<double> pack_state(const RigidBodyState& Xt) {

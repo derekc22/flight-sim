@@ -211,6 +211,11 @@ namespace dynamics {
     template <typename T>
     WrenchVector_T<T> unpack_wrench_T(const Wrench_T<T>& wrench);
 
+    template <typename T>
+    Wrench_T<T> pack_wrench_T(const WrenchVector_T<T>& wrench);
+
+    WrenchVector_T<double> unpack_wrench(const Wrench& wrench);
+
     Wrench pack_wrench(const WrenchVector_T<double>& wrench);
 
     Wrench pack_wrench(const Wrench_T<double>& wrench);
