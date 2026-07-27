@@ -1,4 +1,5 @@
 #include <tuple>
+#include <spdlog/spdlog.h>
 #include "simulation/allocator/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/control/public.hpp"
@@ -32,6 +33,7 @@ namespace allocator {
         const qp::Solution solution = solver.solve(problem);
 
         if (solution.status != qp::Status::Solved) {
+            spdlog::error("allocator::AllocatorProperties::step QP solve failed with status {}", static_cast<int>(solution.status));
             return input.operating_point.input;
         }
 

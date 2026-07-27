@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <cppad/example/cppad_eigen.hpp>
 #include <cppad/cppad.hpp>
+#include <spdlog/spdlog.h>
 #include "simulation/actuators/propulsor/public.hpp"
 #include "simulation/actuators/surface/public.hpp"
 #include "simulation/actuators/public.hpp"
@@ -132,6 +133,7 @@ namespace trim {
             const qp::Solution step_solution = solver.solve(step_problem);
 
             if (step_solution.status != qp::Status::Solved || !step_solution.x.allFinite()) {
+                spdlog::error("trim::solve_trim QP solve failed with status {}", static_cast<int>(step_solution.status));
                 break;
             }
 
