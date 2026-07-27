@@ -1,10 +1,12 @@
 #pragma once
+#include <array>
 #include "simulation/actuators/propulsor/public.hpp"
 #include "simulation/actuators/surface/public.hpp"
 #include "simulation/actuators/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/guidance/public.hpp"
 #include "simulation/linearization/public.hpp"
+#include "simulation/constants/public.hpp"
 
 namespace control {
 
@@ -17,6 +19,11 @@ namespace control {
 
 	template <typename T>
     using VirtualControlOutput_T = dynamics::Wrench_T<T>;
+
+    struct VirtualControlOutputSet {
+        VirtualControlOutput mu;
+        std::array<bool, constants::virtual_input_dim> mask;
+    };
 
     struct AttitudeControllerInput {
         const dynamics::RigidBodyState& Zt;

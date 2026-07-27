@@ -1,6 +1,7 @@
 #include <chrono>
 #include <string>
 #include <thread>
+#include <array>
 #include "simulation/runner/public.hpp"
 #include "simulation/runner/private.hpp"
 #include "simulation/actuators/public.hpp"
@@ -75,10 +76,14 @@ namespace runner {
         return aircraft;
     }
 
-    Scheduler::Scheduler(const ModuleRates& module_rates, int tf) : module_rates(module_rates) {
+    Scheduler::Scheduler(const ModuleRates& module_rates, int tf)
+        : module_rates(module_rates)
+    {
         double frac_guidance_steps = module_rates.guidance_hz / constants::hz; // fraction of steps that will call guidance
-        guidance_tf = 1 + // for the immediate call at t=0
-            std::floor((tf - 1) * frac_guidance_steps); // number of remaining steps that will call guidance
+        guidance_tf = 1 +  // for the immediate call at t=0
+            static_cast<int>(
+                std::floor((tf - 1) * frac_guidance_steps) // number of remaining steps that will call guidance
+            );
     }
 
     void Scheduler::step(fsm::FiniteState current_mode) {
@@ -228,11 +233,15 @@ namespace runner {
         // build autodiff model
         autodiff::AutoDiffModel autodiff_model = autodiff::build_autodiff_model(aircraft);
 
+        // initialize transient conditions
         operating::OperatingConditions transient_conditions{
             .atm = atm_t,
             .windB = windB,
             .steady_state = false
         };
+
+        // initialize active mask
+        std::array<bool, constants::virtual_input_dim> active_mask;
 
         // trim and linearization
         if (json_flags.trim_flag && !trim_sol.attempted) {
@@ -413,6 +422,7 @@ namespace runner {
         // no need to rate-limit as the trim command is fixed
         else if (current_mode == fsm::FiniteState::AutopilotTrim) {
             mu_cmd = dynamics::pack_wrench(trim_sol.wrench);
+            util::fill_arr(active_mask, 0, 6, true);
         }
 
         else if (current_mode == fsm::FiniteState::Autopilot) {
@@ -434,20 +444,29 @@ namespace runner {
                     setpoint
                 );
 
-                mu_cmd = control_properties.step(controller_inputs, control_dt);
+                control::VirtualControlOutputSet ctrl_out = control_properties.step(controller_inputs, control_dt);
+                mu_cmd = ctrl_out.mu;
+                active_mask = ctrl_out.mask;
+
                 mu_cmd_t_1 = mu_cmd;
+                active_mask_t_1 = active_mask;
 
                 scheduler.control_tick -= constants::hz;
                 scheduler.control_elapsed_ticks = 0;
             }
-            else mu_cmd = mu_cmd_t_1; // perform ZOH
+            else {
+                mu_cmd = mu_cmd_t_1; // perform ZOH
+                active_mask = active_mask_t_1;
+            }
         }
 
         // step control allocator
         if (current_mode == fsm::FiniteState::AutopilotTrim || current_mode == fsm::FiniteState::Autopilot) {
             u_cmd = allocator_properties.step(
                 allocator::build_allocator_input(
-                    mu_cmd, Zt, u_cmd_t_1, 
+                    mu_cmd,
+                    active_mask,
+                    Zt, u_cmd_t_1, 
                     transient_conditions, 
                     autodiff_model
                 )

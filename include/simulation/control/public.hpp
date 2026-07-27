@@ -3,6 +3,7 @@
 #include <optional>
 #include "simulation/control/shared/public.hpp"
 #include "simulation/trim/public.hpp"
+#include "simulation/constants/public.hpp"
 
 namespace control {
 
@@ -49,7 +50,7 @@ namespace control {
         LinearQuadraticController linear_quadratic_controller;
         NonlinearController nonlinear_controller;
 
-        VirtualControlOutput step(const ControllerInputs& inputs, double dt);
+        VirtualControlOutputSet step(const ControllerInputs& inputs, double dt);
 
         ControllerInputs build_controller_inputs(
             const dynamics::RigidBodyState& Zt, 

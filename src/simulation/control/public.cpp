@@ -1,34 +1,48 @@
-#include <Eigen/Dense>
+#include <array>
 #include "simulation/control/public.hpp"
 #include "simulation/control/shared/public.hpp"
+#include "simulation/constants/public.hpp"
+#include "simulation/util/public.hpp"
 
 namespace control {
 
-    VirtualControlOutput ControlProperties::step(const ControllerInputs& inputs, double dt) {
+    VirtualControlOutputSet ControlProperties::step(const ControllerInputs& inputs, double dt) {
         VirtualControlOutput_T<double> out{};
+        std::array<bool, constants::virtual_input_dim> active_mask{};
 
         if (attitude_controller && inputs.attitude_controller_input.has_value()) {
             VirtualControlOutput_T<double> _out = attitude_controller(inputs.attitude_controller_input.value(), dt);
             out.F += _out.F;
             out.M += _out.M;
+        	util::fill_arr(active_mask, 3, 6, true);
+
         }
         if (velocity_controller && inputs.velocity_controller_input.has_value()) {
             VirtualControlOutput_T<double> _out = velocity_controller(inputs.velocity_controller_input.value(), dt);
             out.F += _out.F;
             out.M += _out.M;
+        	util::fill_arr(active_mask, 0, 1, true);
         }
         if (linear_quadratic_controller && inputs.linear_quadratic_controller_input.has_value()) {
             VirtualControlOutput_T<double> _out = linear_quadratic_controller(inputs.linear_quadratic_controller_input.value(), dt);
             out.F += _out.F;
             out.M += _out.M;
+        	util::fill_arr(active_mask, 0, 6, true);
         }
         if (nonlinear_controller && inputs.nonlinear_controller_input.has_value()) {
             VirtualControlOutput_T<double> _out = nonlinear_controller(inputs.nonlinear_controller_input.value(), dt);
             out.F += _out.F;
             out.M += _out.M;
+        	util::fill_arr(active_mask, 0, 6, true);
         }
 
-        return { { out.F }, { out.M } };
+        return {
+	        {
+		        { out.F },
+	        	{ out.M }
+	        },
+        	active_mask
+        };
     }
 
     ControllerInputs ControlProperties::build_controller_inputs(

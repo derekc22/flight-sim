@@ -15,9 +15,16 @@ namespace allocator {
         const actuators::ActuatorInputsVector_T<double> u_0 = actuators::unpack_actuator_inputs_T(input.operating_point.input);
         const actuators::ActuatorLimitsVector limits = actuators::unpack_actuator_limits(input.model.actuator_limits);
 
+        dynamics::WrenchVector_T<double> err = (input.mu - mu_0);
+
+        // evaluate active mask
+        for (Eigen::Index i = 0; i < err.rows(); ++i) {
+            err(i) = input.active_mask[i] ? err(i) : 0.0;
+        }
+
         const qp::Problem problem{
             .hessian = E.transpose() * Q * E + R,
-            .gradient = -E.transpose() * Q * (input.mu - mu_0),
+            .gradient = -E.transpose() * Q * err,
             .lower = limits.col(0) - u_0,
             .upper = limits.col(1) - u_0
         };
@@ -68,7 +75,8 @@ namespace allocator {
 
 
     AllocatorInput build_allocator_input(
-        const control::VirtualControlOutput& mu_cmd, 
+        const control::VirtualControlOutput& mu_cmd,
+        const std::array<bool, constants::virtual_input_dim>& active_mask,
         const dynamics::RigidBodyState& Zt, 
         const control::ControlOutput& u_cmd_t_1, 
         const operating::OperatingConditions& conditions, 
@@ -76,6 +84,7 @@ namespace allocator {
     ) {
         return {
             .mu = dynamics::unpack_wrench(mu_cmd),
+            .active_mask = active_mask,
             .operating_point = {
                 .state = dynamics::pack_state(Zt),
                 .input = u_cmd_t_1

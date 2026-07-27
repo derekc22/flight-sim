@@ -1,5 +1,6 @@
 #pragma once
 #include <tuple>
+#include <array>
 #include "simulation/control/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/linearization/public.hpp"
@@ -11,6 +12,7 @@ namespace allocator {
 
 	struct AllocatorInput {
 		control::VirtualControlOutputVector_T<double> mu;
+		std::array<bool, constants::virtual_input_dim> active_mask;
 		operating::OperatingPoint_T<double> operating_point;	// (zt, ut_1)
         operating::OperatingConditions conditions;
         autodiff::AutoDiffModel& model;
@@ -27,8 +29,9 @@ namespace allocator {
 	std::tuple<EffectivenessMatrix, dynamics::WrenchVector_T<double>> compute_effectiveness_matrix(autodiff::AutoDiffModel& model, const operating::OperatingPoint_T<double>& operating_point, const operating::OperatingConditions& conditions);
 
     AllocatorInput build_allocator_input(
-        const control::VirtualControlOutput& mu_cmd, 
-        const dynamics::RigidBodyState& Zt, 
+        const control::VirtualControlOutput& mu_cmd,
+        const std::array<bool, constants::virtual_input_dim>& active_mask,
+        const dynamics::RigidBodyState& Zt,
         const control::ControlOutput& u_cmd_t_1, 
         const operating::OperatingConditions& conditions, 
         autodiff::AutoDiffModel& model

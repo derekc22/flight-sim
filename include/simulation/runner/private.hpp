@@ -12,7 +12,6 @@
 #include "simulation/constants/public.hpp"
 #include "simulation/sensors/public.hpp"
 #include "simulation/guidance/public.hpp"
-#include "simulation/control/public.hpp"
 #include "simulation/fsm/public.hpp"
 #include "core/messages/public.hpp"
 #include "core/connection/public.hpp"
@@ -83,6 +82,7 @@ namespace runner {
         dynamics::RigidBodyState Zt_1;
         guidance::GuidanceSetpoint setpoint_t_1;
         control::VirtualControlOutput mu_cmd_t_1;
+        std::array<bool, constants::virtual_input_dim> active_mask_t_1;
         control::ControlOutput u_cmd_t_1;
 
         // initialize udp out cache
