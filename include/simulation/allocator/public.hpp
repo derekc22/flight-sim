@@ -32,9 +32,11 @@ namespace allocator {
         const control::VirtualControlOutput& mu_cmd,
         const std::array<bool, constants::virtual_input_dim>& active_mask,
         const dynamics::RigidBodyState& Zt,
-        const control::ControlOutput& u_cmd_t_1, 
+        const control::ControlOutput& u_actual_t_1,
         const operating::OperatingConditions& conditions, 
         autodiff::AutoDiffModel& model
     );
+
+    EffectivenessMatrix apply_beta_scale(const EffectivenessMatrix& E, const actuators::ActuatorInputsVector_T<double>& time_constants);
 
 }

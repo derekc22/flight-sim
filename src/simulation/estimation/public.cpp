@@ -21,7 +21,7 @@ namespace estimation {
         const trim::TrimSolution& trim_sol, 
         const linearization::LocalLinearization& lin_sol, 
         autodiff::AutoDiffModel& model, 
-        const control::ControlOutput& u_cmd_t_1, 
+        const control::ControlOutput& u_actual_t_1,
         const operating::OperatingConditions& conditions
     ) {
         EstimatorInputs estimator_inputs{ .Yt = Yt };
@@ -31,13 +31,13 @@ namespace estimation {
                 .Yt = Yt,
                 .operating_point = trim_sol.operating_point,
                 .lin_sol = lin_sol,
-                .u_cmd_t_1 = u_cmd_t_1
+                .u_actual_t_1 = u_actual_t_1
             });
         }
         if (extended_kalman_estimator_type != EstimatorType::None) {
             estimator_inputs.extended_kalman_estimator_input.emplace(ExtendedKalmanEstimatorInput{
                 .Yt = Yt,
-                .u_cmd_t_1 = u_cmd_t_1,
+                .u_actual_t_1 = u_actual_t_1,
                 .model = model,
                 .conditions = conditions
             });

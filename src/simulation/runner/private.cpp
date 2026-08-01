@@ -379,7 +379,7 @@ namespace runner {
                     Yt,
                     trim_sol, lin_sol,
                     autodiff_model,
-                    u_cmd_t_1,
+                    u_actual_t_1,
                     transient_conditions
                 );
 
@@ -466,7 +466,7 @@ namespace runner {
                 allocator::build_allocator_input(
                     mu_cmd,
                     active_mask,
-                    Zt, u_cmd_t_1, 
+                    Zt, u_actual_t_1,
                     transient_conditions, 
                     autodiff_model
                 )
@@ -488,6 +488,9 @@ namespace runner {
 
         // apply propulsor actuator dynamics
         u_actual.propulsor_inputs = actuator_properties.step(u_cmd.propulsor_inputs, constants::dt);
+
+        // update prior-step actual control
+        u_actual_t_1 = u_actual;
 
         integrators::RK4Model rk4_model{
             .structural = structural_properties,

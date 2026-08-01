@@ -21,7 +21,8 @@ namespace autodiff {
         const aerodynamics::AerodynamicProperties& aerodynamic;
         actuators::PropulsorActuators& propulsor_actuators;
         actuators::ActuatorLimits actuator_limits;
-        actuators::FixedActuatorInputs fixed_actuator_inputs{};
+        actuators::ActuatorInputsVector_T<double> actuator_time_constants;
+        actuators::FixedActuatorInputs fixed_actuator_inputs;
     };
 
     AutoDiffModel build_autodiff_model(vehicles::Aircraft& aircraft);

@@ -1,3 +1,4 @@
+#include <cmath>
 #include <tuple>
 #include <spdlog/spdlog.h>
 #include "simulation/allocator/public.hpp"
@@ -16,16 +17,18 @@ namespace allocator {
         const actuators::ActuatorInputsVector_T<double> u_0 = actuators::unpack_actuator_inputs_T(input.operating_point.input);
         const actuators::ActuatorLimitsVector limits = actuators::unpack_actuator_limits(input.model.actuator_limits);
 
-        dynamics::WrenchVector_T<double> err = (input.mu - mu_0);
+        dynamics::WrenchVector_T<double> err = input.mu - mu_0;
 
         // evaluate active mask
         for (Eigen::Index i = 0; i < err.rows(); ++i) {
             err(i) = input.active_mask[i] ? err(i) : 0.0;
         }
 
+        EffectivenessMatrix E_scaled = apply_beta_scale(E, input.model.actuator_time_constants);
+
         const qp::Problem problem{
-            .hessian = E.transpose() * Q * E + R,
-            .gradient = -E.transpose() * Q * err,
+            .hessian = E_scaled.transpose() * Q * E_scaled + R,
+            .gradient = -E_scaled.transpose() * Q * err,
             .lower = limits.col(0) - u_0,
             .upper = limits.col(1) - u_0
         };
@@ -80,7 +83,7 @@ namespace allocator {
         const control::VirtualControlOutput& mu_cmd,
         const std::array<bool, constants::virtual_input_dim>& active_mask,
         const dynamics::RigidBodyState& Zt, 
-        const control::ControlOutput& u_cmd_t_1, 
+        const control::ControlOutput& u_actual_t_1,
         const operating::OperatingConditions& conditions, 
         autodiff::AutoDiffModel& model
     ) {
@@ -89,11 +92,24 @@ namespace allocator {
             .active_mask = active_mask,
             .operating_point = {
                 .state = dynamics::pack_state(Zt),
-                .input = u_cmd_t_1
+                .input = u_actual_t_1
             },
             .conditions = conditions,
             .model = model
         };
+    }
+
+    EffectivenessMatrix apply_beta_scale(const EffectivenessMatrix& E, const actuators::ActuatorInputsVector_T<double>& time_constants) {
+        actuators::ActuatorInputsVector_T<double> beta;
+
+        for (Eigen::Index i = 0; i < beta.rows(); ++i) {
+            // assumes first order actuator response
+            const double tau = time_constants(i);
+            beta(i) = tau > 0.0 ? 1.0 - std::exp(-constants::dt / tau) : 1.0;
+        }
+
+        const EffectivenessMatrix E_scaled = E * beta.asDiagonal();
+        return E_scaled;
     }
 
 }

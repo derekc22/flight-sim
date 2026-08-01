@@ -20,12 +20,12 @@ namespace estimation {
         dynamics::RigidBodyState Yt;
         operating::OperatingPoint_T<double> operating_point;
         linearization::LocalLinearization lin_sol;
-        actuators::ActuatorInputs_T<double> u_cmd_t_1;
+        actuators::ActuatorInputs_T<double> u_actual_t_1;
     };
 
     struct ExtendedKalmanEstimatorInput {
         dynamics::RigidBodyState Yt;
-        actuators::ActuatorInputs_T<double> u_cmd_t_1;
+        actuators::ActuatorInputs_T<double> u_actual_t_1;
         autodiff::AutoDiffModel& model;
         operating::OperatingConditions conditions;
     };

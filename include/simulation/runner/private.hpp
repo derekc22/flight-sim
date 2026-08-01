@@ -84,6 +84,7 @@ namespace runner {
         control::VirtualControlOutput mu_cmd_t_1;
         std::array<bool, constants::virtual_input_dim> active_mask_t_1;
         control::ControlOutput u_cmd_t_1;
+        control::ControlOutput u_actual_t_1;
 
         // initialize udp out cache
         messages::ProcessedFlightGearMessageOut cached_msg_out{};

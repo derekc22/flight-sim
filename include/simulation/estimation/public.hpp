@@ -37,7 +37,7 @@ namespace estimation {
             const trim::TrimSolution& trim_sol, 
             const linearization::LocalLinearization& lin_sol, 
             autodiff::AutoDiffModel& model, 
-            const control::ControlOutput& u_cmd_t_1, 
+            const control::ControlOutput& u_actual_t_1,
             const operating::OperatingConditions& conditions
         );
     };
