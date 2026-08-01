@@ -58,7 +58,8 @@ namespace control {
             const linearization::VirtualLocalLinearization& virtual_lin_sol, 
             const actuators::SurfaceActuators& surface_actuators, 
             const actuators::PropulsorActuators& propulsor_actuators, 
-            const guidance::GuidanceSetpoint& setpoint
+            const guidance::GuidanceSetpoint& setpoint,
+            dynamics::WrenchVector_T<double> delta_mu_vec_t_1
         );
     };
 

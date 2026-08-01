@@ -22,7 +22,10 @@ namespace control {
         // unsaturated control
         double u = params.Kp * err - params.Kd * d_filtered + params.Ki * integral_new;
 
-        integral = integral_new;
+        // anti-windup
+        if ( !((input.delta_mu < -constants::eps && err > 0.0) || (input.delta_mu > constants::eps && err < 0.0)) ) { 
+            integral = integral_new;
+        }
 
         prev_err = err;
 

@@ -15,7 +15,8 @@ namespace control {
 
         return {
             .x = Zt.v.data(0),
-            .x_des = setpoint.vB_BI.data(0)
+            .x_des = setpoint.vB_BI.data(0),
+            .delta_mu = input.delta_mu_vec_t_1[0]
         };
     }
 

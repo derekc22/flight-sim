@@ -7,6 +7,7 @@ namespace control {
         double x;
         double x_des;
         std::optional<double> x_dot;
+        double delta_mu;
     };
 
     struct PIDPolicyParameters {

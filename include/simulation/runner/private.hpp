@@ -86,6 +86,9 @@ namespace runner {
         control::ControlOutput u_cmd_t_1;
         control::ControlOutput u_actual_t_1;
 
+        // initialize prior-step delta mu
+        dynamics::WrenchVector_T<double> delta_mu_vec_t_1{};
+
         // initialize udp out cache
         messages::ProcessedFlightGearMessageOut cached_msg_out{};
 
@@ -108,8 +111,5 @@ namespace runner {
         void step(int t);
 
     };
-
-
-
 
 }

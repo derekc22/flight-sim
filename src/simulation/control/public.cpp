@@ -51,39 +51,51 @@ namespace control {
         const linearization::VirtualLocalLinearization& virtual_lin_sol, 
         const actuators::SurfaceActuators& surface_actuators, 
         const actuators::PropulsorActuators& propulsor_actuators, 
-        const guidance::GuidanceSetpoint& setpoint
+        const guidance::GuidanceSetpoint& setpoint,
+        const dynamics::WrenchVector_T<double> delta_mu_vec_t_1
     ) {
         ControllerInputs controller_inputs;
 
         if (attitude_controller_type != ControllerType::None) {
-            controller_inputs.attitude_controller_input.emplace(AttitudeControllerInput{
-				.Zt = Zt,
-				.setpoint = guidance::AttitudeSetpoint{ setpoint }
-			});
+            controller_inputs.attitude_controller_input.emplace(
+				AttitudeControllerInput{
+			    	.Zt = Zt,
+			    	.setpoint = guidance::AttitudeSetpoint{ setpoint },
+			    	.delta_mu_vec_t_1 = delta_mu_vec_t_1
+			    }
+            );
         }
         if (velocity_controller_type != ControllerType::None) {
-            controller_inputs.velocity_controller_input.emplace(VelocityControllerInput{
-				.Zt = Zt,
-				.setpoint = guidance::VelocitySetpoint{ setpoint }
-			});
+            controller_inputs.velocity_controller_input.emplace(
+                VelocityControllerInput{
+                    .Zt = Zt,
+                    .setpoint = guidance::VelocitySetpoint{ setpoint },
+                    .delta_mu_vec_t_1 = delta_mu_vec_t_1
+                }
+            );
         }
         if (linear_quadratic_controller_type != ControllerType::None) {
-            controller_inputs.linear_quadratic_controller_input.emplace(LinearQuadraticControllerInput{
-				.Zt = Zt,
-				.mu_sol_trim = trim_sol.wrench,
-				.surface_actuators = surface_actuators,
-				.propulsor_actuators = propulsor_actuators,
-				.virtual_linearization = virtual_lin_sol,
-				.setpoint = guidance::LinearQuadraticSetpoint{ setpoint }
-			});
+            controller_inputs.linear_quadratic_controller_input.emplace(
+                LinearQuadraticControllerInput{
+				    .Zt = Zt,
+				    .mu_sol_trim = trim_sol.wrench,
+				    .surface_actuators = surface_actuators,
+				    .propulsor_actuators = propulsor_actuators,
+				    .virtual_linearization = virtual_lin_sol,
+				    .setpoint = guidance::LinearQuadraticSetpoint{ setpoint },
+				    .delta_mu_vec_t_1 = delta_mu_vec_t_1
+			    }
+            );
         }
         if (nonlinear_controller_type != ControllerType::None) {
-            controller_inputs.nonlinear_controller_input.emplace(NonlinearControllerInput{
-				.Zt = Zt,
-				.surface_actuators = surface_actuators,
-				.propulsor_actuators = propulsor_actuators,
-				.setpoint = guidance::NonlinearSetpoint{ setpoint }
-			});
+            controller_inputs.nonlinear_controller_input.emplace(
+                NonlinearControllerInput{
+				    .Zt = Zt,
+				    .surface_actuators = surface_actuators,
+				    .propulsor_actuators = propulsor_actuators,
+				    .setpoint = guidance::NonlinearSetpoint{ setpoint }
+			    }
+            );
         }
 
 		return controller_inputs;

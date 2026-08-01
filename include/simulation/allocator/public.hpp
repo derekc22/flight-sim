@@ -23,7 +23,8 @@ namespace allocator {
         constants::MatrixX_T<double, constants::input_dim, constants::input_dim> R;
         qp::Solver solver{constants::input_dim};
 
-        control::ControlOutput step(const AllocatorInput& input);
+        control::ControlOutputSet step(const AllocatorInput& input);
+        std::tuple<control::ControlOutput, EffectivenessMatrix> solve_qp(const AllocatorInput& input, bool constrained);
     };
 
 	std::tuple<EffectivenessMatrix, dynamics::WrenchVector_T<double>> compute_effectiveness_matrix(autodiff::AutoDiffModel& model, const operating::OperatingPoint_T<double>& operating_point, const operating::OperatingConditions& conditions);

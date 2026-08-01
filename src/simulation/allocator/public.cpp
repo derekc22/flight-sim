@@ -10,12 +10,23 @@
 
 namespace allocator {
 
-    control::ControlOutput AllocatorProperties::step(const AllocatorInput& input) {
+    control::ControlOutputSet AllocatorProperties::step(const AllocatorInput& input) {
+
+        auto [u_constrained, E_scaled] = solve_qp(input, true);
+        auto [u_unconstrained, _] = solve_qp(input, false);
+
+        actuators::ActuatorInputsVector_T<double> u_constrained_vec = actuators::unpack_actuator_inputs_T(u_constrained);
+        actuators::ActuatorInputsVector_T<double> u_unconstrained_vec = actuators::unpack_actuator_inputs_T(u_unconstrained);
+        dynamics::WrenchVector_T<double> delta_mu_vec = E_scaled * (u_constrained_vec - u_unconstrained_vec);
+
+        return { u_constrained, delta_mu_vec };
+    }
+
+    std::tuple<control::ControlOutput, EffectivenessMatrix> AllocatorProperties::solve_qp(const AllocatorInput& input, bool constrained) {
 
         auto [E, mu_0] = compute_effectiveness_matrix(input.model, input.operating_point, input.conditions);
 
         const actuators::ActuatorInputsVector_T<double> u_0 = actuators::unpack_actuator_inputs_T(input.operating_point.input);
-        const actuators::ActuatorLimitsVector limits = actuators::unpack_actuator_limits(input.model.actuator_limits);
 
         dynamics::WrenchVector_T<double> err = input.mu - mu_0;
 
@@ -26,23 +37,33 @@ namespace allocator {
 
         EffectivenessMatrix E_scaled = apply_beta_scale(E, input.model.actuator_time_constants);
 
+        const double infinity = proxsuite::helpers::infinite_bound<double>::value();
+        Eigen::VectorXd lower = Eigen::VectorXd::Constant(constants::input_dim, -infinity);
+        Eigen::VectorXd upper = Eigen::VectorXd::Constant(constants::input_dim, infinity);
+
+        if (constrained) {
+            const actuators::ActuatorLimitsVector limits = actuators::unpack_actuator_limits(input.model.actuator_limits);
+            lower = limits.col(0) - u_0;
+            upper = limits.col(1) - u_0;
+        }
+
         const qp::Problem problem{
             .hessian = E_scaled.transpose() * Q * E_scaled + R,
             .gradient = -E_scaled.transpose() * Q * err,
-            .lower = limits.col(0) - u_0,
-            .upper = limits.col(1) - u_0
+            .lower = lower,
+            .upper = upper
         };
 
         const qp::Solution solution = solver.solve(problem);
 
         if (solution.status != qp::Status::Solved) {
             spdlog::error("allocator::AllocatorProperties::step QP solve failed with status {}", static_cast<int>(solution.status));
-            return input.operating_point.input;
+            return { input.operating_point.input, E_scaled };
         }
 
         const actuators::ActuatorInputsVector_T<double> u = u_0 + solution.x;
 
-        return actuators::pack_actuator_inputs_T(u);
+        return { actuators::pack_actuator_inputs_T(u), E_scaled };
     }
 
 

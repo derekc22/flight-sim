@@ -107,7 +107,7 @@ python "$PLOT_2D_PATH" -d "$DATA_DIR_PATH/u_surface.csv" -r "$DATA_DIR_PATH/u_su
 
 python "$PLOT_2D_PATH" -d "$DATA_DIR_PATH/u_propulsor.csv" -r "$DATA_DIR_PATH/u_propulsor_commanded.csv" -s "$PLOT_DIR_PATH" \
 -l "front(t) [N]" "left(t) [N]" "right(t) [N]" \
--t "propulsor inputs commanded propulsor inputs"
+-t "propulsor inputs vs commanded propulsor inputs"
 
 python "$PLOT_2D_PATH" -d "$DATA_DIR_PATH/F_net.csv" -s "$PLOT_DIR_PATH" \
 -l "Fx_net(t) [N]" "Fy_net(t) [N]" "Fz_net(t) [N]" \

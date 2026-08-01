@@ -1,4 +1,5 @@
 #include <Eigen/Dense>
+#include <algorithm>
 #include "simulation/control/linear_quadratic/controllers/lqr/public.hpp"
 #include "simulation/control/linear_quadratic/controllers/lqi/public.hpp"
 #include "simulation/constants/public.hpp"
@@ -6,6 +7,7 @@
 #include "simulation/trim/public.hpp"
 #include "simulation/control/linear_quadratic/private.hpp"
 #include "simulation/util/public.hpp"
+#include "simulation/dynamics/public.hpp"
 
 namespace control {
 
@@ -82,6 +84,10 @@ namespace control {
 
         VirtualControlOutputVector_T<double> mu_trim = dynamics::unpack_wrench_T(input.mu_sol_trim);
         VirtualControlOutputVector_T<double> mu = mu_deviation + mu_trim;
+
+        if (input.delta_mu_vec_t_1.norm() <= constants::eps) {
+            integral = integral_new;
+        }
 
         return dynamics::pack_wrench_T(mu);
     }

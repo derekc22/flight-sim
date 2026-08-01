@@ -441,12 +441,13 @@ namespace runner {
                     Zt, 
                     trim_sol, virtual_lin_sol, 
                     surface_actuators, propulsor_actuators, 
-                    setpoint
+                    setpoint,
+                    delta_mu_vec_t_1
                 );
 
-                control::VirtualControlOutputSet ctrl_out = control_properties.step(controller_inputs, control_dt);
-                mu_cmd = ctrl_out.mu;
-                active_mask = ctrl_out.mask;
+                control::VirtualControlOutputSet virtual_ctrl_out = control_properties.step(controller_inputs, control_dt);
+                mu_cmd = virtual_ctrl_out.mu;
+                active_mask = virtual_ctrl_out.active_mask;
 
                 mu_cmd_t_1 = mu_cmd;
                 active_mask_t_1 = active_mask;
@@ -462,7 +463,7 @@ namespace runner {
 
         // step control allocator
         if (current_mode == fsm::FiniteState::AutopilotTrim || current_mode == fsm::FiniteState::Autopilot) {
-            u_cmd = allocator_properties.step(
+            control::ControlOutputSet ctrl_out = allocator_properties.step(
                 allocator::build_allocator_input(
                     mu_cmd,
                     active_mask,
@@ -471,6 +472,8 @@ namespace runner {
                     autodiff_model
                 )
             );
+            u_cmd = ctrl_out.u;
+            delta_mu_vec_t_1 = ctrl_out.delta_mu_vec_t_1;
         }
 
         // apply fixed actuator inputs

@@ -12,6 +12,11 @@ namespace control {
 
     using ControlOutput = actuators::ActuatorInputs_T<double>;
 
+    struct ControlOutputSet {
+        ControlOutput u;
+        dynamics::WrenchVector_T<double> delta_mu_vec_t_1;
+    };
+
 	using VirtualControlOutput = dynamics::Wrench;
 
 	template <typename T>
@@ -22,17 +27,19 @@ namespace control {
 
     struct VirtualControlOutputSet {
         VirtualControlOutput mu;
-        std::array<bool, constants::virtual_input_dim> mask;
+        std::array<bool, constants::virtual_input_dim> active_mask;
     };
 
     struct AttitudeControllerInput {
         const dynamics::RigidBodyState& Zt;
         const guidance::AttitudeSetpoint& setpoint;
+        dynamics::WrenchVector_T<double> delta_mu_vec_t_1;
     };
 
     struct VelocityControllerInput {
         const dynamics::RigidBodyState& Zt;
         const guidance::VelocitySetpoint& setpoint;
+        dynamics::WrenchVector_T<double> delta_mu_vec_t_1;
     };
 
     struct LinearQuadraticControllerInput {
@@ -42,6 +49,7 @@ namespace control {
         const actuators::PropulsorActuators& propulsor_actuators;
         const linearization::VirtualLocalLinearization& virtual_linearization;
         const guidance::LinearQuadraticSetpoint& setpoint;
+        dynamics::WrenchVector_T<double> delta_mu_vec_t_1;
     };
 
     struct NonlinearControllerInput {
