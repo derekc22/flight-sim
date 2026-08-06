@@ -26,10 +26,8 @@ namespace control {
         VirtualControlOutputVector_T<double> mu_deviation = policy.step(
             make_linear_quadratic_policy_input(input)
         );
-        VirtualControlOutputVector_T<double> mu_trim = dynamics::unpack_wrench_T(input.mu_sol_trim);
-        VirtualControlOutputVector_T<double> mu = mu_deviation + mu_trim;
 
-        return dynamics::pack_wrench_T(mu);
+        return dynamics::pack_wrench_T(mu_deviation);
     }
 
 }

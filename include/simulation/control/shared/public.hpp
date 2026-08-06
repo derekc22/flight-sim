@@ -28,27 +28,26 @@ namespace control {
     struct VirtualControlOutputSet {
         VirtualControlOutput mu;
         std::array<bool, constants::virtual_input_dim> active_mask;
+        std::array<bool, constants::input_dim> actuator_mask;
     };
 
     struct AttitudeControllerInput {
         const dynamics::RigidBodyState& Zt;
-        const guidance::AttitudeSetpoint& setpoint;
+        guidance::AttitudeSetpoint setpoint;
         dynamics::WrenchVector_T<double> delta_mu_vec_t_1;
     };
 
     struct VelocityControllerInput {
         const dynamics::RigidBodyState& Zt;
-        const guidance::VelocitySetpoint& setpoint;
+        guidance::VelocitySetpoint setpoint;
         dynamics::WrenchVector_T<double> delta_mu_vec_t_1;
     };
 
     struct LinearQuadraticControllerInput {
         const dynamics::RigidBodyState& Zt;
-        const VirtualControlOutput_T<double>& mu_sol_trim;
-        const actuators::SurfaceActuators& surface_actuators;
-        const actuators::PropulsorActuators& propulsor_actuators;
         const linearization::VirtualLocalLinearization& virtual_linearization;
-        const guidance::LinearQuadraticSetpoint& setpoint;
+        const dynamics::State_T<double>& Z_sol_trim;
+        guidance::LinearQuadraticSetpoint setpoint;
         dynamics::WrenchVector_T<double> delta_mu_vec_t_1;
     };
 
@@ -56,7 +55,7 @@ namespace control {
         const dynamics::RigidBodyState& Zt;
         const actuators::SurfaceActuators& surface_actuators;
         const actuators::PropulsorActuators& propulsor_actuators;
-        const guidance::NonlinearSetpoint& setpoint;
+        guidance::NonlinearSetpoint setpoint;
     };
 
 }

@@ -28,10 +28,13 @@ namespace control {
     };
 
     IntegratedStateVector LinearQuadraticIntegrator::integrate_state_err(const dynamics::StateVector_T<double>& zt, const dynamics::StateVector_T<double>& zt_des, double dt) {
-        IntegratedStateVector zt_pqr = zt.segment<integrated_state_dim>(3);  // grab p, q, r
-        IntegratedStateVector zt_des_pqr = zt_des.segment<integrated_state_dim>(3);
+        IntegratedStateVector zt_integrated;    // grab phi, theta, r
+        zt_integrated << zt(6), zt(7), zt(5);
 
-        return integral + (zt_des_pqr - zt_pqr) * dt;     // integrate
+        IntegratedStateVector zt_des_integrated;
+        zt_des_integrated << zt_des(6), zt_des(7), zt_des(5);
+
+        return integral + (zt_des_integrated - zt_integrated) * dt;     // integrate
     }
 
 
@@ -43,24 +46,26 @@ namespace control {
         Eigen::MatrixXd A_virtual_aug = Eigen::MatrixXd::Zero(n + i, n + i);
         A_virtual_aug.block(0, 0, n, n) = input.virtual_linearization.A_virtual;
 
-        // Ci selects the integrated states p, q, r from the state vector for the LQI controller - it is not the canonical output matrix C
+        // Ci selects the integrated states phi, theta, r from the state vector for the LQI controller - it is not the canonical output matrix C
         Eigen::MatrixXd Ci = Eigen::MatrixXd::Zero(integrated_state_dim, constants::state_dim);
-        Ci.block<integrated_state_dim, integrated_state_dim>(0, 3) = constants::IX_T<double, integrated_state_dim>;
+        Ci(0, 6) = 1.0;
+        Ci(1, 7) = 1.0;
+        Ci(2, 5) = 1.0;
         A_virtual_aug.block(n, 0, i, n) = -Ci;
 
         Eigen::MatrixXd B_virtual_aug = Eigen::MatrixXd::Zero(n + i, m);
         B_virtual_aug.block(0, 0, n, m) = input.virtual_linearization.B_virtual;
 
         dynamics::StateVector_T<double> zt = dynamics::unpack_state(input.Zt);
-        dynamics::StateVector_T<double> zt_des = unpack_state(input.setpoint);
+        dynamics::StateVector_T<double> zt_trim = dynamics::unpack_state_T(input.Z_sol_trim);
 
         AugmentedStateVector zt_aug;
         zt_aug << zt, integral_new;
 
-        AugmentedStateVector zt_des_aug;
-        zt_des_aug << zt_des, IntegratedStateVector::Zero();
+        AugmentedStateVector zt_trim_aug;
+        zt_trim_aug << zt_trim, IntegratedStateVector::Zero();
 
-        AugmentedStateVector zt_aug_deviation = zt_aug - zt_des_aug;
+        AugmentedStateVector zt_aug_deviation = zt_aug - zt_trim_aug;
 
         return {
             .zt = zt_aug_deviation,
@@ -82,14 +87,11 @@ namespace control {
             make_linear_quadratic_policy_input(input, integral_new)
         );
 
-        VirtualControlOutputVector_T<double> mu_trim = dynamics::unpack_wrench_T(input.mu_sol_trim);
-        VirtualControlOutputVector_T<double> mu = mu_deviation + mu_trim;
-
         if (input.delta_mu_vec_t_1.norm() <= constants::eps) {
             integral = integral_new;
         }
 
-        return dynamics::pack_wrench_T(mu);
+        return dynamics::pack_wrench_T(mu_deviation);
     }
 
 }

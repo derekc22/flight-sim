@@ -1,7 +1,7 @@
 {
     "actuators": {
         "fixed_actuator_inputs": {
-            "flap": 0.0,
+            "flap": 0.436332,
             "spoiler": 0.0
         }
     },

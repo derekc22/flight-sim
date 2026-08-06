@@ -2,6 +2,6 @@
     "trajectory_type": "regulation",
     "attitude": {
         "w": [[0.0, 0.0, 0.0]],
-        "eul": [[0.0, 0.0, 0.0]]
+        "eul": [[0.0, -0.0591, 0.0]]
     }
 }

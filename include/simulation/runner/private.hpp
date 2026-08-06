@@ -83,6 +83,7 @@ namespace runner {
         guidance::GuidanceSetpoint setpoint_t_1;
         control::VirtualControlOutput mu_cmd_t_1;
         std::array<bool, constants::virtual_input_dim> active_mask_t_1;
+        std::array<bool, constants::input_dim> actuator_mask_t_1;
         control::ControlOutput u_cmd_t_1;
         control::ControlOutput u_actual_t_1;
 

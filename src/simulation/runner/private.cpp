@@ -119,12 +119,15 @@ namespace runner {
         // initialize scheduler
         scheduler(json_options.module_rates, json_options.tf),
 
-        // start timer
-        next(std::chrono::steady_clock::now()),
-
         // create state machine
         state_machine(json_options.flags)
     {
+        // set u_actual_t_1 to match actuators' neutral initialization
+        u_actual_t_1 = actuators::get_neutral_actuator_inputs(
+            aircraft.actuator_properties.surface_actuators,
+            aircraft.actuator_properties.propulsor_actuators
+        );
+
         // create data manager
         if (cli_options.flags.data_flag) {
             data_manager.emplace(json_options.tf, json_options.flags);
@@ -147,6 +150,9 @@ namespace runner {
             );
             joystick_manager.emplace(actuator_limits);
         }
+
+        // start timer
+        next = std::chrono::steady_clock::now();
     }
 
     RunManager::~RunManager() = default;
@@ -242,6 +248,7 @@ namespace runner {
 
         // initialize active mask
         std::array<bool, constants::virtual_input_dim> active_mask;
+        std::array<bool, constants::input_dim> actuator_mask;
 
         // trim and linearization
         if (json_flags.trim_flag && !trim_sol.attempted) {
@@ -281,9 +288,9 @@ namespace runner {
                 // overwrite internal state with trim state
                 WB_net_t_1 = WB_net_trim;
 
-                /** @deprecated */
                 // overwrite actuator lag state with trim controls
-                // trim::update_actuators_lag_from_trim(surface_actuators, propulsor_actuators, trim_sol);
+                trim::update_actuators_lag_from_trim(surface_actuators, propulsor_actuators, trim_sol);
+                u_actual_t_1 = trim_sol.operating_point.input;
 
                 // compute linearization
                 lin_sol = linearization::linearize_operating_point(
@@ -421,8 +428,9 @@ namespace runner {
 
         // no need to rate-limit as the trim command is fixed
         else if (current_mode == fsm::FiniteState::AutopilotTrim) {
-            mu_cmd = dynamics::pack_wrench(trim_sol.wrench);
+            mu_cmd = {};
             util::fill_arr(active_mask, 0, 6, true);
+            util::fill_arr(actuator_mask, 0, 6, true);
         }
 
         else if (current_mode == fsm::FiniteState::Autopilot) {
@@ -439,7 +447,7 @@ namespace runner {
 
                 control::ControllerInputs controller_inputs = control_properties.build_controller_inputs(
                     Zt, 
-                    trim_sol, virtual_lin_sol, 
+                    trim_sol, virtual_lin_sol,
                     surface_actuators, propulsor_actuators, 
                     setpoint,
                     delta_mu_vec_t_1
@@ -448,9 +456,11 @@ namespace runner {
                 control::VirtualControlOutputSet virtual_ctrl_out = control_properties.step(controller_inputs, control_dt);
                 mu_cmd = virtual_ctrl_out.mu;
                 active_mask = virtual_ctrl_out.active_mask;
+                actuator_mask = virtual_ctrl_out.actuator_mask;
 
                 mu_cmd_t_1 = mu_cmd;
                 active_mask_t_1 = active_mask;
+                actuator_mask_t_1 = actuator_mask;
 
                 scheduler.control_tick -= constants::hz;
                 scheduler.control_elapsed_ticks = 0;
@@ -458,6 +468,7 @@ namespace runner {
             else {
                 mu_cmd = mu_cmd_t_1; // perform ZOH
                 active_mask = active_mask_t_1;
+                actuator_mask = actuator_mask_t_1;
             }
         }
 
@@ -467,7 +478,9 @@ namespace runner {
                 allocator::build_allocator_input(
                     mu_cmd,
                     active_mask,
+                    actuator_mask,
                     Zt, u_actual_t_1,
+                    trim_sol.converged ? std::make_optional(trim_sol.operating_point.input) : std::nullopt,
                     transient_conditions, 
                     autodiff_model
                 )
@@ -530,6 +543,7 @@ namespace runner {
             .WB_net=WB_net,
             .WB_aerodynamic=rk4_out.WB_set.aerodynamic,
             .WB_propulsive=rk4_out.WB_set.propulsive,
+            .allocator_diagnostics=allocator_properties.diagnostics,
             .setpoint=setpoint,
             .windB=windB
         };

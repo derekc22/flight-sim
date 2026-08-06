@@ -1,5 +1,6 @@
 #include <cmath>
 #include <tuple>
+#include <vector>
 #include <spdlog/spdlog.h>
 #include "simulation/allocator/public.hpp"
 #include "simulation/dynamics/public.hpp"
@@ -12,58 +13,172 @@ namespace allocator {
 
     control::ControlOutputSet AllocatorProperties::step(const AllocatorInput& input) {
 
-        auto [u_constrained, E_scaled] = solve_qp(input, true);
-        auto [u_unconstrained, _] = solve_qp(input, false);
-
-        actuators::ActuatorInputsVector_T<double> u_constrained_vec = actuators::unpack_actuator_inputs_T(u_constrained);
-        actuators::ActuatorInputsVector_T<double> u_unconstrained_vec = actuators::unpack_actuator_inputs_T(u_unconstrained);
-        dynamics::WrenchVector_T<double> delta_mu_vec = E_scaled * (u_constrained_vec - u_unconstrained_vec);
-
-        return { u_constrained, delta_mu_vec };
-    }
-
-    std::tuple<control::ControlOutput, EffectivenessMatrix> AllocatorProperties::solve_qp(const AllocatorInput& input, bool constrained) {
-
         auto [E, mu_0] = compute_effectiveness_matrix(input.model, input.operating_point, input.conditions);
 
         const actuators::ActuatorInputsVector_T<double> u_0 = actuators::unpack_actuator_inputs_T(input.operating_point.input);
 
-        dynamics::WrenchVector_T<double> err = input.mu - mu_0;
+        dynamics::WrenchVector_T<double> mu_actuator_0 = mu_0;
+        if (input.u_preferred.has_value()) {
+            const operating::OperatingPoint_T<double> preferred_operating_point{
+                .state = input.operating_point.state,
+                .input = input.u_preferred.value()
+            };
+            const dynamics::Wrench_T<double> mu_preferred = autodiff::compute_net_wrench_T<double>(preferred_operating_point, input.model, input.conditions, constants::dt);
+            mu_actuator_0 -= dynamics::unpack_wrench_T(mu_preferred);
+        }
+
+        dynamics::WrenchVector_T<double> err = input.mu - mu_actuator_0;
+        EffectivenessMatrix E_active = E;
 
         // evaluate active mask
         for (Eigen::Index i = 0; i < err.rows(); ++i) {
-            err(i) = input.active_mask[i] ? err(i) : 0.0;
+            if (!input.active_mask[i]) {
+                err(i) = 0.0;
+                E_active.row(i).setZero();
+            }
         }
 
-        EffectivenessMatrix E_scaled = apply_beta_scale(E, input.model.actuator_time_constants);
-
-        const double infinity = proxsuite::helpers::infinite_bound<double>::value();
-        Eigen::VectorXd lower = Eigen::VectorXd::Constant(constants::input_dim, -infinity);
-        Eigen::VectorXd upper = Eigen::VectorXd::Constant(constants::input_dim, infinity);
-
-        if (constrained) {
-            const actuators::ActuatorLimitsVector limits = actuators::unpack_actuator_limits(input.model.actuator_limits);
-            lower = limits.col(0) - u_0;
-            upper = limits.col(1) - u_0;
+        constants::MatrixX_T<double, constants::input_dim, constants::input_dim> trim_hessian = constants::MatrixX_T<double, constants::input_dim, constants::input_dim>::Zero();
+        actuators::ActuatorInputsVector_T<double> trim_gradient = actuators::ActuatorInputsVector_T<double>::Zero();
+        actuators::ActuatorInputsVector_T<double> actuator_target = u_0;
+        if (input.u_preferred.has_value()) {
+            const actuators::ActuatorInputsVector_T<double> u_preferred = actuators::unpack_actuator_inputs_T(input.u_preferred.value());
+            trim_hessian = R_trim;
+            trim_gradient = R_trim * (u_0 - u_preferred);
+            actuator_target = u_preferred;
         }
 
-        const qp::Problem problem{
-            .hessian = E_scaled.transpose() * Q * E_scaled + R,
-            .gradient = -E_scaled.transpose() * Q * err,
-            .lower = lower,
-            .upper = upper
+        const constants::MatrixX_T<double, constants::input_dim, constants::input_dim> hessian = E_active.transpose() * Q * E_active + R + trim_hessian;
+        const actuators::ActuatorInputsVector_T<double> gradient = -E_active.transpose() * Q * err + trim_gradient;
+        const actuators::ActuatorLimitsVector limits = actuators::unpack_actuator_limits(input.model.actuator_limits);
+
+        control::ControlOutput u_constrained = solve_qp(hessian, gradient, u_0, actuator_target, limits, input.actuator_mask, true);
+        control::ControlOutput u_unconstrained = solve_qp(hessian, gradient, u_0, actuator_target, limits, input.actuator_mask, false);
+
+        actuators::ActuatorInputsVector_T<double> u_constrained_vec = actuators::unpack_actuator_inputs_T(u_constrained);
+        actuators::ActuatorInputsVector_T<double> u_unconstrained_vec = actuators::unpack_actuator_inputs_T(u_unconstrained);
+
+        bool allocation_limited = false;
+        for (Eigen::Index i = 0; i < u_unconstrained_vec.rows(); ++i) {
+            if (!input.actuator_mask[i] || std::abs(limits(i, 1) - limits(i, 0)) <= constants::eps) {
+                continue;
+            }
+
+            const double tolerance = constants::eps * (1.0 + std::abs(limits(i, 0)) + std::abs(limits(i, 1)));
+            if (u_unconstrained_vec(i) < limits(i, 0) - tolerance || u_unconstrained_vec(i) > limits(i, 1) + tolerance) {
+                allocation_limited = true;
+                break;
+            }
+        }
+
+        dynamics::WrenchVector_T<double> delta_mu_vec = dynamics::WrenchVector_T<double>::Zero();
+        if (allocation_limited) {
+            delta_mu_vec = E_active * (u_constrained_vec - u_unconstrained_vec);
+        }
+
+        const actuators::ActuatorInputsVector_T<double> command_delta = u_constrained_vec - u_0;
+        const dynamics::WrenchVector_T<double> mu_predicted = mu_actuator_0 + E_active * command_delta;
+        dynamics::WrenchVector_T<double> tracking_error = mu_predicted - input.mu;
+        for (Eigen::Index i = 0; i < tracking_error.rows(); ++i) {
+            if (!input.active_mask[i]) {
+                tracking_error(i) = 0.0;
+            }
+        }
+
+        double trim_cost = 0.0;
+        if (input.u_preferred.has_value()) {
+            const actuators::ActuatorInputsVector_T<double> u_preferred = actuators::unpack_actuator_inputs_T(input.u_preferred.value());
+            const actuators::ActuatorInputsVector_T<double> trim_error = u_constrained_vec - u_preferred;
+            trim_cost = trim_error.dot(R_trim * trim_error);
+        }
+
+        diagnostics = {
+            .mu_requested = input.mu,
+            .mu_baseline = mu_actuator_0,
+            .mu_predicted = mu_predicted,
+            .u_commanded = u_constrained_vec,
+            .tracking_cost = tracking_error.dot(Q * tracking_error),
+            .movement_cost = command_delta.dot(R * command_delta),
+            .trim_cost = trim_cost,
+            .allocation_limited = allocation_limited
         };
 
-        const qp::Solution solution = solver.solve(problem);
+        return { u_constrained, delta_mu_vec };
+    }
+
+
+    control::ControlOutput AllocatorProperties::solve_qp(const constants::MatrixX_T<double, constants::input_dim, constants::input_dim>& hessian, const actuators::ActuatorInputsVector_T<double>& gradient, const actuators::ActuatorInputsVector_T<double>& u_0, const actuators::ActuatorInputsVector_T<double>& actuator_target, const actuators::ActuatorLimitsVector& limits, const std::array<bool, constants::input_dim>& actuator_mask, bool constrained) {
+        qp::Solution solution;
+
+        if (constrained) {
+            Eigen::VectorXd lower = limits.col(0) - u_0;
+            Eigen::VectorXd upper = limits.col(1) - u_0;
+
+            for (Eigen::Index i = 0; i < lower.rows(); ++i) {
+                if (!actuator_mask[i]) {
+                    lower(i) = actuator_target(i) - u_0(i);
+                    upper(i) = lower(i);
+                }
+            }
+
+            const qp::Problem problem{
+                .hessian = hessian,
+                .gradient = gradient,
+                .lower = lower,
+                .upper = upper
+            };
+
+            solution = solver.solve(problem);
+        }
+        else {
+            std::vector<Eigen::Index> free_indices;
+            actuators::ActuatorInputsVector_T<double> x = actuators::ActuatorInputsVector_T<double>::Zero();
+
+            for (Eigen::Index i = 0; i < x.rows(); ++i) {
+                if (std::abs(limits(i, 1) - limits(i, 0)) <= constants::eps) {
+                    x(i) = limits(i, 0) - u_0(i);
+                }
+                else if (!actuator_mask[i]) {
+                    x(i) = actuator_target(i) - u_0(i);
+                }
+                else {
+                    free_indices.push_back(i);
+                }
+            }
+
+            if (!free_indices.empty()) {
+                Eigen::MatrixXd hessian_free(free_indices.size(), free_indices.size());
+                Eigen::VectorXd gradient_free(free_indices.size());
+
+                for (std::size_t i = 0; i < free_indices.size(); ++i) {
+                    gradient_free(i) = gradient(free_indices[i]) + hessian.row(free_indices[i]).dot(x);
+
+                    for (std::size_t j = 0; j < free_indices.size(); ++j) {
+                        hessian_free(i, j) = hessian(free_indices[i], free_indices[j]);
+                    }
+                }
+
+                const Eigen::VectorXd x_free = hessian_free.completeOrthogonalDecomposition().solve(-gradient_free);
+
+                for (std::size_t i = 0; i < free_indices.size(); ++i) {
+                    x(free_indices[i]) = x_free(i);
+                }
+            }
+
+            solution = {
+                .x = x,
+                .status = qp::Status::Solved
+            };
+        }
 
         if (solution.status != qp::Status::Solved) {
             spdlog::error("allocator::AllocatorProperties::step QP solve failed with status {}", static_cast<int>(solution.status));
-            return { input.operating_point.input, E_scaled };
+            return actuators::pack_actuator_inputs_T(u_0);
         }
 
         const actuators::ActuatorInputsVector_T<double> u = u_0 + solution.x;
 
-        return { actuators::pack_actuator_inputs_T(u), E_scaled };
+        return actuators::pack_actuator_inputs_T(u);
     }
 
 
@@ -99,28 +214,31 @@ namespace allocator {
     }
 
 
-
     AllocatorInput build_allocator_input(
         const control::VirtualControlOutput& mu_cmd,
         const std::array<bool, constants::virtual_input_dim>& active_mask,
+        const std::array<bool, constants::input_dim>& actuator_mask,
         const dynamics::RigidBodyState& Zt, 
         const control::ControlOutput& u_actual_t_1,
+        const std::optional<control::ControlOutput>& u_preferred,
         const operating::OperatingConditions& conditions, 
         autodiff::AutoDiffModel& model
     ) {
         return {
             .mu = dynamics::unpack_wrench(mu_cmd),
             .active_mask = active_mask,
+            .actuator_mask = actuator_mask,
             .operating_point = {
                 .state = dynamics::pack_state(Zt),
                 .input = u_actual_t_1
             },
+            .u_preferred = u_preferred,
             .conditions = conditions,
             .model = model
         };
     }
 
-    EffectivenessMatrix apply_beta_scale(const EffectivenessMatrix& E, const actuators::ActuatorInputsVector_T<double>& time_constants) {
+    actuators::ActuatorInputsVector_T<double> compute_actuator_beta(const actuators::ActuatorInputsVector_T<double>& time_constants) {
         actuators::ActuatorInputsVector_T<double> beta;
 
         for (Eigen::Index i = 0; i < beta.rows(); ++i) {
@@ -129,8 +247,7 @@ namespace allocator {
             beta(i) = tau > 0.0 ? 1.0 - std::exp(-constants::dt / tau) : 1.0;
         }
 
-        const EffectivenessMatrix E_scaled = E * beta.asDiagonal();
-        return E_scaled;
+        return beta;
     }
 
 }

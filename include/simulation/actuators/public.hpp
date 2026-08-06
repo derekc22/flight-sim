@@ -47,6 +47,8 @@ namespace actuators {
 
     ActuatorLimitsVector unpack_actuator_limits(const SurfaceActuators& surface_actuators, const PropulsorActuators& propulsor_actuators);
 
+    ActuatorInputs_T<double> get_neutral_actuator_inputs(const SurfaceActuators& surface_actuators, const PropulsorActuators& propulsor_actuators);
+
 	struct Settings {  
         FixedActuatorInputs fixed_actuator_inputs{};
         FixedActuatorInputs get_fixed_actuator_inputs();

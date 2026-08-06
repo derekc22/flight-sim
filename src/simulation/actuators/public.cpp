@@ -103,6 +103,12 @@ namespace actuators {
         return unpack_actuator_limits(pack_actuator_limits(surface_actuators, propulsor_actuators));
     }
 
+    ActuatorInputs_T<double> get_neutral_actuator_inputs(const SurfaceActuators& surface_actuators, const PropulsorActuators& propulsor_actuators) {
+        const ActuatorLimitsVector actuator_limits = unpack_actuator_limits(surface_actuators, propulsor_actuators);
+        const ActuatorInputsVector_T<double> neutral_actuators = ActuatorInputsVector_T<double>::Zero().cwiseMax(actuator_limits.col(0)).cwiseMin(actuator_limits.col(1));
+        return pack_actuator_inputs_T(neutral_actuators);
+    }
+
     FixedActuatorInputs Settings::get_fixed_actuator_inputs() {
         return {
             .flap = fixed_actuator_inputs.flap,

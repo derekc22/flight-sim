@@ -11,6 +11,7 @@ namespace autodiff {
         actuators::SurfaceActuators& surface_actuators = aircraft.actuator_properties.surface_actuators;
         actuators::PropulsorActuators& propulsor_actuators = aircraft.actuator_properties.propulsor_actuators;
         actuators::ActuatorLimits actuator_limits = actuators::pack_actuator_limits(surface_actuators, propulsor_actuators);
+
         actuators::ActuatorInputsVector_T<double> actuator_time_constants;
         actuator_time_constants << surface_actuators.elevator.tau,
                                    surface_actuators.aileron.tau,

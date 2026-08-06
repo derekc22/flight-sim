@@ -1,19 +1,32 @@
 #pragma once
+#include <optional>
 #include <tuple>
 #include <array>
 #include "simulation/control/public.hpp"
 #include "simulation/dynamics/public.hpp"
-#include "simulation/linearization/public.hpp"
 #include "simulation/qp/public.hpp"
 
 namespace allocator {
 
 	using EffectivenessMatrix = constants::MatrixX_T<double, constants::virtual_input_dim, constants::input_dim>;
 
+    struct AllocatorDiagnostics {
+        dynamics::WrenchVector_T<double> mu_requested = dynamics::WrenchVector_T<double>::Zero();
+        dynamics::WrenchVector_T<double> mu_baseline = dynamics::WrenchVector_T<double>::Zero();
+        dynamics::WrenchVector_T<double> mu_predicted = dynamics::WrenchVector_T<double>::Zero();
+        actuators::ActuatorInputsVector_T<double> u_commanded = actuators::ActuatorInputsVector_T<double>::Zero();
+        double tracking_cost = 0.0;
+        double movement_cost = 0.0;
+        double trim_cost = 0.0;
+        bool allocation_limited = false;
+    };
+
 	struct AllocatorInput {
 		control::VirtualControlOutputVector_T<double> mu;
 		std::array<bool, constants::virtual_input_dim> active_mask;
+		std::array<bool, constants::input_dim> actuator_mask;
 		operating::OperatingPoint_T<double> operating_point;	// (zt, ut_1)
+        std::optional<control::ControlOutput> u_preferred;
         operating::OperatingConditions conditions;
         autodiff::AutoDiffModel& model;
     };
@@ -21,10 +34,12 @@ namespace allocator {
     struct AllocatorProperties {
         constants::MatrixX_T<double, constants::virtual_input_dim, constants::virtual_input_dim> Q;
         constants::MatrixX_T<double, constants::input_dim, constants::input_dim> R;
+        constants::MatrixX_T<double, constants::input_dim, constants::input_dim> R_trim;
+        AllocatorDiagnostics diagnostics;
         qp::Solver solver{constants::input_dim};
 
         control::ControlOutputSet step(const AllocatorInput& input);
-        std::tuple<control::ControlOutput, EffectivenessMatrix> solve_qp(const AllocatorInput& input, bool constrained);
+        control::ControlOutput solve_qp(const constants::MatrixX_T<double, constants::input_dim, constants::input_dim>& hessian, const actuators::ActuatorInputsVector_T<double>& gradient, const actuators::ActuatorInputsVector_T<double>& u_0, const actuators::ActuatorInputsVector_T<double>& actuator_target, const actuators::ActuatorLimitsVector& limits, const std::array<bool, constants::input_dim>& actuator_mask, bool constrained);
     };
 
 	std::tuple<EffectivenessMatrix, dynamics::WrenchVector_T<double>> compute_effectiveness_matrix(autodiff::AutoDiffModel& model, const operating::OperatingPoint_T<double>& operating_point, const operating::OperatingConditions& conditions);
@@ -32,12 +47,14 @@ namespace allocator {
     AllocatorInput build_allocator_input(
         const control::VirtualControlOutput& mu_cmd,
         const std::array<bool, constants::virtual_input_dim>& active_mask,
+        const std::array<bool, constants::input_dim>& actuator_mask,
         const dynamics::RigidBodyState& Zt,
         const control::ControlOutput& u_actual_t_1,
+        const std::optional<control::ControlOutput>& u_preferred,
         const operating::OperatingConditions& conditions, 
         autodiff::AutoDiffModel& model
     );
 
-    EffectivenessMatrix apply_beta_scale(const EffectivenessMatrix& E, const actuators::ActuatorInputsVector_T<double>& time_constants);
+    actuators::ActuatorInputsVector_T<double> compute_actuator_beta(const actuators::ActuatorInputsVector_T<double>& time_constants);
 
 }

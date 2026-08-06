@@ -7,7 +7,7 @@
 
 namespace control {
 
-    inline constexpr std::size_t integrated_state_dim = 3;  // p, q, r are the integrated states
+    inline constexpr std::size_t integrated_state_dim = 3;  // phi, theta, r are the integrated states
     using IntegratedStateVector = constants::MatrixX_T<double, integrated_state_dim, 1>;
     using AugmentedStateVector = constants::MatrixX_T<double, constants::state_dim + integrated_state_dim, 1>;
 

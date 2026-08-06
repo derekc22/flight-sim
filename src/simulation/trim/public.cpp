@@ -212,33 +212,18 @@ namespace trim {
         return Xt_trim;
     }
 
-    /** @deprecated */
-    // void update_actuators_lag_from_trim(actuators::SurfaceActuators& surface_actuators, actuators::PropulsorActuators& propulsor_actuators, const TrimSolution& trim_sol) {
-    //     surface_actuators.aileron.prev_cmd = trim_sol.operating_point.input.aileron_cmd;
-    //     surface_actuators.elevator.prev_cmd = trim_sol.operating_point.input.elevator_cmd;
-    //     surface_actuators.rudder.prev_cmd = trim_sol.operating_point.input.rudder_cmd;
+    void update_actuators_lag_from_trim(actuators::SurfaceActuators& surface_actuators, actuators::PropulsorActuators& propulsor_actuators, const TrimSolution& trim_sol) {
+        const actuators::SurfaceActuatorInputs_T<double>& surface_inputs = trim_sol.operating_point.input.surface_inputs;
+        const actuators::PropulsorActuatorInputs_T<double>& propulsor_inputs = trim_sol.operating_point.input.propulsor_inputs;
 
-    //     propulsor_actuators.front_propulsor.prev_cmd = trim_sol.operating_point.input.front_propulsor_cmd;
-    //     propulsor_actuators.left_propulsor.prev_cmd = trim_sol.operating_point.input.left_propulsor_cmd;
-    //     propulsor_actuators.right_propulsor.prev_cmd = trim_sol.operating_point.input.right_propulsor_cmd;
-    // }
-
-    /** @deprecated */
-    // actuators::ActuatorInputs_T<double> set_actuator_inputs_from_trim(actuators::ActuatorInputs_T<double> actuator_inputs, const actuators::ActuatorInputs_T<double>& trim_inputs) {
-    //     const actuators::SurfaceActuatorInputs_T<double>& trim_surface_inputs = trim_inputs.surface_inputs;
-    //     const actuators::PropulsorActuatorInputs_T<double>& trim_propulsor_inputs = trim_inputs.propulsor_inputs;
-
-    //     actuators::SurfaceActuatorInputs_T<double>& surface_inputs = actuator_inputs.surface_inputs;
-    //     actuators::PropulsorActuatorInputs_T<double>& propulsor_inputs = actuator_inputs.propulsor_inputs;
-
-    //     surface_inputs.elevator_cmd = trim_surface_inputs.elevator_cmd;
-    //     surface_inputs.aileron_cmd = trim_surface_inputs.aileron_cmd;
-    //     surface_inputs.rudder_cmd = trim_surface_inputs.rudder_cmd;
-    //     propulsor_inputs.front_propulsor_cmd = trim_propulsor_inputs.front_propulsor_cmd;
-    //     propulsor_inputs.left_propulsor_cmd = trim_propulsor_inputs.left_propulsor_cmd;
-    //     propulsor_inputs.right_propulsor_cmd = trim_propulsor_inputs.right_propulsor_cmd;
-
-    //     return actuator_inputs;
-    // }
+        surface_actuators.elevator.prev_cmd = surface_inputs.elevator_cmd;
+        surface_actuators.aileron.prev_cmd = surface_inputs.aileron_cmd;
+        surface_actuators.rudder.prev_cmd = surface_inputs.rudder_cmd;
+        surface_actuators.flap.prev_cmd = surface_inputs.flap_cmd;
+        surface_actuators.spoiler.prev_cmd = surface_inputs.spoiler_cmd;
+        propulsor_actuators.front_propulsor.prev_cmd = propulsor_inputs.front_propulsor_cmd;
+        propulsor_actuators.left_propulsor.prev_cmd = propulsor_inputs.left_propulsor_cmd;
+        propulsor_actuators.right_propulsor.prev_cmd = propulsor_inputs.right_propulsor_cmd;
+    }
 
 }

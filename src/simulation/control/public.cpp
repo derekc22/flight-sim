@@ -9,12 +9,14 @@ namespace control {
     VirtualControlOutputSet ControlProperties::step(const ControllerInputs& inputs, double dt) {
         VirtualControlOutput_T<double> out{};
         std::array<bool, constants::virtual_input_dim> active_mask{};
+        std::array<bool, constants::input_dim> actuator_mask{};
 
         if (attitude_controller && inputs.attitude_controller_input.has_value()) {
             VirtualControlOutput_T<double> _out = attitude_controller(inputs.attitude_controller_input.value(), dt);
             out.F += _out.F;
             out.M += _out.M;
         	util::fill_arr(active_mask, 3, 6, true);
+            util::fill_arr(actuator_mask, 0, 3, true);
 
         }
         if (velocity_controller && inputs.velocity_controller_input.has_value()) {
@@ -22,18 +24,21 @@ namespace control {
             out.F += _out.F;
             out.M += _out.M;
         	util::fill_arr(active_mask, 0, 1, true);
+            util::fill_arr(actuator_mask, 3, 4, true);
         }
         if (linear_quadratic_controller && inputs.linear_quadratic_controller_input.has_value()) {
             VirtualControlOutput_T<double> _out = linear_quadratic_controller(inputs.linear_quadratic_controller_input.value(), dt);
             out.F += _out.F;
             out.M += _out.M;
         	util::fill_arr(active_mask, 0, 6, true);
+            util::fill_arr(actuator_mask, 0, 6, true);
         }
         if (nonlinear_controller && inputs.nonlinear_controller_input.has_value()) {
             VirtualControlOutput_T<double> _out = nonlinear_controller(inputs.nonlinear_controller_input.value(), dt);
             out.F += _out.F;
             out.M += _out.M;
         	util::fill_arr(active_mask, 0, 6, true);
+            util::fill_arr(actuator_mask, 0, 6, true);
         }
 
         return {
@@ -41,7 +46,8 @@ namespace control {
 		        { out.F },
 	        	{ out.M }
 	        },
-        	active_mask
+            active_mask,
+            actuator_mask
         };
     }
 
@@ -78,10 +84,8 @@ namespace control {
             controller_inputs.linear_quadratic_controller_input.emplace(
                 LinearQuadraticControllerInput{
 				    .Zt = Zt,
-				    .mu_sol_trim = trim_sol.wrench,
-				    .surface_actuators = surface_actuators,
-				    .propulsor_actuators = propulsor_actuators,
 				    .virtual_linearization = virtual_lin_sol,
+				    .Z_sol_trim = trim_sol.operating_point.state,
 				    .setpoint = guidance::LinearQuadraticSetpoint{ setpoint },
 				    .delta_mu_vec_t_1 = delta_mu_vec_t_1
 			    }
