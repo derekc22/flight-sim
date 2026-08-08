@@ -1,14 +1,14 @@
 #pragma once
 #include <optional>
 #include <Eigen/Dense>
-#include "simulation/actuators/public.hpp"
+#include "simulation/control/shared/public.hpp"
 
 namespace control {
 
     struct LinearQuadraticPolicyInput {
         Eigen::VectorXd zt;
-        Eigen::MatrixXd A;
-        Eigen::Matrix<double, Eigen::Dynamic, constants::input_dim> B;
+        Eigen::MatrixXd A_virtual;
+        constants::MatrixX_T<double, Eigen::Dynamic, constants::virtual_input_dim> B_virtual;
     };
 
     struct LinearQuadraticPolicyParameters {
@@ -21,6 +21,6 @@ namespace control {
         LinearQuadraticPolicyParameters params;
 
         LinearQuadraticPolicy(const LinearQuadraticPolicyParameters& params);
-        actuators::ActuatorInputsVector step(const LinearQuadraticPolicyInput& input);
+        VirtualControlOutputVector_T<double> step(const LinearQuadraticPolicyInput& input);
     };
 }

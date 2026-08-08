@@ -1,6 +1,9 @@
 #pragma once
 #include <functional>
+#include <optional>
 #include "simulation/control/shared/public.hpp"
+#include "simulation/trim/public.hpp"
+#include "simulation/constants/public.hpp"
 
 namespace control {
 
@@ -21,19 +24,19 @@ namespace control {
         IncrementalNonlinearDynamicInversion
     };
 
-    using AttitudeController = std::function<ControlOutput(const AttitudeControllerInput&, double dt)>;
+    using AttitudeController = std::function<VirtualControlOutput_T<double>(const AttitudeControllerInput&, double dt)>;
 
-    using VelocityController = std::function<ControlOutput(const VelocityControllerInput&, double dt)>;
+    using VelocityController = std::function<VirtualControlOutput_T<double>(const VelocityControllerInput&, double dt)>;
 
-    using LinearQuadraticController = std::function<ControlOutput(const LinearQuadraticControllerInput&, double dt)>;
+    using LinearQuadraticController = std::function<VirtualControlOutput_T<double>(const LinearQuadraticControllerInput&, double dt)>;
 
-    using NonlinearController = std::function<ControlOutput(const NonlinearControllerInput&, double dt)>;
+    using NonlinearController = std::function<VirtualControlOutput_T<double>(const NonlinearControllerInput&, double dt)>;
 
     struct ControllerInputs {
-        const AttitudeControllerInput& attitude_controller_input;
-        const VelocityControllerInput& velocity_controller_input;
-        const LinearQuadraticControllerInput& linear_quadratic_controller_input;
-        const NonlinearControllerInput& nonlinear_controller_input;
+        std::optional<AttitudeControllerInput> attitude_controller_input;
+        std::optional<VelocityControllerInput> velocity_controller_input;
+        std::optional<LinearQuadraticControllerInput> linear_quadratic_controller_input;
+        std::optional<NonlinearControllerInput> nonlinear_controller_input;
     };
 
     struct ControlProperties {
@@ -47,7 +50,17 @@ namespace control {
         LinearQuadraticController linear_quadratic_controller;
         NonlinearController nonlinear_controller;
 
-        ControlOutput step(const ControllerInputs& inputs, double dt, bool trim_flag);
+        VirtualControlOutputSet step(const ControllerInputs& inputs, double dt);
+
+        ControllerInputs build_controller_inputs(
+            const dynamics::RigidBodyState& Zt, 
+            const trim::TrimSolution& trim_sol, 
+            const linearization::VirtualLocalLinearization& virtual_lin_sol, 
+            const actuators::SurfaceActuators& surface_actuators, 
+            const actuators::PropulsorActuators& propulsor_actuators, 
+            const guidance::GuidanceSetpoint& setpoint,
+            dynamics::WrenchVector_T<double> delta_mu_vec_t_1
+        );
     };
 
 }

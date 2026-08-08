@@ -7,11 +7,11 @@
 
 namespace linearization {
 
-    using StateJacobian = Eigen::Matrix<double, constants::state_dim, constants::state_dim>;
-    using InputJacobian = Eigen::Matrix<double, constants::state_dim, constants::input_dim>;
+    using StateJacobian = constants::MatrixX_T<double, constants::state_dim, constants::state_dim>;
+    using InputJacobian = constants::MatrixX_T<double, constants::state_dim, constants::input_dim>;
 
-    using OutputJacobian = Eigen::Matrix<double, constants::state_dim, constants::state_dim>;
-    using DirectFeedthroughJacobian = Eigen::Matrix<double, constants::state_dim, constants::input_dim>;
+    using OutputJacobian = constants::MatrixX_T<double, constants::state_dim, constants::state_dim>;
+    using DirectFeedthroughJacobian = constants::MatrixX_T<double, constants::state_dim, constants::input_dim>;
 
     struct LocalLinearization {
         StateJacobian A = StateJacobian::Zero();
@@ -27,11 +27,24 @@ namespace linearization {
         DirectFeedthroughJacobian D = DirectFeedthroughJacobian::Zero();
     };
 
+
+    using VirtualInputJacobian = constants::MatrixX_T<double, constants::state_dim, constants::virtual_input_dim>;
+    using VirtualDirectFeedthroughJacobian = constants::MatrixX_T<double, constants::state_dim, constants::virtual_input_dim>;
+
+    struct VirtualLocalLinearization {
+        StateJacobian A_virtual = StateJacobian::Zero();
+        VirtualInputJacobian B_virtual = VirtualInputJacobian::Zero();
+        OutputJacobian C_virtual = OutputJacobian::Identity();
+        VirtualDirectFeedthroughJacobian D_virtual = VirtualDirectFeedthroughJacobian::Zero();
+    };
+
     DiscretizedLocalLinearization discretize(const LocalLinearization& lin_sol, double dt);
 
     DiscretizedLocalLinearization discretize_euler(const LocalLinearization& lin_sol, double dt);
 
-    LocalLinearization linearize_operating_point(autodiff::AutoDiffModel& model, const operating::OperatingPoint& operating_point, const operating::OperatingConditions& conditions);
+    LocalLinearization linearize_operating_point(autodiff::AutoDiffModel& model, const operating::OperatingPoint_T<double>& operating_point, const operating::OperatingConditions& conditions);
+
+    VirtualLocalLinearization linearize_virtual_operating_point(autodiff::AutoDiffModel& model, const operating::VirtualOperatingPoint_T<double>& virtual_operating_point);
 
     std::string print_linearization_solution(const LocalLinearization& lin);
 }

@@ -4,59 +4,20 @@
 
 namespace actuators {
 
-    ActuatorInputs_T<double> pack_actuator_inputs(const ActuatorInputsVector& u) {
-        return {
-            .surface_inputs = {
-                .elevator_cmd = u(0),
-                .aileron_cmd = u(1),
-                .rudder_cmd = u(2),
-            },
-            .propulsor_inputs = {
-                .front_propulsor_cmd = u(3),
-                .left_propulsor_cmd = u(4),
-                .right_propulsor_cmd = u(5),
-            }
-        };
-    }
-
-    ActuatorInputsVector unpack_actuator_inputs(const ActuatorInputs_T<double>& u) {
-        const SurfaceActuatorInputs_T<double>& surface_inputs = u.surface_inputs;
-        const PropulsorActuatorInputs_T<double>& propulsor_inputs = u.propulsor_inputs;
-        ActuatorInputsVector out;
-        out << surface_inputs.elevator_cmd,
-               surface_inputs.aileron_cmd,
-               surface_inputs.rudder_cmd,
-               propulsor_inputs.front_propulsor_cmd,
-               propulsor_inputs.left_propulsor_cmd,
-               propulsor_inputs.right_propulsor_cmd;
-        return out;
-    }
-
     ActuatorLimits pack_actuator_limits(const ActuatorLimitsVector& limits) {
-        const ActuatorInputsVector limit_min = limits.col(0);
-        const ActuatorInputsVector limit_max = limits.col(1);
+        const ActuatorInputsVector_T<double> limit_min = limits.col(0);
+        const ActuatorInputsVector_T<double> limit_max = limits.col(1);
         return {
-            .limit_min = pack_actuator_inputs(limit_min),
-            .limit_max = pack_actuator_inputs(limit_max),
+            .limit_min = pack_actuator_inputs_T(limit_min),
+            .limit_max = pack_actuator_inputs_T(limit_max),
         };
     }
 
     ActuatorLimitsVector unpack_actuator_limits(const ActuatorLimits& limits) {
         ActuatorLimitsVector out;
-        out.col(0) = unpack_actuator_inputs(limits.limit_min);
-        out.col(1) = unpack_actuator_inputs(limits.limit_max);
+        out.col(0) = unpack_actuator_inputs_T(limits.limit_min);
+        out.col(1) = unpack_actuator_inputs_T(limits.limit_max);
         return out;
-    }
-
-    ActuatorInputs_T<double> pack_actuator_inputs(const SurfaceActuatorInputs_T<double>& u_surface, const PropulsorActuatorInputs_T<double>& u_propulsor) {
-        return {
-            .surface_inputs = u_surface,
-            .propulsor_inputs = u_propulsor
-        };
-    }
-
-    ActuatorInputsVector unpack_actuator_inputs(const SurfaceActuatorInputs_T<double>& u_surface, const PropulsorActuatorInputs_T<double>& u_propulsor) {
-        return unpack_actuator_inputs(pack_actuator_inputs(u_surface, u_propulsor));
     }
 
     ActuatorLimits pack_actuator_limits(const SurfaceActuators& surface_actuators, const PropulsorActuators& propulsor_actuators) {
@@ -140,6 +101,12 @@ namespace actuators {
 
     ActuatorLimitsVector unpack_actuator_limits(const SurfaceActuators& surface_actuators, const PropulsorActuators& propulsor_actuators) {
         return unpack_actuator_limits(pack_actuator_limits(surface_actuators, propulsor_actuators));
+    }
+
+    ActuatorInputs_T<double> get_neutral_actuator_inputs(const SurfaceActuators& surface_actuators, const PropulsorActuators& propulsor_actuators) {
+        const ActuatorLimitsVector actuator_limits = unpack_actuator_limits(surface_actuators, propulsor_actuators);
+        const ActuatorInputsVector_T<double> neutral_actuators = ActuatorInputsVector_T<double>::Zero().cwiseMax(actuator_limits.col(0)).cwiseMin(actuator_limits.col(1));
+        return pack_actuator_inputs_T(neutral_actuators);
     }
 
     FixedActuatorInputs Settings::get_fixed_actuator_inputs() {

@@ -12,7 +12,6 @@
 #include "simulation/aerodynamics/public.hpp"
 #include "simulation/structural/public.hpp"
 #include "simulation/operating/public.hpp"
-#include "simulation/control/shared/public.hpp"
 #include "simulation/autodiff/public.hpp"
 
 namespace vehicles { struct Aircraft; } // forward declare
@@ -38,12 +37,11 @@ namespace trim {
     };
 
     struct TrimSolution {
-        operating::OperatingPoint operating_point;
+        operating::OperatingPoint_T<double> operating_point;
         operating::OperatingConditions conditions;
-        dynamics::Wrench wrench{};
+        dynamics::Wrench_T<double> wrench{};
         TrimResidual_T<double> residual;
         TrimResidual_T<double> weighted_residual;
-        operating::StateInputVector_T<double> variables = operating::StateInputVector_T<double>::Zero();
         bool attempted = false;
         bool converged = false;
         std::size_t iterations = 0;
@@ -51,25 +49,12 @@ namespace trim {
         double weighted_residual_norm_inf = 0.0;
     };
 
-    template <typename T>
-    T get_control_from_solver_space_T(const T& u_solver, double limit_min, double limit_max);
-
-    template <typename T>
-    actuators::ActuatorInputs_T<T> pack_trim_actuator_inputs_T(const operating::StateInputVector_T<T>& xu, const actuators::ActuatorLimits& actuator_limits, const actuators::FixedActuatorInputs& fixed_actuator_inputs);
-
     TrimSolution inspect_trim(vehicles::Aircraft& aircraft, autodiff::AutoDiffModel& model, const atmospheric::Wind& wind);
 
     std::string print_trim_solution(const TrimSolution& trim_sol);
 
     dynamics::RigidBodyState update_state_from_trim(const dynamics::RigidBodyState& Xt, const dynamics::State_T<double>& trim_state);
 
-    control::ControlOutput set_control_inputs_from_trim(const actuators::ActuatorInputs_T<double>& trim_inputs);
-
-    /** @deprecated */
-    // void update_actuators_lag_from_trim(actuators::SurfaceActuators& surface_actuators, actuators::PropulsorActuators& propulsor_actuators, const TrimSolution& trim_sol);
-
-    actuators::ActuatorInputs_T<double> set_actuator_inputs_from_trim(actuators::ActuatorInputs_T<double> actuator_inputs, const actuators::ActuatorInputs_T<double>& trim_inputs);
+    void update_actuators_lag_from_trim(actuators::SurfaceActuators& surface_actuators, actuators::PropulsorActuators& propulsor_actuators, const TrimSolution& trim_sol);
 
 }
-
-#include "simulation/trim/public.tpp"

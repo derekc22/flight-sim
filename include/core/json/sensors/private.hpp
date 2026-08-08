@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
 #include <nlohmann/json.hpp>
-#include "core/json/sensors/public.hpp"
 #include "simulation/sensors/public.hpp"
 
 namespace json {

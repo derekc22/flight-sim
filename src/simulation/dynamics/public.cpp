@@ -6,7 +6,7 @@
 #include "simulation/frames/public.hpp"
 #include "simulation/integrators/public.hpp"
 #include "simulation/transforms/public.hpp"
-#include "simulation/util/public.hpp"
+#include "simulation/util/linalg/public.hpp"
 
 namespace dynamics {
 
@@ -14,7 +14,11 @@ namespace dynamics {
         data = transforms::quat_to_rot(q.data); 
     }
     void OrientationMatrix::set(const EulerAngles& eul) { 
-        data = transforms::eul_to_C(eul.psi(), eul.theta(), eul.phi(), transforms::EulerOrder::ZYX, transforms::RotationType::Intrinsic); 
+        data = transforms::eul_to_C(
+            eul.psi(), eul.theta(), eul.phi(), 
+            transforms::EulerOrder::ZYX,
+            transforms::RotationType::Intrinsic
+        ); 
     }
 
     OrientationMatrix HomogeneousTransformationMatrix::C() const { 
@@ -37,7 +41,14 @@ namespace dynamics {
     }
     void HomogeneousTransformationMatrix::set(const EulerAngles& eul) {
         data = transforms::make_HC(
-            transforms::eul_to_C(eul.psi(), eul.theta(), eul.phi(), transforms::EulerOrder::ZYX, transforms::RotationType::Intrinsic), p().data, transforms::TransformationOrder::TranslateFirst); 
+            transforms::eul_to_C(
+                eul.psi(), eul.theta(), eul.phi(), 
+                transforms::EulerOrder::ZYX, 
+                transforms::RotationType::Intrinsic
+            ), 
+            p().data, 
+            transforms::TransformationOrder::TranslateFirst
+        ); 
     }
 
     void OrientationQuaternion::set(const OrientationMatrix& C) {
@@ -158,25 +169,24 @@ namespace dynamics {
         return { eul_dot_to_wB_BI_mat(theta, phi) * eul_dot.data };
     }
 
-    State_T<double> pack_state(const StateVector& x) {
+    WrenchVector_T<double> unpack_wrench(const Wrench& wrench) {
+        WrenchVector_T<double> out;
+        out << wrench.F.data, wrench.M.data;
+        return out;
+    }
+
+    Wrench pack_wrench(const WrenchVector_T<double>& wrench) {
         return {
-            .vx = x(0),
-            .vy = x(1),
-            .vz = x(2),
-            .p = x(3),
-            .q = x(4),
-            .r = x(5),
-            .phi = x(6),
-            .theta = x(7)
+            .F = Force{ Eigen::Vector3d(wrench(0), wrench(1), wrench(2)) },
+            .M = Moment{ Eigen::Vector3d(wrench(3), wrench(4), wrench(5)) }
         };
     }
 
-    StateVector unpack_state(const State_T<double>& x) {
-        StateVector out;
-        out << x.vx, x.vy, x.vz,
-               x.p, x.q, x.r,
-               x.phi, x.theta;
-        return out;
+    Wrench pack_wrench(const Wrench_T<double>& wrench) {
+        return {
+            .F = dynamics::Force{ wrench.F },
+            .M = dynamics::Moment{ wrench.M },
+        };
     }
 
     State_T<double> pack_state(const RigidBodyState& Xt) {
@@ -197,8 +207,8 @@ namespace dynamics {
         };
     }
 
-    StateVector unpack_state(const RigidBodyState& Xt) {
-        return unpack_state(pack_state(Xt));
+    StateVector_T<double> unpack_state(const RigidBodyState& Xt) {
+        return unpack_state_T(pack_state(Xt));
     }
 
 }

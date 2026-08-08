@@ -3,11 +3,8 @@
 #include <optional>
 #include <string>
 #include "simulation/runner/public.hpp"
-#include "simulation/aerodynamics/public.hpp"
 #include "simulation/actuators/public.hpp"
-#include "simulation/atmospheric/public.hpp"
 #include "simulation/dynamics/public.hpp"
-#include "simulation/geography/public.hpp"
 #include "simulation/linearization/public.hpp"
 #include "simulation/trim/public.hpp"
 #include "simulation/vehicles/public.hpp"
@@ -15,7 +12,6 @@
 #include "simulation/constants/public.hpp"
 #include "simulation/sensors/public.hpp"
 #include "simulation/guidance/public.hpp"
-#include "simulation/control/public.hpp"
 #include "simulation/fsm/public.hpp"
 #include "core/messages/public.hpp"
 #include "core/connection/public.hpp"
@@ -67,11 +63,12 @@ namespace runner {
         std::optional<io::AnalysisManager> analysis_manager;
         std::optional<devices::JoystickManager> joystick_manager;
 
-        actuators::ActuatorInputs_T<double> u_actual_t_1{};
-
         // initialize trim and linearization solutions
         trim::TrimSolution trim_sol;
         linearization::LocalLinearization lin_sol;
+
+        // initialize virtual linearization solution
+        linearization::VirtualLocalLinearization virtual_lin_sol;
 
         // initialize prior-step net wrench
         dynamics::Wrench WB_net_t_1{ 
@@ -84,7 +81,14 @@ namespace runner {
         dynamics::RigidBodyState Yt_1;
         dynamics::RigidBodyState Zt_1;
         guidance::GuidanceSetpoint setpoint_t_1;
+        control::VirtualControlOutput mu_cmd_t_1;
+        std::array<bool, constants::virtual_input_dim> active_mask_t_1;
+        std::array<bool, constants::input_dim> actuator_mask_t_1;
         control::ControlOutput u_cmd_t_1;
+        control::ControlOutput u_actual_t_1;
+
+        // initialize prior-step delta mu
+        dynamics::WrenchVector_T<double> delta_mu_vec_t_1{};
 
         // initialize udp out cache
         messages::ProcessedFlightGearMessageOut cached_msg_out{};
@@ -106,16 +110,7 @@ namespace runner {
         void cleanup();
         void run();
         void step(int t);
+
     };
-
-    std::string print_vec(const char* name, const Eigen::Vector3d& x, const char* unit);
-
-    void log_state(
-        int t,
-        const dynamics::RigidBodyState& Xt,
-        const geography::GeographicState& geo,
-        const aerodynamics::AerodynamicState& aero,
-        const atmospheric::Wind& windI
-    );
 
 }

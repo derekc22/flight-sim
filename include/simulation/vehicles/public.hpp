@@ -9,6 +9,7 @@
 #include "simulation/control/public.hpp"
 #include "simulation/estimation/public.hpp"
 #include "simulation/actuators/public.hpp"
+#include "simulation/allocator/public.hpp"
 #include "simulation/geography/public.hpp"
 #include "simulation/atmospheric/public.hpp"
 #include "simulation/sensors/public.hpp"
@@ -200,6 +201,7 @@ namespace vehicles {
         avionics::AvionicsProperties avionics_properties;
         guidance::GuidanceProperties guidance_properties;
         estimation::EstimationProperties estimation_properties;
+        allocator::AllocatorProperties allocator_properties;
 
         Aircraft(
             const std::string& id,
@@ -210,7 +212,8 @@ namespace vehicles {
             const sensors::SensorProperties& sensor_properties,
             const avionics::AvionicsProperties& avionics_properties,
             const guidance::GuidanceProperties& guidance_properties,
-            const estimation::EstimationProperties& estimation_properties
+            const estimation::EstimationProperties& estimation_properties,
+            const allocator::AllocatorProperties& allocator_properties
         );
 
         void step(const StepOptions& opts);

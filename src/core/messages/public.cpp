@@ -1,7 +1,8 @@
 #include "core/messages/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/geography/public.hpp"
-#include "simulation/util/public.hpp"
+#include "simulation/util/trig/public.hpp"
+#include "simulation/util/units/public.hpp"
 
 namespace messages {
 

@@ -90,7 +90,14 @@ namespace json {
         estimator = make_extended_kalman_estimator(estimator_type, estimator_json);
     }
 
-    estimation::EstimationProperties parse_estimation_properties(const nlohmann::json& config) {
+    void validate_estimator(const nlohmann::json& estimator_json, bool trim_flag) {
+        if (fetch_estimator_type(estimator_json) == estimation::EstimatorType::LinearKalmanFilter && !trim_flag) {
+            throw std::runtime_error("json::validate_estimator: LinearKalmanFilter requires trim");
+        }
+    }
+
+    estimation::EstimationProperties parse_estimation_properties(const nlohmann::json& config, bool trim_flag) {
+        validate_estimator(config, trim_flag);
         estimation::EstimationProperties estimation_properties;
 
         switch (fetch_estimator_type(config)) {

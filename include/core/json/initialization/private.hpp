@@ -1,7 +1,6 @@
 #pragma once
 #include <optional>
 #include <nlohmann/json.hpp>
-#include "core/json/initialization/public.hpp"
 #include "simulation/aerodynamics/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/geography/public.hpp"

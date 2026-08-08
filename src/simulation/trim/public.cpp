@@ -10,7 +10,7 @@
 #include "simulation/dynamics/public.hpp"
 #include "simulation/trim/public.hpp"
 #include "simulation/trim/private.hpp"
-#include "simulation/util/public.hpp"
+#include "simulation/util/trig/public.hpp"
 #include "simulation/vehicles/public.hpp"
 #include "simulation/autodiff/public.hpp"
 #include "simulation/operating/public.hpp"
@@ -38,7 +38,7 @@ namespace trim {
                 .windB = wind,
                 .steady_state = true
             },
-            .initial_guess = operating::OperatingPoint{
+            .initial_guess = operating::OperatingPoint_T<double>{
                 .state = dynamics::State_T<double>{
                     .vx = aircraft.FRDFrameNED.vB_BN.data.x(),
                     .vy = aircraft.FRDFrameNED.vB_BN.data.y(),
@@ -85,11 +85,13 @@ namespace trim {
 
 
     std::string print_trim_solution(const TrimSolution& trim_sol) {
-        const operating::OperatingPoint& operating_point = trim_sol.operating_point;
+        const operating::OperatingPoint_T<double>& operating_point = trim_sol.operating_point;
         const dynamics::State_T<double>& state = operating_point.state;
-        const dynamics::Wrench& wrench = trim_sol.wrench;
-        const Eigen::Vector3d& F = wrench.F.data;
-        const Eigen::Vector3d& M = wrench.M.data;
+
+        const dynamics::Wrench_T<double>& wrench = trim_sol.wrench;
+        const Eigen::Vector3d& F = wrench.F;
+        const Eigen::Vector3d& M = wrench.M;
+
         const TrimResidual_T<double>& residual = trim_sol.residual;
         const TrimResidual_T<double>& weighted_residual = trim_sol.weighted_residual;
 
@@ -210,36 +212,18 @@ namespace trim {
         return Xt_trim;
     }
 
-    control::ControlOutput set_control_inputs_from_trim(const actuators::ActuatorInputs_T<double>& trim_inputs) {
-        return trim_inputs;
-    }
+    void update_actuators_lag_from_trim(actuators::SurfaceActuators& surface_actuators, actuators::PropulsorActuators& propulsor_actuators, const TrimSolution& trim_sol) {
+        const actuators::SurfaceActuatorInputs_T<double>& surface_inputs = trim_sol.operating_point.input.surface_inputs;
+        const actuators::PropulsorActuatorInputs_T<double>& propulsor_inputs = trim_sol.operating_point.input.propulsor_inputs;
 
-    /** @deprecated */
-    // void update_actuators_lag_from_trim(actuators::SurfaceActuators& surface_actuators, actuators::PropulsorActuators& propulsor_actuators, const TrimSolution& trim_sol) {
-    //     surface_actuators.aileron.prev_cmd = trim_sol.operating_point.input.aileron_cmd;
-    //     surface_actuators.elevator.prev_cmd = trim_sol.operating_point.input.elevator_cmd;
-    //     surface_actuators.rudder.prev_cmd = trim_sol.operating_point.input.rudder_cmd;
-
-    //     propulsor_actuators.front_propulsor.prev_cmd = trim_sol.operating_point.input.front_propulsor_cmd;
-    //     propulsor_actuators.left_propulsor.prev_cmd = trim_sol.operating_point.input.left_propulsor_cmd;
-    //     propulsor_actuators.right_propulsor.prev_cmd = trim_sol.operating_point.input.right_propulsor_cmd;
-    // }
-
-    actuators::ActuatorInputs_T<double> set_actuator_inputs_from_trim(actuators::ActuatorInputs_T<double> actuator_inputs, const actuators::ActuatorInputs_T<double>& trim_inputs) {
-        const actuators::SurfaceActuatorInputs_T<double>& trim_surface_inputs = trim_inputs.surface_inputs;
-        const actuators::PropulsorActuatorInputs_T<double>& trim_propulsor_inputs = trim_inputs.propulsor_inputs;
-
-        actuators::SurfaceActuatorInputs_T<double>& surface_inputs = actuator_inputs.surface_inputs;
-        actuators::PropulsorActuatorInputs_T<double>& propulsor_inputs = actuator_inputs.propulsor_inputs;
-
-        surface_inputs.elevator_cmd = trim_surface_inputs.elevator_cmd;
-        surface_inputs.aileron_cmd = trim_surface_inputs.aileron_cmd;
-        surface_inputs.rudder_cmd = trim_surface_inputs.rudder_cmd;
-        propulsor_inputs.front_propulsor_cmd = trim_propulsor_inputs.front_propulsor_cmd;
-        propulsor_inputs.left_propulsor_cmd = trim_propulsor_inputs.left_propulsor_cmd;
-        propulsor_inputs.right_propulsor_cmd = trim_propulsor_inputs.right_propulsor_cmd;
-
-        return actuator_inputs;
+        surface_actuators.elevator.prev_cmd = surface_inputs.elevator_cmd;
+        surface_actuators.aileron.prev_cmd = surface_inputs.aileron_cmd;
+        surface_actuators.rudder.prev_cmd = surface_inputs.rudder_cmd;
+        surface_actuators.flap.prev_cmd = surface_inputs.flap_cmd;
+        surface_actuators.spoiler.prev_cmd = surface_inputs.spoiler_cmd;
+        propulsor_actuators.front_propulsor.prev_cmd = propulsor_inputs.front_propulsor_cmd;
+        propulsor_actuators.left_propulsor.prev_cmd = propulsor_inputs.left_propulsor_cmd;
+        propulsor_actuators.right_propulsor.prev_cmd = propulsor_inputs.right_propulsor_cmd;
     }
 
 }

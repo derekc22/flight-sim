@@ -25,7 +25,7 @@ Install C++ dependencies:
 sudo apt install pkg-config libeigen3-dev cppad nlohmann-json3-dev libslicot-dev gcc g++ libgtest-dev libopencv-dev libsdl3-dev
 
 # macOS
-brew install pkgconf eigen cppad nlohmann-json slicot gcc googletest opencv sdl3
+brew install pkgconf eigen cppad nlohmann-json slicot gcc googletest opencv sdl3 proxsuite
 ```
 
 Install MATLAB Runtime:
@@ -107,7 +107,7 @@ scripts/bin/analyze.sh <OUT_DIR>
 The current analysis implementation requires an active MATLAB license. A planned transition to pre-compiled binaries will remove this requirement, requiring only the MATLAB Runtime instead
 
 ## Devices
-The simulator supports the Sony Dualshock PlayStation 4 Wireless Controller as an input device for manual flight. The flight controls are mapped as follows:
+The simulator supports the Sony Dualshock 4 Wireless Controller as an input device for manual flight. The flight controls are mapped as follows:
 - `Elevator`: left stick up/down
 - `Ailerons`: left stick left/right
 - `Rudder`: right stick left/right

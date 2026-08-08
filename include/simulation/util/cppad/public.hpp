@@ -2,6 +2,7 @@
 
 #include <Eigen/Dense>
 #include <cppad/cppad.hpp>
+#include "simulation/constants/public.hpp"
 
 namespace util {
 
@@ -24,6 +25,6 @@ namespace util {
     CppAD::AD<double> clamp_positive(const CppAD::AD<double>& x, double max_value);
     CppAD::AD<double> clamp_to_1(const CppAD::AD<double>& x);
 
-    Eigen::Matrix<CppAD::AD<double>, 3, 1> norm(const Eigen::Matrix<CppAD::AD<double>, 3, 1>& v);
+    constants::MatrixX_T<CppAD::AD<double>, 3, 1> norm(const constants::MatrixX_T<CppAD::AD<double>, 3, 1>& v);
 
 }

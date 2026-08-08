@@ -1,7 +1,5 @@
 
 #include <stdexcept>
-#include "simulation/actuators/propulsor/public.hpp"
-#include "simulation/actuators/surface/public.hpp"
 #include "simulation/control/pid/controllers/attitude/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/guidance/public.hpp"
@@ -10,7 +8,6 @@
 namespace control {
 
     AttitudePID::AttitudePID(const AttitudePIDParameters& params) :
-        params(params),
         lateral_policy({
                 .Kp = params.Kp_roll,
                 .Ki = params.Ki_roll,
@@ -34,40 +31,36 @@ namespace control {
         )
     {};
 
-    PIDPolicyInput AttitudePID::make_pid_policy_input(const AttitudeControllerInput& input, ControlAxis axis) {
+    PIDPolicyInput AttitudePID::make_pid_policy_input(const AttitudeControllerInput& input, AttitudeAxis axis) {
         dynamics::RigidBodyState Zt = input.Zt;
-        actuators::SurfaceActuators surface_actuators = input.surface_actuators;
         guidance::AttitudeSetpoint setpoint = input.setpoint;
 
         dynamics::EulerAngles eul_est_t;
         eul_est_t.set(Zt.q);
 
         switch (axis) {
-            case ControlAxis::Lateral:
+            case AttitudeAxis::Lateral:
                 return {
                     .x = eul_est_t.phi(),
                     .x_des = setpoint.eulIB.phi(),
                     .x_dot = Zt.w.p(),
-                    .limit_min = surface_actuators.aileron.limit_min,
-                    .limit_max = surface_actuators.aileron.limit_max
+                    .delta_mu = input.delta_mu_vec_t_1[3]
                 };
 
-            case ControlAxis::Longitudinal:
+            case AttitudeAxis::Longitudinal:
                 return {
                     .x = eul_est_t.theta(),
                     .x_des = setpoint.eulIB.theta(),
                     .x_dot = Zt.w.q(),
-                    .limit_min = surface_actuators.elevator.limit_min,
-                    .limit_max = surface_actuators.elevator.limit_max
+                    .delta_mu = input.delta_mu_vec_t_1[4]
                 };
 
-            case ControlAxis::Vertical:
+            case AttitudeAxis::Vertical:
                 return {
                     .x = eul_est_t.psi(),
                     .x_des = setpoint.eulIB.psi(),
                     .x_dot = Zt.w.r(),
-                    .limit_min = surface_actuators.rudder.limit_min,
-                    .limit_max = surface_actuators.rudder.limit_max
+                    .delta_mu = input.delta_mu_vec_t_1[5]
                 };
 
             default:
@@ -75,26 +68,25 @@ namespace control {
         }
     }
 
-    ControlOutput AttitudePID::step(const AttitudeControllerInput& input, double dt) {
-        actuators::SurfaceActuatorInputs_T<double> u_surface{};
-        actuators::PropulsorActuatorInputs_T<double> u_propulsor{};
+    VirtualControlOutput_T<double> AttitudePID::step(const AttitudeControllerInput& input, double dt) {
+        VirtualControlOutput_T<double> out{};
 
-        u_surface.aileron_cmd = lateral_policy.step(
-            make_pid_policy_input(input, ControlAxis::Lateral),
+        out.M.x() = lateral_policy.step(
+            make_pid_policy_input(input, AttitudeAxis::Lateral),
             dt
         );
 
-        u_surface.elevator_cmd = longitudinal_policy.step(
-            make_pid_policy_input(input, ControlAxis::Longitudinal),
+        out.M.y() = longitudinal_policy.step(
+            make_pid_policy_input(input, AttitudeAxis::Longitudinal),
             dt
         );
 
-        u_surface.rudder_cmd = vertical_policy.step(
-            make_pid_policy_input(input, ControlAxis::Vertical),
+        out.M.z() = vertical_policy.step(
+            make_pid_policy_input(input, AttitudeAxis::Vertical),
             dt
         );
 
-        return { u_surface, u_propulsor };
+        return out;
     }
 
 }

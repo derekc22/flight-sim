@@ -7,8 +7,6 @@
 
 namespace control {
 
-    ControlOutput make_control_output(const actuators::ActuatorInputsVector& u_cmd);
-
-    dynamics::StateVector unpack_state(const guidance::LinearQuadraticSetpoint& setpoint);
+    dynamics::StateVector_T<double> unpack_state(const guidance::LinearQuadraticSetpoint& setpoint);
 
 }

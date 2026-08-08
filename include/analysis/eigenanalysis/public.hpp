@@ -6,8 +6,8 @@
 #include "simulation/linearization/public.hpp"
 
 namespace analysis {
-    using Eigenvalues = Eigen::Matrix<std::complex<double>, constants::state_dim, 1>;
-    using Eigenvectors = Eigen::Matrix<std::complex<double>, constants::state_dim, constants::state_dim>;
+    using Eigenvalues = constants::MatrixX_T<std::complex<double>, constants::state_dim, 1>;
+    using Eigenvectors = constants::MatrixX_T<std::complex<double>, constants::state_dim, constants::state_dim>;
 
     struct EigenAnalysis {
         Eigenvalues eigenvalues = Eigenvalues::Zero();

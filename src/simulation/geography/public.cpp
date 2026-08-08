@@ -7,7 +7,7 @@
 #include "simulation/geography/private.hpp"
 #include "simulation/geography/public.hpp"
 #include "simulation/transforms/public.hpp"
-#include "simulation/util/public.hpp"
+#include "simulation/util/trig/public.hpp"
 
 namespace geography {
 

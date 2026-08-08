@@ -1,9 +1,7 @@
 #pragma once
+#include <array>
+#include <cstddef>
 #include <Eigen/Dense>
-#include "simulation/util/cppad/public.hpp"
-#include "simulation/util/linalg/public.hpp"
-#include "simulation/util/trig/public.hpp"
-#include "simulation/util/units/public.hpp"
 
 namespace util {
 
@@ -24,4 +22,9 @@ namespace util {
 
     Eigen::VectorXd vec_clamp(const Eigen::VectorXd& x, const Eigen::VectorXd& x_min, const Eigen::VectorXd& x_max);
     bool vec_is_close(const Eigen::VectorXd& a, const Eigen::VectorXd& b);
+
+    template <typename T, std::size_t N>
+    void fill_arr(std::array<T, N>& x, std::size_t start, std::size_t stop, const T& val);
 }
+
+#include "simulation/util/public.tpp"

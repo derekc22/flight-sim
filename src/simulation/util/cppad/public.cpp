@@ -106,7 +106,7 @@ namespace util {
         );
     }
 
-    Eigen::Matrix<CppAD::AD<double>, 3, 1> norm(const Eigen::Matrix<CppAD::AD<double>, 3, 1>& v) {
+    constants::MatrixX_T<CppAD::AD<double>, 3, 1> norm(const constants::MatrixX_T<CppAD::AD<double>, 3, 1>& v) {
         const CppAD::AD<double> n = v.norm();
 
         const CppAD::AD<double> denom = CppAD::CondExpLt(

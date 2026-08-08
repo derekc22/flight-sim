@@ -15,7 +15,7 @@ static void expect_matrix_near(const Eigen::Matrix3d& A, const Eigen::Matrix3d& 
 }
 
 static void expect_orthonormal_with_unit_determinant(const Eigen::Matrix3d& R) {
-    EXPECT_TRUE((R.transpose() * R).isApprox(Eigen::Matrix3d::Identity(), constants::eps_strict));
+    EXPECT_TRUE((R.transpose() * R).isApprox(constants::IX_T<double, 3>, constants::eps_strict));
     EXPECT_NEAR(R.determinant(), 1.0, constants::eps_strict);
 }
 
@@ -113,7 +113,7 @@ TEST(transforms_so3, IntrinsicAndExtrinsicWrappersDispatch) {
 
 TEST(transforms_so3, RejectsInvalidTypeArgument) {
     EXPECT_THROW(transforms::eul_to_C(0.0, 0.0, 0.0, transforms::EulerOrder::ZYX, static_cast<transforms::RotationType>(-1)), std::invalid_argument);
-    EXPECT_THROW(transforms::C_to_eul(Eigen::Matrix3d::Identity(), transforms::EulerOrder::ZYX, static_cast<transforms::RotationType>(-1)), std::invalid_argument);
+    EXPECT_THROW(transforms::C_to_eul(constants::IX_T<double, 3>, transforms::EulerOrder::ZYX, static_cast<transforms::RotationType>(-1)), std::invalid_argument);
 }
 
 TEST(transforms_so3, RejectsInvalidEulerOrderArgument) {

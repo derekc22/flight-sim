@@ -3,5 +3,5 @@
 
 namespace json {
 
-    control::ControlProperties parse_control_config();
+    control::ControlProperties parse_control_config(bool trim_flag);
 }

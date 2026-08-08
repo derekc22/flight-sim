@@ -1,6 +1,8 @@
 #pragma once
 #include <functional>
+#include <optional>
 #include "simulation/estimation/shared/public.hpp"
+#include "simulation/control/shared/public.hpp"
 #include "simulation/dynamics/public.hpp"
 
 namespace estimation {
@@ -16,9 +18,9 @@ namespace estimation {
     using ExtendedKalmanEstimator = std::function<EstimationOutput(const ExtendedKalmanEstimatorInput&, double dt)>;
 
     struct EstimatorInputs {
-        const dynamics::RigidBodyState& Yt;
-        const LinearKalmanEstimatorInput& linear_kalman_estimator_input;
-        const ExtendedKalmanEstimatorInput& extended_kalman_estimator_input;
+        const dynamics::RigidBodyState Yt;
+        std::optional<LinearKalmanEstimatorInput> linear_kalman_estimator_input;
+        std::optional<ExtendedKalmanEstimatorInput> extended_kalman_estimator_input;
     };
 
     struct EstimationProperties {
@@ -28,6 +30,16 @@ namespace estimation {
         LinearKalmanEstimator linear_kalman_estimator;
         ExtendedKalmanEstimator extended_kalman_estimator;
 
-        EstimationOutput step(const EstimatorInputs& inputs, double dt, bool trim_flag);
+        EstimationOutput step(const EstimatorInputs& inputs, double dt);
+
+        EstimatorInputs build_estimator_inputs(
+            const dynamics::RigidBodyState& Yt, 
+            const trim::TrimSolution& trim_sol, 
+            const linearization::LocalLinearization& lin_sol, 
+            autodiff::AutoDiffModel& model, 
+            const control::ControlOutput& u_actual_t_1,
+            const operating::OperatingConditions& conditions
+        );
     };
+
 }
