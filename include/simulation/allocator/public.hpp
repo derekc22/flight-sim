@@ -23,7 +23,6 @@ namespace allocator {
     struct AllocatorProperties {
         constants::MatrixX_T<double, constants::virtual_input_dim, constants::virtual_input_dim> Q;
         constants::MatrixX_T<double, constants::input_dim, constants::input_dim> R;
-        constants::MatrixX_T<double, constants::input_dim, constants::input_dim> R_trim;
         qp::Solver solver{constants::input_dim};
 
         control::ControlOutputSet step(const AllocatorInput& input);

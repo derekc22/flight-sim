@@ -43,8 +43,8 @@ namespace allocator {
         actuators::ActuatorInputsVector_T<double> actuator_target = u_0;
         if (input.u_preferred.has_value()) {
             const actuators::ActuatorInputsVector_T<double> u_preferred = actuators::unpack_actuator_inputs_T(input.u_preferred.value());
-            trim_hessian = R_trim;
-            trim_gradient = R_trim * (u_0 - u_preferred);
+            trim_hessian = R;
+            trim_gradient = R * (u_0 - u_preferred);
             actuator_target = u_preferred;
         }
 

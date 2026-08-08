@@ -14,8 +14,8 @@ namespace json {
         if (!config.is_object()) {
             throw std::runtime_error("json::validate_allocator expected object");
         }
-        if (!config.contains("Q") || !config.contains("R") || !config.contains("R_trim")) {
-            throw std::runtime_error("json::validate_allocator requires Q, R, and R_trim");
+        if (!config.contains("Q") || !config.contains("R")) {
+            throw std::runtime_error("json::validate_allocator requires Q and R");
         }
     }
 
@@ -24,17 +24,14 @@ namespace json {
 
         Eigen::MatrixXd Q = parse_MatrixXd(config.at("Q"));
         Eigen::MatrixXd R = parse_MatrixXd(config.at("R"));
-        Eigen::MatrixXd R_trim = parse_MatrixXd(config.at("R_trim"));
 
         const std::string context = "json::parse_allocator_properties";
         util::validate_shape(Q, constants::virtual_input_dim, constants::virtual_input_dim, context, "Q");
         util::validate_shape(R, constants::input_dim, constants::input_dim, context, "R");
-        util::validate_shape(R_trim, constants::input_dim, constants::input_dim, context, "R_trim");
 
         return {
             .Q = Q,
-            .R = R,
-            .R_trim = R_trim
+            .R = R
         };
     }
 }
