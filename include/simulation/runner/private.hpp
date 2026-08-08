@@ -111,6 +111,18 @@ namespace runner {
         void run();
         void step(int t);
 
+
+        struct StepContext;
+
+        StepContext prepare_step();
+        void initialize_trim(StepContext& context);
+        void step_measurements(StepContext& context);
+        void step_estimation(StepContext& context);
+        void step_control(StepContext& context);
+        void step_physics(StepContext& context);
+        void publish_step(int t, StepContext& context);
+        void finish_step(fsm::FiniteState current_mode);
+
     };
 
 }
