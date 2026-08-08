@@ -43,10 +43,10 @@ done
 : "${HEADLESS_FLAG:=0}"
 : "${BUILD_FLAG:=0}"
 
-DATA_DIR_PATH="$PROJ_PATH/results/data/$OUT_DIR"
-LOG_DIR_PATH="$PROJ_PATH/results/logs/$OUT_DIR"
-PLOT_DIR_PATH="$PROJ_PATH/results/figures/$OUT_DIR"
-REPORT_DIR_PATH="$PROJ_PATH/results/reports/$OUT_DIR"
+DATA_DIR_PATH="$PROJ_PATH/results/$OUT_DIR/data"
+LOG_DIR_PATH="$PROJ_PATH/results/$OUT_DIR/logs"
+PLOT_DIR_PATH="$PROJ_PATH/results/$OUT_DIR/figures"
+REPORT_DIR_PATH="$PROJ_PATH/results/$OUT_DIR/reports"
 
 # required args check
 [[ -z "$AIRCRAFT" ]] && usage 1

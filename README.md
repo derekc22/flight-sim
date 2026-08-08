@@ -77,7 +77,7 @@ To run the simulation:
 - `-o OUT_DIR`: Output directory name
   
 ## Example
-Run a simulation of the C172 with logs, data, plots, and reports saved to `results/logs/c172`, `results/data/c172`, `results/figures/c172`, and `results/reports/c172`, respectively:
+Run a simulation of the C172 with logs, data, plots, and reports saved under `results/c172`:
 ```bash
 ./scripts/bin/run.sh -a c172p -d -p -m -o c172
 ```

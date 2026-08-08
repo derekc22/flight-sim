@@ -13,10 +13,10 @@ ANALYSIS_TYPE="$2"
 MATLAB_SCRIPT="$3"
 CONFIG_PATH="$4"
 
-DATA_DIR_PATH="$PROJ_PATH/results/data/$OUT_DIR"
-DATA_MAT_PATH="$PROJ_PATH/results/data/$OUT_DIR/data.mat"
-PLOT_DIR_PATH="$PROJ_PATH/results/figures/$OUT_DIR"
-REPORT_DIR_PATH="$PROJ_PATH/results/reports/$OUT_DIR"
+DATA_DIR_PATH="$PROJ_PATH/results/$OUT_DIR/data"
+DATA_MAT_PATH="$PROJ_PATH/results/$OUT_DIR/data/data.mat"
+PLOT_DIR_PATH="$PROJ_PATH/results/$OUT_DIR/figures"
+REPORT_DIR_PATH="$PROJ_PATH/results/$OUT_DIR/reports"
 MATLAB_SCRIPT_DIR_PATH="$PROJ_PATH/scripts/lib/analysis/matlab/$ANALYSIS_TYPE"
 
 "$MATLAB_PATH" -batch \

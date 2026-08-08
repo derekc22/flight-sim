@@ -16,8 +16,8 @@ if [ -z "$1" ]; then
 fi
 
 OUT_DIR="$1"
-DATA_DIR_PATH="$PROJ_PATH/results/data/$OUT_DIR"
-PLOT_DIR_PATH="$PROJ_PATH/results/figures/$OUT_DIR"
+DATA_DIR_PATH="$PROJ_PATH/results/$OUT_DIR/data"
+PLOT_DIR_PATH="$PROJ_PATH/results/$OUT_DIR/figures"
 
 python "$PLOT_2D_PATH" -d "$DATA_DIR_PATH/p.csv" -s "$PLOT_DIR_PATH" \
 -l "x(t) [m]" "y(t) [m]" "z(t) [m]" \
