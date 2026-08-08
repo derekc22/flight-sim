@@ -55,7 +55,6 @@ namespace io {
             eul_setpoint_DM = DataMatrix(tf, 3+1);
             w_setpoint_DM = DataMatrix(tf, 3+1);
             v_setpoint_DM = DataMatrix(tf, 3+1);
-            allocator_diagnostics_DM = DataMatrix(tf, 34+1);
         }
 
         if (json_flags.avionics_flag) {
@@ -98,17 +97,6 @@ namespace io {
         M_propulsive_DM->insert(t, context.WB_propulsive.M.data);
 
         if (json_flags.control_flag) {
-            Eigen::VectorXd allocator_diagnostics(34);
-            allocator_diagnostics.segment<6>(0) = context.allocator_diagnostics.mu_requested;
-            allocator_diagnostics.segment<6>(6) = context.allocator_diagnostics.mu_baseline;
-            allocator_diagnostics.segment<6>(12) = context.allocator_diagnostics.mu_predicted;
-            allocator_diagnostics.segment<6>(18) = dynamics::unpack_wrench(context.WB_net);
-            allocator_diagnostics.segment<6>(24) = context.allocator_diagnostics.u_commanded;
-            allocator_diagnostics(30) = context.allocator_diagnostics.tracking_cost;
-            allocator_diagnostics(31) = context.allocator_diagnostics.movement_cost;
-            allocator_diagnostics(32) = context.allocator_diagnostics.trim_cost;
-            allocator_diagnostics(33) = context.allocator_diagnostics.allocation_limited;
-            allocator_diagnostics_DM->insert(t, allocator_diagnostics);
             eul_setpoint_DM->insert(t, context.setpoint.eulIB.data);
             w_setpoint_DM->insert(t, context.setpoint.wB_BI.data);
             v_setpoint_DM->insert(t, context.setpoint.vB_BI.data);
@@ -156,7 +144,6 @@ namespace io {
         write_csv(M_propulsive_DM->data, data_dir_path, "M_propulsive");
 
         if (json_flags.control_flag) {
-            write_csv(allocator_diagnostics_DM->data, data_dir_path, "allocator_diagnostics");
             write_csv(eul_setpoint_DM->data, data_dir_path, "eul_setpoint");
             write_csv(w_setpoint_DM->data, data_dir_path, "w_setpoint");
             write_csv(v_setpoint_DM->data, data_dir_path, "v_setpoint");

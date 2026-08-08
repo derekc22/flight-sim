@@ -543,7 +543,6 @@ namespace runner {
             .WB_net=WB_net,
             .WB_aerodynamic=rk4_out.WB_set.aerodynamic,
             .WB_propulsive=rk4_out.WB_set.propulsive,
-            .allocator_diagnostics=allocator_properties.diagnostics,
             .setpoint=setpoint,
             .windB=windB
         };

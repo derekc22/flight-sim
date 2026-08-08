@@ -4,7 +4,6 @@
 #include <Eigen/Dense>
 #include "simulation/actuators/propulsor/public.hpp"
 #include "simulation/actuators/surface/public.hpp"
-#include "simulation/allocator/public.hpp"
 #include "simulation/atmospheric/public.hpp"
 #include "simulation/dynamics/public.hpp"
 #include "simulation/guidance/public.hpp"
@@ -32,7 +31,6 @@ namespace io {
         dynamics::Wrench WB_net;
         dynamics::Wrench WB_aerodynamic;
         dynamics::Wrench WB_propulsive;
-        allocator::AllocatorDiagnostics allocator_diagnostics;
         guidance::GuidanceSetpoint setpoint;
         atmospheric::Wind windB;
     };
@@ -65,7 +63,6 @@ namespace io {
         std::optional<DataMatrix> M_aerodynamic_DM;
         std::optional<DataMatrix> F_propulsive_DM;
         std::optional<DataMatrix> M_propulsive_DM;
-        std::optional<DataMatrix> allocator_diagnostics_DM;
         std::optional<DataMatrix> windB_DM;
 
         void step(int t, const DataContext& context);

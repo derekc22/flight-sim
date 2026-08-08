@@ -10,17 +10,6 @@ namespace allocator {
 
 	using EffectivenessMatrix = constants::MatrixX_T<double, constants::virtual_input_dim, constants::input_dim>;
 
-    struct AllocatorDiagnostics {
-        dynamics::WrenchVector_T<double> mu_requested = dynamics::WrenchVector_T<double>::Zero();
-        dynamics::WrenchVector_T<double> mu_baseline = dynamics::WrenchVector_T<double>::Zero();
-        dynamics::WrenchVector_T<double> mu_predicted = dynamics::WrenchVector_T<double>::Zero();
-        actuators::ActuatorInputsVector_T<double> u_commanded = actuators::ActuatorInputsVector_T<double>::Zero();
-        double tracking_cost = 0.0;
-        double movement_cost = 0.0;
-        double trim_cost = 0.0;
-        bool allocation_limited = false;
-    };
-
 	struct AllocatorInput {
 		control::VirtualControlOutputVector_T<double> mu;
 		std::array<bool, constants::virtual_input_dim> active_mask;
@@ -35,7 +24,6 @@ namespace allocator {
         constants::MatrixX_T<double, constants::virtual_input_dim, constants::virtual_input_dim> Q;
         constants::MatrixX_T<double, constants::input_dim, constants::input_dim> R;
         constants::MatrixX_T<double, constants::input_dim, constants::input_dim> R_trim;
-        AllocatorDiagnostics diagnostics;
         qp::Solver solver{constants::input_dim};
 
         control::ControlOutputSet step(const AllocatorInput& input);
@@ -54,7 +42,5 @@ namespace allocator {
         const operating::OperatingConditions& conditions, 
         autodiff::AutoDiffModel& model
     );
-
-    actuators::ActuatorInputsVector_T<double> compute_actuator_beta(const actuators::ActuatorInputsVector_T<double>& time_constants);
 
 }

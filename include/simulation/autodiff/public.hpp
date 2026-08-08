@@ -21,7 +21,6 @@ namespace autodiff {
         const aerodynamics::AerodynamicProperties& aerodynamic;
         actuators::PropulsorActuators& propulsor_actuators;
         actuators::ActuatorLimits actuator_limits;
-        actuators::ActuatorInputsVector_T<double> actuator_time_constants;
         actuators::FixedActuatorInputs fixed_actuator_inputs;
     };
 

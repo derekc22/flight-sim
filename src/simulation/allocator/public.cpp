@@ -76,33 +76,6 @@ namespace allocator {
             delta_mu_vec = E_active * (u_constrained_vec - u_unconstrained_vec);
         }
 
-        const actuators::ActuatorInputsVector_T<double> command_delta = u_constrained_vec - u_0;
-        const dynamics::WrenchVector_T<double> mu_predicted = mu_actuator_0 + E_active * command_delta;
-        dynamics::WrenchVector_T<double> tracking_error = mu_predicted - input.mu;
-        for (Eigen::Index i = 0; i < tracking_error.rows(); ++i) {
-            if (!input.active_mask[i]) {
-                tracking_error(i) = 0.0;
-            }
-        }
-
-        double trim_cost = 0.0;
-        if (input.u_preferred.has_value()) {
-            const actuators::ActuatorInputsVector_T<double> u_preferred = actuators::unpack_actuator_inputs_T(input.u_preferred.value());
-            const actuators::ActuatorInputsVector_T<double> trim_error = u_constrained_vec - u_preferred;
-            trim_cost = trim_error.dot(R_trim * trim_error);
-        }
-
-        diagnostics = {
-            .mu_requested = input.mu,
-            .mu_baseline = mu_actuator_0,
-            .mu_predicted = mu_predicted,
-            .u_commanded = u_constrained_vec,
-            .tracking_cost = tracking_error.dot(Q * tracking_error),
-            .movement_cost = command_delta.dot(R * command_delta),
-            .trim_cost = trim_cost,
-            .allocation_limited = allocation_limited
-        };
-
         return { u_constrained, delta_mu_vec };
     }
 
@@ -236,18 +209,6 @@ namespace allocator {
             .conditions = conditions,
             .model = model
         };
-    }
-
-    actuators::ActuatorInputsVector_T<double> compute_actuator_beta(const actuators::ActuatorInputsVector_T<double>& time_constants) {
-        actuators::ActuatorInputsVector_T<double> beta;
-
-        for (Eigen::Index i = 0; i < beta.rows(); ++i) {
-            // assumes first order actuator response
-            const double tau = time_constants(i);
-            beta(i) = tau > 0.0 ? 1.0 - std::exp(-constants::dt / tau) : 1.0;
-        }
-
-        return beta;
     }
 
 }
