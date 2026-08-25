@@ -1,4 +1,4 @@
-#include <string>
+#include <tuple>
 #include "simulation/frames/public.hpp"
 #include "simulation/frames/private.hpp"
 #include "simulation/transforms/public.hpp"
@@ -7,6 +7,12 @@
 #include "simulation/dynamics/public.hpp"
 
 namespace frames {
+    MutableFrameView ECEFFrame::view() {
+        return { &H, &q, &eul, &C_dot, &q_dot, &w, &eul_dot, &wq, &v, &g };
+    }
+    FrameView ECEFFrame::view() const {
+        return { &H, &q, &eul, &C_dot, &q_dot, &w, &eul_dot, &wq, &v, &g };
+    }
 
     MutableFrameView NEDFrameECEF::view() {
         return { &HEN, &qEN, &eulEN, &CEN_dot, &qEN_dot, &wN_NE, &eulEN_dot, &wq_NE, &vN_NE, &gN };
@@ -27,6 +33,13 @@ namespace frames {
     }
     FrameView FRDFrameNED::view() const {
         return { &HNB, &qNB, &eulNB, &CNB_dot, &qNB_dot, &wB_BN, &eulNB_dot, &wq_BN, &vB_BN, &gB };
+    }
+
+    MutableFrameView CGFrameFRD::view() {
+        return { &HBG, &qBG, &eulBG, &CBG_dot, &qBG_dot, &wG_GB, &eulBG_dot, &wq_GB, &vG_GB, &gG };
+    }
+    FrameView CGFrameFRD::view() const {
+        return { &HBG, &qBG, &eulBG, &CBG_dot, &qBG_dot, &wG_GB, &eulBG_dot, &wq_GB, &vG_GB, &gG };
     }
 
     MutableFrameView STABFrameFRD::view() {
@@ -125,7 +138,7 @@ namespace frames {
 
 
 
-    Frame::Frame(std::string n, Frame* p) : name(n), parent(p) {};
+    Frame::Frame(FrameID id, Frame* p) : id(id), parent(p) {};
 
     Frame::~Frame() {
         // Destructor for frame A
@@ -149,12 +162,13 @@ namespace frames {
         p->dependent_on.insert(this);
     }
 
-    // interpret nullptr parent as ECEFFrame
-    NEDFrameECEF::NEDFrameECEF() : Frame("NEDFrameECEF", nullptr) {};
-    FRDFrameECEF::FRDFrameECEF() : Frame("FRDFrameECEF", nullptr) {};
-    FRDFrameNED::FRDFrameNED(NEDFrameECEF* pNEDFrameECEF) : Frame("FRDFrameNED", pNEDFrameECEF) {};
-    STABFrameFRD::STABFrameFRD(FRDFrameNED* pFRDFrameNED) : Frame("STABFrameFRD", pFRDFrameNED) {};
-    WINDFrameSTAB::WINDFrameSTAB(STABFrameFRD* pSTABFrameFRD) : Frame("WINDFrameSTAB", pSTABFrameFRD) {};
+    ECEFFrame::ECEFFrame() : Frame(FrameID::ECEFFrame, nullptr) {};
+    NEDFrameECEF::NEDFrameECEF(ECEFFrame* pECEFFrame) : Frame(FrameID::NEDFrameECEF, pECEFFrame) {};
+    FRDFrameECEF::FRDFrameECEF(ECEFFrame* pECEFFrame) : Frame(FrameID::FRDFrameECEF, pECEFFrame) {};
+    FRDFrameNED::FRDFrameNED(NEDFrameECEF* pNEDFrameECEF) : Frame(FrameID::FRDFrameNED, pNEDFrameECEF) {};
+    CGFrameFRD::CGFrameFRD(FRDFrameNED* pFRDFrameNED) : Frame(FrameID::CGFrameFRD, pFRDFrameNED) {};
+    STABFrameFRD::STABFrameFRD(FRDFrameNED* pFRDFrameNED) : Frame(FrameID::STABFrameFRD, pFRDFrameNED) {};
+    WINDFrameSTAB::WINDFrameSTAB(STABFrameFRD* pSTABFrameFRD) : Frame(FrameID::WINDFrameSTAB, pSTABFrameFRD) {};
 
 
     void Frame::set(const SetOptions& opts) {
@@ -173,41 +187,33 @@ namespace frames {
     }
 
     Eigen::Vector3d transform_vec(const Eigen::Vector3d& vA, const Frame& A, const Frame& B) {
-        Eigen::Matrix3d CRA = CRF(A);
-        Eigen::Matrix3d CRB = CRF(B);
-        Eigen::Vector3d vB = CRB * CRA.transpose() * vA;
-        return vB;
-    }
-
-    Eigen::Vector3d transform_vec(const Eigen::Vector3d& vA, const Frame& A, const ECEFFrame&) {
-        Eigen::Matrix3d CRA = CRF(A);
-        Eigen::Vector3d vB = CRA.transpose() * vA;
-        return vB;
-    }
-
-    Eigen::Vector3d transform_vec(const Eigen::Vector3d& vA, const ECEFFrame&, const Frame& B) {
-        Eigen::Matrix3d CRB = CRF(B);
-        Eigen::Vector3d vB = CRB * vA;
+        Eigen::Matrix3d CAB = CRF(B, A);
+        Eigen::Vector3d vB = CAB * vA;
         return vB;
     }
 
     Eigen::Vector3d transform_point(const Eigen::Vector3d& pA, const Frame& A, const Frame& B) {
-        Eigen::Matrix4d HRA = HRF(A);
-        Eigen::Matrix4d HRB = HRF(B);
-        Eigen::Vector3d pB = transforms::apply_H(HRB * transforms::make_Hinv(HRA), pA);
+        Eigen::Matrix4d HAB = HRF(B, A);
+        Eigen::Vector3d pB = transforms::apply_H(HAB, pA);
         return pB;
     }
 
-    Eigen::Vector3d transform_point(const Eigen::Vector3d& pA, const Frame& A, const ECEFFrame&) {
-        Eigen::Matrix4d HRA = HRF(A);
-        Eigen::Vector3d pB = transforms::apply_H(transforms::make_Hinv(HRA), pA);
-        return pB;
+    dynamics::HomogeneousTransformationMatrix H_from_R(const Frame& F, const Frame& R) {
+        return { HRF(F, R) };
     }
 
-    Eigen::Vector3d transform_point(const Eigen::Vector3d& pA, const ECEFFrame&, const Frame& B) {
-        Eigen::Matrix4d HRB = HRF(B);
-        Eigen::Vector3d pB = transforms::apply_H(HRB, pA);
-        return pB;
+    std::tuple<dynamics::TranslationalVelocity, dynamics::AngularVelocity> vel_from_R(const Frame& F, const Frame& R) {
+        auto [vF_FE, wF_FE] = vel_from_E(F);
+        auto [vR_RE, wR_RE] = vel_from_E(R);
+
+        dynamics::HomogeneousTransformationMatrix HRF = H_from_R(F, R);
+        Eigen::Matrix3d CRF = HRF.C().data;
+        Eigen::Vector3d pR_FR = HRF.p().data;
+
+        Eigen::Vector3d vF_FR = vF_FE.data - CRF * (vR_RE.data + wR_RE.data.cross(pR_FR));
+        Eigen::Vector3d wF_FR = wF_FE.data - CRF * wR_RE.data;
+
+        return { { vF_FR }, { wF_FR } };
     }
 
 }

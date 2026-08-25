@@ -54,7 +54,7 @@ namespace runner {
         vehicles::Aircraft aircraft {
             aircraft_id,
             structural_properties,
-            json::parse_aerodynamics_config(structural_properties),
+            json::parse_aerodynamics_config(),
             actuator_properties,
             control_properties,
             json::parse_sensors_config(),
@@ -65,7 +65,10 @@ namespace runner {
         };
 
         // set initial conditions from config
-        aircraft.step(json::parse_initialization_config(json_flags.trim_flag));
+        vehicles::StepOptions InitStepOpts = json::parse_initialization_config(json_flags.trim_flag);
+        structural::StructuralState struc_t = aircraft.structural_properties.compute_structural_state();
+        InitStepOpts.CGFrameFRDStepOpts = vehicles::CGFrameFRDStepOptions{ .pB_GB = dynamics::Position{ struc_t.pB_GB.data } };
+        aircraft.step(InitStepOpts);
 
         // parse settings
         settings::SettingsManager settings_manager = json::parse_settings_config(actuator_properties);
@@ -104,28 +107,6 @@ namespace runner {
 
         log_tick += module_rates.log_hz;
     }
-
-    struct RunManager::StepContext {
-        atmospheric::Wind windI;
-        atmospheric::Wind windB;
-        dynamics::RigidBodyState Xt;
-        dynamics::RigidBodyState XEt;
-        aerodynamics::AerodynamicState aero_t;
-        geography::GeographicState geo_t;
-        atmospheric::StaticAtmosphericState atm_t;
-        autodiff::AutoDiffModel autodiff_model;
-        operating::OperatingConditions transient_conditions;
-        dynamics::RigidBodyState Yt;
-        dynamics::RigidBodyState Zt;
-        guidance::GuidanceSetpoint setpoint;
-        control::ControlOutput u_cmd;
-        actuators::ActuatorInputs_T<double> u_actual;
-        fsm::FiniteState current_mode = fsm::FiniteState::None;
-        dynamics::RigidBodyState Xt1;
-        dynamics::Wrench WB_net;
-        dynamics::Wrench WB_aerodynamic;
-        dynamics::Wrench WB_propulsive;
-    };
 
     RunManager::RunManager(const CLIOptions& cli_options, const JSONOptions& json_options) : 
         cli_options(cli_options), 
@@ -217,7 +198,7 @@ namespace runner {
         finish_step(context.current_mode);
     }
 
-    RunManager::StepContext RunManager::prepare_step() {
+    StepContext RunManager::prepare_step() {
         JSONFlags& json_flags = json_options.flags;
 
         // fetch from FlightGear
@@ -238,17 +219,20 @@ namespace runner {
         }
 
         // compute rigid body states
-        dynamics::RigidBodyState Xt = dynamics::compute_rigid_body_state(aircraft.FRDFrameNED);
-        dynamics::RigidBodyState XEt = dynamics::compute_rigid_body_state(aircraft.FRDFrameECEF);
+        dynamics::RigidBodyState Xt = dynamics::compute_rigid_body_state(aircraft.CGFrameFRD, aircraft.NEDFrameECEF);
+        dynamics::RigidBodyState XEt = dynamics::compute_rigid_body_state(aircraft.CGFrameFRD, aircraft.ECEFFrame);
+
+        // compute structural state
+        structural::StructuralState struc_t = aircraft.structural_properties.compute_structural_state();
 
         // compute aerodynamic state
         aerodynamics::AerodynamicState aero_t = aerodynamics::compute_aerodynamic_state(Xt, windB);
 
         // compute geographic state
-        geography::GeographicState geo_t = geography::compute_geographic_state(aircraft.FRDFrameECEF);
+        geography::GeographicState geo_t = geography::compute_geographic_state(aircraft.FRDFrameECEF, aircraft.ECEFFrame);
 
         // compute static atmospheric state
-        atmospheric::StaticAtmosphericState atm_t = atmospheric::compute_static_atmospheric_state(aircraft.FRDFrameECEF);
+        atmospheric::StaticAtmosphericState atm_t = atmospheric::compute_static_atmospheric_state(aircraft.FRDFrameECEF, aircraft.ECEFFrame);
 
         // build autodiff model
         autodiff::AutoDiffModel autodiff_model = autodiff::build_autodiff_model(aircraft);
@@ -260,11 +244,12 @@ namespace runner {
             .steady_state = false
         };
 
-        return StepContext{
+        return StepContext {
             .windI = windI,
             .windB = windB,
             .Xt = Xt,
             .XEt = XEt,
+            .struc_t = struc_t,
             .aero_t = aero_t,
             .geo_t = geo_t,
             .atm_t = atm_t,
@@ -307,10 +292,10 @@ namespace runner {
 
                 // overwrite local state with trim state
                 context.Xt = Xt_trim;
-                context.XEt = dynamics::compute_rigid_body_state(aircraft.FRDFrameECEF);
+                context.XEt = dynamics::compute_rigid_body_state(aircraft.CGFrameFRD, aircraft.ECEFFrame);
                 context.aero_t = aerodynamics::compute_aerodynamic_state(context.Xt, context.windB);
-                context.geo_t = geography::compute_geographic_state(aircraft.FRDFrameECEF);
-                context.atm_t = atmospheric::compute_static_atmospheric_state(aircraft.FRDFrameECEF);
+                context.geo_t = geography::compute_geographic_state(aircraft.FRDFrameECEF, aircraft.ECEFFrame);
+                context.atm_t = atmospheric::compute_static_atmospheric_state(aircraft.FRDFrameECEF, aircraft.ECEFFrame);
 
                 dynamics::Wrench WB_net_trim = {
                     .F = dynamics::Force{ trim_sol.wrench.F },
@@ -354,7 +339,6 @@ namespace runner {
 
     void RunManager::step_measurements(StepContext& context) {
         // extract reusable quantities
-        dynamics::Mass& mass = aircraft.structural_properties.mass;
         sensors::SensorProperties& sensor_properties = aircraft.sensor_properties;
         avionics::AvionicsProperties& avionics_properties = aircraft.avionics_properties;
         JSONFlags& json_flags = json_options.flags;
@@ -368,7 +352,7 @@ namespace runner {
             context.XEt,
             context.aero_t,
             context.atm_t,
-            mass,
+            context.struc_t.mass,
             WB_net_t_1
         );
 
@@ -566,12 +550,11 @@ namespace runner {
     }
 
     void RunManager::step_physics(StepContext& context) {
-        structural::StructuralProperties& structural_properties = aircraft.structural_properties;
         aerodynamics::AerodynamicProperties& aerodynamic_properties = aircraft.aerodynamic_properties;
         actuators::PropulsorActuators& propulsor_actuators = aircraft.actuator_properties.propulsor_actuators;
 
         integrators::RK4Model rk4_model{
-            .structural = structural_properties,
+            .struc_t = context.struc_t,
             .aerodynamic = aerodynamic_properties,
             .propulsor_actuators = propulsor_actuators
         };
@@ -639,6 +622,7 @@ namespace runner {
         // set step options
         vehicles::StepOptions StepOpts;
         StepOpts.FRDFrameNEDStepOpts = vehicles::FRDFrameNEDStepOptions{ .X_BN = context.Xt1 };
+        StepOpts.CGFrameFRDStepOpts = vehicles::CGFrameFRDStepOptions{ .pB_GB = dynamics::Position{ context.struc_t.pB_GB.data } };
         StepOpts.STABFrameFRDStepOpts = vehicles::STABFrameFRDStepOptions{ .aero = aero_t1 };
         StepOpts.WINDFrameSTABStepOpts = vehicles::WINDFrameSTABStepOptions{ .aero = aero_t1 };
 
@@ -649,7 +633,7 @@ namespace runner {
         WB_net_t_1 = context.WB_net;
 
         // compute next-step geographic state
-        geography::GeographicState geo_t1 = geography::compute_geographic_state(aircraft.FRDFrameECEF);
+        geography::GeographicState geo_t1 = geography::compute_geographic_state(aircraft.FRDFrameECEF, aircraft.ECEFFrame);
 
         // check for runtime failures
         geography::HeightAGL height_agl{ geo_t1.alt.data - cached_msg_out.ground_elevation.data };

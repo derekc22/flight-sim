@@ -69,8 +69,10 @@ namespace aerodynamics {
 
         const constants::Vector3_T<T> n_hat = s.n.cast<T>();
         const constants::Vector3_T<T> d_hat = -sk.vB_rel / sk.V;
+
         const constants::Vector3_T<T> lift_axis = n_hat - n_hat.dot(d_hat) * d_hat;
         const constants::Vector3_T<T> l_hat = util::norm(lift_axis);
+
         const constants::Vector3_T<T> moment_axis = l_hat.cross(d_hat);
         const constants::Vector3_T<T> m_hat = util::norm(moment_axis);
 

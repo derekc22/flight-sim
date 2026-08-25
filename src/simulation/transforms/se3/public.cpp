@@ -27,14 +27,14 @@ namespace transforms {
     }
  
     Eigen::Matrix4d make_HR(const Eigen::Matrix3d& R, const Eigen::Vector3d& d, TransformationOrder order) {
-        // d is initially provided in the fixed frame (ie the only frame) and stays in the fixed frame (again, the only frame)
+        // d is provided in the fixed frame (ie the only frame) and stays in the fixed frame (again, the only frame)
         if (order == TransformationOrder::RotateFirst) return make_HR_rotate_first(R, d);
         if (order == TransformationOrder::TranslateFirst) return make_HR_translate_first(R, d);
         throw std::invalid_argument("Unsupported transformation order");
     };
 
     Eigen::Matrix4d make_HC(const Eigen::Matrix3d& C, const Eigen::Vector3d& d, TransformationOrder order) {
-        // d is initially provided in frame {0} and stays in/attached to frame {0}
+        // d is provided in frame {0} and stays in/attached to frame {0}
         if (order == TransformationOrder::RotateFirst) return make_HC_rotate_first(C, d);
         if (order == TransformationOrder::TranslateFirst) return make_HC_translate_first(C, d);
         throw std::invalid_argument("Unsupported transformation order");

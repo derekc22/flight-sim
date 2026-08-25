@@ -1,5 +1,4 @@
 #include <Eigen/Dense>
-#include <format>
 #include <stdexcept>
 #include "simulation/dynamics/private.hpp"
 #include "simulation/dynamics/public.hpp"
@@ -145,15 +144,7 @@ namespace dynamics {
         return { wB_BI_to_eul_dot_T<double>(wB_BI.data, theta, phi) };
     }
 
-    RigidBodyState compute_rigid_body_state(const frames::Frame& F) {
-        if (F.parent != nullptr && F.parent->name != "NEDFrameECEF") {
-            throw std::invalid_argument(
-                std::format(
-                    "rigid_body_state: Invalid frame input. "
-                    "The parent of {} must be an inertial frame: ECEFFrame or NEDFrameECEF", F.name
-                )
-            );
-        }
+    RigidBodyState get_rigid_body_state(const frames::Frame& F) {
         const frames::FrameView fv = F.view();
         return {
             .p = fv.H->p(),
@@ -162,6 +153,21 @@ namespace dynamics {
             .w = *fv.w
         };
     }
+
+  RigidBodyState compute_rigid_body_state(const frames::Frame& F, const frames::Frame& R) {
+        dynamics::HomogeneousTransformationMatrix HRF = frames::H_from_R(F, R);
+        dynamics::OrientationQuaternion qRF;
+        qRF.set(HRF.C());
+
+        auto [vF_FR, wF_FR] = frames::vel_from_R(F, R);
+
+        return {
+            .p = HRF.p(),
+            .v = vF_FR,
+            .q = qRF,
+            .w = wF_FR
+        };
+  }
 
     AngularVelocity eul_dot_to_wB_BI(const EulerAngleRates& eul_dot, const EulerAngles& eul) {
         double theta = eul.theta();

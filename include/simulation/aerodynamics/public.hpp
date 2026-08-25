@@ -46,9 +46,8 @@ namespace aerodynamics {
         double span;
         double area;
         double AR;
-        // For a thin airfoil in incompressible subsonic flow, 
-        // the aerodynamic center is approximately at the quarter chord
-        Eigen::Vector3d p_ac_cg;
+        // For a thin airfoil in incompressible subsonic flow, the aerodynamic center is approximately at the quarter chord
+        Eigen::Vector3d p_ac;
         Eigen::Vector3d n;
         double CL0, e, i, CD0, CDa, a0, CM0, CMa;
         DynamicDerivatives dyn;
@@ -114,8 +113,7 @@ namespace aerodynamics {
     template <typename T>
     dynamics::Wrench_T<T> compute_surface_loads_T(const Surface& s, const SurfaceKinematics_T<T>& sk, const SurfaceCoefficients_T<T>& sc);
 
-    /** @warning The parent of F must be an inertial frame: ECEFFrame or NEDFrameECEF */
-    AerodynamicState compute_aerodynamic_state(const frames::Frame& F, const atmospheric::Wind& windB);
+    AerodynamicState compute_aerodynamic_state(const frames::Frame& F, const frames::Frame& R, const atmospheric::Wind& windB);
 
     template <typename T>
     dynamics::Wrench_T<T> step_aero_forces_moments_T(const AerodynamicProperties& aerodynamic_properties, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& atm, const actuators::SurfaceActuatorInputs_T<T>& u, const atmospheric::Wind& windB);

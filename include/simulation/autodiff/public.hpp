@@ -17,7 +17,7 @@ namespace vehicles { struct Aircraft; } // forward declare
 namespace autodiff {
 
     struct AutoDiffModel {
-        const structural::StructuralProperties& structural;
+        const structural::StructuralState& struc_t;
         const aerodynamics::AerodynamicProperties& aerodynamic;
         actuators::PropulsorActuators& propulsor_actuators;
         actuators::ActuatorLimits actuator_limits;

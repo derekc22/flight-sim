@@ -50,7 +50,7 @@ namespace json {
         }
     }
 
-    aerodynamics::AerodynamicProperties parse_aerodynamic_properties(const nlohmann::json& config, const structural::StructuralProperties& structural_properties) {
+    aerodynamics::AerodynamicProperties parse_aerodynamic_properties(const nlohmann::json& config) {
         const auto& surfaces_json = config.at("surfaces");
         validate_surfaces_json(surfaces_json);
 
@@ -66,7 +66,7 @@ namespace json {
                 .id = id,
                 .chord = surface_json.at("chord").get<double>(),
                 .span = surface_json.at("span").get<double>(),
-                .p_ac_cg = p_ac - structural_properties.p_cg.data,
+                .p_ac = p_ac,
                 .n = n,
                 .CL0 = surface_json.at("CL0").get<double>(),
                 .e = surface_json.at("e").get<double>(),

@@ -53,6 +53,29 @@ namespace runner {
 
     vehicles::Aircraft load_vehicle(const std::string& aircraft_id, const JSONFlags& json_flags);
 
+    struct StepContext {
+        atmospheric::Wind windI;
+        atmospheric::Wind windB;
+        dynamics::RigidBodyState Xt;
+        dynamics::RigidBodyState XEt;
+        structural::StructuralState struc_t;
+        aerodynamics::AerodynamicState aero_t;
+        geography::GeographicState geo_t;
+        atmospheric::StaticAtmosphericState atm_t;
+        autodiff::AutoDiffModel autodiff_model;
+        operating::OperatingConditions transient_conditions;
+        dynamics::RigidBodyState Yt;
+        dynamics::RigidBodyState Zt;
+        guidance::GuidanceSetpoint setpoint;
+        control::ControlOutput u_cmd;
+        actuators::ActuatorInputs_T<double> u_actual;
+        fsm::FiniteState current_mode = fsm::FiniteState::None;
+        dynamics::RigidBodyState Xt1;
+        dynamics::Wrench WB_net;
+        dynamics::Wrench WB_aerodynamic;
+        dynamics::Wrench WB_propulsive;
+    };
+
     struct RunManager {
         CLIOptions cli_options;
         JSONOptions json_options;
@@ -110,9 +133,6 @@ namespace runner {
         void cleanup();
         void run();
         void step(int t);
-
-
-        struct StepContext;
 
         StepContext prepare_step();
         void initialize_trim(StepContext& context);

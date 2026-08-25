@@ -1,6 +1,5 @@
 
 #include <Eigen/Dense>
-#include <format>
 #include <string>
 #include <stdexcept>
 #include <queue>
@@ -31,7 +30,7 @@ namespace vehicles {
         if (opts.FRDFrameECEFStepOpts.has_value() && opts.FRDFrameNEDStepOpts.has_value()) throw std::invalid_argument(err_msg);
     }
 
-    void _StepOptions::validate(const frames::Frame& F, const _StepOptions& opts) {
+    void _StepOptions::validate(const _StepOptions& opts) {
 
         const bool has_H = opts.H.has_value();
         const bool has_C = opts.C.has_value();
@@ -59,13 +58,13 @@ namespace vehicles {
         const bool has_geo_all = (has_lat && has_lon && has_alt);
 
         if (has_geo_any && !has_geo_all) {
-            std::string err_msg = std::format("vehicles::_StepOptions::validate: Invalid geographic input for {}, lat, lon, alt must be passed together", F.name);
+            std::string err_msg = "vehicles::_StepOptions::validate: Invalid geographic input, lat, lon, alt must be passed together";
             throw std::invalid_argument(err_msg);
         }
 
         // H cannot be combined with any other position or orientation representations
         if (has_H && (has_C || has_p || has_q || has_eul || has_geo_any || has_geo)) {
-            std::string err_msg = std::format("vehicles::_StepOptions::validate: Invalid position or orientation input for {}, cannot pass C, p, q, eul, (lat, lon, alt), geo with H", F.name);
+            std::string err_msg = "vehicles::_StepOptions::validate: Invalid position or orientation input, cannot pass C, p, q, eul, (lat, lon, alt), geo with H";
             throw std::invalid_argument(err_msg);
         }
 
@@ -73,13 +72,13 @@ namespace vehicles {
         if ((has_p && has_geo_any) ||
             (has_p && has_geo) ||
             (has_geo_any && has_geo)) {
-            std::string err_msg = std::format("vehicles::_StepOptions::validate: Invalid position input for {}, pass at most one of p, (lat, lon, alt), geo", F.name);
+            std::string err_msg = "vehicles::_StepOptions::validate: Invalid position input, pass at most one of p, (lat, lon, alt), geo";
             throw std::invalid_argument(err_msg);
         }
 
         // Only one orientation representation at a time
         if ((has_C && has_q) || (has_C && has_eul) || (has_q && has_eul)) {
-            std::string err_msg = std::format("vehicles::_StepOptions::validate: Invalid orientation input for {}, pass at most one of C, q, eul", F.name);
+            std::string err_msg = "vehicles::_StepOptions::validate: Invalid orientation input, pass at most one of C, q, eul";
             throw std::invalid_argument(err_msg);
         }
 
@@ -88,7 +87,7 @@ namespace vehicles {
             (has_q_dot && (has_w || has_eul_dot || has_wq)) ||
             (has_w && (has_eul_dot || has_wq)) ||
             (has_eul_dot && has_wq)) {
-            std::string err_msg = std::format("vehicles::_StepOptions::validate: Invalid attitude-rate input for {}, pass at most one of C_dot, q_dot, w, eul_dot, wq", F.name);
+            std::string err_msg = "vehicles::_StepOptions::validate: Invalid attitude-rate input, pass at most one of C_dot, q_dot, w, eul_dot, wq";
             throw std::invalid_argument(err_msg);
         }
 
@@ -99,13 +98,13 @@ namespace vehicles {
             has_v ||
             has_geo_any ||
             has_geo)) {
-            std::string err_msg = std::format("vehicles::_StepOptions::validate: Invalid state input for {}, cannot pass H, C, p, q, eul, (lat, lon, alt), geo, C_dot, q_dot, w, eul_dot, wq with X", F.name);
+            std::string err_msg = "vehicles::_StepOptions::validate: Invalid state input, cannot pass H, C, p, q, eul, (lat, lon, alt), geo, C_dot, q_dot, w, eul_dot, wq with X";
             throw std::invalid_argument(err_msg);
         }
 
         // Only one aerodynamics representation at a time
         if (has_aero && (has_alpha || has_beta)) {
-            std::string err_msg = std::format("vehicles::_StepOptions::validate: Invalid aerodynamics input for {}, cannot pass alpha, beta with aero", F.name);
+            std::string err_msg = "vehicles::_StepOptions::validate: Invalid aerodynamics input, cannot pass alpha, beta with aero";
             throw std::invalid_argument(err_msg);
         }
     }
@@ -115,15 +114,22 @@ namespace vehicles {
         StepOptions::validate(opts);
 
         if (opts.NEDFrameECEFStepOpts.has_value()) {
-            _StepOptions _opts; 
-            _opts.lat = opts.NEDFrameECEFStepOpts->lat_NE;
-            _opts.lon = opts.NEDFrameECEFStepOpts->lon_NE;
-            _opts.alt = opts.NEDFrameECEFStepOpts->alt_NE;
-            _opts.geo = opts.NEDFrameECEFStepOpts->geo_NE;
+            if (!stepped_NEDFrameECEF) {
+                _StepOptions _opts; 
+                _opts.lat = opts.NEDFrameECEFStepOpts->lat_NE;
+                _opts.lon = opts.NEDFrameECEFStepOpts->lon_NE;
+                _opts.alt = opts.NEDFrameECEFStepOpts->alt_NE;
+                _opts.geo = opts.NEDFrameECEFStepOpts->geo_NE;
 
-            _StepOptions::validate(NEDFrameECEF, _opts);
-            Aircraft::step(NEDFrameECEF, _opts);
-            Aircraft::step_dependents(NEDFrameECEF);
+                _StepOptions::validate(_opts);
+                Aircraft::step(NEDFrameECEF, _opts);
+                Aircraft::step_dependents(NEDFrameECEF);
+
+                stepped_NEDFrameECEF = true;
+            } else {
+                std::string err_msg = "vehicles::Aircraft::step: Error. Attempting to re-step NEDFrameECEF";
+                throw std::invalid_argument(err_msg);
+            }
         }
 
         if (opts.FRDFrameECEFStepOpts.has_value()) {
@@ -145,7 +151,7 @@ namespace vehicles {
             _opts.X = opts.FRDFrameECEFStepOpts->X_BE;
             _opts.geo = opts.FRDFrameECEFStepOpts->geo_BE;
 
-            _StepOptions::validate(FRDFrameECEF, _opts);
+            _StepOptions::validate(_opts);
             Aircraft::step(FRDFrameECEF, _opts);
             Aircraft::step_dependents(FRDFrameECEF);
         }
@@ -165,9 +171,19 @@ namespace vehicles {
             _opts.v = opts.FRDFrameNEDStepOpts->vB_BN;
             _opts.X = opts.FRDFrameNEDStepOpts->X_BN;
 
-            _StepOptions::validate(FRDFrameNED, _opts);
+            _StepOptions::validate(_opts);
             Aircraft::step(FRDFrameNED, _opts);
             Aircraft::step_dependents(FRDFrameNED);
+        }
+
+        if (opts.CGFrameFRDStepOpts.has_value()) {
+            _StepOptions _opts;
+            _opts.p = opts.CGFrameFRDStepOpts->pB_GB;
+            _opts.X = opts.CGFrameFRDStepOpts->X_GB;
+
+            _StepOptions::validate(_opts);
+            Aircraft::step(CGFrameFRD, _opts);
+            Aircraft::step_dependents(CGFrameFRD);
         }
 
         if (opts.STABFrameFRDStepOpts.has_value()) {
@@ -175,7 +191,7 @@ namespace vehicles {
             _opts.alpha = opts.STABFrameFRDStepOpts->alpha;
             _opts.aero = opts.STABFrameFRDStepOpts->aero;
 
-            _StepOptions::validate(STABFrameFRD, _opts);
+            _StepOptions::validate(_opts);
             Aircraft::step(STABFrameFRD, _opts);
             Aircraft::step_dependents(STABFrameFRD);
         }
@@ -185,7 +201,7 @@ namespace vehicles {
             _opts.beta = opts.WINDFrameSTABStepOpts->beta;
             _opts.aero = opts.WINDFrameSTABStepOpts->aero;
 
-            _StepOptions::validate(WINDFrameSTAB, _opts);
+            _StepOptions::validate(_opts);
             Aircraft::step(WINDFrameSTAB, _opts);
             Aircraft::step_dependents(WINDFrameSTAB);
         }
@@ -237,7 +253,7 @@ namespace vehicles {
             throw std::invalid_argument(err_msg);
         }
 
-        // Defaults
+        // Invariants
         NEDFrameECEFSetOpts.C_dot = dynamics::OrientationMatrixRate{ constants::Zero3x3 };
         NEDFrameECEFSetOpts.v = dynamics::TranslationalVelocity{ constants::Zero3 };
 
@@ -320,7 +336,7 @@ namespace vehicles {
         }
 
         else {
-            dynamics::Position p{ frames::transform_point(FRDFrameNED.HNB.p().data, NEDFrameECEF, frames::ECEF) };
+            dynamics::Position p{ frames::transform_point(FRDFrameNED.HNB.p().data, NEDFrameECEF, ECEFFrame) };
             FRDFrameECEFSetOpts.p = p;
             dynamics::OrientationMatrix C{ FRDFrameNED.HNB.C().data * NEDFrameECEF.HEN.C().data };
             FRDFrameECEFSetOpts.C = C;
@@ -397,7 +413,7 @@ namespace vehicles {
         }
 
         else {
-            FRDFrameNEDSetOpts.p = dynamics::Position{ frames::transform_point(FRDFrameECEF.HEB.p().data, frames::ECEF, NEDFrameECEF) };
+            FRDFrameNEDSetOpts.p = dynamics::Position{ frames::transform_point(FRDFrameECEF.HEB.p().data, ECEFFrame, NEDFrameECEF) };
             dynamics::OrientationMatrix C{ FRDFrameECEF.HEB.C().data *  NEDFrameECEF.HEN.C().data.transpose() };
             FRDFrameNEDSetOpts.C = C;
             FRDFrameNEDSetOpts.w = FRDFrameECEF.wB_BE;
@@ -405,6 +421,58 @@ namespace vehicles {
         }
 
         F.set(FRDFrameNEDSetOpts); 
+    }
+
+    void Aircraft::step(frames::CGFrameFRD& F, const _StepOptions& opts) {
+
+        bool recursive = !opts;
+        frames::SetOptions CGFrameFRDSetOpts;
+
+        if (!recursive) {
+
+            // final guard
+            if (
+                opts.H.has_value()           ||
+                opts.C.has_value()           ||
+                opts.q.has_value()           ||
+                opts.eul.has_value()         ||
+                opts.C_dot.has_value()       ||
+                opts.q_dot.has_value()       ||
+                opts.w.has_value()           ||
+                opts.eul_dot.has_value()     ||
+                opts.wq.has_value()          ||
+                opts.v.has_value()           ||
+                opts.g.has_value()
+            ) { 
+                std::string err_msg = "vehicles::Aircraft::_step: Invalid _StepOptions input passed for CGFrameFRD";
+                throw std::invalid_argument(err_msg);
+            }
+
+            if (opts.p.has_value()) { 
+                CGFrameFRDSetOpts.p = *opts.p;
+            }
+
+            if (opts.X.has_value()) {
+                CGFrameFRDSetOpts.p = opts.X->p;
+                CGFrameFRDSetOpts.q = opts.X->q;
+                CGFrameFRDSetOpts.v = opts.X->v;
+                CGFrameFRDSetOpts.w = opts.X->w;
+            }
+        }
+
+        else {
+            // By design, recursive updates use only information available from the frame hierarchy
+            // All non-frame information must enter explicitly through StepOptions
+            // Updating CGFrameFRD requires information that cannot be derived from the frame hierarchy alone: CG location
+            // Therefore, recursive stepping leaves this frame unchanged
+        }
+
+        // Invariants
+        CGFrameFRDSetOpts.C = dynamics::OrientationMatrix { constants::I3 };
+        CGFrameFRDSetOpts.C_dot = dynamics::OrientationMatrixRate{ constants::Zero3x3 };
+        CGFrameFRDSetOpts.v = dynamics::TranslationalVelocity{ constants::Zero3 };
+
+        F.set(CGFrameFRDSetOpts); 
     }
 
     void Aircraft::step(frames::STABFrameFRD& F, const _StepOptions& opts) {
@@ -445,9 +513,13 @@ namespace vehicles {
         }
 
         else {
+            // By design, recursive updates use only information available from the frame hierarchy
+            // All non-frame information must enter explicitly through StepOptions
+            // Updating STABFrameFRD requires information that cannot be derived from the frame hierarchy alone: alpha
+            // Therefore, recursive stepping leaves this frame unchanged
         }
 
-        // Defaults
+        // Invariants
         STABFrameFRDSetOpts.p = dynamics::Position{ constants::Zero3 };
         STABFrameFRDSetOpts.C_dot = dynamics::OrientationMatrixRate{ constants::Zero3x3 };
         STABFrameFRDSetOpts.v = dynamics::TranslationalVelocity{ constants::Zero3 };
@@ -493,9 +565,13 @@ namespace vehicles {
         }
 
         else {
+            // By design, recursive updates use only information available from the frame hierarchy
+            // All non-frame information must enter explicitly through StepOptions
+            // Updating WINDFrameSTAB requires information that cannot be derived from the frame hierarchy alone: beta
+            // Therefore, recursive stepping leaves this frame unchanged
         }
 
-        // Defaults
+        // Invariants
         WINDFrameSTABSetOpts.p = dynamics::Position{ constants::Zero3 };
         WINDFrameSTABSetOpts.C_dot = dynamics::OrientationMatrixRate{ constants::Zero3x3 };
         WINDFrameSTABSetOpts.v = dynamics::TranslationalVelocity{ constants::Zero3 };
@@ -526,11 +602,12 @@ namespace vehicles {
     }
 
     void Aircraft::step_dependent(frames::Frame& F) {
-        if (F.name == "NEDFrameECEF")   return step(static_cast<frames::NEDFrameECEF&>(F), {});
-        if (F.name == "FRDFrameECEF")   return step(static_cast<frames::FRDFrameECEF&>(F), {});
-        if (F.name == "FRDFrameNED")    return step(static_cast<frames::FRDFrameNED&>(F), {});
-        if (F.name == "STABFrameFRD")   return step(static_cast<frames::STABFrameFRD&>(F), {});
-        if (F.name == "WINDFrameSTAB")  return step(static_cast<frames::WINDFrameSTAB&>(F), {});
+        if (F.id == frames::FrameID::NEDFrameECEF)   return step(static_cast<frames::NEDFrameECEF&>(F), {});
+        if (F.id == frames::FrameID::FRDFrameECEF)   return step(static_cast<frames::FRDFrameECEF&>(F), {});
+        if (F.id == frames::FrameID::FRDFrameNED)    return step(static_cast<frames::FRDFrameNED&>(F), {});
+        if (F.id == frames::FrameID::CGFrameFRD)     return step(static_cast<frames::CGFrameFRD&>(F), {});
+        if (F.id == frames::FrameID::STABFrameFRD)   return step(static_cast<frames::STABFrameFRD&>(F), {});
+        if (F.id == frames::FrameID::WINDFrameSTAB)  return step(static_cast<frames::WINDFrameSTAB&>(F), {});
 
         std::string err_msg = "vehicles::Aircraft::step_dependent: Attempting to recursively step an unknown frame type";
         throw std::invalid_argument(err_msg);
@@ -577,12 +654,14 @@ namespace vehicles {
         // Option B: FRDFrameNED.gB = geography::gB(FRDFrameNED.HNB.C())
         // Performs a coordinate transform into the body frame of NEDFrameECEF's gravity vector
         // Because NEDFrameECEF is fixed at the initialization point and is never updated, this approximation slowly drifts from the true gravity vector (FRDFrameECEF.gB) as the aircraft moves away from the NED origin
-        // Thus
         // Option A: best for global consistency of FRDFrameNED.gB with FRDFrameECEF.gB. Both frames agree on the same gravity vector derived from the true ECEF position
         // Option B: best for local congruence of FRDFrameNED with the fixed NEDFrameECEF frame, but FRDFrameNED.gB will diverge from the true ECEF‑based gravity vector (FRDFrameECEF.gB) as the aircraft moves
         // Verdict: For maximum calculation consistency, we choose option A
         FRDFrameNED.gB = FRDFrameECEF.gB;
         // FRDFrameNED.gB = geography::gB(FRDFrameNED.HNB.C());
+
+        // Sync CGFrameFRD gravity
+        CGFrameFRD.gG = FRDFrameNED.gB;
 
         // Sync STABFrameFRD and WINDFrameSTAB gravity
         STABFrameFRD.gS = geography::gS(FRDFrameNED.gB, STABFrameFRD.HBS.C());
@@ -592,17 +671,18 @@ namespace vehicles {
     void Aircraft::init_frames() {
 
         // Set default values
-        frames::SetOptions initStepOptions;
-        initStepOptions.H = dynamics::HomogeneousTransformationMatrix{ constants::HI };
-        initStepOptions.w = dynamics::AngularVelocity{ constants::Zero3 };
-        initStepOptions.v = dynamics::TranslationalVelocity{ constants::Zero3 };
-        initStepOptions.g = dynamics::Gravity{ constants::Zero3 };
+        frames::SetOptions init_step_options;
+        init_step_options.H = dynamics::HomogeneousTransformationMatrix{ constants::HI };
+        init_step_options.w = dynamics::AngularVelocity{ constants::Zero3 };
+        init_step_options.v = dynamics::TranslationalVelocity{ constants::Zero3 };
+        init_step_options.g = dynamics::Gravity{ constants::Zero3 };
 
-        NEDFrameECEF.set(initStepOptions);
-        FRDFrameECEF.set(initStepOptions);
-        FRDFrameNED.set(initStepOptions);
-        STABFrameFRD.set(initStepOptions);
-        WINDFrameSTAB.set(initStepOptions);
+        NEDFrameECEF.set(init_step_options);
+        FRDFrameECEF.set(init_step_options);
+        FRDFrameNED.set(init_step_options);
+        CGFrameFRD.set(init_step_options);
+        STABFrameFRD.set(init_step_options);
+        WINDFrameSTAB.set(init_step_options);
 
         // Set dependents, {X} -depends-on-> {Y}
         NEDFrameECEF.add_as_direct_dependent(&FRDFrameNED);    // {FRDFrameNED} -> {NEDFrameECEF}
@@ -610,6 +690,7 @@ namespace vehicles {
         FRDFrameECEF.add_as_direct_dependent(&FRDFrameNED);    // {FRDFrameNED} -> {FRDFrameECEF}
 
         FRDFrameNED.add_as_direct_dependent(&FRDFrameECEF);    // {FRDFrameECEF} -> {FRDFrameNED}
+        FRDFrameNED.add_as_direct_dependent(&CGFrameFRD);    // {CGFrameFRD} -> {FRDFrameNED}
         FRDFrameNED.add_as_direct_dependent(&STABFrameFRD);    // {STABFrameFRD} -> {FRDFrameNED}
 
         STABFrameFRD.add_as_direct_dependent(&WINDFrameSTAB);  // {WINDFrameSTAB} -> {STABFrameFRD}
@@ -629,11 +710,15 @@ namespace vehicles {
         const allocator::AllocatorProperties& allocator_properties
     ) :
         id(id),
-        NEDFrameECEF{},
-        FRDFrameECEF{},
+
+        ECEFFrame{},
+        NEDFrameECEF{&ECEFFrame},
+        FRDFrameECEF{&ECEFFrame},
         FRDFrameNED{&NEDFrameECEF},
+        CGFrameFRD{&FRDFrameNED},
         STABFrameFRD{&FRDFrameNED},
         WINDFrameSTAB{&STABFrameFRD},
+
         structural_properties(structural_properties),
         aerodynamic_properties(aerodynamic_properties),
         actuator_properties(actuator_properties),
