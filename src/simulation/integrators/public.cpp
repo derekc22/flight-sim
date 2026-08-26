@@ -78,7 +78,8 @@ namespace integrators {
         actuators::PropulsorActuators& propulsor_actuators = model.propulsor_actuators;
         const actuators::PropulsorActuatorInputs_T<double>& propulsor_inputs = u.propulsor_inputs;
         const atmospheric::AirDensity& rho = conditions.atm.rho;
-        const structural::StructuralProperties& structural = model.structural;
+        const dynamics::Mass mass = model.struc_t.mass;
+        const dynamics::InertiaTensor JB = model.struc_t.JB;
 
         const propulsion::PropellerOmegaStateSet_T<double> propeller_omega_state_set{
             .front_propulsor = propulsion::compute_propeller_omega_state_T<double>(
@@ -107,19 +108,19 @@ namespace integrators {
             .right_propulsor = propeller_omega_state_set.right_propulsor.omega_dot
         };
         const dynamics::WrenchSet wrench_1 = compute_net_wrench(Xt, model, conditions, u, propeller_omega_dot_set);
-        const dynamics::RigidBodyStateDot k1 = compute_rigid_body_state_dot(Xt, structural.mass, structural.JB, wrench_1.net);
+        const dynamics::RigidBodyStateDot k1 = compute_rigid_body_state_dot(Xt, mass, JB, wrench_1.net);
 
         const dynamics::RigidBodyState X2 = add_scaled_rigid_body_state_dot(Xt, k1, 0.5 * dt);
         const dynamics::WrenchSet wrench_2 = compute_net_wrench(X2, model, conditions, u, propeller_omega_dot_set);
-        const dynamics::RigidBodyStateDot k2 = compute_rigid_body_state_dot(X2, structural.mass, structural.JB, wrench_2.net);
+        const dynamics::RigidBodyStateDot k2 = compute_rigid_body_state_dot(X2, mass, JB, wrench_2.net);
 
         const dynamics::RigidBodyState X3 = add_scaled_rigid_body_state_dot(Xt, k2, 0.5 * dt);
         const dynamics::WrenchSet wrench_3 = compute_net_wrench(X3, model, conditions, u, propeller_omega_dot_set);
-        const dynamics::RigidBodyStateDot k3 = compute_rigid_body_state_dot(X3, structural.mass, structural.JB, wrench_3.net);
+        const dynamics::RigidBodyStateDot k3 = compute_rigid_body_state_dot(X3, mass, JB, wrench_3.net);
 
         const dynamics::RigidBodyState X4 = add_scaled_rigid_body_state_dot(Xt, k3, dt);
         const dynamics::WrenchSet wrench_4 = compute_net_wrench(X4, model, conditions, u, propeller_omega_dot_set);
-        const dynamics::RigidBodyStateDot k4 = compute_rigid_body_state_dot(X4, structural.mass, structural.JB, wrench_4.net);
+        const dynamics::RigidBodyStateDot k4 = compute_rigid_body_state_dot(X4, mass, JB, wrench_4.net);
 
         const dynamics::RigidBodyState Xt1 = add_rk4_weighted_rigid_body_state_dot(Xt, k1, k2, k3, k4, dt);
 

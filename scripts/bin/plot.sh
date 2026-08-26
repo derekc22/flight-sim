@@ -110,11 +110,11 @@ python "$PLOT_2D_PATH" -d "$DATA_DIR_PATH/u_propulsor.csv" -r "$DATA_DIR_PATH/u_
 -t "propulsor inputs vs commanded propulsor inputs"
 
 python "$PLOT_2D_PATH" -d "$DATA_DIR_PATH/F_net.csv" -s "$PLOT_DIR_PATH" \
--l "Fx_net(t) [N]" "Fy_net(t) [N]" "Fz_net(t) [N]" \
+-l "Fx(t) [N]" "Fy(t) [N]" "Fz(t) [N]" \
 -t "net force"
 
 python "$PLOT_2D_PATH" -d "$DATA_DIR_PATH/M_net.csv" -s "$PLOT_DIR_PATH" \
--l "Mx_net(t) [Nm]" "My_net(t) [Nm]" "Mz_net(t) [Nm]" \
+-l "Mx(t) [Nm]" "My(t) [Nm]" "Mz(t) [Nm]" \
 -t "net moment"
 
 python "$PLOT_2D_PATH" -d "$DATA_DIR_PATH/F_aerodynamic.csv" -s "$PLOT_DIR_PATH" \

@@ -3,6 +3,10 @@ set -e
 
 source .env
 
+CONDA_BASE_PATH="$(conda info --base)"
+source "$CONDA_BASE_PATH/etc/profile.d/conda.sh"
+conda activate ame532
+
 usage() {
 	exit_code="$1"
 	cat >&2 <<EOF

@@ -28,17 +28,17 @@ namespace propulsion {
     }
 
     template <typename T>
-    dynamics::Wrench_T<T> step_propulsor_forces_moments_T(const actuators::PropulsorActuator& propulsor, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& atm, const T& thrust, const T& omega_dot) {
+    dynamics::Wrench_T<T> step_propulsor_forces_moments_T(const actuators::PropulsorActuator& propulsor, const constants::Vector3_T<T>& pB_GB, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& atm, const T& thrust, const T& omega_dot) {
         dynamics::Wrench_T<T> out;
 
         const constants::Vector3_T<T>& wB_BI = twist.w;
 
         const constants::Vector3_T<T> n_prop = propulsor.n_prop.cast<T>();
-        const constants::Vector3_T<T> r_prop = propulsor.p_propulsor_cg.cast<T>();
+        const constants::Vector3_T<T> pG_propG = propulsor.pB_propB.cast<T>() - pB_GB;
         const atmospheric::AirDensity& rho = atm.rho;
 
         out.F = n_prop * thrust;
-        out.M = r_prop.cross(out.F);
+        out.M = pG_propG.cross(out.F);
 
         if (propulsor.propellers.has_value()) {
             const actuators::PropellerAssembly& propellers = propulsor.propellers.value();
@@ -55,17 +55,17 @@ namespace propulsion {
     }
 
     template <typename T>
-    dynamics::Wrench_T<T> step_propulsive_forces_moments_T(const actuators::PropulsorActuators& propulsor_actuators, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& atm, const actuators::PropulsorActuatorInputs_T<T>& u, const PropellerOmegaDotSet_T<T>& propeller_omega_dot_set) {
+    dynamics::Wrench_T<T> step_propulsive_forces_moments_T(const actuators::PropulsorActuators& propulsor_actuators, const constants::Vector3_T<T>& pB_GB, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& atm, const actuators::PropulsorActuatorInputs_T<T>& u, const PropellerOmegaDotSet_T<T>& propeller_omega_dot_set) {
         dynamics::Wrench_T<T> total;
 
         const dynamics::Wrench_T<T> front = step_propulsor_forces_moments_T<T>(
-            propulsor_actuators.front_propulsor, twist, atm, u.front_propulsor_cmd, propeller_omega_dot_set.front_propulsor
+            propulsor_actuators.front_propulsor, pB_GB, twist, atm, u.front_propulsor_cmd, propeller_omega_dot_set.front_propulsor
         );
         const dynamics::Wrench_T<T> left = step_propulsor_forces_moments_T<T>(
-            propulsor_actuators.left_propulsor, twist, atm, u.left_propulsor_cmd, propeller_omega_dot_set.left_propulsor
+            propulsor_actuators.left_propulsor, pB_GB, twist, atm, u.left_propulsor_cmd, propeller_omega_dot_set.left_propulsor
         );
         const dynamics::Wrench_T<T> right = step_propulsor_forces_moments_T<T>(
-            propulsor_actuators.right_propulsor, twist, atm, u.right_propulsor_cmd, propeller_omega_dot_set.right_propulsor
+            propulsor_actuators.right_propulsor, pB_GB, twist, atm, u.right_propulsor_cmd, propeller_omega_dot_set.right_propulsor
         );
 
         total.F = front.F + left.F + right.F;

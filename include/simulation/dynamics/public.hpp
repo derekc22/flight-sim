@@ -132,9 +132,6 @@ namespace dynamics {
         Eigen::Vector3d data;   // e.g. gB [ms^-2]
     };
 
-    struct CenterOfGravity {
-        Eigen::Vector3d data;   // p_cg [m]
-    };
 
     struct WrenchSet {
         Wrench aerodynamic;
@@ -227,8 +224,13 @@ namespace dynamics {
 
     StateVector_T<double> unpack_state(const RigidBodyState& Xt);
 
-    /** @warning The parent of F must be an inertial frame: ECEFFrame or NEDFrameECEF */
-    RigidBodyState compute_rigid_body_state(const frames::Frame& F);
+    RigidBodyState get_rigid_body_state(const frames::Frame& F);
+
+    RigidBodyState compute_rigid_body_state(const frames::Frame& F, const frames::Frame& R);
+
+    RigidBodyState invert_rigid_body_state(const RigidBodyState& X_BA);
+
+    RigidBodyState compose_rigid_body_state(const RigidBodyState& X_BA, const RigidBodyState& X_AR);
 
     template <typename T>
     constants::Vector3_T<T> ddtB_vB_BI_T(const constants::Vector3_T<T>& vB, const constants::Vector3_T<T>& wB_BI, double mass, const constants::Vector3_T<T>& FB_net);

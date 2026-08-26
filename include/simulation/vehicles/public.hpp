@@ -24,11 +24,11 @@ namespace vehicles {
 
         /** @note NEDFrameECEF, {ECEF} -> {NED}
             Assumed inertial. Once initialized, NEDFrameECEF remains fixed
-            Position: Determined by input
-            Orientation: Uniquely determined by initial Position
-            Orientation rate: None
-            Linear velocity: None
-            Gravity: Uniquely determined by initial Position and initial Orientation
+            Position: Determined by input Latitude, Longitude, and GeometricAltitude
+            Orientation: Uniquely determined by Position
+            Orientation rate: 0.0
+            Linear velocity: 0.0
+            Gravity: [0.0, 0.0, constants::g_earth]
         */
         // std::optional<dynamics::HomogeneousTransformationMatrix> HEN;
         // std::optional<dynamics::OrientationMatrix> CEN;
@@ -45,6 +45,7 @@ namespace vehicles {
         std::optional<geography::Latitude> lat_NE;
         std::optional<geography::Longitude> lon_NE;
         std::optional<geography::GeometricAltitude> alt_NE;
+
         std::optional<geography::GeographicState> geo_NE; // container
     };
 
@@ -52,10 +53,10 @@ namespace vehicles {
 
         /** @note FRDFrameECEF, {ECEF} -> {FRD}
             Non-inertial
-            Position: Determined by input OR (uniquely determined by NEDFrameECEF Orientation AND FRDFrameNED Position AND NEDFrameECEF Position)
-            Orientation: Determined by input OR (uniquely determined by NEDFrameECEF Orientation AND FRDFrameNED Orientation)
-            Orientation rate: Determined by input OR (equal to FRDFrameNED Angular velocity)
-            Linear velocity: Determined by input OR (equal to FRDFrameNED Linear velocity)
+            Position: Determined by input Position OR (uniquely determined by NEDFrameECEF Orientation AND FRDFrameNED Position AND NEDFrameECEF Position)
+            Orientation: Determined by input Orientation OR (uniquely determined by NEDFrameECEF Orientation AND FRDFrameNED Orientation)
+            Orientation rate: Determined by input Orientation rate OR (equal to FRDFrameNED Orientation rate)
+            Linear velocity: Determined by input Linear velocity OR (equal to FRDFrameNED Linear velocity)
             Gravity: Uniquely determined by Position and Orientation
         */
         std::optional<dynamics::HomogeneousTransformationMatrix> HEB; 
@@ -73,6 +74,7 @@ namespace vehicles {
         std::optional<geography::Latitude> lat_BE;
         std::optional<geography::Longitude> lon_BE;
         std::optional<geography::GeometricAltitude> alt_BE;
+
         std::optional<dynamics::RigidBodyState> X_BE; // container
         std::optional<geography::GeographicState> geo_BE; // container
     };
@@ -81,10 +83,10 @@ namespace vehicles {
 
         /** @note FRDFrameNED, {NED} -> {FRD}
             Non-inertial
-            Position: Determined by input OR (uniquely determined by NEDFrameECEF Orientation AND FRDFrameECEF Position AND NEDFrameECEF Position)
-            Orientation: Determined by input OR (uniquely determined by NEDFrameECEF Orientation AND FRDFrameECEF Orientation)
-            Orientation rate: Determined by input OR (equal to FRDFrameECEF Angular velocity)
-            Linear velocity: Determined by input OR (equal to FRDFrameECEF Linear velocity)
+            Position: Determined by input Position OR (uniquely determined by NEDFrameECEF Orientation AND FRDFrameECEF Position AND NEDFrameECEF Position)
+            Orientation: Determined by input Orientation OR (uniquely determined by NEDFrameECEF Orientation AND FRDFrameECEF Orientation)
+            Orientation rate: Determined by input Orientation rate OR (equal to FRDFrameECEF Orientation rate)
+            Linear velocity: Determined by input Linear velocity OR (equal to FRDFrameECEF Linear velocity)
             Gravity: Equal to FRDFrameECEF Gravity
         */
         std::optional<dynamics::HomogeneousTransformationMatrix> HNB; 
@@ -99,19 +101,46 @@ namespace vehicles {
         std::optional<dynamics::AngularVelocityQuaternion> wq_BN;
         std::optional<dynamics::TranslationalVelocity> vB_BN;
         // std::optional<dynamics::Gravity> gB;
+
         std::optional<dynamics::RigidBodyState> X_BN; // container
+    };
+
+    struct CGFrameFRDStepOptions {
+
+        /** @note CGFrameFRD, {FRD} -> {CG}
+            Non-inertial
+            Position: Uniquely determined by CG position
+            Orientation: Identity
+            Orientation rate: 0.0
+            Linear velocity: 0.0
+            Gravity: Equal to FRDFrameNED Gravity
+        */
+        // std::optional<dynamics::HomogeneousTransformationMatrix> HBG; 
+        // std::optional<dynamics::OrientationMatrix> CBG;
+        std::optional<dynamics::Position> pB_GB;
+        // std::optional<dynamics::OrientationQuaternion> qBG;
+        // std::optional<dynamics::EulerAngles> eulBG;
+        // std::optional<dynamics::OrientationMatrixRate> CBG_dot;
+        // std::optional<dynamics::OrientationQuaternionRate> qBG_dot;
+        // std::optional<dynamics::AngularVelocity> wG_GB;
+        // std::optional<dynamics::EulerAngleRates> eulBG_dot;
+        // std::optional<dynamics::AngularVelocityQuaternion> wq_GB;
+        // std::optional<dynamics::TranslationalVelocity> vG_GB;
+        // std::optional<dynamics::Gravity> gG;
+
+        std::optional<dynamics::RigidBodyState> X_GB; // container
     };
 
     struct STABFrameFRDStepOptions {
 
         /** @note STABFrameFRD, {FRD} -> {STAB}
             Non-inertial
-            Position: 0
+            Position: 0.0
             Orientation: Uniquely determined by AngleOfAttack
-            Orientation rate: Determined by input OR (assume 0 ???) OR (finite difference ???) OR (ignore entirely, for now, since they're not actually needed for anything)
-            Linear velocity: 0
+            Orientation rate: Assumed 0.0 for now. This assumption is kinematically inaccurate when alpha changes
+            Linear velocity: 0.0
             Gravity: Uniquely determined by Orientation AND FRDFrameNED Gravity 
-            AngleOfAttack: Determined by input
+            AngleOfAttack: Determined by input AngleOfAttack
         */
         // std::optional<dynamics::HomogeneousTransformationMatrix> HBS; 
         // std::optional<dynamics::OrientationMatrix> CBS;
@@ -126,6 +155,7 @@ namespace vehicles {
         // std::optional<dynamics::TranslationalVelocity> vS_SB;
         // std::optional<dynamics::Gravity> gS;
         std::optional<aerodynamics::AngleOfAttack> alpha;
+
         std::optional<aerodynamics::AerodynamicState> aero; // container
     };
 
@@ -133,12 +163,12 @@ namespace vehicles {
 
         /** @note WINDFrameSTAB, {STAB} -> {WIND}
             Non-inertial
-            Position: 0
+            Position: 0.0
             Orientation: Uniquely determined by SideslipAngle
-            Orientation rate: Determined by input OR (assume 0 ???) OR (finite difference ???) OR (ignore entirely, for now, since they're not actually needed for anything)
-            Linear velocity: 0
+            Orientation rate: Assumed 0.0 for now. This assumption is kinematically inaccurate when beta changes
+            Linear velocity: 0.0
             Gravity: Uniquely determined by Orientation AND STABFrameFRD Gravity 
-            SideslipAngle: Determined by input
+            SideslipAngle: Determined by input SideslipAngle
         */
         // std::optional<dynamics::HomogeneousTransformationMatrix> HSW; 
         // std::optional<dynamics::OrientationMatrix> CSW;
@@ -153,6 +183,7 @@ namespace vehicles {
         // std::optional<dynamics::TranslationalVelocity> vW_WS;
         // std::optional<dynamics::Gravity> gW;
         std::optional<aerodynamics::SideslipAngle> beta;
+
         std::optional<aerodynamics::AerodynamicState> aero; // container
     };
 
@@ -160,6 +191,7 @@ namespace vehicles {
         std::optional<NEDFrameECEFStepOptions> NEDFrameECEFStepOpts;
         std::optional<FRDFrameECEFStepOptions> FRDFrameECEFStepOpts;
         std::optional<FRDFrameNEDStepOptions> FRDFrameNEDStepOpts;
+        std::optional<CGFrameFRDStepOptions> CGFrameFRDStepOpts;
         std::optional<STABFrameFRDStepOptions> STABFrameFRDStepOpts;
         std::optional<WINDFrameSTABStepOptions> WINDFrameSTABStepOpts;
 
@@ -181,18 +213,24 @@ namespace vehicles {
         std::optional<geography::GeographicState> geo;
         std::optional<aerodynamics::AerodynamicState> aero;
 
-        static void validate(const frames::Frame& F, const _StepOptions& opts);
+        static void validate(const _StepOptions& opts);
         explicit operator bool() const;
     };
 
 
     struct Aircraft {
         std::string id;
+
+        frames::ECEFFrame ECEFFrame;
         frames::NEDFrameECEF NEDFrameECEF;
         frames::FRDFrameNED FRDFrameNED;
         frames::FRDFrameECEF FRDFrameECEF;
+        frames::CGFrameFRD CGFrameFRD;
         frames::STABFrameFRD STABFrameFRD;
         frames::WINDFrameSTAB WINDFrameSTAB;
+
+        bool stepped_NEDFrameECEF = false;
+
         structural::StructuralProperties structural_properties;
         aerodynamics::AerodynamicProperties aerodynamic_properties;
         actuators::ActuatorProperties actuator_properties;
@@ -217,15 +255,22 @@ namespace vehicles {
         );
 
         void step(const StepOptions& opts);
+
         void step(frames::NEDFrameECEF& F, const _StepOptions& opts);
         void step(frames::FRDFrameNED& F, const _StepOptions& opts);
         void step(frames::FRDFrameECEF& F, const _StepOptions& opts);
+        void step(frames::CGFrameFRD& F, const _StepOptions& opts);
         void step(frames::STABFrameFRD& F, const _StepOptions& opts);
         void step(frames::WINDFrameSTAB& F, const _StepOptions& opts);
+
         void step_dependents(frames::Frame& root);
         void step_dependent(frames::Frame& F);
+
         void step_gravity();
         void init_frames();
+
+        dynamics::RigidBodyState rebase_cg_state(const dynamics::RigidBodyState& X_GN, const dynamics::Position& pB_GB);
+
     };
 
 }

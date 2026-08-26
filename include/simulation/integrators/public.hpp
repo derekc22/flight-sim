@@ -12,7 +12,7 @@
 namespace integrators {
 
     struct RK4Model {
-        const structural::StructuralProperties& structural;
+        const structural::StructuralState& struc_t;
         const aerodynamics::AerodynamicProperties& aerodynamic;
         actuators::PropulsorActuators& propulsor_actuators;
     };

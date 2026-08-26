@@ -114,7 +114,7 @@ namespace trim {
             const TrimResidualJacobian jac_raw = compute_trim_residual_jac(xu, model, problem.target, problem.conditions);
             const TrimResidualJacobian jac = weights.asDiagonal() * jac_raw;
 
-            const constants::MatrixX_T<double, constants::state_input_dim, constants::state_input_dim> hess = jac.transpose() * jac + damping * constants::IX_T<double, constants::state_input_dim>;
+            const constants::MatrixX_T<double, constants::state_input_dim, constants::state_input_dim> hess = jac.transpose() * jac + damping * constants::I_T<double, constants::state_input_dim>;
 
             const operating::StateInputVector_T<double> grad = jac.transpose() * weighted_residual;
 

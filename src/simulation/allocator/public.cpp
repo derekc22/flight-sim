@@ -52,8 +52,8 @@ namespace allocator {
         const actuators::ActuatorInputsVector_T<double> gradient = -E_active.transpose() * Q * err + trim_gradient;
         const actuators::ActuatorLimitsVector limits = actuators::unpack_actuator_limits(input.model.actuator_limits);
 
-        control::ControlOutput u_constrained = solve_qp(hessian, gradient, u_0, actuator_target, limits, input.actuator_mask, true);
-        control::ControlOutput u_unconstrained = solve_qp(hessian, gradient, u_0, actuator_target, limits, input.actuator_mask, false);
+        control::ControlOutput u_constrained = solve_qp_constrained(hessian, gradient, u_0, actuator_target, limits, input.actuator_mask);
+        control::ControlOutput u_unconstrained = solve_qp_unconstrained(hessian, gradient, u_0, actuator_target, limits, input.actuator_mask);
 
         actuators::ActuatorInputsVector_T<double> u_constrained_vec = actuators::unpack_actuator_inputs_T(u_constrained);
         actuators::ActuatorInputsVector_T<double> u_unconstrained_vec = actuators::unpack_actuator_inputs_T(u_unconstrained);
@@ -80,69 +80,25 @@ namespace allocator {
     }
 
 
-    control::ControlOutput AllocatorProperties::solve_qp(const constants::MatrixX_T<double, constants::input_dim, constants::input_dim>& hessian, const actuators::ActuatorInputsVector_T<double>& gradient, const actuators::ActuatorInputsVector_T<double>& u_0, const actuators::ActuatorInputsVector_T<double>& actuator_target, const actuators::ActuatorLimitsVector& limits, const std::array<bool, constants::input_dim>& actuator_mask, bool constrained) {
-        qp::Solution solution;
+    control::ControlOutput AllocatorProperties::solve_qp_constrained(const constants::MatrixX_T<double, constants::input_dim, constants::input_dim>& hessian, const actuators::ActuatorInputsVector_T<double>& gradient, const actuators::ActuatorInputsVector_T<double>& u_0, const actuators::ActuatorInputsVector_T<double>& actuator_target, const actuators::ActuatorLimitsVector& limits, const std::array<bool, constants::input_dim>& actuator_mask) {
+        Eigen::VectorXd lower = limits.col(0) - u_0;
+        Eigen::VectorXd upper = limits.col(1) - u_0;
 
-        if (constrained) {
-            Eigen::VectorXd lower = limits.col(0) - u_0;
-            Eigen::VectorXd upper = limits.col(1) - u_0;
-
-            for (Eigen::Index i = 0; i < lower.rows(); ++i) {
-                if (!actuator_mask[i]) {
-                    lower(i) = actuator_target(i) - u_0(i);
-                    upper(i) = lower(i);
-                }
+        for (Eigen::Index i = 0; i < lower.rows(); ++i) {
+            if (!actuator_mask[i]) {
+                lower(i) = actuator_target(i) - u_0(i);
+                upper(i) = lower(i);
             }
-
-            const qp::Problem problem{
-                .hessian = hessian,
-                .gradient = gradient,
-                .lower = lower,
-                .upper = upper
-            };
-
-            solution = solver.solve(problem);
         }
-        else {
-            std::vector<Eigen::Index> free_indices;
-            actuators::ActuatorInputsVector_T<double> x = actuators::ActuatorInputsVector_T<double>::Zero();
 
-            for (Eigen::Index i = 0; i < x.rows(); ++i) {
-                if (std::abs(limits(i, 1) - limits(i, 0)) <= constants::eps) {
-                    x(i) = limits(i, 0) - u_0(i);
-                }
-                else if (!actuator_mask[i]) {
-                    x(i) = actuator_target(i) - u_0(i);
-                }
-                else {
-                    free_indices.push_back(i);
-                }
-            }
+        const qp::Problem problem{
+            .hessian = hessian,
+            .gradient = gradient,
+            .lower = lower,
+            .upper = upper
+        };
 
-            if (!free_indices.empty()) {
-                Eigen::MatrixXd hessian_free(free_indices.size(), free_indices.size());
-                Eigen::VectorXd gradient_free(free_indices.size());
-
-                for (std::size_t i = 0; i < free_indices.size(); ++i) {
-                    gradient_free(i) = gradient(free_indices[i]) + hessian.row(free_indices[i]).dot(x);
-
-                    for (std::size_t j = 0; j < free_indices.size(); ++j) {
-                        hessian_free(i, j) = hessian(free_indices[i], free_indices[j]);
-                    }
-                }
-
-                const Eigen::VectorXd x_free = hessian_free.completeOrthogonalDecomposition().solve(-gradient_free);
-
-                for (std::size_t i = 0; i < free_indices.size(); ++i) {
-                    x(free_indices[i]) = x_free(i);
-                }
-            }
-
-            solution = {
-                .x = x,
-                .status = qp::Status::Solved
-            };
-        }
+        const qp::Solution solution = solver.solve(problem);
 
         if (solution.status != qp::Status::Solved) {
             spdlog::error("allocator::AllocatorProperties::step QP solve failed with status {}", static_cast<int>(solution.status));
@@ -150,6 +106,46 @@ namespace allocator {
         }
 
         const actuators::ActuatorInputsVector_T<double> u = u_0 + solution.x;
+
+        return actuators::pack_actuator_inputs_T(u);
+    }
+
+    control::ControlOutput AllocatorProperties::solve_qp_unconstrained(const constants::MatrixX_T<double, constants::input_dim, constants::input_dim>& hessian, const actuators::ActuatorInputsVector_T<double>& gradient, const actuators::ActuatorInputsVector_T<double>& u_0, const actuators::ActuatorInputsVector_T<double>& actuator_target, const actuators::ActuatorLimitsVector& limits, const std::array<bool, constants::input_dim>& actuator_mask) {
+        std::vector<Eigen::Index> free_indices;
+        actuators::ActuatorInputsVector_T<double> x = actuators::ActuatorInputsVector_T<double>::Zero();
+
+        for (Eigen::Index i = 0; i < x.rows(); ++i) {
+            if (std::abs(limits(i, 1) - limits(i, 0)) <= constants::eps) {
+                x(i) = limits(i, 0) - u_0(i);
+            }
+            else if (!actuator_mask[i]) {
+                x(i) = actuator_target(i) - u_0(i);
+            }
+            else {
+                free_indices.push_back(i);
+            }
+        }
+
+        if (!free_indices.empty()) {
+            Eigen::MatrixXd hessian_free(free_indices.size(), free_indices.size());
+            Eigen::VectorXd gradient_free(free_indices.size());
+
+            for (std::size_t i = 0; i < free_indices.size(); ++i) {
+                gradient_free(i) = gradient(free_indices[i]) + hessian.row(free_indices[i]).dot(x);
+
+                for (std::size_t j = 0; j < free_indices.size(); ++j) {
+                    hessian_free(i, j) = hessian(free_indices[i], free_indices[j]);
+                }
+            }
+
+            const Eigen::VectorXd x_free = hessian_free.completeOrthogonalDecomposition().solve(-gradient_free);
+
+            for (std::size_t i = 0; i < free_indices.size(); ++i) {
+                x(free_indices[i]) = x_free(i);
+            }
+        }
+
+        const actuators::ActuatorInputsVector_T<double> u = u_0 + x;
 
         return actuators::pack_actuator_inputs_T(u);
     }

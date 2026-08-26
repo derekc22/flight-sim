@@ -1,5 +1,4 @@
 #include <cmath>
-#include <format>
 #include <stdexcept>
 #include "simulation/atmospheric/private.hpp"
 #include "simulation/atmospheric/public.hpp"
@@ -12,11 +11,11 @@
 
 namespace atmospheric {
 
-    StaticAtmosphericState compute_static_atmospheric_state(const frames::Frame& F) {
-        if (F.parent != nullptr) {
-            throw std::invalid_argument(std::format("atmospheric::compute_static_atmospheric_state: Invalid frame input, the parent of {} must be ECEFFrame", F.name));
+    StaticAtmosphericState compute_static_atmospheric_state(const frames::Frame& F, const frames::Frame& E) {
+        if (E.id != frames::FrameID::ECEFFrame) {
+            throw std::invalid_argument("atmospheric::compute_static_atmospheric_state: E must be ECEFFrame");
         }
-        return std_atmosphere(geography::compute_geographic_state(F).alt);
+        return std_atmosphere(geography::compute_geographic_state(F, E).alt);
     }
 
     StaticAirTemperature T_from_T0(const StagnationAirTemperature& T0, const MachNumber& M) {

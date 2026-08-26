@@ -22,7 +22,7 @@ namespace trim {
         const actuators::PropulsorActuatorInputs_T<double>& propulsor_limit_max = model.actuator_limits.limit_max.propulsor_inputs;
         const actuators::PropulsorActuatorInputs_T<double>& propulsor_limit_min = model.actuator_limits.limit_min.propulsor_inputs;
 
-        const aerodynamics::AerodynamicState target_aero = aerodynamics::compute_aerodynamic_state(aircraft.FRDFrameNED, wind);
+        const aerodynamics::AerodynamicState target_aero = aerodynamics::compute_aerodynamic_state(aircraft.CGFrameFRD, aircraft.NEDFrameECEF, wind);
 
         const TrimProblem problem{
             .target = TrimTarget{
@@ -34,7 +34,7 @@ namespace trim {
                 .psi_dot = aircraft.FRDFrameNED.eulNB_dot.psi_dot()
             },
             .conditions = operating::OperatingConditions{
-                .atm = atmospheric::compute_static_atmospheric_state(aircraft.FRDFrameECEF),
+                .atm = atmospheric::compute_static_atmospheric_state(aircraft.FRDFrameECEF, aircraft.ECEFFrame),
                 .windB = wind,
                 .steady_state = true
             },

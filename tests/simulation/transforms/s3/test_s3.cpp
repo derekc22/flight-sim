@@ -25,7 +25,7 @@ namespace {
     }
 
     void expect_valid_rotation_matrix(const Eigen::Matrix3d& R) {
-        EXPECT_TRUE((R.transpose() * R).isApprox(constants::IX_T<double, 3>, constants::eps_strict));
+        EXPECT_TRUE((R.transpose() * R).isApprox(constants::I_T<double, 3>, constants::eps_strict));
         EXPECT_NEAR(R.determinant(), 1.0, constants::eps_strict);
     }
 }

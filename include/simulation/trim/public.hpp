@@ -6,11 +6,8 @@
 #include "simulation/actuators/surface/public.hpp"
 #include "simulation/actuators/public.hpp"
 #include "simulation/atmospheric/public.hpp"
-#include "simulation/constants/public.hpp"
 #include "simulation/dynamics/public.hpp"
-#include "simulation/propulsion/public.hpp"
 #include "simulation/aerodynamics/public.hpp"
-#include "simulation/structural/public.hpp"
 #include "simulation/operating/public.hpp"
 #include "simulation/autodiff/public.hpp"
 

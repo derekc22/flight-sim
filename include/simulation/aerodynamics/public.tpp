@@ -11,10 +11,10 @@
 namespace aerodynamics {
 
     template <typename T>
-    SurfaceKinematics_T<T> compute_surface_kinematics_T(const Surface& s, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& atm, const atmospheric::Wind& windB) {
+    SurfaceKinematics_T<T> compute_surface_kinematics_T(const Surface& s, const constants::Vector3_T<T>& pB_GB, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& atm, const atmospheric::Wind& windB) {
         SurfaceKinematics_T<T> out;
-        const constants::Vector3_T<T> p_ac_cg = s.p_ac_cg.cast<T>();
-        out.vB_rel = (twist.v - windB.data.cast<T>()) + twist.w.cross(p_ac_cg);
+        const constants::Vector3_T<T> pG_acG = s.pB_acB.cast<T>() - pB_GB;
+        out.vB_rel = (twist.v - windB.data.cast<T>()) + twist.w.cross(pG_acG);
         out.V = out.vB_rel.norm();
 
         if (out.V < T(constants::eps)) {
@@ -61,7 +61,7 @@ namespace aerodynamics {
     }
 
     template <typename T>
-    dynamics::Wrench_T<T> compute_surface_loads_T(const Surface& s, const SurfaceKinematics_T<T>& sk, const SurfaceCoefficients_T<T>& sc) {
+    dynamics::Wrench_T<T> compute_surface_loads_T(const Surface& s, const constants::Vector3_T<T>& pB_GB, const SurfaceKinematics_T<T>& sk, const SurfaceCoefficients_T<T>& sc) {
         dynamics::Wrench_T<T> out;
         if (sk.V < T(constants::eps)) {
             return out;
@@ -69,8 +69,10 @@ namespace aerodynamics {
 
         const constants::Vector3_T<T> n_hat = s.n.cast<T>();
         const constants::Vector3_T<T> d_hat = -sk.vB_rel / sk.V;
+
         const constants::Vector3_T<T> lift_axis = n_hat - n_hat.dot(d_hat) * d_hat;
         const constants::Vector3_T<T> l_hat = util::norm(lift_axis);
+
         const constants::Vector3_T<T> moment_axis = l_hat.cross(d_hat);
         const constants::Vector3_T<T> m_hat = util::norm(moment_axis);
 
@@ -79,18 +81,18 @@ namespace aerodynamics {
         const T Mmag = sk.qbar * T(s.area * s.chord) * sc.CM;
 
         out.F = L * l_hat + D * d_hat;
-        const constants::Vector3_T<T> p_ac_cg = s.p_ac_cg.cast<T>();
-        out.M = p_ac_cg.cross(out.F) + Mmag * m_hat;
+        const constants::Vector3_T<T> pG_acG = s.pB_acB.cast<T>() - pB_GB;
+        out.M = pG_acG.cross(out.F) + Mmag * m_hat;
         return out;
     }
 
     template <typename T>
-    dynamics::Wrench_T<T> step_aero_forces_moments_T(const AerodynamicProperties& aerodynamic_properties, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& atm, const actuators::SurfaceActuatorInputs_T<T>& u, const atmospheric::Wind& windB) {
+    dynamics::Wrench_T<T> step_aero_forces_moments_T(const AerodynamicProperties& aerodynamic_properties, const constants::Vector3_T<T>& pB_GB, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& atm, const actuators::SurfaceActuatorInputs_T<T>& u, const atmospheric::Wind& windB) {
         dynamics::Wrench_T<T> total;
         for (const Surface& s : aerodynamic_properties.surfaces) {
-            const SurfaceKinematics_T<T> sk = compute_surface_kinematics_T<T>(s, twist, atm, windB);
+            const SurfaceKinematics_T<T> sk = compute_surface_kinematics_T<T>(s, pB_GB, twist, atm, windB);
             const SurfaceCoefficients_T<T> sc = compute_surface_coefficients_T<T>(s, sk, u);
-            const dynamics::Wrench_T<T> loads = compute_surface_loads_T<T>(s, sk, sc);
+            const dynamics::Wrench_T<T> loads = compute_surface_loads_T<T>(s, pB_GB, sk, sc);
             total.F += loads.F;
             total.M += loads.M;
         }

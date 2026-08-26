@@ -1,7 +1,6 @@
 #pragma once
 #include "simulation/geography/public.hpp"
 #include "simulation/dynamics/public.hpp"
-#include "simulation/dynamics/public.hpp"
 #include "simulation/atmospheric/public.hpp"
 #include "simulation/constants/public.hpp"
 

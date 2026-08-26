@@ -53,8 +53,7 @@ namespace atmospheric {
         DynamicViscosity mu;
     };
 
-    /** @warning The parent of F must be the ECEFFrame */
-    StaticAtmosphericState compute_static_atmospheric_state(const frames::Frame& F);
+    StaticAtmosphericState compute_static_atmospheric_state(const frames::Frame& F, const frames::Frame& E);
 
     StaticAirTemperature T_from_T0(const StagnationAirTemperature& T0, const MachNumber& M);
 

@@ -1,5 +1,4 @@
 #include <cmath>
-#include <format>
 #include <stdexcept>
 #include <Eigen/Dense>
 #include "simulation/constants/public.hpp"
@@ -11,12 +10,12 @@
 
 namespace geography {
 
-    GeographicState compute_geographic_state(const frames::Frame& F) {
-        if (F.parent != nullptr) {
-            throw std::invalid_argument(std::format("geography::compute_geographic_state: Invalid frame input, the parent of {} must be ECEFFrame", F.name));
+    GeographicState compute_geographic_state(const frames::Frame& F, const frames::Frame& E) {
+        if (E.id != frames::FrameID::ECEFFrame) {
+            throw std::invalid_argument("geography::compute_geographic_state: E must be ECEFFrame");
         }
-        const frames::FrameView fv = F.view();
-        return lat_lon_alt_from_pE(fv.H->p());
+        dynamics::HomogeneousTransformationMatrix HEF = frames::H_from_R(F, E);
+        return lat_lon_alt_from_pE(HEF.p());
     }
 
     dynamics::OrientationMatrix CEN_from_lat_lon(const Latitude& latitude, const Longitude& longitude) {
@@ -45,7 +44,7 @@ namespace geography {
     }
 
     dynamics::Gravity gN() { 
-        return { Eigen::Vector3d(0, 0, constants::g_earth) }; 
+        return { Eigen::Vector3d(0.0, 0.0, constants::g_earth) }; 
     };
 
     dynamics::Gravity gB(const dynamics::Position& pE, const dynamics::HomogeneousTransformationMatrix& HEB) { 

@@ -13,9 +13,6 @@
 namespace structural {
 
     StructuralProperties::StructuralProperties(const std::vector<Geometry>& geoms) : geometries(geoms) {
-        mass = dynamics::Mass{ compute_mass() };
-        p_cg = dynamics::CenterOfGravity{ compute_CG() };
-        JB = dynamics::InertiaTensor{ compute_JB() };
         geometry_id_map = build_geometry_id_map();
     }
 
@@ -38,16 +35,16 @@ namespace structural {
         return m;
     }
 
-    Eigen::Vector3d StructuralProperties::compute_CG() {
-        Eigen::Vector3d p_cg = constants::Zero3;
+    Eigen::Vector3d StructuralProperties::compute_CG(const dynamics::Mass& mass) {
+        Eigen::Vector3d pB_GB = constants::Zero3;
         for (const Geometry& geom : geometries) {
-            p_cg += geom.mass * geom.p_ref;
+            pB_GB += geom.mass * geom.pB_geomB;
         }
-        p_cg /= mass.data;
-        return p_cg;
+        pB_GB /= mass.data;
+        return pB_GB;
     }
 
-    Eigen::Matrix3d StructuralProperties::compute_JB() {
+    Eigen::Matrix3d StructuralProperties::compute_JB(const CenterOfGravity& pB_GB) {
         Eigen::Matrix3d j = constants::Zero3x3;
 
         for (const Geometry& geom : geometries) {
@@ -55,9 +52,9 @@ namespace structural {
             Eigen::Matrix3d j_local = compute_local_JB(geom);
 
             // Distance from geometry CG to system CG
-            double dx = geom.p_ref(0) - p_cg.data(0);
-            double dy = geom.p_ref(1) - p_cg.data(1);
-            double dz = geom.p_ref(2) - p_cg.data(2);
+            double dx = geom.pB_geomB(0) - pB_GB.data(0);
+            double dy = geom.pB_geomB(1) - pB_GB.data(1);
+            double dz = geom.pB_geomB(2) - pB_GB.data(2);
 
             // Parallel axis theorem
             j(0, 0) += j_local(0, 0) + m * (dy * dy + dz * dz);   // Jxx
@@ -105,12 +102,19 @@ namespace structural {
         return axis_hat.dot(compute_local_JB(geom) * axis_hat);
     }
 
-    std::unordered_map<std::string, size_t> StructuralProperties::build_geometry_id_map() {
-        std::unordered_map<std::string, size_t> m;
-        for (size_t i = 0; i < geometries.size(); ++i) {
+    std::unordered_map<std::string, std::size_t> StructuralProperties::build_geometry_id_map() {
+        std::unordered_map<std::string, std::size_t> m;
+        for (std::size_t i = 0; i < geometries.size(); ++i) {
             m[geometries[i].id] = i;
         }
         return m;
+    }
+
+    StructuralState StructuralProperties::compute_structural_state() {
+        dynamics::Mass mass = dynamics::Mass{ compute_mass() };
+        CenterOfGravity pB_GB = CenterOfGravity{ compute_CG(mass) };
+        dynamics::InertiaTensor JB = dynamics::InertiaTensor{ compute_JB(pB_GB) };
+        return { mass, pB_GB, JB };
     }
 
 }

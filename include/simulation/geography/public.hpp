@@ -48,8 +48,7 @@ namespace geography {
         GeometricAltitude alt;
     };
 
-    /** @warning The parent of F must the ECEFFrame */
-    GeographicState compute_geographic_state(const frames::Frame& F);
+    GeographicState compute_geographic_state(const frames::Frame& F, const frames::Frame& E);
 
     dynamics::OrientationMatrix CEN_from_lat_lon(const Latitude& lat, const Longitude& lon);
 

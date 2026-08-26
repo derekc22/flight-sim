@@ -4,6 +4,6 @@
 
 namespace json {
 
-    aerodynamics::AerodynamicProperties parse_aerodynamics_config(const structural::StructuralProperties& structural_properties);
+    aerodynamics::AerodynamicProperties parse_aerodynamics_config();
 
 }
