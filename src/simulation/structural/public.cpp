@@ -38,7 +38,7 @@ namespace structural {
     Eigen::Vector3d StructuralProperties::compute_CG(const dynamics::Mass& mass) {
         Eigen::Vector3d pB_GB = constants::Zero3;
         for (const Geometry& geom : geometries) {
-            pB_GB += geom.mass * geom.p_ref;
+            pB_GB += geom.mass * geom.pB_geomB;
         }
         pB_GB /= mass.data;
         return pB_GB;
@@ -52,9 +52,9 @@ namespace structural {
             Eigen::Matrix3d j_local = compute_local_JB(geom);
 
             // Distance from geometry CG to system CG
-            double dx = geom.p_ref(0) - pB_GB.data(0);
-            double dy = geom.p_ref(1) - pB_GB.data(1);
-            double dz = geom.p_ref(2) - pB_GB.data(2);
+            double dx = geom.pB_geomB(0) - pB_GB.data(0);
+            double dy = geom.pB_geomB(1) - pB_GB.data(1);
+            double dz = geom.pB_geomB(2) - pB_GB.data(2);
 
             // Parallel axis theorem
             j(0, 0) += j_local(0, 0) + m * (dy * dy + dz * dz);   // Jxx

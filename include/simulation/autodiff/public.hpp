@@ -17,14 +17,14 @@ namespace vehicles { struct Aircraft; } // forward declare
 namespace autodiff {
 
     struct AutoDiffModel {
-        const structural::StructuralState& struc_t;
+        structural::StructuralState struc_t;
         const aerodynamics::AerodynamicProperties& aerodynamic;
         actuators::PropulsorActuators& propulsor_actuators;
         actuators::ActuatorLimits actuator_limits;
         actuators::FixedActuatorInputs fixed_actuator_inputs;
     };
 
-    AutoDiffModel build_autodiff_model(vehicles::Aircraft& aircraft);
+    AutoDiffModel build_autodiff_model(vehicles::Aircraft& aircraft, const structural::StructuralState& struc_t);
 
     template <typename T>
     dynamics::Wrench_T<T> compute_net_wrench_T(const operating::OperatingPoint_T<T>& operating_point, AutoDiffModel& model, const operating::OperatingConditions& conditions, T dt);

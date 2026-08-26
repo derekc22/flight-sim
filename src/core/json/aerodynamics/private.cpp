@@ -58,7 +58,7 @@ namespace json {
         surfaces.reserve(surfaces_json.size());
         for (const auto& surface_json : surfaces_json) {
             std::string id = surface_json.at("id").get<std::string>();
-            Eigen::Vector3d p_ac = parse_Vector3d(surface_json.at("p_ac"));
+            Eigen::Vector3d pB_acB = parse_Vector3d(surface_json.at("pB_acB"));
             Eigen::Vector3d n = parse_Vector3d(surface_json.at("n"));
             util::validate_unit(n, "json::parse_aerodynamic_properties", id + " surface normal");
 
@@ -66,7 +66,7 @@ namespace json {
                 .id = id,
                 .chord = surface_json.at("chord").get<double>(),
                 .span = surface_json.at("span").get<double>(),
-                .p_ac = p_ac,
+                .pB_acB = pB_acB,
                 .n = n,
                 .CL0 = surface_json.at("CL0").get<double>(),
                 .e = surface_json.at("e").get<double>(),

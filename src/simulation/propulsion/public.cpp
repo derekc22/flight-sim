@@ -23,7 +23,7 @@ namespace propulsion {
         commit_propeller_omega_state(propulsor_actuators.right_propulsor, propeller_omega_state_set.right_propulsor);
     }
 
-    dynamics::Wrench step_propulsive_forces_moments(actuators::PropulsorActuators& propulsor_actuators, const dynamics::RigidBodyState& X, const atmospheric::StaticAtmosphericState& atm, const actuators::PropulsorActuatorInputs_T<double>& u, double dt) {
+    dynamics::Wrench step_propulsive_forces_moments(actuators::PropulsorActuators& propulsor_actuators, const structural::CenterOfGravity& pB_GB, const dynamics::RigidBodyState& X, const atmospheric::StaticAtmosphericState& atm, const actuators::PropulsorActuatorInputs_T<double>& u, double dt) {
         dynamics::Twist_T<double> twist{
             .v = X.v.data,
             .w = X.w.data
@@ -41,7 +41,7 @@ namespace propulsion {
             .right_propulsor = propeller_omega_state_set.right_propulsor.omega_dot
         };
 
-        dynamics::Wrench_T<double> wrench = step_propulsive_forces_moments_T<double>(propulsor_actuators, twist, atm, u, propeller_omega_dot_set);
+        dynamics::Wrench_T<double> wrench = step_propulsive_forces_moments_T<double>(propulsor_actuators, pB_GB.data, twist, atm, u, propeller_omega_dot_set);
 
         commit_propeller_omega_state_set(propulsor_actuators, propeller_omega_state_set);
 

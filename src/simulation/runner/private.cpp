@@ -226,7 +226,7 @@ namespace runner {
         structural::StructuralState struc_t = aircraft.structural_properties.compute_structural_state();
 
         // compute aerodynamic state
-        aerodynamics::AerodynamicState aero_t = aerodynamics::compute_aerodynamic_state(Xt, windB);
+        aerodynamics::AerodynamicState aero_t = aerodynamics::compute_aerodynamic_state(aircraft.CGFrameFRD, aircraft.NEDFrameECEF, windB);
 
         // compute geographic state
         geography::GeographicState geo_t = geography::compute_geographic_state(aircraft.FRDFrameECEF, aircraft.ECEFFrame);
@@ -235,7 +235,7 @@ namespace runner {
         atmospheric::StaticAtmosphericState atm_t = atmospheric::compute_static_atmospheric_state(aircraft.FRDFrameECEF, aircraft.ECEFFrame);
 
         // build autodiff model
-        autodiff::AutoDiffModel autodiff_model = autodiff::build_autodiff_model(aircraft);
+        autodiff::AutoDiffModel autodiff_model = autodiff::build_autodiff_model(aircraft, struc_t);
 
         // initialize transient conditions
         operating::OperatingConditions transient_conditions{
@@ -279,11 +279,15 @@ namespace runner {
                 dynamics::RigidBodyState Xt_trim = trim::update_state_from_trim(context.Xt, trim_sol.operating_point.state);
                 aerodynamics::AerodynamicState aero_t_trim = aerodynamics::compute_aerodynamic_state(Xt_trim, trim_sol.conditions.windB);
 
+                dynamics::Position pB_GB{ context.struc_t.pB_GB.data };
+                dynamics::RigidBodyState X_BN_trim = aircraft.rebase_cg_state(Xt_trim, pB_GB);
+
                 // define TrimStepOptions
                 vehicles::StepOptions TrimStepOptions;
 
                 // overwrite state with trim state
-                TrimStepOptions.FRDFrameNEDStepOpts = vehicles::FRDFrameNEDStepOptions{ .X_BN = Xt_trim };
+                TrimStepOptions.FRDFrameNEDStepOpts = vehicles::FRDFrameNEDStepOptions{ .X_BN = X_BN_trim };
+                TrimStepOptions.CGFrameFRDStepOpts = vehicles::CGFrameFRDStepOptions{ .pB_GB = pB_GB };
                 TrimStepOptions.STABFrameFRDStepOpts = vehicles::STABFrameFRDStepOptions{ .aero = aero_t_trim };
                 TrimStepOptions.WINDFrameSTABStepOpts = vehicles::WINDFrameSTABStepOptions{ .aero = aero_t_trim };
 
@@ -619,10 +623,13 @@ namespace runner {
         // compute next-step aerodynamic state
         aerodynamics::AerodynamicState aero_t1 = aerodynamics::compute_aerodynamic_state(context.Xt1, context.windB);
 
+        dynamics::Position pB_GB{ context.struc_t.pB_GB.data };
+        dynamics::RigidBodyState X_BN_t1 = aircraft.rebase_cg_state(context.Xt1, pB_GB);
+
         // set step options
         vehicles::StepOptions StepOpts;
-        StepOpts.FRDFrameNEDStepOpts = vehicles::FRDFrameNEDStepOptions{ .X_BN = context.Xt1 };
-        StepOpts.CGFrameFRDStepOpts = vehicles::CGFrameFRDStepOptions{ .pB_GB = dynamics::Position{ context.struc_t.pB_GB.data } };
+        StepOpts.FRDFrameNEDStepOpts = vehicles::FRDFrameNEDStepOptions{ .X_BN = X_BN_t1 };
+        StepOpts.CGFrameFRDStepOpts = vehicles::CGFrameFRDStepOptions{ .pB_GB = pB_GB };
         StepOpts.STABFrameFRDStepOpts = vehicles::STABFrameFRDStepOptions{ .aero = aero_t1 };
         StepOpts.WINDFrameSTABStepOpts = vehicles::WINDFrameSTABStepOptions{ .aero = aero_t1 };
 

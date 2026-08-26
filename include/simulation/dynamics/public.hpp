@@ -228,6 +228,10 @@ namespace dynamics {
 
     RigidBodyState compute_rigid_body_state(const frames::Frame& F, const frames::Frame& R);
 
+    RigidBodyState invert_rigid_body_state(const RigidBodyState& X_BA);
+
+    RigidBodyState compose_rigid_body_state(const RigidBodyState& X_BA, const RigidBodyState& X_AR);
+
     template <typename T>
     constants::Vector3_T<T> ddtB_vB_BI_T(const constants::Vector3_T<T>& vB, const constants::Vector3_T<T>& wB_BI, double mass, const constants::Vector3_T<T>& FB_net);
 

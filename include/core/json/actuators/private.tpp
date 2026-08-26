@@ -1,5 +1,4 @@
 #pragma once
-#include <Eigen/Dense>
 #include <string>
 #include <nlohmann/json.hpp>
 #include "core/json/public.hpp"
@@ -35,8 +34,7 @@ namespace json {
 
         std::string geometry_id = propulsor_actuator_json.at("geometry_id").get<std::string>();
         const structural::Geometry& geom = structural_properties.get_geometry(geometry_id);
-        validate_propulsor_actuator_placement(geom.p_ref, key);
-        Eigen::Vector3d p_propulsor_cg = geom.p_ref - structural_properties.p_cg.data;
+        validate_propulsor_actuator_placement(geom.pB_geomB, key);
 
         PropulsorActuatorType propulsor(
             propulsor_actuator_json.at("limit_max").get<double>(),
@@ -44,7 +42,7 @@ namespace json {
             propulsor_actuator_json.at("tau").get<double>(),
             propulsor_actuator_json.at("inclination_angle").get<double>(),
             propulsor_actuator_json.at("toe_angle").get<double>(),
-            p_propulsor_cg
+            geom.pB_geomB
         );
 
         if (propulsor_actuator_json.contains("propellers")) {

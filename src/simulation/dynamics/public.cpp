@@ -51,12 +51,14 @@ namespace dynamics {
     }
 
     void OrientationQuaternion::set(const OrientationMatrix& C) {
-        data = transforms::normalize_and_canonicalize(transforms::rot_to_quat(C.data)); 
+        data = transforms::rot_to_quat(C.data); 
     }
     void OrientationQuaternion::set(const EulerAngles& eul) {
-        data = transforms::normalize_and_canonicalize(
-            transforms::eul_to_quatC(eul.psi(), eul.theta(), eul.phi(), transforms::EulerOrder::ZYX, transforms::RotationType::Intrinsic)
-        ); 
+        data = transforms::eul_to_quatC(
+            eul.psi(), eul.theta(), eul.phi(), 
+            transforms::EulerOrder::ZYX, 
+            transforms::RotationType::Intrinsic
+        );
     }
 
     double EulerAngles::psi() const { 
@@ -168,6 +170,54 @@ namespace dynamics {
             .w = wF_FR
         };
   }
+
+    dynamics::RigidBodyState invert_rigid_body_state(const dynamics::RigidBodyState& X_BA) {
+        dynamics::OrientationMatrix CAB;
+        CAB.set(X_BA.q);
+
+        dynamics::OrientationMatrix CBA{ CAB.data.transpose() };
+        dynamics::OrientationQuaternion qBA;
+        qBA.set(CBA);
+
+        dynamics::Position pB_AB{ -CAB.data * X_BA.p.data };
+
+        return {
+            .p = pB_AB,
+            .v = dynamics::TranslationalVelocity{
+                -CBA.data * (X_BA.v.data + X_BA.w.data.cross(pB_AB.data))
+            },
+            .q = qBA,
+            .w = dynamics::AngularVelocity{ -CBA.data * X_BA.w.data }
+        };
+    }
+
+    dynamics::RigidBodyState compose_rigid_body_state(const dynamics::RigidBodyState& X_BA, const dynamics::RigidBodyState& X_AR) {
+        dynamics::OrientationMatrix CRA;
+        CRA.set(X_AR.q);
+
+        dynamics::OrientationMatrix CAB;
+        CAB.set(X_BA.q);
+
+        dynamics::OrientationMatrix CRB{ CAB.data * CRA.data };
+        dynamics::OrientationQuaternion qRB;
+        qRB.set(CRB);
+
+        return {
+            .p = dynamics::Position{
+                X_AR.p.data + CRA.data.transpose() * X_BA.p.data
+            },
+            // vBR = vAR + vBA + wAR x pBA
+            .v = dynamics::TranslationalVelocity{
+                X_BA.v.data + CAB.data * (
+                    X_AR.v.data + X_AR.w.data.cross(X_BA.p.data)
+                )
+            },
+            .q = qRB,
+            .w = dynamics::AngularVelocity{
+                X_BA.w.data + CAB.data * X_AR.w.data
+            }
+        };
+    }
 
     AngularVelocity eul_dot_to_wB_BI(const EulerAngleRates& eul_dot, const EulerAngles& eul) {
         double theta = eul.theta();

@@ -119,8 +119,8 @@ namespace json {
 
         for (const std::string& geometry_id : geometry_ids) {
             const structural::Geometry& geom = structural_properties.get_geometry(geometry_id);
-            y_min = std::min(y_min, geom.p_ref(1) - 0.5 * geom.y_size);
-            y_max = std::max(y_max, geom.p_ref(1) + 0.5 * geom.y_size);
+            y_min = std::min(y_min, geom.pB_geomB(1) - 0.5 * geom.y_size);
+            y_max = std::max(y_max, geom.pB_geomB(1) + 0.5 * geom.y_size);
             spin_inertia += structural_properties.compute_spin_inertia(geom, n_prop);
         }
 

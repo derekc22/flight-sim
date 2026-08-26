@@ -732,4 +732,11 @@ namespace vehicles {
         init_frames();
     }
 
+    dynamics::RigidBodyState Aircraft::rebase_cg_state(const dynamics::RigidBodyState& X_GN, const dynamics::Position& pB_GB) {
+        dynamics::RigidBodyState X_GB = dynamics::get_rigid_body_state(CGFrameFRD);
+        X_GB.p = pB_GB;
+        dynamics::RigidBodyState X_BG = dynamics::invert_rigid_body_state(X_GB);
+        return dynamics::compose_rigid_body_state(X_BG, X_GN);
+    }
+
 }

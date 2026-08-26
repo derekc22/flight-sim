@@ -27,13 +27,13 @@ namespace aerodynamics {
         return compute_aerodynamic_state(dynamics::compute_rigid_body_state(F, R), windB);
     }
 
-    dynamics::Wrench step_aero_forces_moments(const AerodynamicProperties& aerodynamic_properties, const dynamics::RigidBodyState& X, const atmospheric::StaticAtmosphericState& atm, const actuators::SurfaceActuatorInputs_T<double>& u, const atmospheric::Wind& windB) {
+    dynamics::Wrench step_aero_forces_moments(const AerodynamicProperties& aerodynamic_properties, const structural::CenterOfGravity& pB_GB, const dynamics::RigidBodyState& X, const atmospheric::StaticAtmosphericState& atm, const actuators::SurfaceActuatorInputs_T<double>& u, const atmospheric::Wind& windB) {
         const dynamics::Twist_T<double> twist{
             .v = X.v.data,
             .w = X.w.data,
         };
 
-        const dynamics::Wrench_T<double> loads = step_aero_forces_moments_T<double>(aerodynamic_properties, twist, atm, u, windB);
+        const dynamics::Wrench_T<double> loads = step_aero_forces_moments_T<double>(aerodynamic_properties, pB_GB.data, twist, atm, u, windB);
 
         return { dynamics::Force{ loads.F }, dynamics::Moment{ loads.M } };
     }
