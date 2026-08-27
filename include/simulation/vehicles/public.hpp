@@ -269,8 +269,6 @@ namespace vehicles {
         void step_gravity();
         void init_frames();
 
-        dynamics::RigidBodyState rebase_cg_state(const dynamics::RigidBodyState& X_GN, const dynamics::Position& pB_GB);
-
     };
 
 }

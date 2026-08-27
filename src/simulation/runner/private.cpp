@@ -280,7 +280,7 @@ namespace runner {
                 aerodynamics::AerodynamicState aero_t_trim = aerodynamics::compute_aerodynamic_state(Xt_trim, trim_sol.conditions.windB);
 
                 dynamics::Position pB_GB{ context.struc_t.pB_GB.data };
-                dynamics::RigidBodyState X_BN_trim = aircraft.rebase_cg_state(Xt_trim, pB_GB);
+                dynamics::RigidBodyState X_BN_trim = dynamics::rebase_cg_state(Xt_trim, pB_GB, aircraft.CGFrameFRD);
 
                 // define TrimStepOptions
                 vehicles::StepOptions TrimStepOptions;
@@ -624,7 +624,7 @@ namespace runner {
         aerodynamics::AerodynamicState aero_t1 = aerodynamics::compute_aerodynamic_state(context.Xt1, context.windB);
 
         dynamics::Position pB_GB{ context.struc_t.pB_GB.data };
-        dynamics::RigidBodyState X_BN_t1 = aircraft.rebase_cg_state(context.Xt1, pB_GB);
+        dynamics::RigidBodyState X_BN_t1 = dynamics::rebase_cg_state(context.Xt1, pB_GB, aircraft.CGFrameFRD);
 
         // set step options
         vehicles::StepOptions StepOpts;

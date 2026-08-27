@@ -219,6 +219,13 @@ namespace dynamics {
         };
     }
 
+    dynamics::RigidBodyState rebase_cg_state(const dynamics::RigidBodyState& X_GN, const dynamics::Position& pB_GB, const frames::Frame& CGFrame) {
+        dynamics::RigidBodyState X_GB = dynamics::get_rigid_body_state(CGFrame);
+        X_GB.p = pB_GB;
+        dynamics::RigidBodyState X_BG = dynamics::invert_rigid_body_state(X_GB);
+        return dynamics::compose_rigid_body_state(X_BG, X_GN);
+    }
+
     AngularVelocity eul_dot_to_wB_BI(const EulerAngleRates& eul_dot, const EulerAngles& eul) {
         double theta = eul.theta();
         double phi = eul.phi();
