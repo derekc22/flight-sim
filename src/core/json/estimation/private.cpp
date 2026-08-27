@@ -48,7 +48,7 @@ namespace json {
         switch (estimator_type) {
             case estimation::EstimatorType::LinearKalmanFilter: {
                 estimation::LinearKalmanFilterParameters params = parse_linear_kalman_filter_parameters(estimator_json);
-                return make_stateful_estimator<struct estimation::LinearKalmanFilter, estimation::LinearKalmanEstimator, estimation::LinearKalmanFilterParameters, estimation::LinearKalmanEstimatorInput>(params);
+                return make_stateful_estimator<estimation::LinearKalmanFilter, estimation::LinearKalmanEstimator, estimation::LinearKalmanFilterParameters, estimation::LinearKalmanEstimatorInput>(params);
             }
 
             default:
@@ -60,7 +60,7 @@ namespace json {
         switch (estimator_type) {
             case estimation::EstimatorType::ExtendedKalmanFilter: {
                 estimation::ExtendedKalmanFilterParameters params = parse_extended_kalman_filter_parameters(estimator_json);
-                return make_stateful_estimator<struct estimation::ExtendedKalmanFilter, estimation::ExtendedKalmanEstimator, estimation::ExtendedKalmanFilterParameters, estimation::ExtendedKalmanEstimatorInput>(params);
+                return make_stateful_estimator<estimation::ExtendedKalmanFilter, estimation::ExtendedKalmanEstimator, estimation::ExtendedKalmanFilterParameters, estimation::ExtendedKalmanEstimatorInput>(params);
             }
 
             default:

@@ -1,6 +1,5 @@
 #include <stdexcept>
 #include <string>
-#include <Eigen/Dense>
 #include <nlohmann/json.hpp>
 #include "core/json/control/private.hpp"
 #include "core/json/public.hpp"
@@ -138,12 +137,12 @@ namespace json {
         switch (controller_type) {
             case control::ControllerType::AttitudePID: {
                 control::AttitudePIDParameters params = parse_attitude_pid_parameters(controller_json);
-                return make_stateful_controller<struct control::AttitudePID, control::AttitudeController, control::AttitudePIDParameters, control::AttitudeControllerInput>(params);
+                return make_stateful_controller<control::AttitudePID, control::AttitudeController, control::AttitudePIDParameters, control::AttitudeControllerInput>(params);
             }
 
             case control::ControllerType::DamperPID: {
                 control::AttitudePIDParameters params = parse_damper_pid_parameters(controller_json);
-                return make_stateful_controller<struct control::DamperPID, control::AttitudeController, control::AttitudePIDParameters, control::AttitudeControllerInput>(params);
+                return make_stateful_controller<control::DamperPID, control::AttitudeController, control::AttitudePIDParameters, control::AttitudeControllerInput>(params);
             }
 
             default:
@@ -155,7 +154,7 @@ namespace json {
         switch (controller_type) {
             case control::ControllerType::VelocityPID: {
                 control::VelocityPIDParameters params = parse_velocity_pid_parameters(controller_json);
-                return make_stateful_controller<struct control::VelocityPID, control::VelocityController, control::VelocityPIDParameters, control::VelocityControllerInput>(params);
+                return make_stateful_controller<control::VelocityPID, control::VelocityController, control::VelocityPIDParameters, control::VelocityControllerInput>(params);
             }
 
             default:
@@ -167,12 +166,12 @@ namespace json {
         switch (controller_type) {
             case control::ControllerType::LinearQuadraticRegulator: {
                 control::LinearQuadraticRegulatorParameters params = parse_linear_quadratic_regulator_parameters(controller_json);
-                return make_stateful_controller<struct control::LinearQuadraticRegulator, control::LinearQuadraticController, control::LinearQuadraticRegulatorParameters, control::LinearQuadraticControllerInput>(params);
+                return make_stateful_controller<control::LinearQuadraticRegulator, control::LinearQuadraticController, control::LinearQuadraticRegulatorParameters, control::LinearQuadraticControllerInput>(params);
             }
 
             case control::ControllerType::LinearQuadraticIntegrator: {
                 control::LinearQuadraticIntegratorParameters params = parse_linear_quadratic_integrator_parameters(controller_json);
-                return make_stateful_controller<struct control::LinearQuadraticIntegrator, control::LinearQuadraticController, control::LinearQuadraticIntegratorParameters, control::LinearQuadraticControllerInput>(params);
+                return make_stateful_controller<control::LinearQuadraticIntegrator, control::LinearQuadraticController, control::LinearQuadraticIntegratorParameters, control::LinearQuadraticControllerInput>(params);
             }
 
             case control::ControllerType::LinearQuadraticTracker:
