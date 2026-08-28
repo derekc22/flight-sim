@@ -7,10 +7,10 @@
 
 namespace json {
 
-    actuators::ActuatorProperties parse_actuator_config(structural::StructuralProperties& structural_properties) {
+    actuators::ActuatorManager parse_actuator_config(structural::StructuralManager& structural_manager) {
         const auto config_path = resolve_run_config_entry_path("actuator_config");
         const auto config = read_json_file(config_path);
-        return parse_actuator_properties(config, structural_properties);
+        return parse_actuator_manager(config, structural_manager);
     }
 
 }

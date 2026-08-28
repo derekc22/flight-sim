@@ -96,27 +96,27 @@ namespace json {
         }
     }
 
-    estimation::EstimationProperties parse_estimation_properties(const nlohmann::json& config, bool trim_flag) {
+    estimation::EstimationManager parse_estimation_manager(const nlohmann::json& config, bool trim_flag) {
         validate_estimator(config, trim_flag);
-        estimation::EstimationProperties estimation_properties;
+        estimation::EstimationManager estimation_manager;
 
         switch (fetch_estimator_type(config)) {
             case estimation::EstimatorType::None:
                 break;
 
             case estimation::EstimatorType::LinearKalmanFilter:
-                parse_linear_kalman_estimator(config, estimation_properties.linear_kalman_estimator, estimation_properties.linear_kalman_estimator_type);
+                parse_linear_kalman_estimator(config, estimation_manager.linear_kalman_estimator, estimation_manager.linear_kalman_estimator_type);
                 break;
 
             case estimation::EstimatorType::ExtendedKalmanFilter:
-                parse_extended_kalman_estimator(config, estimation_properties.extended_kalman_estimator, estimation_properties.extended_kalman_estimator_type);
+                parse_extended_kalman_estimator(config, estimation_manager.extended_kalman_estimator, estimation_manager.extended_kalman_estimator_type);
                 break;
 
             default:
-                throw std::runtime_error("json::parse_estimation_properties unknown estimator type");
+                throw std::runtime_error("json::parse_estimation_manager unknown estimator type");
         }
 
-        return estimation_properties;
+        return estimation_manager;
     }
 
 }

@@ -4,6 +4,6 @@
 
 namespace json {
 
-    settings::SettingsManager parse_settings_config(const actuators::ActuatorProperties& actuator_properties);
+    settings::SettingsManager parse_settings_config(const actuators::ActuatorManager& actuator_manager);
 
 }

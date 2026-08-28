@@ -3,7 +3,7 @@
 
 namespace estimation {
 
-    EstimationOutput EstimationProperties::step(const EstimatorInputs& inputs, double dt) {
+    EstimationOutput EstimationManager::step(const EstimatorInputs& inputs, double dt) {
         EstimationOutput out{ .Zt = inputs.Yt };
 
         if (linear_kalman_estimator && inputs.linear_kalman_estimator_input.has_value()) {
@@ -16,7 +16,7 @@ namespace estimation {
         return out;
     }
 
-    EstimatorInputs EstimationProperties::build_estimator_inputs(
+    EstimatorInputs EstimationManager::build_estimator_inputs(
         const dynamics::RigidBodyState& Yt, 
         const trim::TrimSolution& trim_sol, 
         const linearization::LocalLinearization& lin_sol, 

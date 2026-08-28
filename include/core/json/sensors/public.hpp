@@ -3,6 +3,6 @@
 
 namespace json {
 
-    sensors::SensorProperties parse_sensors_config();
+    sensors::SensorManager parse_sensors_config();
 
 }

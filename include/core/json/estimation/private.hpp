@@ -22,7 +22,7 @@ namespace json {
     void parse_extended_kalman_estimator(const nlohmann::json& estimator_json, estimation::ExtendedKalmanEstimator& estimator, estimation::EstimatorType& estimator_type);
     void validate_estimator(const nlohmann::json& estimator_json, bool trim_flag);
 
-    estimation::EstimationProperties parse_estimation_properties(const nlohmann::json& config, bool trim_flag);
+    estimation::EstimationManager parse_estimation_manager(const nlohmann::json& config, bool trim_flag);
 }
 
 #include "core/json/estimation/private.tpp"

@@ -10,7 +10,7 @@ namespace json {
     template <typename SensorType>
     SensorType parse_sensor(const nlohmann::json& config, const std::string& key);
 
-    sensors::SensorProperties parse_sensor_properties(const nlohmann::json& config);
+    sensors::SensorManager parse_sensor_manager(const nlohmann::json& config);
 }
 
 #include "core/json/sensors/private.tpp"

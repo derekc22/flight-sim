@@ -4,8 +4,8 @@
 namespace settings {
 
 	vehicles::Aircraft& SettingsManager::populate(vehicles::Aircraft& aircraft) {
-		aircraft.actuator_properties.settings = actuator_settings;
-		aircraft.avionics_properties.settings = avionics_settings;
+		aircraft.actuator_manager.settings = actuator_settings;
+		aircraft.avionics_manager.settings = avionics_settings;
 		return aircraft;
 	}
 

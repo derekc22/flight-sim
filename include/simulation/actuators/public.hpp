@@ -54,7 +54,7 @@ namespace actuators {
         FixedActuatorInputs get_fixed_actuator_inputs();
 	};
 
-    struct ActuatorProperties {
+    struct ActuatorManager {
         SurfaceActuators surface_actuators;
         SurfaceActuatorInputs_T<double> step(const SurfaceActuatorInputs_T<double>& u_cmd, double dt);
 

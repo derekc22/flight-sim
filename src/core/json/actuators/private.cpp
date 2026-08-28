@@ -109,7 +109,7 @@ namespace json {
         }
     }
 
-    actuators::PropellerAssembly parse_propellers(const nlohmann::json& propellers_json, structural::StructuralProperties& structural_properties, const Eigen::Vector3d& n_prop) {
+    actuators::PropellerAssembly parse_propellers(const nlohmann::json& propellers_json, structural::StructuralManager& structural_manager, const Eigen::Vector3d& n_prop) {
         validate_propellers_json(propellers_json);
 
         std::vector<std::string> geometry_ids = propellers_json.at("geometry_ids").get<std::vector<std::string>>();
@@ -118,10 +118,10 @@ namespace json {
         double spin_inertia = 0.0;
 
         for (const std::string& geometry_id : geometry_ids) {
-            const structural::Geometry& geom = structural_properties.get_geometry(geometry_id);
+            const structural::Geometry& geom = structural_manager.get_geometry(geometry_id);
             y_min = std::min(y_min, geom.pB_geomB(1) - 0.5 * geom.y_size);
             y_max = std::max(y_max, geom.pB_geomB(1) + 0.5 * geom.y_size);
-            spin_inertia += structural_properties.compute_spin_inertia(geom, n_prop);
+            spin_inertia += structural_manager.compute_spin_inertia(geom, n_prop);
         }
 
         const double diameter = y_max - y_min;
@@ -142,7 +142,7 @@ namespace json {
         };
     }
 
-    actuators::ActuatorProperties parse_actuator_properties(const nlohmann::json& config, structural::StructuralProperties& structural_properties) {
+    actuators::ActuatorManager parse_actuator_manager(const nlohmann::json& config, structural::StructuralManager& structural_manager) {
         const auto& surface_actuator_json = config.at("surfaces");
         const auto& propulsor_actuator_json = config.at("propulsors");
 
@@ -155,9 +155,9 @@ namespace json {
         };
 
         actuators::PropulsorActuators propulsor_actuators = {
-            .front_propulsor = parse_propulsor_actuator<actuators::FrontPropulsor>(propulsor_actuator_json, "front_propulsor", structural_properties),
-            .left_propulsor = parse_propulsor_actuator<actuators::LeftPropulsor>(propulsor_actuator_json, "left_propulsor", structural_properties),
-            .right_propulsor = parse_propulsor_actuator<actuators::RightPropulsor>(propulsor_actuator_json, "right_propulsor", structural_properties),
+            .front_propulsor = parse_propulsor_actuator<actuators::FrontPropulsor>(propulsor_actuator_json, "front_propulsor", structural_manager),
+            .left_propulsor = parse_propulsor_actuator<actuators::LeftPropulsor>(propulsor_actuator_json, "left_propulsor", structural_manager),
+            .right_propulsor = parse_propulsor_actuator<actuators::RightPropulsor>(propulsor_actuator_json, "right_propulsor", structural_manager),
         };
 
         return { .surface_actuators = surface_actuators, .propulsor_actuators = propulsor_actuators };

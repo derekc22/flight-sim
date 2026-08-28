@@ -4,6 +4,6 @@
 
 namespace json {
 
-    guidance::GuidanceProperties parse_guidance_config(const control::ControlProperties& control_properties);
+    guidance::GuidanceManager parse_guidance_config(const control::ControlManager& control_manager);
 
 }

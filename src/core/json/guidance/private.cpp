@@ -230,30 +230,30 @@ namespace json {
         return traj;
     }
 
-    guidance::GuidanceProperties parse_guidance_properties(const nlohmann::json& config, const control::ControlProperties& control_properties) {
+    guidance::GuidanceManager parse_guidance_manager(const nlohmann::json& config, const control::ControlManager& control_manager) {
         validate_guidance(config);
 
-        guidance::GuidanceProperties guidance_properties;
+        guidance::GuidanceManager guidance_manager;
         guidance::TrajectoryComponents traj_components;
 
         if (config.contains("attitude")) {
             const auto& attitude_guidance_json = config.at("attitude");
-            traj_components = parse_attitude_control_setpoint(attitude_guidance_json, control_properties.attitude_controller_type, traj_components);
+            traj_components = parse_attitude_control_setpoint(attitude_guidance_json, control_manager.attitude_controller_type, traj_components);
         }
 
         if (config.contains("velocity")) {
             const auto& velocity_guidance_json = config.at("velocity");
-            traj_components = parse_velocity_control_setpoint(velocity_guidance_json, control_properties.velocity_controller_type, traj_components);
+            traj_components = parse_velocity_control_setpoint(velocity_guidance_json, control_manager.velocity_controller_type, traj_components);
         }
 
         if (config.contains("linear_quadratic")) {
             const auto& linear_quadratic_guidance_json = config.at("linear_quadratic");
-            traj_components = parse_linear_quadratic_control_setpoint(linear_quadratic_guidance_json, control_properties.linear_quadratic_controller_type, traj_components);
+            traj_components = parse_linear_quadratic_control_setpoint(linear_quadratic_guidance_json, control_manager.linear_quadratic_controller_type, traj_components);
         }
 
         if (config.contains("nonlinear")) {
             const auto& nonlinear_guidance_json = config.at("nonlinear");
-            traj_components = parse_nonlinear_control_setpoint(nonlinear_guidance_json, control_properties.nonlinear_controller_type, traj_components);
+            traj_components = parse_nonlinear_control_setpoint(nonlinear_guidance_json, control_manager.nonlinear_controller_type, traj_components);
         }
 
         fill_missing_trajectory_components(traj_components);
@@ -262,10 +262,10 @@ namespace json {
         guidance::TrajectoryType traj_type = map_trajectory_type( config.at("trajectory_type").get<std::string>() );
         validate_trajectory_type(traj_components, traj_type);
 
-        guidance_properties.trajectory_type = traj_type;
-        guidance_properties.trajectory = merge_trajectory_components(traj_components);
+        guidance_manager.trajectory_type = traj_type;
+        guidance_manager.trajectory = merge_trajectory_components(traj_components);
 
-        return guidance_properties;
+        return guidance_manager;
     }
 
 }

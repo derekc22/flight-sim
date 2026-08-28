@@ -131,7 +131,7 @@ namespace sensors {
         Magnetometer magnetometer;
     };
 
-    struct SensorProperties {
+    struct SensorManager {
         Sensors sensors;
         std::optional<SensorMeasurements> hist;
 

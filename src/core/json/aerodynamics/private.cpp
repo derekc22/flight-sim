@@ -46,11 +46,11 @@ namespace json {
 
     void validate_surfaces_json(const nlohmann::json& surfaces_json) {
         if (!surfaces_json.is_array()) { 
-            throw std::runtime_error("json::parse_aerodynamic_properties expected 'surfaces' to be an array"); 
+            throw std::runtime_error("json::parse_aerodynamics_manager expected 'surfaces' to be an array");
         }
     }
 
-    aerodynamics::AerodynamicProperties parse_aerodynamic_properties(const nlohmann::json& config) {
+    aerodynamics::AerodynamicsManager parse_aerodynamics_manager(const nlohmann::json& config) {
         const auto& surfaces_json = config.at("surfaces");
         validate_surfaces_json(surfaces_json);
 
@@ -60,7 +60,7 @@ namespace json {
             std::string id = surface_json.at("id").get<std::string>();
             Eigen::Vector3d pB_acB = parse_Vector3d(surface_json.at("pB_acB"));
             Eigen::Vector3d n = parse_Vector3d(surface_json.at("n"));
-            util::validate_unit(n, "json::parse_aerodynamic_properties", id + " surface normal");
+            util::validate_unit(n, "json::parse_aerodynamics_manager", id + " surface normal");
 
             surfaces.push_back(aerodynamics::Surface{
                 .id = id,

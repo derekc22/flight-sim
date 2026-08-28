@@ -6,10 +6,10 @@
 
 namespace json {
 
-    structural::StructuralProperties parse_structural_config() {
+    structural::StructuralManager parse_structural_config() {
         const auto config_path = resolve_run_config_entry_path("structural_config");
         const auto config = read_json_file(config_path);
-        return parse_structural_properties(config);
+        return parse_structural_manager(config);
     }
 
 }

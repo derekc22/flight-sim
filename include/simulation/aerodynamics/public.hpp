@@ -73,10 +73,10 @@ namespace aerodynamics {
         T CM = T(0.0);
     };
 
-    struct AerodynamicProperties {
+    struct AerodynamicsManager {
         std::vector<Surface> surfaces;
 
-        AerodynamicProperties(std::vector<Surface> s);
+        AerodynamicsManager(std::vector<Surface> s);
         void compute_surface_geometry();
     };
 
@@ -117,12 +117,12 @@ namespace aerodynamics {
     AerodynamicState compute_aerodynamic_state(const frames::Frame& F, const frames::Frame& R, const atmospheric::Wind& windB);
 
     template <typename T>
-    dynamics::Wrench_T<T> step_aero_forces_moments_T(const AerodynamicProperties& aerodynamic_properties, const constants::Vector3_T<T>& pB_GB, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& atm, const actuators::SurfaceActuatorInputs_T<T>& u, const atmospheric::Wind& windB);
+    dynamics::Wrench_T<T> step_aero_forces_moments_T(const AerodynamicsManager& aerodynamics_manager, const constants::Vector3_T<T>& pB_GB, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& atm, const actuators::SurfaceActuatorInputs_T<T>& u, const atmospheric::Wind& windB);
 
     template <typename T>
     AerodynamicState_T<T> compute_aerodynamic_state_T(const dynamics::Twist_T<T>& twist, const atmospheric::Wind& windB);
 
-    dynamics::Wrench step_aero_forces_moments(const AerodynamicProperties& aerodynamic_properties, const structural::CenterOfGravity& pB_GB, const dynamics::RigidBodyState& X, const atmospheric::StaticAtmosphericState& atm, const actuators::SurfaceActuatorInputs_T<double>& u, const atmospheric::Wind& windB);
+    dynamics::Wrench step_aero_forces_moments(const AerodynamicsManager& aerodynamics_manager, const structural::CenterOfGravity& pB_GB, const dynamics::RigidBodyState& X, const atmospheric::StaticAtmosphericState& atm, const actuators::SurfaceActuatorInputs_T<double>& u, const atmospheric::Wind& windB);
 
     AerodynamicState compute_aerodynamic_state(const dynamics::RigidBodyState& X, const atmospheric::Wind& windB);
 

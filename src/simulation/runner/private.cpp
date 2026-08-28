@@ -46,32 +46,32 @@
 namespace runner {
 
     vehicles::Aircraft load_vehicle(const std::string& aircraft_id, const JSONFlags& json_flags) {
-        structural::StructuralProperties structural_properties = json::parse_structural_config();
-        actuators::ActuatorProperties actuator_properties = json::parse_actuator_config(structural_properties);
-        control::ControlProperties control_properties = json::parse_control_config(json_flags.trim_flag);
+        structural::StructuralManager structural_manager = json::parse_structural_config();
+        actuators::ActuatorManager actuator_manager = json::parse_actuator_config(structural_manager);
+        control::ControlManager control_manager = json::parse_control_config(json_flags.trim_flag);
 
         // create vehicle from config
         vehicles::Aircraft aircraft {
             aircraft_id,
-            structural_properties,
+            structural_manager,
             json::parse_aerodynamics_config(),
-            actuator_properties,
-            control_properties,
+            actuator_manager,
+            control_manager,
             json::parse_sensors_config(),
             json::parse_avionics_config(),
-            json::parse_guidance_config(control_properties),
+            json::parse_guidance_config(control_manager),
             json::parse_estimation_config(json_flags.trim_flag),
             json::parse_allocator_config()
         };
 
         // set initial conditions from config
         vehicles::StepOptions InitStepOpts = json::parse_initialization_config(json_flags.trim_flag);
-        structural::StructuralState struc_t = aircraft.structural_properties.compute_structural_state();
+        structural::StructuralState struc_t = aircraft.structural_manager.compute_structural_state();
         InitStepOpts.CGFrameFRDStepOpts = vehicles::CGFrameFRDStepOptions{ .pB_GB = dynamics::Position{ struc_t.pB_GB.data } };
         aircraft.step(InitStepOpts);
 
         // parse settings
-        settings::SettingsManager settings_manager = json::parse_settings_config(actuator_properties);
+        settings::SettingsManager settings_manager = json::parse_settings_config(actuator_manager);
 
         // apply settings
         aircraft = settings_manager.populate(aircraft);
@@ -127,8 +127,8 @@ namespace runner {
     {
         // set u_actual_t_1 to match actuators' neutral initialization
         u_actual_t_1 = actuators::get_neutral_actuator_inputs(
-            aircraft.actuator_properties.surface_actuators,
-            aircraft.actuator_properties.propulsor_actuators
+            aircraft.actuator_manager.surface_actuators,
+            aircraft.actuator_manager.propulsor_actuators
         );
 
         // create data manager
@@ -148,8 +148,8 @@ namespace runner {
         // create joystick manager
         if (json_options.flags.joystick_flag) {
             actuators::ActuatorLimits actuator_limits = actuators::pack_actuator_limits(
-                aircraft.actuator_properties.surface_actuators,
-                aircraft.actuator_properties.propulsor_actuators
+                aircraft.actuator_manager.surface_actuators,
+                aircraft.actuator_manager.propulsor_actuators
             );
             joystick_manager.emplace(actuator_limits);
         }
@@ -223,7 +223,7 @@ namespace runner {
         dynamics::RigidBodyState XEt = dynamics::compute_rigid_body_state(aircraft.CGFrameFRD, aircraft.ECEFFrame);
 
         // compute structural state
-        structural::StructuralState struc_t = aircraft.structural_properties.compute_structural_state();
+        structural::StructuralState struc_t = aircraft.structural_manager.compute_structural_state();
 
         // compute aerodynamic state
         aerodynamics::AerodynamicState aero_t = aerodynamics::compute_aerodynamic_state(aircraft.CGFrameFRD, aircraft.NEDFrameECEF, windB);
@@ -260,9 +260,9 @@ namespace runner {
 
     void RunManager::initialize_trim(StepContext& context) {
         // get aircraft properties
-        actuators::ActuatorProperties& actuator_properties = aircraft.actuator_properties;
-        actuators::SurfaceActuators& surface_actuators = actuator_properties.surface_actuators;
-        actuators::PropulsorActuators& propulsor_actuators = actuator_properties.propulsor_actuators;
+        actuators::ActuatorManager& actuator_manager = aircraft.actuator_manager;
+        actuators::SurfaceActuators& surface_actuators = actuator_manager.surface_actuators;
+        actuators::PropulsorActuators& propulsor_actuators = actuator_manager.propulsor_actuators;
 
         // get flags
         JSONFlags& json_flags = json_options.flags;
@@ -343,8 +343,8 @@ namespace runner {
 
     void RunManager::step_measurements(StepContext& context) {
         // extract reusable quantities
-        sensors::SensorProperties& sensor_properties = aircraft.sensor_properties;
-        avionics::AvionicsProperties& avionics_properties = aircraft.avionics_properties;
+        sensors::SensorManager& sensor_manager = aircraft.sensor_manager;
+        avionics::AvionicsManager& avionics_manager = aircraft.avionics_manager;
         JSONFlags& json_flags = json_options.flags;
 
         // initialize measurements to ground truth
@@ -368,7 +368,7 @@ namespace runner {
                 double sensor_dt = scheduler.sensor_elapsed_ticks * constants::dt;
 
                 // step sensors
-                sensor_meas = sensor_properties.step(sensor_gt, sensor_dt);
+                sensor_meas = sensor_manager.step(sensor_gt, sensor_dt);
                 sensor_meas_t_1 = sensor_meas;
 
                 scheduler.sensor_tick -= constants::hz;
@@ -391,10 +391,10 @@ namespace runner {
                 );
 
                 // step avionics
-                avionics::AvionicsMeasurements avionics_meas = avionics_properties.step(sensor_meas, sensor_properties.hist, sensor_gt, avionics_gt, avionics_dt);
+                avionics::AvionicsMeasurements avionics_meas = avionics_manager.step(sensor_meas, sensor_manager.hist, sensor_gt, avionics_gt, avionics_dt);
 
                 // overwrite local measurement state with sensor measurements
-                context.Yt = avionics::get_state_from_avionics(sensor_meas, avionics_meas, avionics_properties.settings);
+                context.Yt = avionics::get_state_from_avionics(sensor_meas, avionics_meas, avionics_manager.settings);
                 Yt_1 = context.Yt;
 
                 scheduler.avionics_tick -= constants::hz;
@@ -405,7 +405,7 @@ namespace runner {
     }
 
     void RunManager::step_estimation(StepContext& context) {
-        estimation::EstimationProperties& estimation_properties = aircraft.estimation_properties;
+        estimation::EstimationManager& estimation_manager = aircraft.estimation_manager;
         JSONFlags& json_flags = json_options.flags;
 
         // initialize estimated state to measurements
@@ -415,7 +415,7 @@ namespace runner {
             if (scheduler.estimation_tick >= constants::hz) {
                 double estimation_dt = scheduler.estimation_elapsed_ticks * constants::dt;
 
-                estimation::EstimatorInputs estimator_inputs = estimation_properties.build_estimator_inputs(
+                estimation::EstimatorInputs estimator_inputs = estimation_manager.build_estimator_inputs(
                     context.Yt,
                     trim_sol, lin_sol,
                     context.autodiff_model,
@@ -424,7 +424,7 @@ namespace runner {
                 );
 
                 // overwrite local estimated state with estimator result
-                context.Zt = estimation_properties.step(estimator_inputs, estimation_dt).Zt;
+                context.Zt = estimation_manager.step(estimator_inputs, estimation_dt).Zt;
                 Zt_1 = context.Zt;
 
                 scheduler.estimation_tick -= constants::hz;
@@ -435,12 +435,12 @@ namespace runner {
     }
 
     void RunManager::step_control(StepContext& context) {
-        control::ControlProperties& control_properties = aircraft.control_properties;
-        actuators::ActuatorProperties& actuator_properties = aircraft.actuator_properties;
-        guidance::GuidanceProperties& guidance_properties = aircraft.guidance_properties;
-        allocator::AllocatorProperties& allocator_properties = aircraft.allocator_properties;
-        actuators::SurfaceActuators& surface_actuators = actuator_properties.surface_actuators;
-        actuators::PropulsorActuators& propulsor_actuators = actuator_properties.propulsor_actuators;
+        control::ControlManager& control_manager = aircraft.control_manager;
+        actuators::ActuatorManager& actuator_manager = aircraft.actuator_manager;
+        guidance::GuidanceManager& guidance_manager = aircraft.guidance_manager;
+        allocator::AllocatorManager& allocator_manager = aircraft.allocator_manager;
+        actuators::SurfaceActuators& surface_actuators = actuator_manager.surface_actuators;
+        actuators::PropulsorActuators& propulsor_actuators = actuator_manager.propulsor_actuators;
 
         // initialize active mask
         std::array<bool, constants::virtual_input_dim> active_mask;
@@ -481,7 +481,7 @@ namespace runner {
 
         else if (context.current_mode == fsm::FiniteState::Autopilot) {
             if (scheduler.guidance_tick >= constants::hz) {
-                context.setpoint = guidance_properties.step(scheduler.guidance_tf);
+                context.setpoint = guidance_manager.step(scheduler.guidance_tf);
                 setpoint_t_1 = context.setpoint;
 
                 scheduler.guidance_tick -= constants::hz;
@@ -491,7 +491,7 @@ namespace runner {
             if (scheduler.control_tick >= constants::hz) {
                 double control_dt = scheduler.control_elapsed_ticks * constants::dt;
 
-                control::ControllerInputs controller_inputs = control_properties.build_controller_inputs(
+                control::ControllerInputs controller_inputs = control_manager.build_controller_inputs(
                     context.Zt,
                     trim_sol, virtual_lin_sol,
                     surface_actuators, propulsor_actuators, 
@@ -499,7 +499,7 @@ namespace runner {
                     delta_mu_vec_t_1
                 );
 
-                control::VirtualControlOutputSet virtual_ctrl_out = control_properties.step(controller_inputs, control_dt);
+                control::VirtualControlOutputSet virtual_ctrl_out = control_manager.step(controller_inputs, control_dt);
                 mu_cmd = virtual_ctrl_out.mu;
                 active_mask = virtual_ctrl_out.active_mask;
                 actuator_mask = virtual_ctrl_out.actuator_mask;
@@ -520,7 +520,7 @@ namespace runner {
 
         // step control allocator
         if (context.current_mode == fsm::FiniteState::AutopilotTrim || context.current_mode == fsm::FiniteState::Autopilot) {
-            control::ControlOutputSet ctrl_out = allocator_properties.step(
+            control::ControlOutputSet ctrl_out = allocator_manager.step(
                 allocator::build_allocator_input(
                     mu_cmd,
                     active_mask,
@@ -536,7 +536,7 @@ namespace runner {
         }
 
         // apply fixed actuator inputs
-        actuators::FixedActuatorInputs fixed_inputs = actuator_properties.settings.get_fixed_actuator_inputs();
+        actuators::FixedActuatorInputs fixed_inputs = actuator_manager.settings.get_fixed_actuator_inputs();
         context.u_cmd.surface_inputs.flap_cmd = fixed_inputs.flap;
         context.u_cmd.surface_inputs.spoiler_cmd = fixed_inputs.spoiler;
 
@@ -544,22 +544,22 @@ namespace runner {
         u_cmd_t_1 = context.u_cmd;
 
         // apply surface actuator dynamics
-        context.u_actual.surface_inputs = actuator_properties.step(context.u_cmd.surface_inputs, constants::dt);
+        context.u_actual.surface_inputs = actuator_manager.step(context.u_cmd.surface_inputs, constants::dt);
 
         // apply propulsor actuator dynamics
-        context.u_actual.propulsor_inputs = actuator_properties.step(context.u_cmd.propulsor_inputs, constants::dt);
+        context.u_actual.propulsor_inputs = actuator_manager.step(context.u_cmd.propulsor_inputs, constants::dt);
 
         // update prior-step actual control
         u_actual_t_1 = context.u_actual;
     }
 
     void RunManager::step_physics(StepContext& context) {
-        aerodynamics::AerodynamicProperties& aerodynamic_properties = aircraft.aerodynamic_properties;
-        actuators::PropulsorActuators& propulsor_actuators = aircraft.actuator_properties.propulsor_actuators;
+        aerodynamics::AerodynamicsManager& aerodynamics_manager = aircraft.aerodynamics_manager;
+        actuators::PropulsorActuators& propulsor_actuators = aircraft.actuator_manager.propulsor_actuators;
 
         integrators::RK4Model rk4_model{
             .struc_t = context.struc_t,
-            .aerodynamic = aerodynamic_properties,
+            .aerodynamic = aerodynamics_manager,
             .propulsor_actuators = propulsor_actuators
         };
 

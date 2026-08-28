@@ -265,31 +265,31 @@ namespace json {
         }
     }
 
-    control::ControlProperties parse_control_properties(const nlohmann::json& config, bool trim_flag) {
+    control::ControlManager parse_control_manager(const nlohmann::json& config, bool trim_flag) {
         validate_controllers(config, trim_flag);
-        control::ControlProperties control_properties;
+        control::ControlManager control_manager;
 
         if (config.contains("attitude")) {
             const auto& attitude_controller_json = config.at("attitude");
-            parse_attitude_controller(attitude_controller_json, control_properties.attitude_controller, control_properties.attitude_controller_type);
+            parse_attitude_controller(attitude_controller_json, control_manager.attitude_controller, control_manager.attitude_controller_type);
         }
 
         if (config.contains("velocity")) {
             const auto& velocity_controller_json = config.at("velocity");
-            parse_velocity_controller(velocity_controller_json, control_properties.velocity_controller, control_properties.velocity_controller_type);
+            parse_velocity_controller(velocity_controller_json, control_manager.velocity_controller, control_manager.velocity_controller_type);
         }
 
         if (config.contains("linear_quadratic")) {
             const auto& linear_quadratic_controller_json = config.at("linear_quadratic");
-            parse_linear_quadratic_controller(linear_quadratic_controller_json, control_properties.linear_quadratic_controller, control_properties.linear_quadratic_controller_type);
+            parse_linear_quadratic_controller(linear_quadratic_controller_json, control_manager.linear_quadratic_controller, control_manager.linear_quadratic_controller_type);
         }
 
         if (config.contains("nonlinear")) {
             const auto& nonlinear_controller_json = config.at("nonlinear");
-            parse_nonlinear_controller(nonlinear_controller_json, control_properties.nonlinear_controller, control_properties.nonlinear_controller_type);
+            parse_nonlinear_controller(nonlinear_controller_json, control_manager.nonlinear_controller, control_manager.nonlinear_controller_type);
         }
 
-        return control_properties;
+        return control_manager;
     }
 
 }

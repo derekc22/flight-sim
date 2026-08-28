@@ -19,7 +19,7 @@ namespace guidance {
         return out;
     }
 
-    GuidanceSetpoint GuidanceProperties::step(int kf) {
+    GuidanceSetpoint GuidanceManager::step(int kf) {
         GuidanceSetpoint out;
         switch (trajectory_type) {
             case TrajectoryType::Regulation: {
@@ -30,7 +30,7 @@ namespace guidance {
             case TrajectoryType::Tracking: {
                 if (k >= trajectory.data.rows()) { 
                     k = trajectory.data.rows() - 1; 
-                    spdlog::warn("GuidanceProperties: Tracking trajectory was fully consumed. Reusing last setpoint");     
+                    spdlog::warn("GuidanceManager: Tracking trajectory was fully consumed. Reusing last setpoint");
                 }
                 out = pack_guidance_setpoint(trajectory.data.row(k).transpose());
             }
@@ -38,7 +38,7 @@ namespace guidance {
 
             case TrajectoryType::Interpolated: {
                 if (kf <= 1) { 
-                    throw std::runtime_error("GuidanceProperties::step: kf <= 1 for interpolated trajectory"); 
+                    throw std::runtime_error("GuidanceManager::step: kf <= 1 for interpolated trajectory");
                 }
                 GuidanceSetpointVector setpoint_t = ((trajectory.data.row(1) - trajectory.data.row(0)) * 
                                                     (static_cast<double>(k) / (kf - 1)) + 

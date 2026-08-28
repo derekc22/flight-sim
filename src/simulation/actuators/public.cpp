@@ -49,7 +49,7 @@ namespace actuators {
         };
     }
 
-    SurfaceActuatorInputs_T<double> ActuatorProperties::step(const SurfaceActuatorInputs_T<double>& u_cmd, double dt) {
+    SurfaceActuatorInputs_T<double> ActuatorManager::step(const SurfaceActuatorInputs_T<double>& u_cmd, double dt) {
         return {
             .elevator_cmd = surface_actuators.elevator.step(
                 u_cmd.elevator_cmd, 
@@ -79,7 +79,7 @@ namespace actuators {
         };
     }
 
-    PropulsorActuatorInputs_T<double> ActuatorProperties::step(const PropulsorActuatorInputs_T<double>& u_cmd, double dt) {
+    PropulsorActuatorInputs_T<double> ActuatorManager::step(const PropulsorActuatorInputs_T<double>& u_cmd, double dt) {
         return {
             .front_propulsor_cmd = propulsor_actuators.front_propulsor.step(
                 u_cmd.front_propulsor_cmd, 

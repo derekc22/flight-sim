@@ -97,7 +97,7 @@ namespace sensors {
         return { step(heading.data, prev_heading_lag, dt) };
     }
 
-    SensorMeasurements SensorProperties::step(const SensorGroundTruth& sensor_gt, double dt) {
+    SensorMeasurements SensorManager::step(const SensorGroundTruth& sensor_gt, double dt) {
         SensorMeasurements sensor_meas {
             .alpha = sensors.aoa_vane.measure(sensor_gt.alpha, dt),
             .fB = sensors.accelerometer.measure(sensor_gt.fB, dt),

@@ -231,27 +231,27 @@ namespace vehicles {
 
         bool stepped_NEDFrameECEF = false;
 
-        structural::StructuralProperties structural_properties;
-        aerodynamics::AerodynamicProperties aerodynamic_properties;
-        actuators::ActuatorProperties actuator_properties;
-        control::ControlProperties control_properties;
-        sensors::SensorProperties sensor_properties;
-        avionics::AvionicsProperties avionics_properties;
-        guidance::GuidanceProperties guidance_properties;
-        estimation::EstimationProperties estimation_properties;
-        allocator::AllocatorProperties allocator_properties;
+        structural::StructuralManager structural_manager;
+        aerodynamics::AerodynamicsManager aerodynamics_manager;
+        actuators::ActuatorManager actuator_manager;
+        control::ControlManager control_manager;
+        sensors::SensorManager sensor_manager;
+        avionics::AvionicsManager avionics_manager;
+        guidance::GuidanceManager guidance_manager;
+        estimation::EstimationManager estimation_manager;
+        allocator::AllocatorManager allocator_manager;
 
         Aircraft(
             const std::string& id,
-            const structural::StructuralProperties& structural_properties,
-            const aerodynamics::AerodynamicProperties& aerodynamic_properties,
-            const actuators::ActuatorProperties& actuator_properties,
-            const control::ControlProperties& control_properties,
-            const sensors::SensorProperties& sensor_properties,
-            const avionics::AvionicsProperties& avionics_properties,
-            const guidance::GuidanceProperties& guidance_properties,
-            const estimation::EstimationProperties& estimation_properties,
-            const allocator::AllocatorProperties& allocator_properties
+            const structural::StructuralManager& structural_manager,
+            const aerodynamics::AerodynamicsManager& aerodynamics_manager,
+            const actuators::ActuatorManager& actuator_manager,
+            const control::ControlManager& control_manager,
+            const sensors::SensorManager& sensor_manager,
+            const avionics::AvionicsManager& avionics_manager,
+            const guidance::GuidanceManager& guidance_manager,
+            const estimation::EstimationManager& estimation_manager,
+            const allocator::AllocatorManager& allocator_manager
         );
 
         void step(const StepOptions& opts);

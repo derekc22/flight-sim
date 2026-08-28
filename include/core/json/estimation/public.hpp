@@ -3,5 +3,5 @@
 
 namespace json {
 
-    estimation::EstimationProperties parse_estimation_config(bool trim_flag);
+    estimation::EstimationManager parse_estimation_config(bool trim_flag);
 }

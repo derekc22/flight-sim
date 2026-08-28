@@ -6,7 +6,7 @@
 
 namespace control {
 
-    VirtualControlOutputSet ControlProperties::step(const ControllerInputs& inputs, double dt) {
+    VirtualControlOutputSet ControlManager::step(const ControllerInputs& inputs, double dt) {
         VirtualControlOutput_T<double> out{};
         std::array<bool, constants::virtual_input_dim> active_mask{};
         std::array<bool, constants::input_dim> actuator_mask{};
@@ -51,7 +51,7 @@ namespace control {
         };
     }
 
-    ControllerInputs ControlProperties::build_controller_inputs(
+    ControllerInputs ControlManager::build_controller_inputs(
         const dynamics::RigidBodyState& Zt, 
         const trim::TrimSolution& trim_sol, 
         const linearization::VirtualLocalLinearization& virtual_lin_sol, 

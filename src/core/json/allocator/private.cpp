@@ -19,13 +19,13 @@ namespace json {
         }
     }
 
-    allocator::AllocatorProperties parse_allocator_properties(const nlohmann::json& config) {
+    allocator::AllocatorManager parse_allocator_manager(const nlohmann::json& config) {
         validate_allocator(config);
 
         Eigen::MatrixXd Q = parse_MatrixXd(config.at("Q"));
         Eigen::MatrixXd R = parse_MatrixXd(config.at("R"));
 
-        const std::string context = "json::parse_allocator_properties";
+        const std::string context = "json::parse_allocator_manager";
         util::validate_shape(Q, constants::virtual_input_dim, constants::virtual_input_dim, context, "Q");
         util::validate_shape(R, constants::input_dim, constants::input_dim, context, "R");
 

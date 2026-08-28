@@ -35,11 +35,11 @@ namespace structural {
         constants::Matrix3_T<T> JB = constants::Zero3x3_T<T>;
     };
 
-    struct StructuralProperties {
+    struct StructuralManager {
         std::vector<Geometry> geometries;
         std::unordered_map<std::string, size_t> geometry_id_map;
 
-        StructuralProperties(const std::vector<Geometry>& geoms);
+        StructuralManager(const std::vector<Geometry>& geoms);
 
         std::unordered_map<std::string, size_t> build_geometry_id_map();
         Geometry& get_geometry(const std::string& id);

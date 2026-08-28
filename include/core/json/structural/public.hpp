@@ -3,6 +3,6 @@
 
 namespace json {
 
-    structural::StructuralProperties parse_structural_config();
+    structural::StructuralManager parse_structural_config();
 
 }

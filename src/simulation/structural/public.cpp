@@ -12,30 +12,30 @@
 
 namespace structural {
 
-    StructuralProperties::StructuralProperties(const std::vector<Geometry>& geoms) : geometries(geoms) {
+    StructuralManager::StructuralManager(const std::vector<Geometry>& geoms) : geometries(geoms) {
         geometry_id_map = build_geometry_id_map();
     }
 
-    Geometry& StructuralProperties::get_geometry(const std::string& id) {
+    Geometry& StructuralManager::get_geometry(const std::string& id) {
         const auto it = geometry_id_map.find(id);
         if (it == geometry_id_map.end()) { 
-            throw std::runtime_error("structural::StructuralProperties::get_geometry: geometry id not found: " + id); 
+            throw std::runtime_error("structural::StructuralManager::get_geometry: geometry id not found: " + id);
         }
         return geometries[it->second];
     }
 
-    double StructuralProperties::compute_mass() {
+    double StructuralManager::compute_mass() {
         double m = 0.0;
         for (const Geometry& geom : geometries) {
             m += geom.mass;
         }
         if (m < constants::eps) { 
-            throw std::runtime_error("structural::StructuralProperties::compute_mass: mass must be positive"); 
+            throw std::runtime_error("structural::StructuralManager::compute_mass: mass must be positive");
         }
         return m;
     }
 
-    Eigen::Vector3d StructuralProperties::compute_CG(const dynamics::Mass& mass) {
+    Eigen::Vector3d StructuralManager::compute_CG(const dynamics::Mass& mass) {
         Eigen::Vector3d pB_GB = constants::Zero3;
         for (const Geometry& geom : geometries) {
             pB_GB += geom.mass * geom.pB_geomB;
@@ -44,7 +44,7 @@ namespace structural {
         return pB_GB;
     }
 
-    Eigen::Matrix3d StructuralProperties::compute_JB(const CenterOfGravity& pB_GB) {
+    Eigen::Matrix3d StructuralManager::compute_JB(const CenterOfGravity& pB_GB) {
         Eigen::Matrix3d j = constants::Zero3x3;
 
         for (const Geometry& geom : geometries) {
@@ -74,13 +74,13 @@ namespace structural {
 
         double detj = j.determinant();
         if (std::abs(detj) < constants::eps) { 
-            throw std::runtime_error("structural::StructuralProperties::compute_JB: Inertia tensor is singular"); 
+            throw std::runtime_error("structural::StructuralManager::compute_JB: Inertia tensor is singular");
         }
 
         return j;
     }
 
-    Eigen::Matrix3d StructuralProperties::compute_local_JB(const Geometry& geom) {
+    Eigen::Matrix3d StructuralManager::compute_local_JB(const Geometry& geom) {
         double m = geom.mass;
         double lx = geom.x_size;
         double ly = geom.y_size;
@@ -94,15 +94,15 @@ namespace structural {
         return j;
     }
 
-    double StructuralProperties::compute_spin_inertia(const Geometry& geom, const Eigen::Vector3d& axis) {
+    double StructuralManager::compute_spin_inertia(const Geometry& geom, const Eigen::Vector3d& axis) {
         Eigen::Vector3d axis_hat = util::norm(axis);
         if (axis_hat.norm() < constants::eps) { 
-            throw std::runtime_error("structural::StructuralProperties::compute_spin_inertia: spin axis cannot be zero"); 
+            throw std::runtime_error("structural::StructuralManager::compute_spin_inertia: spin axis cannot be zero");
         }
         return axis_hat.dot(compute_local_JB(geom) * axis_hat);
     }
 
-    std::unordered_map<std::string, std::size_t> StructuralProperties::build_geometry_id_map() {
+    std::unordered_map<std::string, std::size_t> StructuralManager::build_geometry_id_map() {
         std::unordered_map<std::string, std::size_t> m;
         for (std::size_t i = 0; i < geometries.size(); ++i) {
             m[geometries[i].id] = i;
@@ -110,7 +110,7 @@ namespace structural {
         return m;
     }
 
-    StructuralState StructuralProperties::compute_structural_state() {
+    StructuralState StructuralManager::compute_structural_state() {
         dynamics::Mass mass = dynamics::Mass{ compute_mass() };
         CenterOfGravity pB_GB = CenterOfGravity{ compute_CG(mass) };
         dynamics::InertiaTensor JB = dynamics::InertiaTensor{ compute_JB(pB_GB) };

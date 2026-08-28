@@ -24,7 +24,7 @@ namespace json {
     }
 
     template <typename PropulsorActuatorType>
-    PropulsorActuatorType parse_propulsor_actuator(const nlohmann::json& config, const std::string& key, structural::StructuralProperties& structural_properties) {
+    PropulsorActuatorType parse_propulsor_actuator(const nlohmann::json& config, const std::string& key, structural::StructuralManager& structural_manager) {
         if (config.at(key).is_null()) {
             return PropulsorActuatorType{};
         }
@@ -33,7 +33,7 @@ namespace json {
         validate_propulsor_actuator_json(propulsor_actuator_json);
 
         std::string geometry_id = propulsor_actuator_json.at("geometry_id").get<std::string>();
-        const structural::Geometry& geom = structural_properties.get_geometry(geometry_id);
+        const structural::Geometry& geom = structural_manager.get_geometry(geometry_id);
         validate_propulsor_actuator_placement(geom.pB_geomB, key);
 
         PropulsorActuatorType propulsor(
@@ -46,7 +46,7 @@ namespace json {
         );
 
         if (propulsor_actuator_json.contains("propellers")) {
-            propulsor.propellers = parse_propellers(propulsor_actuator_json.at("propellers"), structural_properties, propulsor.n_prop);
+            propulsor.propellers = parse_propellers(propulsor_actuator_json.at("propellers"), structural_manager, propulsor.n_prop);
         }
 
         return propulsor;

@@ -20,15 +20,15 @@ namespace json {
         }
     }
 
-    void validate_actuator_settings(const actuators::Settings& actuator_settings, const actuators::ActuatorProperties& actuator_properties) {
+    void validate_actuator_settings(const actuators::Settings& actuator_settings, const actuators::ActuatorManager& actuator_manager) {
         validate_fixed_control(
             actuator_settings.fixed_actuator_inputs.flap, 
-            actuator_properties.surface_actuators.flap, 
+            actuator_manager.surface_actuators.flap,
             "flap"
         );
         validate_fixed_control(
             actuator_settings.fixed_actuator_inputs.spoiler, 
-            actuator_properties.surface_actuators.spoiler, 
+            actuator_manager.surface_actuators.spoiler,
             "spoiler"
         );
     }
@@ -72,7 +72,7 @@ namespace json {
         }
     }
 
-    settings::SettingsManager parse_settings(const nlohmann::json& config, const actuators::ActuatorProperties& actuator_properties) {
+    settings::SettingsManager parse_settings(const nlohmann::json& config, const actuators::ActuatorManager& actuator_manager) {
         settings::SettingsManager settings_manager;
 
         validate_actuator_settings_json(config);
@@ -86,7 +86,7 @@ namespace json {
             settings_manager.actuator_settings.fixed_actuator_inputs.spoiler =
                 fixed_actuator_inputs_json.at("spoiler").get<double>();
         }
-        validate_actuator_settings(settings_manager.actuator_settings, actuator_properties);
+        validate_actuator_settings(settings_manager.actuator_settings, actuator_manager);
 
 
         validate_avionics_settings_json(config);

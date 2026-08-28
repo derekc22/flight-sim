@@ -5,5 +5,5 @@
 namespace json {
 
     void validate_allocator(const nlohmann::json& config);
-    allocator::AllocatorProperties parse_allocator_properties(const nlohmann::json& config);
+    allocator::AllocatorManager parse_allocator_manager(const nlohmann::json& config);
 }

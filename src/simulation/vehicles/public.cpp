@@ -699,15 +699,15 @@ namespace vehicles {
 
     Aircraft::Aircraft(
         const std::string& id,
-        const structural::StructuralProperties& structural_properties,
-        const aerodynamics::AerodynamicProperties& aerodynamic_properties,
-        const actuators::ActuatorProperties& actuator_properties,
-        const control::ControlProperties& control_properties,
-        const sensors::SensorProperties& sensor_properties,
-        const avionics::AvionicsProperties& avionics_properties,
-        const guidance::GuidanceProperties& guidance_properties,
-        const estimation::EstimationProperties& estimation_properties,
-        const allocator::AllocatorProperties& allocator_properties
+        const structural::StructuralManager& structural_manager,
+        const aerodynamics::AerodynamicsManager& aerodynamics_manager,
+        const actuators::ActuatorManager& actuator_manager,
+        const control::ControlManager& control_manager,
+        const sensors::SensorManager& sensor_manager,
+        const avionics::AvionicsManager& avionics_manager,
+        const guidance::GuidanceManager& guidance_manager,
+        const estimation::EstimationManager& estimation_manager,
+        const allocator::AllocatorManager& allocator_manager
     ) :
         id(id),
 
@@ -719,15 +719,15 @@ namespace vehicles {
         STABFrameFRD{&FRDFrameNED},
         WINDFrameSTAB{&STABFrameFRD},
 
-        structural_properties(structural_properties),
-        aerodynamic_properties(aerodynamic_properties),
-        actuator_properties(actuator_properties),
-        control_properties(control_properties),
-        sensor_properties(sensor_properties),
-        avionics_properties(avionics_properties),
-        guidance_properties(guidance_properties),
-        estimation_properties(estimation_properties),
-        allocator_properties(allocator_properties)
+        structural_manager(structural_manager),
+        aerodynamics_manager(aerodynamics_manager),
+        actuator_manager(actuator_manager),
+        control_manager(control_manager),
+        sensor_manager(sensor_manager),
+        avionics_manager(avionics_manager),
+        guidance_manager(guidance_manager),
+        estimation_manager(estimation_manager),
+        allocator_manager(allocator_manager)
     {
         init_frames();
     }

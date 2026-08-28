@@ -12,11 +12,11 @@
 
 namespace aerodynamics {
 
-    AerodynamicProperties::AerodynamicProperties(std::vector<Surface> s) : surfaces(std::move(s)) {
+    AerodynamicsManager::AerodynamicsManager(std::vector<Surface> s) : surfaces(std::move(s)) {
         compute_surface_geometry();
     }
 
-    void AerodynamicProperties::compute_surface_geometry() {
+    void AerodynamicsManager::compute_surface_geometry() {
         for (Surface& s : surfaces) {
             s.area = s.chord * s.span;
             s.AR   = s.span / s.chord;
@@ -27,13 +27,13 @@ namespace aerodynamics {
         return compute_aerodynamic_state(dynamics::compute_rigid_body_state(F, R), windB);
     }
 
-    dynamics::Wrench step_aero_forces_moments(const AerodynamicProperties& aerodynamic_properties, const structural::CenterOfGravity& pB_GB, const dynamics::RigidBodyState& X, const atmospheric::StaticAtmosphericState& atm, const actuators::SurfaceActuatorInputs_T<double>& u, const atmospheric::Wind& windB) {
+    dynamics::Wrench step_aero_forces_moments(const AerodynamicsManager& aerodynamics_manager, const structural::CenterOfGravity& pB_GB, const dynamics::RigidBodyState& X, const atmospheric::StaticAtmosphericState& atm, const actuators::SurfaceActuatorInputs_T<double>& u, const atmospheric::Wind& windB) {
         const dynamics::Twist_T<double> twist{
             .v = X.v.data,
             .w = X.w.data,
         };
 
-        const dynamics::Wrench_T<double> loads = step_aero_forces_moments_T<double>(aerodynamic_properties, pB_GB.data, twist, atm, u, windB);
+        const dynamics::Wrench_T<double> loads = step_aero_forces_moments_T<double>(aerodynamics_manager, pB_GB.data, twist, atm, u, windB);
 
         return { dynamics::Force{ loads.F }, dynamics::Moment{ loads.M } };
     }

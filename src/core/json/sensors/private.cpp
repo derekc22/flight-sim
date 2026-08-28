@@ -30,7 +30,7 @@ namespace json {
         }
     }
 
-    sensors::SensorProperties parse_sensor_properties(const nlohmann::json& config) {
+    sensors::SensorManager parse_sensor_manager(const nlohmann::json& config) {
         sensors::Sensors sensors = {
             .aoa_vane = parse_sensor<sensors::AngleOfAttackVane>(config, "angle_of_attack_vane"),
             .accelerometer = parse_sensor<sensors::Accelerometer>(config, "accelerometer"),

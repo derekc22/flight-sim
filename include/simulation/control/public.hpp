@@ -39,7 +39,7 @@ namespace control {
         std::optional<NonlinearControllerInput> nonlinear_controller_input;
     };
 
-    struct ControlProperties {
+    struct ControlManager {
         ControllerType attitude_controller_type = ControllerType::None;
         ControllerType velocity_controller_type = ControllerType::None;
         ControllerType linear_quadratic_controller_type = ControllerType::None;

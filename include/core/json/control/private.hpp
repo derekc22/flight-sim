@@ -35,7 +35,7 @@ namespace json {
 
     void validate_controllers(const nlohmann::json& controllers_json, bool trim_flag);
 
-    control::ControlProperties parse_control_properties(const nlohmann::json& config, bool trim_flag);
+    control::ControlManager parse_control_manager(const nlohmann::json& config, bool trim_flag);
 }
 
 #include "core/json/control/private.tpp"

@@ -30,7 +30,7 @@ namespace json {
         };
     }
 
-    avionics::AvionicsProperties parse_avionics_properties(const nlohmann::json& config) {
+    avionics::AvionicsManager parse_avionics_manager(const nlohmann::json& config) {
         const auto& ahrs_json = config.at("attitude_heading_reference_system");
 
         avionics::Avionics avionics = {

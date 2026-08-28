@@ -87,9 +87,9 @@ namespace aerodynamics {
     }
 
     template <typename T>
-    dynamics::Wrench_T<T> step_aero_forces_moments_T(const AerodynamicProperties& aerodynamic_properties, const constants::Vector3_T<T>& pB_GB, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& atm, const actuators::SurfaceActuatorInputs_T<T>& u, const atmospheric::Wind& windB) {
+    dynamics::Wrench_T<T> step_aero_forces_moments_T(const AerodynamicsManager& aerodynamics_manager, const constants::Vector3_T<T>& pB_GB, const dynamics::Twist_T<T>& twist, const atmospheric::StaticAtmosphericState& atm, const actuators::SurfaceActuatorInputs_T<T>& u, const atmospheric::Wind& windB) {
         dynamics::Wrench_T<T> total;
-        for (const Surface& s : aerodynamic_properties.surfaces) {
+        for (const Surface& s : aerodynamics_manager.surfaces) {
             const SurfaceKinematics_T<T> sk = compute_surface_kinematics_T<T>(s, pB_GB, twist, atm, windB);
             const SurfaceCoefficients_T<T> sc = compute_surface_coefficients_T<T>(s, sk, u);
             const dynamics::Wrench_T<T> loads = compute_surface_loads_T<T>(s, pB_GB, sk, sc);

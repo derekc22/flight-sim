@@ -4,5 +4,5 @@
 
 namespace json {
 
-    structural::StructuralProperties parse_structural_properties(const nlohmann::json& config);
+    structural::StructuralManager parse_structural_manager(const nlohmann::json& config);
 }

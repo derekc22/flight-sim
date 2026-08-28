@@ -62,9 +62,9 @@ namespace avionics {
         return { integrators::trans_kin_vel(prev_vB_BI, vB_BI_dot, dt).data };
     }
 
-    AvionicsMeasurements AvionicsProperties::step(
+    AvionicsMeasurements AvionicsManager::step(
         const sensors::SensorMeasurements& sensor_meas,
-        // sensor_hist will always be populated by the time AvionicsProperties::step is called, but std::optional is kept here for consistency
+        // sensor_hist will always be populated by the time AvionicsManager::step is called, but std::optional is kept here for consistency
         const std::optional<sensors::SensorMeasurements> sensor_hist,
         const sensors::SensorGroundTruth& sensor_gt,
         const AvionicsGroundTruth& avionics_gt,

@@ -3,5 +3,5 @@
 
 namespace json {
 
-    allocator::AllocatorProperties parse_allocator_config();
+    allocator::AllocatorManager parse_allocator_config();
 }

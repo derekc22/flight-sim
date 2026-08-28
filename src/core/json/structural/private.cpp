@@ -8,7 +8,7 @@
 
 namespace json {
 
-    structural::StructuralProperties parse_structural_properties(const nlohmann::json& config) {
+    structural::StructuralManager parse_structural_manager(const nlohmann::json& config) {
         const auto& geometries_json = config.at("geometries");
         if (!geometries_json.is_array()) { 
             throw std::runtime_error("json::parse_structural_config expected 'geometries' to be an array"); 

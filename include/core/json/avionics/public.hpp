@@ -3,6 +3,6 @@
 
 namespace json {
 
-    avionics::AvionicsProperties parse_avionics_config();
+    avionics::AvionicsManager parse_avionics_config();
 
 }

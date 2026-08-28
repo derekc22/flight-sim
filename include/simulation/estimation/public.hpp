@@ -23,7 +23,7 @@ namespace estimation {
         std::optional<ExtendedKalmanEstimatorInput> extended_kalman_estimator_input;
     };
 
-    struct EstimationProperties {
+    struct EstimationManager {
         EstimatorType linear_kalman_estimator_type = EstimatorType::None;
         EstimatorType extended_kalman_estimator_type = EstimatorType::None;
 

@@ -20,5 +20,5 @@ namespace json {
     void fill_missing_trajectory_components(guidance::TrajectoryComponents& traj_components);
     void validate_trajectory_components(guidance::TrajectoryComponents& traj_components);
     guidance::Trajectory merge_trajectory_components(const guidance::TrajectoryComponents& traj_components);
-    guidance::GuidanceProperties parse_guidance_properties(const nlohmann::json& config, const control::ControlProperties& control_properties);
+    guidance::GuidanceManager parse_guidance_manager(const nlohmann::json& config, const control::ControlManager& control_manager);
 }

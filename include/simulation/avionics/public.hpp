@@ -80,7 +80,7 @@ namespace avionics {
         bool use_ins = false;
 	};
 
-    struct AvionicsProperties {
+    struct AvionicsManager {
         Avionics avionics;
         std::optional<AvionicsMeasurements> hist;
 

@@ -21,7 +21,7 @@ namespace allocator {
         autodiff::AutoDiffModel& model;
     };
 
-    struct AllocatorProperties {
+    struct AllocatorManager {
         constants::MatrixX_T<double, constants::virtual_input_dim, constants::virtual_input_dim> Q;
         constants::MatrixX_T<double, constants::input_dim, constants::input_dim> R;
         qp::Solver solver{constants::input_dim};

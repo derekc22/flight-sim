@@ -42,7 +42,7 @@ namespace guidance {
         Eigen::MatrixXd data;
     };
 
-    struct GuidanceProperties {
+    struct GuidanceManager {
         TrajectoryType trajectory_type;
         Trajectory trajectory;
         int k = 0;

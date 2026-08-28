@@ -11,7 +11,7 @@
 
 namespace allocator {
 
-    control::ControlOutputSet AllocatorProperties::step(const AllocatorInput& input) {
+    control::ControlOutputSet AllocatorManager::step(const AllocatorInput& input) {
 
         auto [E, mu_0] = compute_effectiveness_matrix(input.model, input.operating_point, input.conditions);
 
@@ -80,7 +80,7 @@ namespace allocator {
     }
 
 
-    control::ControlOutput AllocatorProperties::solve_qp_constrained(const constants::MatrixX_T<double, constants::input_dim, constants::input_dim>& hessian, const actuators::ActuatorInputsVector_T<double>& gradient, const actuators::ActuatorInputsVector_T<double>& u_0, const actuators::ActuatorInputsVector_T<double>& actuator_target, const actuators::ActuatorLimitsVector& limits, const std::array<bool, constants::input_dim>& actuator_mask) {
+    control::ControlOutput AllocatorManager::solve_qp_constrained(const constants::MatrixX_T<double, constants::input_dim, constants::input_dim>& hessian, const actuators::ActuatorInputsVector_T<double>& gradient, const actuators::ActuatorInputsVector_T<double>& u_0, const actuators::ActuatorInputsVector_T<double>& actuator_target, const actuators::ActuatorLimitsVector& limits, const std::array<bool, constants::input_dim>& actuator_mask) {
         Eigen::VectorXd lower = limits.col(0) - u_0;
         Eigen::VectorXd upper = limits.col(1) - u_0;
 
@@ -101,7 +101,7 @@ namespace allocator {
         const qp::Solution solution = solver.solve(problem);
 
         if (solution.status != qp::Status::Solved) {
-            spdlog::error("allocator::AllocatorProperties::step QP solve failed with status {}", static_cast<int>(solution.status));
+            spdlog::error("allocator::AllocatorManager::step QP solve failed with status {}", static_cast<int>(solution.status));
             return actuators::pack_actuator_inputs_T(u_0);
         }
 
@@ -110,7 +110,7 @@ namespace allocator {
         return actuators::pack_actuator_inputs_T(u);
     }
 
-    control::ControlOutput AllocatorProperties::solve_qp_unconstrained(const constants::MatrixX_T<double, constants::input_dim, constants::input_dim>& hessian, const actuators::ActuatorInputsVector_T<double>& gradient, const actuators::ActuatorInputsVector_T<double>& u_0, const actuators::ActuatorInputsVector_T<double>& actuator_target, const actuators::ActuatorLimitsVector& limits, const std::array<bool, constants::input_dim>& actuator_mask) {
+    control::ControlOutput AllocatorManager::solve_qp_unconstrained(const constants::MatrixX_T<double, constants::input_dim, constants::input_dim>& hessian, const actuators::ActuatorInputsVector_T<double>& gradient, const actuators::ActuatorInputsVector_T<double>& u_0, const actuators::ActuatorInputsVector_T<double>& actuator_target, const actuators::ActuatorLimitsVector& limits, const std::array<bool, constants::input_dim>& actuator_mask) {
         std::vector<Eigen::Index> free_indices;
         actuators::ActuatorInputsVector_T<double> x = actuators::ActuatorInputsVector_T<double>::Zero();
 

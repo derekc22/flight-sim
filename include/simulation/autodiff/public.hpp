@@ -18,7 +18,7 @@ namespace autodiff {
 
     struct AutoDiffModel {
         structural::StructuralState struc_t;
-        const aerodynamics::AerodynamicProperties& aerodynamic;
+        const aerodynamics::AerodynamicsManager& aerodynamic;
         actuators::PropulsorActuators& propulsor_actuators;
         actuators::ActuatorLimits actuator_limits;
         actuators::FixedActuatorInputs fixed_actuator_inputs;
