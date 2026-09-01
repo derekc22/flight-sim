@@ -2,7 +2,7 @@
 
 #include <string>
 #include <vector>
-#include "simulation/transforms/shared/public.hpp"
+#include "simulation/transforms/public/data/types.hpp"
 
 namespace transforms_test {
 

@@ -1,8 +1,8 @@
 #include <string>
 #include <spdlog/spdlog.h>
-#include "simulation/runner/private.hpp"
-#include "simulation/runner/public.hpp"
-#include "core/json/runner/public.hpp"
+#include "simulation/runner/public/data/types.hpp"
+#include "simulation/runner/public/manager.hpp"
+#include "core/json/runner/public/parser.hpp"
 
 int main(int argc, char* argv[]) {
     int nargin = 8;

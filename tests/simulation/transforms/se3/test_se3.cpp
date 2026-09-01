@@ -3,9 +3,9 @@
 #include <stdexcept>
 #include <vector>
 
-#include "simulation/transforms/se3/public.hpp"
-#include "simulation/transforms/se3/private.hpp"
-#include "simulation/transforms/so3/public.hpp"
+#include "simulation/transforms/private/detail/se3.hpp"
+#include "simulation/transforms/public/detail/se3.hpp"
+#include "simulation/transforms/public/detail/so3.hpp"
 #include "simulation/constants/public.hpp"
 
 static void expect_matrix4_near(const Eigen::Matrix4d& A, const Eigen::Matrix4d& B) {

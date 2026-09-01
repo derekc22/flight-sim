@@ -1,11 +1,10 @@
 #pragma once 
 #include <Eigen/Dense>
 #include <string>
-#include "simulation/dynamics/public.hpp"
-#include "simulation/geography/public.hpp"
-#include "simulation/aerodynamics/public.hpp"
-#include "simulation/atmospheric/public.hpp"
-#include "simulation/trim/public.hpp"
+#include "simulation/dynamics/public/data/types.hpp"
+#include "simulation/geography/public/data/types.hpp"
+#include "simulation/aerodynamics/public/data/types.hpp"
+#include "simulation/atmospheric/public/data/types.hpp"
 
 namespace util {
 

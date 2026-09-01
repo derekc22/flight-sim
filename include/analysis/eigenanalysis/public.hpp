@@ -3,7 +3,7 @@
 #include <complex>
 #include <string>
 #include "simulation/constants/public.hpp"
-#include "simulation/linearization/public.hpp"
+#include "simulation/linearization/public/data/types.hpp"
 
 namespace analysis {
     using Eigenvalues = constants::MatrixX_T<std::complex<double>, constants::state_dim, 1>;
