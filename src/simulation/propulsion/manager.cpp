@@ -6,19 +6,19 @@
 namespace propulsion {
 
     PropulsionManagerOutput PropulsionManager::step(const PropulsionManagerInput& input) {
-        const PropellerOmegaStateSet_T<double> propeller_state = compute_propeller_omega_state_set(input.propulsors, state, input.actuator_inputs, input.atmosphere.rho, input.dt, input.steady_state);
+        const PropellerOmegaStateSet_T<double> propeller_state_t = compute_propeller_omega_state_set(input.propulsors, prev_state, input.u, input.atm.rho, input.dt, input.steady_state);
 
         return {
-            .propulsive_wrench = compute_propulsive_loads(input.propulsors, input.center_of_gravity, input.vehicle_twist, input.atmosphere, input.actuator_inputs, propeller_state),
-            .next_state = make_propulsion_state(input.propulsors, propeller_state)
+            .WB_propulsive = compute_propulsive_loads(input.propulsors, input.pB_GB, input.twist, input.atm, input.u, propeller_state_t),
+            .state_t = make_propulsion_state(input.propulsors, propeller_state_t)
         };
     }
 
-    void PropulsionManager::commit(const PropulsionState& next_state) {
+    void PropulsionManager::commit(const PropulsionState& state_t) {
         // only the runtime/non-autodiff path should enter this branch because
         // 1) a type error will occur if this line attempts to assign a CppAD::AD<double> to a double field
         // 2) autodiff/trim/linearization should have no side effects; they should only evaluate simulation state, not mutate it
-        state = next_state;
+        prev_state = state_t;
     }
 
 }

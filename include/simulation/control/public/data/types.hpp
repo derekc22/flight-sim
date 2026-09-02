@@ -74,25 +74,25 @@ namespace control {
     using VirtualControlOutput_T = dynamics::Wrench_T<T>;
 
     struct AttitudeControlInput {
-        const dynamics::RigidBodyState& estimated_state;
+        const dynamics::RigidBodyState& Zt;
         guidance::AttitudeSetpoint setpoint;
-        dynamics::WrenchVector_T<double> previous_control_residual;
+        dynamics::WrenchVector_T<double> delta_mu_vec_t_1;
     };
 
     struct VelocityControlInput {
-        const dynamics::RigidBodyState& estimated_state;
+        const dynamics::RigidBodyState& Zt;
         guidance::VelocitySetpoint setpoint;
-        dynamics::WrenchVector_T<double> previous_control_residual;
+        dynamics::WrenchVector_T<double> delta_mu_vec_t_1;
     };
 
     struct FullStateControlInput {
-        const dynamics::RigidBodyState& estimated_state;
-        const linearization::VirtualLocalLinearization& linearization;
-        const dynamics::State_T<double>& trim_state;
+        const dynamics::RigidBodyState& Zt;
+        const linearization::VirtualLocalLinearization& virtual_linearization;
+        const dynamics::State_T<double>& Z_sol_trim;
         const actuators::SurfaceActuators& surface_actuators;
         const actuators::PropulsorActuators& propulsor_actuators;
         guidance::GuidanceSetpoint setpoint;
-        dynamics::WrenchVector_T<double> previous_control_residual;
+        dynamics::WrenchVector_T<double> delta_mu_vec_t_1;
     };
 
     struct ControlComponentInputs {
@@ -108,24 +108,24 @@ namespace control {
     using FullStateControlImplementation = std::function<VirtualControlOutput_T<double>(const FullStateControlInput&, double dt)>;
 
     struct ControlComponentOutput {
-        VirtualControlOutput_T<double> virtual_control;
+        VirtualControlOutput_T<double> mu;
         std::array<bool, constants::virtual_input_dim> active_mask;
         std::array<bool, constants::input_dim> actuator_mask;
     };
 
     struct ControlManagerInput {
-        const dynamics::RigidBodyState& estimated_state;
-        const trim::TrimSolution& trim_solution;
-        const linearization::VirtualLocalLinearization& linearization;
+        const dynamics::RigidBodyState& Zt;
+        const trim::TrimSolution& trim_sol;
+        const linearization::VirtualLocalLinearization& virtual_lin_sol;
         const actuators::SurfaceActuators& surface_actuators;
         const actuators::PropulsorActuators& propulsor_actuators;
         const guidance::GuidanceSetpoint& setpoint;
-        dynamics::WrenchVector_T<double> previous_control_residual;
+        dynamics::WrenchVector_T<double> delta_mu_vec_t_1;
         double dt;
     };
 
     struct ControlManagerOutput {
-        VirtualControlOutput virtual_control;
+        VirtualControlOutput mu;
         std::array<bool, constants::virtual_input_dim> active_mask;
         std::array<bool, constants::input_dim> actuator_mask;
     };

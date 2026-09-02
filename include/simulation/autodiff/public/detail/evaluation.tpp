@@ -40,7 +40,7 @@ namespace autodiff {
             conditions.steady_state // set omega_dot = 0 if computing gradients for trim (steady state)
         );
 
-        return evaluation.wrench.net;
+        return evaluation.WB_set.net;
     }
 
     template <typename T>

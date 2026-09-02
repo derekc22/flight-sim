@@ -10,10 +10,10 @@ namespace estimation {
         std::optional<KalmanState> state;
 
         ExtendedKalmanEstimator(const ExtendedKalmanFilterParameters& params);
-        EstimationOutput step(const ExtendedKalmanEstimatorInput& input, double dt);
+        dynamics::RigidBodyState step(const ExtendedKalmanEstimatorInput& input, double dt);
 
-        std::tuple<KalmanState, linearization::OutputJacobian> predict(const ExtendedKalmanEstimatorInput& input, const actuators::ActuatorInputsVector_T<double>& previous_actual_inputs, double dt);
-        KalmanState correct(const dynamics::StateVector_T<double>& measured_state, const linearization::OutputJacobian& output_jacobian);
+        std::tuple<KalmanState, linearization::OutputJacobian> predict(const ExtendedKalmanEstimatorInput& input, const actuators::ActuatorInputsVector_T<double>& ut_1, double dt);
+        KalmanState correct(const dynamics::StateVector_T<double>& yt, const linearization::OutputJacobian& output_jacobian);
     };
 
 }

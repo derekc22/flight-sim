@@ -24,7 +24,7 @@ namespace runner {
             input.context.aero_t,
             input.context.atm_t,
             input.context.struc_t.mass,
-            input.previous_wrench
+            input.WB_net_t_1
         );
 
         // use sensors and avionics
@@ -35,7 +35,7 @@ namespace runner {
                 double sensor_dt = input.scheduler.sensor_elapsed_ticks * constants::dt;
 
                 // step sensors
-                sensor_meas = sensor_manager.step(sensor_gt, sensor_dt);
+                sensor_meas = sensor_manager.step({ .sensor_gt = sensor_gt, .dt = sensor_dt }).sensor_meas;
                 sensor_meas_t_1 = sensor_meas;
 
                 input.scheduler.sensor_tick -= constants::hz;
@@ -58,7 +58,8 @@ namespace runner {
                 );
 
                 // step avionics
-                avionics::AvionicsMeasurements avionics_meas = avionics_manager.step(sensor_meas, sensor_manager.hist, sensor_gt, avionics_gt, avionics_dt);
+                // sensor_hist will always be populated by the time AvionicsManager::step is called, but std::optional is kept here for consistency
+                avionics::AvionicsMeasurements avionics_meas = avionics_manager.step({ .sensor_meas = sensor_meas, .sensor_hist = sensor_manager.hist, .sensor_gt = sensor_gt, .avionics_gt = avionics_gt, .dt = avionics_dt }).avionics_meas;
 
                 // overwrite local measurement state with sensor measurements
                 Yt = avionics::get_state_from_avionics(sensor_meas, avionics_meas, avionics_manager.settings);
@@ -70,7 +71,7 @@ namespace runner {
             else Yt = Yt_1; // perform ZOH
         }
 
-        return { .measured_state = Yt };
+        return { .Yt = Yt };
     }
 
 }

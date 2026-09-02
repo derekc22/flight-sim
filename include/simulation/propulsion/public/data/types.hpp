@@ -32,10 +32,10 @@ namespace propulsion {
     template <typename T>
     struct PropulsionManagerInput_T {
         const actuators::PropulsorActuators& propulsors;
-        const constants::Vector3_T<T>& center_of_gravity;
-        const dynamics::Twist_T<T>& vehicle_twist;
-        const atmospheric::StaticAtmosphericState& atmosphere;
-        const actuators::PropulsorActuatorInputs_T<T>& actuator_inputs;
+        const constants::Vector3_T<T>& pB_GB;
+        const dynamics::Twist_T<T>& twist;
+        const atmospheric::StaticAtmosphericState& atm;
+        const actuators::PropulsorActuatorInputs_T<T>& u;
         T dt;
         bool steady_state;
     };
@@ -44,8 +44,8 @@ namespace propulsion {
 
     template <typename T>
     struct PropulsionManagerOutput_T {
-        dynamics::Wrench_T<T> propulsive_wrench;
-        PropulsionState_T<T> next_state;
+        dynamics::Wrench_T<T> WB_propulsive;
+        PropulsionState_T<T> state_t;
     };
 
     using PropulsionManagerOutput = PropulsionManagerOutput_T<double>;

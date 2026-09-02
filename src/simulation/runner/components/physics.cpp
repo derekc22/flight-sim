@@ -31,10 +31,10 @@ namespace runner {
         );
 
         return {
-            .next_state = rk4_out.Xt1,
-            .net_wrench = rk4_out.WB_set.net,
-            .aerodynamic_wrench = rk4_out.WB_set.aerodynamic,
-            .propulsive_wrench = rk4_out.WB_set.propulsive
+            .Xt1 = rk4_out.Xt1,
+            .WB_net = rk4_out.WB_set.net,
+            .WB_aerodynamic = rk4_out.WB_set.aerodynamic,
+            .WB_propulsive = rk4_out.WB_set.propulsive
         };
     }
 

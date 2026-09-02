@@ -12,16 +12,6 @@ namespace estimation {
         std::optional<ExtendedKalmanEstimator> extended_kalman_estimator;
 
         EstimationManagerOutput step(const EstimationManagerInput& input);
-        EstimationOutput step(const EstimatorInputs& inputs, double dt);
-
-        EstimatorInputs build_estimator_inputs(
-            const dynamics::RigidBodyState& Yt, 
-            const trim::TrimSolution& trim_sol, 
-            const linearization::LocalLinearization& lin_sol, 
-            autodiff::AutoDiffModel& model, 
-            const control::ControlOutput& u_actual_t_1,
-            const operating::OperatingConditions& conditions
-        );
     };
 
 }

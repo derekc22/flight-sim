@@ -51,12 +51,12 @@ namespace sensors {
     };
 
     struct SensorManagerInput {
-        const SensorGroundTruth& ground_truth;
+        const SensorGroundTruth& sensor_gt;
         double dt;
     };
 
     struct SensorManagerOutput {
-        SensorMeasurements measurements;
+        SensorMeasurements sensor_meas;
     };
 
 }

@@ -10,7 +10,6 @@ namespace sensors {
         std::optional<SensorMeasurements> hist;
 
         SensorManagerOutput step(const SensorManagerInput& input);
-        SensorMeasurements step(const SensorGroundTruth& sensor_gt, double dt);
     };
 
 }

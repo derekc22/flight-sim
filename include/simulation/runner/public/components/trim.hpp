@@ -4,7 +4,7 @@
 namespace runner {
 
     struct Trim {
-        trim::TrimSolution solution;
+        trim::TrimSolution trim_sol;
 
         TrimOutput step(const TrimInput& input);
     };

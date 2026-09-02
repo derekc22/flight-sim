@@ -5,7 +5,7 @@ namespace failures {
 
     struct FailureManager {
 
-        void check_runtime_failures(const FailureInputs& input);
+        FailureManagerOutput step(const FailureManagerInput& input);
     };
 
 }

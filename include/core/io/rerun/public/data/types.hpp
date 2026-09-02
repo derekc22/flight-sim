@@ -4,6 +4,11 @@
 
 namespace io {
 
+    struct RerunManagerInput {
+        int t;
+        const DataContext& data_context;
+    };
+
     struct RerunContext {
         int t;
         DataContext data_context;

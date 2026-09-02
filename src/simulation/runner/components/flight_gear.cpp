@@ -26,8 +26,8 @@ namespace runner {
         }
 
         return {
-            .inertial_wind = windI,
-            .body_wind = windB
+            .windI = windI,
+            .windB = windB
         };
     }
 

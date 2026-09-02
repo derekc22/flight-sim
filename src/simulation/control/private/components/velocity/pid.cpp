@@ -10,13 +10,13 @@ namespace control {
     {};
 
     PIDPolicyInput VelocityPID::make_pid_policy_input(const VelocityControlInput& input) {
-        dynamics::RigidBodyState Zt = input.estimated_state;
+        dynamics::RigidBodyState Zt = input.Zt;
         guidance::VelocitySetpoint setpoint = input.setpoint;
 
         return {
             .x = Zt.v.data(0),
             .x_des = setpoint.vB_BI.data(0),
-            .delta_mu = input.previous_control_residual[0]
+            .delta_mu = input.delta_mu_vec_t_1[0]
         };
     }
 

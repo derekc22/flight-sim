@@ -56,11 +56,11 @@ namespace runner {
 
         // declare for state machine
         bool mode_toggled = false;
-        devices::JoystickOutput joystick_output;
+        devices::JoystickManagerOutput joystick_output;
 
         // fetch from joystick
         if (joystick_manager) {
-            joystick_output = joystick_manager->step(u_cmd_t_1);
+            joystick_output = joystick_manager->step({ .u_cmd_t_1 = u_cmd_t_1 });
             mode_toggled = joystick_output.mode_toggled;
         }
 
@@ -80,7 +80,7 @@ namespace runner {
 
         else if (current_mode == fsm::FiniteState::Autopilot) {
             if (input.scheduler.guidance_tick >= constants::hz) {
-                setpoint = guidance_manager.step(input.scheduler.guidance_tf);
+                setpoint = guidance_manager.step({ .kf = input.scheduler.guidance_tf }).setpoint;
                 setpoint_t_1 = setpoint;
 
                 input.scheduler.guidance_tick -= constants::hz;
@@ -90,16 +90,17 @@ namespace runner {
             if (input.scheduler.control_tick >= constants::hz) {
                 double control_dt = input.scheduler.control_elapsed_ticks * constants::dt;
 
-                control::ControlComponentInputs controller_inputs = control_manager.build_component_inputs(
-                    input.context.Zt,
-                    input.trim_solution, input.linearization,
-                    surface_actuators, propulsor_actuators, 
-                    setpoint,
-                    delta_mu_vec_t_1
-                );
-
-                control::ControlManagerOutput virtual_ctrl_out = control_manager.step(controller_inputs, control_dt);
-                mu_cmd = virtual_ctrl_out.virtual_control;
+                control::ControlManagerOutput virtual_ctrl_out = control_manager.step({
+                    .Zt = input.context.Zt,
+                    .trim_sol = input.trim_sol,
+                    .virtual_lin_sol = input.virtual_lin_sol,
+                    .surface_actuators = surface_actuators,
+                    .propulsor_actuators = propulsor_actuators,
+                    .setpoint = setpoint,
+                    .delta_mu_vec_t_1 = delta_mu_vec_t_1,
+                    .dt = control_dt
+                });
+                mu_cmd = virtual_ctrl_out.mu;
                 active_mask = virtual_ctrl_out.active_mask;
                 actuator_mask = virtual_ctrl_out.actuator_mask;
 
@@ -125,38 +126,33 @@ namespace runner {
                     active_mask,
                     actuator_mask,
                     input.context.Zt, u_actual_t_1,
-                    input.trim_solution.converged ? std::make_optional(input.trim_solution.operating_point.input) : std::nullopt,
+                    input.trim_sol.converged ? std::make_optional(input.trim_sol.operating_point.input) : std::nullopt,
                     input.context.transient_conditions,
                     input.context.autodiff_model
                 )
             );
-            u_cmd = allocator_output.actuator_command;
-            delta_mu_vec_t_1 = allocator_output.control_residual;
+            u_cmd = allocator_output.u;
+            delta_mu_vec_t_1 = allocator_output.delta_mu_vec_t_1;
         }
 
         // apply fixed actuator inputs
-        actuators::FixedActuatorInputs fixed_inputs = actuator_manager.settings.fixed_actuator_inputs;
-        u_cmd.surface_inputs.flap_cmd = fixed_inputs.flap;
-        u_cmd.surface_inputs.spoiler_cmd = fixed_inputs.spoiler;
+        // apply surface actuator dynamics
+        // apply propulsor actuator dynamics
+        actuators::ActuatorManagerOutput actuator_output = actuator_manager.step({ .u_cmd = u_cmd, .dt = constants::dt });
+        u_cmd = actuator_output.u_cmd;
 
         // update prior-step control command
         u_cmd_t_1 = u_cmd;
 
-        actuators::ActuatorInputs_T<double> u_actual;
-
-        // apply surface actuator dynamics
-        u_actual.surface_inputs = actuator_manager.step(u_cmd.surface_inputs, constants::dt);
-
-        // apply propulsor actuator dynamics
-        u_actual.propulsor_inputs = actuator_manager.step(u_cmd.propulsor_inputs, constants::dt);
+        actuators::ActuatorInputs_T<double> u_actual = actuator_output.u_actual;
 
         // update prior-step actual control
         u_actual_t_1 = u_actual;
 
         return {
             .setpoint = setpoint,
-            .commanded_inputs = u_cmd,
-            .actual_inputs = u_actual,
+            .u_cmd = u_cmd,
+            .u_actual = u_actual,
             .current_mode = current_mode
         };
     }

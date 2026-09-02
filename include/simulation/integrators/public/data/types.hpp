@@ -21,13 +21,13 @@ namespace integrators {
 
     template <typename T>
     struct WrenchEvaluation_T {
-        dynamics::WrenchSet_T<T> wrench;
-        propulsion::PropulsionState_T<T> next_propulsion_state;
+        dynamics::WrenchSet_T<T> WB_set;
+        propulsion::PropulsionState_T<T> propulsion_state_t;
     };
 
     struct WrenchEvaluation {
-        dynamics::WrenchSet wrench;
-        propulsion::PropulsionState next_propulsion_state;
+        dynamics::WrenchSet WB_set;
+        propulsion::PropulsionState propulsion_state_t;
     };
 
 }

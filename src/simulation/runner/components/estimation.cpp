@@ -16,16 +16,8 @@ namespace runner {
             if (input.scheduler.estimation_tick >= constants::hz) {
                 double estimation_dt = input.scheduler.estimation_elapsed_ticks * constants::dt;
 
-                estimation::EstimatorInputs estimator_inputs = estimation_manager.build_estimator_inputs(
-                    input.context.Yt,
-                    input.trim_solution, input.linearization,
-                    input.context.autodiff_model,
-                    input.actual_inputs,
-                    input.context.transient_conditions
-                );
-
                 // overwrite local estimated state with estimator result
-                Zt = estimation_manager.step(estimator_inputs, estimation_dt).Zt;
+                Zt = estimation_manager.step({ .Yt = input.context.Yt, .trim_sol = input.trim_sol, .lin_sol = input.lin_sol, .model = input.context.autodiff_model, .u_actual_t_1 = input.u_actual_t_1, .conditions = input.context.transient_conditions, .dt = estimation_dt }).Zt;
                 Zt_1 = Zt;
 
                 input.scheduler.estimation_tick -= constants::hz;
@@ -34,7 +26,7 @@ namespace runner {
             else Zt = Zt_1; // perform ZOH
         }
 
-        return { .estimated_state = Zt };
+        return { .Zt = Zt };
     }
 
 }

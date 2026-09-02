@@ -44,7 +44,7 @@ namespace control {
         size_t i = integrated_state_dim;
 
         Eigen::MatrixXd A_virtual_aug = Eigen::MatrixXd::Zero(n + i, n + i);
-        A_virtual_aug.block(0, 0, n, n) = input.linearization.A_virtual;
+        A_virtual_aug.block(0, 0, n, n) = input.virtual_linearization.A_virtual;
 
         // Ci selects the integrated states phi, theta, r from the state vector for the LQI controller - it is not the canonical output matrix C
         Eigen::MatrixXd Ci = Eigen::MatrixXd::Zero(integrated_state_dim, constants::state_dim);
@@ -54,10 +54,10 @@ namespace control {
         A_virtual_aug.block(n, 0, i, n) = -Ci;
 
         Eigen::MatrixXd B_virtual_aug = Eigen::MatrixXd::Zero(n + i, m);
-        B_virtual_aug.block(0, 0, n, m) = input.linearization.B_virtual;
+        B_virtual_aug.block(0, 0, n, m) = input.virtual_linearization.B_virtual;
 
-        dynamics::StateVector_T<double> zt = dynamics::unpack_state(input.estimated_state);
-        dynamics::StateVector_T<double> zt_trim = dynamics::unpack_state_T(input.trim_state);
+        dynamics::StateVector_T<double> zt = dynamics::unpack_state(input.Zt);
+        dynamics::StateVector_T<double> zt_trim = dynamics::unpack_state_T(input.Z_sol_trim);
 
         AugmentedStateVector zt_aug;
         zt_aug << zt, integral_new;
@@ -78,7 +78,7 @@ namespace control {
 
         // integral candidate
         IntegratedStateVector integral_new = integrate_state_err(
-            dynamics::unpack_state(input.estimated_state),
+            dynamics::unpack_state(input.Zt),
             unpack_state(input.setpoint),
             dt
         );
@@ -87,7 +87,7 @@ namespace control {
             make_linear_quadratic_policy_input(input, integral_new)
         );
 
-        if (input.previous_control_residual.norm() <= constants::eps) {
+        if (input.delta_mu_vec_t_1.norm() <= constants::eps) {
             integral = integral_new;
         }
 

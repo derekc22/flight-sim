@@ -5,10 +5,10 @@
 namespace avionics {
 
     AvionicsManagerOutput AvionicsManager::step(const AvionicsManagerInput& input) {
-        const sensors::SensorMeasurements& sensor_meas = input.sensor_measurements;
-        const std::optional<sensors::SensorMeasurements>& sensor_hist = input.previous_sensor_measurements;
-        const sensors::SensorGroundTruth& sensor_gt = input.sensor_ground_truth;
-        const AvionicsGroundTruth& avionics_gt = input.ground_truth;
+        const sensors::SensorMeasurements& sensor_meas = input.sensor_meas;
+        const std::optional<sensors::SensorMeasurements>& sensor_hist = input.sensor_hist;
+        const sensors::SensorGroundTruth& sensor_gt = input.sensor_gt;
+        const AvionicsGroundTruth& avionics_gt = input.avionics_gt;
         double dt = input.dt;
 
         MachNumberMeasurement mach_meas{ atmospheric::compute_mach(sensor_meas.P0, sensor_meas.P) };
@@ -55,24 +55,6 @@ namespace avionics {
 
         hist = avionics_meas;
 
-        return { .measurements = avionics_meas };
+        return { .avionics_meas = avionics_meas };
     }
-
-    AvionicsMeasurements AvionicsManager::step(
-        const sensors::SensorMeasurements& sensor_meas,
-        // sensor_hist will always be populated by the time AvionicsManager::step is called, but std::optional is kept here for consistency
-        const std::optional<sensors::SensorMeasurements> sensor_hist,
-        const sensors::SensorGroundTruth& sensor_gt,
-        const AvionicsGroundTruth& avionics_gt,
-        double dt
-    ) {
-        return step({
-            .sensor_measurements = sensor_meas,
-            .previous_sensor_measurements = sensor_hist,
-            .sensor_ground_truth = sensor_gt,
-            .ground_truth = avionics_gt,
-            .dt = dt
-        }).measurements;
-    }
-
 }

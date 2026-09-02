@@ -32,7 +32,7 @@ namespace control {
     {};
 
     PIDPolicyInput AttitudePID::make_pid_policy_input(const AttitudeControlInput& input, AttitudeAxis axis) {
-        dynamics::RigidBodyState Zt = input.estimated_state;
+        dynamics::RigidBodyState Zt = input.Zt;
         guidance::AttitudeSetpoint setpoint = input.setpoint;
 
         dynamics::EulerAngles eul_est_t;
@@ -44,7 +44,7 @@ namespace control {
                     .x = eul_est_t.phi(),
                     .x_des = setpoint.eulIB.phi(),
                     .x_dot = Zt.w.p(),
-                    .delta_mu = input.previous_control_residual[3]
+                    .delta_mu = input.delta_mu_vec_t_1[3]
                 };
 
             case AttitudeAxis::Longitudinal:
@@ -52,7 +52,7 @@ namespace control {
                     .x = eul_est_t.theta(),
                     .x_des = setpoint.eulIB.theta(),
                     .x_dot = Zt.w.q(),
-                    .delta_mu = input.previous_control_residual[4]
+                    .delta_mu = input.delta_mu_vec_t_1[4]
                 };
 
             case AttitudeAxis::Vertical:
@@ -60,7 +60,7 @@ namespace control {
                     .x = eul_est_t.psi(),
                     .x_des = setpoint.eulIB.psi(),
                     .x_dot = Zt.w.r(),
-                    .delta_mu = input.previous_control_residual[5]
+                    .delta_mu = input.delta_mu_vec_t_1[5]
                 };
 
             default:

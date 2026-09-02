@@ -50,7 +50,9 @@ namespace io {
         }
     }
 
-    void DataManager::step(int t, const DataContext& context) {
+    void DataManager::step(const DataManagerInput& input) {
+        int t = input.t;
+        const DataContext& context = input.context;
 
         dynamics::EulerAngles eul_t;
         eul_t.set(context.Xt.q);

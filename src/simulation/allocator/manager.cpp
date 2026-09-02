@@ -16,16 +16,16 @@ namespace allocator {
         const actuators::ActuatorInputsVector_T<double> u_0 = actuators::unpack_actuator_inputs_T(input.operating_point.input);
 
         dynamics::WrenchVector_T<double> mu_actuator_0 = mu_0;
-        if (input.preferred_actuator_command.has_value()) {
+        if (input.u_preferred.has_value()) {
             const operating::OperatingPoint_T<double> preferred_operating_point{
                 .state = input.operating_point.state,
-                .input = input.preferred_actuator_command.value()
+                .input = input.u_preferred.value()
             };
             const dynamics::Wrench_T<double> mu_preferred = autodiff::compute_net_wrench_T<double>(preferred_operating_point, input.model, input.conditions, constants::dt);
             mu_actuator_0 -= dynamics::unpack_wrench_T(mu_preferred);
         }
 
-        dynamics::WrenchVector_T<double> err = input.virtual_control - mu_actuator_0;
+        dynamics::WrenchVector_T<double> err = input.mu - mu_actuator_0;
         EffectivenessMatrix E_active = E;
 
         // evaluate active mask
@@ -39,8 +39,8 @@ namespace allocator {
         constants::MatrixX_T<double, constants::input_dim, constants::input_dim> trim_hessian = constants::MatrixX_T<double, constants::input_dim, constants::input_dim>::Zero();
         actuators::ActuatorInputsVector_T<double> trim_gradient = actuators::ActuatorInputsVector_T<double>::Zero();
         actuators::ActuatorInputsVector_T<double> actuator_target = u_0;
-        if (input.preferred_actuator_command.has_value()) {
-            const actuators::ActuatorInputsVector_T<double> u_preferred = actuators::unpack_actuator_inputs_T(input.preferred_actuator_command.value());
+        if (input.u_preferred.has_value()) {
+            const actuators::ActuatorInputsVector_T<double> u_preferred = actuators::unpack_actuator_inputs_T(input.u_preferred.value());
             trim_hessian = R;
             trim_gradient = R * (u_0 - u_preferred);
             actuator_target = u_preferred;
@@ -75,8 +75,8 @@ namespace allocator {
         }
 
         return {
-            .actuator_command = u_constrained,
-            .control_residual = delta_mu_vec
+            .u = u_constrained,
+            .delta_mu_vec_t_1 = delta_mu_vec
         };
     }
 

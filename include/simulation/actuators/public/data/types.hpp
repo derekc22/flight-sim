@@ -49,13 +49,13 @@ namespace actuators {
     };
 
     struct ActuatorManagerInput {
-        ActuatorInputs_T<double> commanded_inputs;
+        ActuatorInputs_T<double> u_cmd;
         double dt;
     };
 
     struct ActuatorManagerOutput {
-        ActuatorInputs_T<double> commanded_inputs;
-        ActuatorInputs_T<double> actual_inputs;
+        ActuatorInputs_T<double> u_cmd;
+        ActuatorInputs_T<double> u_actual;
     };
 
     struct PropellerAssembly {

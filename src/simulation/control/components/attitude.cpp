@@ -29,7 +29,7 @@ namespace control {
     }
 
     ControlComponentOutput AttitudeControl::step(const AttitudeControlInput& input, double dt) {
-        ControlComponentOutput output{ .virtual_control = implementation(input, dt) };
+        ControlComponentOutput output{ .mu = implementation(input, dt) };
         util::fill_arr(output.active_mask, 3, 6, true);
         util::fill_arr(output.actuator_mask, 0, 3, true);
         return output;

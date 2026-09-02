@@ -6,28 +6,28 @@ namespace runner {
 
     LinearizationOutput Linearization::step(const LinearizationInput& input) {
         // compute linearization
-        physical = linearization::linearize_operating_point(
+        lin_sol = linearization::linearize_operating_point(
             input.autodiff_model,
-            input.trim_solution.operating_point,
-            input.trim_solution.conditions
+            input.trim_sol.operating_point,
+            input.trim_sol.conditions
         );
 
         // compute virtual linearization
-        virtual_model = linearization::linearize_virtual_operating_point(
+        virtual_lin_sol = linearization::linearize_virtual_operating_point(
             input.autodiff_model,
             operating::VirtualOperatingPoint_T<double>{
-                .state=input.trim_solution.operating_point.state,
-                .input=input.trim_solution.wrench
+                .state=input.trim_sol.operating_point.state,
+                .input=input.trim_sol.wrench
             }
         );
 
         // perform eigenanalysis
-        eigenanalysis = analysis::linearization_eigen_analysis(physical);
+        eig_sol = analysis::linearization_eigen_analysis(lin_sol);
 
         return {
-            .physical = physical,
-            .virtual_model = virtual_model,
-            .eigenanalysis = eigenanalysis
+            .lin_sol = lin_sol,
+            .virtual_lin_sol = virtual_lin_sol,
+            .eig_sol = eig_sol
         };
     }
 

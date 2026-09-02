@@ -10,7 +10,7 @@ namespace estimation {
 
     LinearKalmanEstimator::LinearKalmanEstimator(const LinearKalmanFilterParameters& params) : params(params) {}
 
-    EstimationOutput LinearKalmanEstimator::step(const LinearKalmanEstimatorInput& input, double dt) {
+    dynamics::RigidBodyState LinearKalmanEstimator::step(const LinearKalmanEstimatorInput& input, double dt) {
         dynamics::StateVector_T<double> yt_deviation = dynamics::unpack_state(
             input.Yt) - dynamics::unpack_state_T(input.operating_point.state);
 
@@ -31,25 +31,25 @@ namespace estimation {
 
         dynamics::RigidBodyState Zt = make_kalman_state_estimate(input.Yt, zt_full);
 
-        return { .Zt = Zt };
+        return Zt;
     }
 
-    KalmanState LinearKalmanEstimator::predict(const linearization::DiscretizedLocalLinearization& lin_sol, const actuators::ActuatorInputsVector_T<double>& previous_actual_inputs) {
+    KalmanState LinearKalmanEstimator::predict(const linearization::DiscretizedLocalLinearization& lin_sol_k, const actuators::ActuatorInputsVector_T<double>& ut_1) {
         KalmanState prev = state.value();
 
-        dynamics::StateVector_T<double> zt_bar = lin_sol.A * prev.zt + lin_sol.B * previous_actual_inputs;
+        dynamics::StateVector_T<double> zt_bar = lin_sol_k.A * prev.zt + lin_sol_k.B * ut_1;
 
-        Eigen::MatrixXd Pt_bar = lin_sol.A * prev.Pt * lin_sol.A.transpose() + params.R;
+        Eigen::MatrixXd Pt_bar = lin_sol_k.A * prev.Pt * lin_sol_k.A.transpose() + params.R;
 
         return { .zt = zt_bar, .Pt = Pt_bar };
     }
 
-    KalmanState LinearKalmanEstimator::correct(const linearization::OutputJacobian& output_jacobian, const dynamics::StateVector_T<double>& measured_state) {
+    KalmanState LinearKalmanEstimator::correct(const linearization::OutputJacobian& output_jacobian, const dynamics::StateVector_T<double>& yt) {
         KalmanState pred = state.value();
 
         Eigen::MatrixXd Kt = pred.Pt * output_jacobian.transpose() * (output_jacobian * pred.Pt * output_jacobian.transpose() + params.Q).inverse(); // Kalman gain
 
-        dynamics::StateVector_T<double> Lt = measured_state - output_jacobian * pred.zt; // Innovation
+        dynamics::StateVector_T<double> Lt = yt - output_jacobian * pred.zt; // Innovation
 
         dynamics::StateVector_T<double> zt = pred.zt + Kt * Lt;
 

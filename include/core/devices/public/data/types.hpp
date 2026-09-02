@@ -15,7 +15,11 @@ namespace devices {
         double front_propulsor_rate = 0.0;
     };
 
-    struct JoystickOutput {
+    struct JoystickManagerInput {
+        const control::ControlOutput& u_cmd_t_1;
+    };
+
+    struct JoystickManagerOutput {
         control::ControlOutput u_cmd;
         bool mode_toggled;
     };

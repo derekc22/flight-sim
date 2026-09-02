@@ -4,11 +4,14 @@
 
 namespace failures {
 
-	void FailureManager::check_runtime_failures(const FailureInputs& input) {
+	FailureManagerOutput FailureManager::step(const FailureManagerInput& input) {
 		// check collision
-		if (input.height_agl.data <= constants::collision_threshold) {
+		bool terrain_collision = input.height_agl.data <= constants::collision_threshold;
+		if (terrain_collision) {
 			spdlog::warn("FailureManager: Terrain collision detected");
 		}
+
+		return { .terrain_collision = terrain_collision };
 	}
 
 }

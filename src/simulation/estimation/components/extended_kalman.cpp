@@ -15,7 +15,7 @@ namespace estimation {
 
     ExtendedKalmanEstimator::ExtendedKalmanEstimator(const ExtendedKalmanFilterParameters& params) : params(params) {}
 
-    EstimationOutput ExtendedKalmanEstimator::step(const ExtendedKalmanEstimatorInput& input, double dt) {
+    dynamics::RigidBodyState ExtendedKalmanEstimator::step(const ExtendedKalmanEstimatorInput& input, double dt) {
         dynamics::StateVector_T<double> yt = dynamics::unpack_state(input.Yt);
         actuators::ActuatorInputsVector_T<double> ut_1 = actuators::unpack_actuator_inputs_T(input.u_actual_t_1);
 
@@ -30,15 +30,15 @@ namespace estimation {
         // EKF predicts full state, so do not add back trim state
         dynamics::RigidBodyState Zt = make_kalman_state_estimate(input.Yt, state.value().zt);
 
-        return { .Zt = Zt };
+        return Zt;
     }
 
-    std::tuple<KalmanState, linearization::OutputJacobian> ExtendedKalmanEstimator::predict(const ExtendedKalmanEstimatorInput& input, const actuators::ActuatorInputsVector_T<double>& previous_actual_inputs, double dt) {
+    std::tuple<KalmanState, linearization::OutputJacobian> ExtendedKalmanEstimator::predict(const ExtendedKalmanEstimatorInput& input, const actuators::ActuatorInputsVector_T<double>& ut_1, double dt) {
         KalmanState prev = state.value();
 
         dynamics::State_T<double> zt_1 = dynamics::pack_state_T(prev.zt);
-        actuators::ActuatorInputs_T<double> ut_1 = actuators::pack_actuator_inputs_T(previous_actual_inputs);
-        operating::OperatingPoint_T<double> operating_point{ .state = zt_1, .input = ut_1 };
+        actuators::ActuatorInputs_T<double> u_actual_t_1 = actuators::pack_actuator_inputs_T(ut_1);
+        operating::OperatingPoint_T<double> operating_point{ .state = zt_1, .input = u_actual_t_1 };
 
         // A @ zt_1 + B @ ut_1 -> f(zt_1, ut_1)
         dynamics::StateDot_T<double> zt_1_dot = autodiff::compute_state_dot_T(operating_point, input.model, input.conditions, dt);
@@ -53,7 +53,7 @@ namespace estimation {
         return { { .zt = zt_bar, .Pt = Pt_bar }, lin_sol.C };
     }
 
-    KalmanState ExtendedKalmanEstimator::correct(const dynamics::StateVector_T<double>& measured_state, const linearization::OutputJacobian& output_jacobian) {
+    KalmanState ExtendedKalmanEstimator::correct(const dynamics::StateVector_T<double>& yt, const linearization::OutputJacobian& output_jacobian) {
         KalmanState pred = state.value();
 
         // C = I -> Ht = I
@@ -62,7 +62,7 @@ namespace estimation {
         Eigen::MatrixXd Kt = pred.Pt * Ht.transpose() * (Ht * pred.Pt * Ht.transpose() + params.Q).inverse(); // Kalman gain
 
         // C @ zt_bar = I @ zt_bar -> h(zt_bar) = zt_bar
-        dynamics::StateVector_T<double> Lt = measured_state - pred.zt; // Innovation
+        dynamics::StateVector_T<double> Lt = yt - pred.zt; // Innovation
 
         dynamics::StateVector_T<double> zt = pred.zt + Kt * Lt;
 

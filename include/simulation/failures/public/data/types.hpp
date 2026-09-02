@@ -3,8 +3,12 @@
 
 namespace failures {
 
-    struct FailureInputs {
+    struct FailureManagerInput {
         geography::HeightAGL height_agl;
+    };
+
+    struct FailureManagerOutput {
+        bool terrain_collision;
     };
 
 }

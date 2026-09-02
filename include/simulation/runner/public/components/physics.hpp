@@ -6,7 +6,7 @@ namespace runner {
 
     struct Physics {
         // initialize prior-step net wrench
-        dynamics::Wrench previous_wrench{ 
+        dynamics::Wrench WB_net_t_1{
             .F = dynamics::Force { constants::Zero3 }, 
             .M = dynamics::Moment{ constants::Zero3 } 
         };

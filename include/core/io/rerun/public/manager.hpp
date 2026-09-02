@@ -46,7 +46,7 @@ namespace io {
         std::mutex camera_mutex;
         cv::Mat latest_image;
 
-        void step(int t, const DataContext& data_context);
+        void step(const RerunManagerInput& input);
         void stream_context(const RerunContext& context);
         void run_worker();
         void run_camera_worker();

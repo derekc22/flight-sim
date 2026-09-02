@@ -13,7 +13,6 @@ namespace guidance {
         std::optional<InterpolatedGuidance> interpolated;
 
         GuidanceManagerOutput step(const GuidanceManagerInput& input);
-        GuidanceSetpoint step(int kf);
     };
 
 }

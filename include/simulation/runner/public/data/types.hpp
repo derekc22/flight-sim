@@ -92,62 +92,62 @@ namespace runner {
     struct TrimInput {
         vehicles::Aircraft& aircraft;
         autodiff::AutoDiffModel& autodiff_model;
-        const atmospheric::Wind& wind;
+        const atmospheric::Wind& windB;
     };
 
     struct TrimOutput {
-        trim::TrimSolution solution;
+        trim::TrimSolution trim_sol;
     };
 
     struct LinearizationInput {
         autodiff::AutoDiffModel& autodiff_model;
-        const trim::TrimSolution& trim_solution;
+        const trim::TrimSolution& trim_sol;
     };
 
     struct LinearizationOutput {
-        linearization::LocalLinearization physical;
-        linearization::VirtualLocalLinearization virtual_model;
-        analysis::EigenAnalysis eigenanalysis;
+        linearization::LocalLinearization lin_sol;
+        linearization::VirtualLocalLinearization virtual_lin_sol;
+        analysis::EigenAnalysis eig_sol;
     };
 
     struct MeasurementsInput {
         vehicles::Aircraft& aircraft;
         Scheduler& scheduler;
         const StepContext& context;
-        const dynamics::Wrench& previous_wrench;
+        const dynamics::Wrench& WB_net_t_1;
         bool enabled;
     };
 
     struct MeasurementsOutput {
-        dynamics::RigidBodyState measured_state;
+        dynamics::RigidBodyState Yt;
     };
 
     struct EstimationInput {
         vehicles::Aircraft& aircraft;
         Scheduler& scheduler;
         const StepContext& context;
-        const trim::TrimSolution& trim_solution;
-        const linearization::LocalLinearization& linearization;
-        const actuators::ActuatorInputs_T<double>& actual_inputs;
+        const trim::TrimSolution& trim_sol;
+        const linearization::LocalLinearization& lin_sol;
+        const actuators::ActuatorInputs_T<double>& u_actual_t_1;
         bool enabled;
     };
 
     struct EstimationOutput {
-        dynamics::RigidBodyState estimated_state;
+        dynamics::RigidBodyState Zt;
     };
 
     struct ControlInput {
         vehicles::Aircraft& aircraft;
         Scheduler& scheduler;
         const StepContext& context;
-        const trim::TrimSolution& trim_solution;
-        const linearization::VirtualLocalLinearization& linearization;
+        const trim::TrimSolution& trim_sol;
+        const linearization::VirtualLocalLinearization& virtual_lin_sol;
     };
 
     struct ControlOutput {
         guidance::GuidanceSetpoint setpoint;
-        control::ControlOutput commanded_inputs;
-        actuators::ActuatorInputs_T<double> actual_inputs;
+        control::ControlOutput u_cmd;
+        actuators::ActuatorInputs_T<double> u_actual;
         fsm::FiniteState current_mode;
     };
 
@@ -157,10 +157,10 @@ namespace runner {
     };
 
     struct PhysicsOutput {
-        dynamics::RigidBodyState next_state;
-        dynamics::Wrench net_wrench;
-        dynamics::Wrench aerodynamic_wrench;
-        dynamics::Wrench propulsive_wrench;
+        dynamics::RigidBodyState Xt1;
+        dynamics::Wrench WB_net;
+        dynamics::Wrench WB_aerodynamic;
+        dynamics::Wrench WB_propulsive;
     };
 
     struct FlightGearInput {
@@ -169,8 +169,8 @@ namespace runner {
     };
 
     struct FlightGearOutput {
-        atmospheric::Wind inertial_wind;
-        atmospheric::Wind body_wind;
+        atmospheric::Wind windI;
+        atmospheric::Wind windB;
     };
 
     struct FlightGearSendInput {

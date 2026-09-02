@@ -13,12 +13,12 @@ namespace control {
         std::optional<FullStateControl> full_state_control;
 
         ControlManagerOutput step(const ControlManagerInput& input);
-        ControlManagerOutput step(const ControlComponentInputs& inputs, double dt);
+        ControlManagerOutput aggregate_components(const ControlComponentInputs& inputs, double dt);
 
         ControlComponentInputs build_component_inputs(
-            const dynamics::RigidBodyState& Zt, 
-            const trim::TrimSolution& trim_sol, 
-            const linearization::VirtualLocalLinearization& virtual_lin_sol, 
+            const dynamics::RigidBodyState& Zt,
+            const trim::TrimSolution& trim_sol,
+            const linearization::VirtualLocalLinearization& virtual_lin_sol,
             const actuators::SurfaceActuators& surface_actuators, 
             const actuators::PropulsorActuators& propulsor_actuators, 
             const guidance::GuidanceSetpoint& setpoint,

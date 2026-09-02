@@ -41,13 +41,13 @@ namespace runner {
 
         // step data manager
         if (data_manager) {
-            data_manager->step(input.t, data_context);
+            data_manager->step({ .t = input.t, .context = data_context });
         }
 
         if (input.scheduler.log_tick >= constants::hz) {
             // step rerun manager
             if (rerun_manager) { 
-                rerun_manager->step(input.t, data_context); 
+                rerun_manager->step({ .t = input.t, .data_context = data_context });
             }
 
             // log state

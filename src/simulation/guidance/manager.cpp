@@ -15,9 +15,4 @@ namespace guidance {
         }
         throw std::runtime_error("control::step invalid trajectory type");
     }
-
-    GuidanceSetpoint GuidanceManager::step(int kf) {
-        return step({ .kf = kf }).setpoint;
-    }
-
 }

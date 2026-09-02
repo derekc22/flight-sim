@@ -42,8 +42,8 @@ namespace io {
             "world/vehicle",
             rerun::Transform3D::from_translation_rotation(
                 rerun::components::Translation3D(
-                    static_cast<float>(Xt.p.data.x()), 
-                    static_cast<float>(Xt.p.data.y()), 
+                    static_cast<float>(Xt.p.data.x()),
+                    static_cast<float>(Xt.p.data.y()),
                     static_cast<float>(Xt.p.data.z())
                 ),
                 rerun::datatypes::Quaternion::from_xyzw(
@@ -63,8 +63,8 @@ namespace io {
             "world/estimated_vehicle",
             rerun::Transform3D::from_translation_rotation(
                 rerun::components::Translation3D(
-                    static_cast<float>(Zt.p.data.x()), 
-                    static_cast<float>(Zt.p.data.y()), 
+                    static_cast<float>(Zt.p.data.x()),
+                    static_cast<float>(Zt.p.data.y()),
                     static_cast<float>(Zt.p.data.z())
                 ),
                 rerun::datatypes::Quaternion::from_xyzw(

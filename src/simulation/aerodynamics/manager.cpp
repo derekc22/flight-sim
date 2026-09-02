@@ -18,8 +18,8 @@ namespace aerodynamics {
 
     AerodynamicsManagerOutput AerodynamicsManager::step(const AerodynamicsManagerInput& input) {
         return {
-            .aerodynamic_state = compute_aerodynamic_state(input.state, input.wind),
-            .aerodynamic_wrench = step_aero_forces_moments(surfaces, input.center_of_gravity, input.state, input.atmosphere, input.actuator_inputs, input.wind)
+            .aero_t = compute_aerodynamic_state(input.X, input.windB),
+            .WB_aerodynamic = step_aero_forces_moments(surfaces, input.pB_GB, input.X, input.atm, input.u, input.windB)
         };
     }
 

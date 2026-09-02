@@ -14,7 +14,7 @@ namespace control {
     {}
 
     ControlComponentOutput VelocityControl::step(const VelocityControlInput& input, double dt) {
-        ControlComponentOutput output{ .virtual_control = implementation(input, dt) };
+        ControlComponentOutput output{ .mu = implementation(input, dt) };
         util::fill_arr(output.active_mask, 0, 1, true);
         util::fill_arr(output.actuator_mask, 3, 4, true);
         return output;

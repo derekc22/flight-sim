@@ -40,12 +40,12 @@ namespace propulsion {
     }
 
     template <typename T>
-    dynamics::Wrench_T<T> compute_propulsive_loads_T(const actuators::PropulsorActuators& propulsors, const constants::Vector3_T<T>& center_of_gravity, const dynamics::Twist_T<T>& vehicle_twist, const atmospheric::StaticAtmosphericState& atmosphere, const actuators::PropulsorActuatorInputs_T<T>& actuator_inputs, const PropellerOmegaStateSet_T<T>& propeller_state) {
+    dynamics::Wrench_T<T> compute_propulsive_loads_T(const actuators::PropulsorActuators& propulsors, const constants::Vector3_T<T>& center_of_gravity, const dynamics::Twist_T<T>& vehicle_twist, const atmospheric::StaticAtmosphericState& atmosphere, const actuators::PropulsorActuatorInputs_T<T>& u, const PropellerOmegaStateSet_T<T>& propeller_state) {
         dynamics::Wrench_T<T> total;
 
-        const dynamics::Wrench_T<T> front = compute_propulsor_loads_T<T>(propulsors.front_propulsor, center_of_gravity, vehicle_twist, atmosphere, actuator_inputs.front_propulsor_cmd, propeller_state.front_propulsor);
-        const dynamics::Wrench_T<T> left = compute_propulsor_loads_T<T>(propulsors.left_propulsor, center_of_gravity, vehicle_twist, atmosphere, actuator_inputs.left_propulsor_cmd, propeller_state.left_propulsor);
-        const dynamics::Wrench_T<T> right = compute_propulsor_loads_T<T>(propulsors.right_propulsor, center_of_gravity, vehicle_twist, atmosphere, actuator_inputs.right_propulsor_cmd, propeller_state.right_propulsor);
+        const dynamics::Wrench_T<T> front = compute_propulsor_loads_T<T>(propulsors.front_propulsor, center_of_gravity, vehicle_twist, atmosphere, u.front_propulsor_cmd, propeller_state.front_propulsor);
+        const dynamics::Wrench_T<T> left = compute_propulsor_loads_T<T>(propulsors.left_propulsor, center_of_gravity, vehicle_twist, atmosphere, u.left_propulsor_cmd, propeller_state.left_propulsor);
+        const dynamics::Wrench_T<T> right = compute_propulsor_loads_T<T>(propulsors.right_propulsor, center_of_gravity, vehicle_twist, atmosphere, u.right_propulsor_cmd, propeller_state.right_propulsor);
 
         total.F = front.F + left.F + right.F;
         total.M = front.M + left.M + right.M;

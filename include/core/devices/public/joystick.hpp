@@ -19,7 +19,7 @@ namespace devices {
         JoystickManager& operator=(const JoystickManager&) = delete;
 
         JoystickOutputRaw poll();
-        JoystickOutput step(const control::ControlOutput& u_cmd_t_1);
+        JoystickManagerOutput step(const JoystickManagerInput& input);
     };
 
 }

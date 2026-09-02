@@ -97,16 +97,16 @@ namespace aerodynamics {
     };
 
     struct AerodynamicsManagerInput {
-        const structural::CenterOfGravity& center_of_gravity;
-        const dynamics::RigidBodyState& state;
-        const atmospheric::StaticAtmosphericState& atmosphere;
-        const actuators::SurfaceActuatorInputs_T<double>& actuator_inputs;
-        const atmospheric::Wind& wind;
+        const structural::CenterOfGravity& pB_GB;
+        const dynamics::RigidBodyState& X;
+        const atmospheric::StaticAtmosphericState& atm;
+        const actuators::SurfaceActuatorInputs_T<double>& u;
+        const atmospheric::Wind& windB;
     };
 
     struct AerodynamicsManagerOutput {
-        AerodynamicState aerodynamic_state;
-        dynamics::Wrench aerodynamic_wrench;
+        AerodynamicState aero_t;
+        dynamics::Wrench WB_aerodynamic;
     };
 
 }

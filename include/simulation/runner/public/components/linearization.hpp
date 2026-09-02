@@ -4,11 +4,11 @@
 namespace runner {
 
     struct Linearization {
-        linearization::LocalLinearization physical;
+        linearization::LocalLinearization lin_sol;
 
         // initialize virtual linearization solution
-        linearization::VirtualLocalLinearization virtual_model;
-        analysis::EigenAnalysis eigenanalysis;
+        linearization::VirtualLocalLinearization virtual_lin_sol;
+        analysis::EigenAnalysis eig_sol;
 
         LinearizationOutput step(const LinearizationInput& input);
     };

@@ -24,7 +24,7 @@ namespace control {
     {}
 
     ControlComponentOutput FullStateControl::step(const FullStateControlInput& input, double dt) {
-        ControlComponentOutput output{ .virtual_control = implementation(input, dt) };
+        ControlComponentOutput output{ .mu = implementation(input, dt) };
         util::fill_arr(output.active_mask, 0, 6, true);
         util::fill_arr(output.actuator_mask, 0, 6, true);
         return output;

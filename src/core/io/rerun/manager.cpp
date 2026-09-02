@@ -71,7 +71,10 @@ namespace io {
         worker.join();
     }
 
-    void RerunManager::step(int t, const DataContext& data_context) {
+    void RerunManager::step(const RerunManagerInput& input) {
+        int t = input.t;
+        const DataContext& data_context = input.data_context;
+
         cv::Mat image;
         {
             std::lock_guard<std::mutex> lock(camera_mutex);

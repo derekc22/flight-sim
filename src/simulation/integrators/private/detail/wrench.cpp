@@ -27,24 +27,24 @@ namespace integrators {
             conditions.steady_state
         );
 
-        const dynamics::WrenchSet_T<double>& wrench = evaluation.wrench;
+        const dynamics::WrenchSet_T<double>& WB_set = evaluation.WB_set;
 
         return {
-            .wrench = {
+            .WB_set = {
                 .aerodynamic = {
-                    .F = dynamics::Force{ wrench.aerodynamic.F },
-                    .M = dynamics::Moment{ wrench.aerodynamic.M }
+                    .F = dynamics::Force{ WB_set.aerodynamic.F },
+                    .M = dynamics::Moment{ WB_set.aerodynamic.M }
                 },
                 .propulsive = {
-                    .F = dynamics::Force{ wrench.propulsive.F },
-                    .M = dynamics::Moment{ wrench.propulsive.M }
+                    .F = dynamics::Force{ WB_set.propulsive.F },
+                    .M = dynamics::Moment{ WB_set.propulsive.M }
                 },
                 .net = {
-                    .F = dynamics::Force{ wrench.net.F },
-                    .M = dynamics::Moment{ wrench.net.M }
+                    .F = dynamics::Force{ WB_set.net.F },
+                    .M = dynamics::Moment{ WB_set.net.M }
                 }
             },
-            .next_propulsion_state = evaluation.next_propulsion_state
+            .propulsion_state_t = evaluation.propulsion_state_t
         };
     }
 

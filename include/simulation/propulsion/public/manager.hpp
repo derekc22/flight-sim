@@ -4,10 +4,10 @@
 namespace propulsion {
 
     struct PropulsionManager {
-        PropulsionState state;
+        PropulsionState prev_state;
 
         PropulsionManagerOutput step(const PropulsionManagerInput& input);
-        void commit(const PropulsionState& next_state);
+        void commit(const PropulsionState& state_t);
 
         template <typename T>
         PropulsionManagerOutput_T<T> step_T(const PropulsionManagerInput_T<T>& input);

@@ -51,15 +51,15 @@ namespace avionics {
 	};
 
     struct AvionicsManagerInput {
-        const sensors::SensorMeasurements& sensor_measurements;
-        const std::optional<sensors::SensorMeasurements>& previous_sensor_measurements;
-        const sensors::SensorGroundTruth& sensor_ground_truth;
-        const AvionicsGroundTruth& ground_truth;
+        const sensors::SensorMeasurements& sensor_meas;
+        const std::optional<sensors::SensorMeasurements>& sensor_hist;
+        const sensors::SensorGroundTruth& sensor_gt;
+        const AvionicsGroundTruth& avionics_gt;
         double dt;
     };
 
     struct AvionicsManagerOutput {
-        AvionicsMeasurements measurements;
+        AvionicsMeasurements avionics_meas;
     };
 
 }

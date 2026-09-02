@@ -94,11 +94,11 @@ namespace devices {
         return raw_output;
     }
 
-    JoystickOutput JoystickManager::step(const control::ControlOutput& u_cmd_t_1) {
+    JoystickManagerOutput JoystickManager::step(const JoystickManagerInput& input) {
         JoystickOutputRaw raw_output = poll();
         const actuators::ActuatorInputs_T<double>& limit_min = actuator_limits.limit_min;
         const actuators::ActuatorInputs_T<double>& limit_max = actuator_limits.limit_max;
-        control::ControlOutput u_cmd = u_cmd_t_1;
+        control::ControlOutput u_cmd = input.u_cmd_t_1;
 
         u_cmd.surface_inputs.elevator_cmd = map_axis(
             raw_output.elevator, 
@@ -117,25 +117,25 @@ namespace devices {
         );
 
         u_cmd.propulsor_inputs.front_propulsor_cmd = step_propulsor(
-            u_cmd_t_1.propulsor_inputs.front_propulsor_cmd, 
+            input.u_cmd_t_1.propulsor_inputs.front_propulsor_cmd,
             raw_output.front_propulsor_rate, 
             limit_min.propulsor_inputs.front_propulsor_cmd, 
             limit_max.propulsor_inputs.front_propulsor_cmd
         );
         u_cmd.propulsor_inputs.left_propulsor_cmd = step_propulsor(
-            u_cmd_t_1.propulsor_inputs.left_propulsor_cmd, 
+            input.u_cmd_t_1.propulsor_inputs.left_propulsor_cmd,
             raw_output.left_propulsor_rate, 
             limit_min.propulsor_inputs.left_propulsor_cmd, 
             limit_max.propulsor_inputs.left_propulsor_cmd
         );
         u_cmd.propulsor_inputs.right_propulsor_cmd = step_propulsor(
-            u_cmd_t_1.propulsor_inputs.right_propulsor_cmd, 
+            input.u_cmd_t_1.propulsor_inputs.right_propulsor_cmd,
             raw_output.right_propulsor_rate, 
             limit_min.propulsor_inputs.right_propulsor_cmd, 
             limit_max.propulsor_inputs.right_propulsor_cmd
         );
 
-        JoystickOutput joystick_output{ .u_cmd = u_cmd, .mode_toggled = mode_toggled };
+        JoystickManagerOutput joystick_output{ .u_cmd = u_cmd, .mode_toggled = mode_toggled };
         mode_toggled = false;
 
         return joystick_output;

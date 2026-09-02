@@ -36,7 +36,7 @@ namespace io {
         std::optional<DataMatrix> M_propulsive_DM;
         std::optional<DataMatrix> windB_DM;
 
-        void step(int t, const DataContext& context);
+        void step(const DataManagerInput& input);
         void save(const std::string& data_dir_path);
         DataManager(int tf, const runner::JSONFlags& json_flags);
 

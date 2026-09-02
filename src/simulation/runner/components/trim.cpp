@@ -4,8 +4,8 @@
 namespace runner {
 
     TrimOutput Trim::step(const TrimInput& input) {
-        solution = trim::inspect_trim(input.aircraft, input.autodiff_model, input.wind);
-        return { .solution = solution };
+        trim_sol = trim::inspect_trim(input.aircraft, input.autodiff_model, input.windB);
+        return { .trim_sol = trim_sol };
     }
 
 }

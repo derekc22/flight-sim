@@ -1,6 +1,5 @@
 #pragma once
 #include <Eigen/Dense>
-#include <optional>
 #include "simulation/actuators/public/data/types.hpp"
 #include "simulation/autodiff/public/data/types.hpp"
 #include "simulation/control/public/data/types.hpp"
@@ -31,16 +30,6 @@ namespace estimation {
         operating::OperatingConditions conditions;
     };
 
-    struct EstimatorInputs {
-        const dynamics::RigidBodyState Yt;
-        std::optional<LinearKalmanEstimatorInput> linear_kalman_estimator_input;
-        std::optional<ExtendedKalmanEstimatorInput> extended_kalman_estimator_input;
-    };
-
-    struct EstimationOutput {
-        dynamics::RigidBodyState Zt;  // state estimate
-    };
-
     struct KalmanState {
         dynamics::StateVector_T<double> zt;  // state estimate
         Eigen::MatrixXd Pt;  // state estimate error covariance matrix
@@ -57,17 +46,17 @@ namespace estimation {
     struct ExtendedKalmanFilterParameters : KalmanFilterParameters {};
 
     struct EstimationManagerInput {
-        const dynamics::RigidBodyState& measured_state;
-        const trim::TrimSolution& trim_solution;
-        const linearization::LocalLinearization& linearization;
+        const dynamics::RigidBodyState& Yt;
+        const trim::TrimSolution& trim_sol;
+        const linearization::LocalLinearization& lin_sol;
         autodiff::AutoDiffModel& model;
-        const control::ControlOutput& previous_actual_inputs;
+        const control::ControlOutput& u_actual_t_1;
         const operating::OperatingConditions& conditions;
         double dt;
     };
 
     struct EstimationManagerOutput {
-        dynamics::RigidBodyState estimated_state;
+        dynamics::RigidBodyState Zt;  // state estimate
     };
 
 }

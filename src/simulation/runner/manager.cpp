@@ -66,8 +66,8 @@ namespace runner {
         JSONFlags& json_flags = json_options.flags;
 
         FlightGearOutput flight_gear_output = flight_gear_component.receive({ .aircraft = aircraft, .wind_enabled = json_flags.wind_flag });
-        atmospheric::Wind windI = flight_gear_output.inertial_wind;
-        atmospheric::Wind windB = flight_gear_output.body_wind;
+        atmospheric::Wind windI = flight_gear_output.windI;
+        atmospheric::Wind windB = flight_gear_output.windB;
 
         // compute rigid body states
         dynamics::RigidBodyState Xt = dynamics::compute_rigid_body_state(aircraft.CGFrameFRD, aircraft.NEDFrameECEF);
@@ -119,16 +119,16 @@ namespace runner {
         JSONFlags& json_flags = json_options.flags;
 
         // trim and linearization
-        if (json_flags.trim_flag && !trim_component.solution.attempted) {
-            TrimOutput trim_output = trim_component.step({ .aircraft = aircraft, .autodiff_model = context.autodiff_model, .wind = context.windB });
+        if (json_flags.trim_flag && !trim_component.trim_sol.attempted) {
+            TrimOutput trim_output = trim_component.step({ .aircraft = aircraft, .autodiff_model = context.autodiff_model, .windB = context.windB });
 
             // update analysis context
-            if (recording_component.analysis_manager) { recording_component.analysis_manager->context.trim_sol = trim_output.solution; }
+            if (recording_component.analysis_manager) { recording_component.analysis_manager->context.trim_sol = trim_output.trim_sol; }
 
-            if (trim_output.solution.converged) {
+            if (trim_output.trim_sol.converged) {
                 // obtain full state from trim solution
-                dynamics::RigidBodyState Xt_trim = trim::update_state_from_trim(context.Xt, trim_output.solution.operating_point.state);
-                aerodynamics::AerodynamicState aero_t_trim = aerodynamics::compute_aerodynamic_state(Xt_trim, trim_output.solution.conditions.windB);
+                dynamics::RigidBodyState Xt_trim = trim::update_state_from_trim(context.Xt, trim_output.trim_sol.operating_point.state);
+                aerodynamics::AerodynamicState aero_t_trim = aerodynamics::compute_aerodynamic_state(Xt_trim, trim_output.trim_sol.conditions.windB);
 
                 dynamics::Position pB_GB{ context.struc_t.pB_GB.data };
                 dynamics::RigidBodyState X_BN_trim = dynamics::rebase_cg_state(Xt_trim, pB_GB, aircraft.CGFrameFRD);
@@ -153,52 +153,52 @@ namespace runner {
                 context.atm_t = atmospheric::compute_static_atmospheric_state(aircraft.FRDFrameECEF, aircraft.ECEFFrame);
 
                 dynamics::Wrench WB_net_trim = {
-                    .F = dynamics::Force{ trim_output.solution.wrench.F },
-                    .M = dynamics::Moment{ trim_output.solution.wrench.M },
+                    .F = dynamics::Force{ trim_output.trim_sol.wrench.F },
+                    .M = dynamics::Moment{ trim_output.trim_sol.wrench.M },
                 };
 
                 // overwrite internal state with trim state
-                physics_component.previous_wrench = WB_net_trim;
+                physics_component.WB_net_t_1 = WB_net_trim;
 
                 // overwrite actuator lag state with trim controls
-                trim::update_actuators_lag_from_trim(surface_actuators, propulsor_actuators, trim_output.solution);
-                control_component.u_actual_t_1 = trim_output.solution.operating_point.input;
+                trim::update_actuators_lag_from_trim(surface_actuators, propulsor_actuators, trim_output.trim_sol);
+                control_component.u_actual_t_1 = trim_output.trim_sol.operating_point.input;
 
-                LinearizationOutput linearization_output = linearization_component.step({ .autodiff_model = context.autodiff_model, .trim_solution = trim_output.solution });
+                LinearizationOutput linearization_output = linearization_component.step({ .autodiff_model = context.autodiff_model, .trim_sol = trim_output.trim_sol });
 
                 // update analysis context
                 if (recording_component.analysis_manager) {
-                    recording_component.analysis_manager->context.lin_sol = linearization_output.physical;
-                    recording_component.analysis_manager->context.eig_sol = linearization_output.eigenanalysis;
+                    recording_component.analysis_manager->context.lin_sol = linearization_output.lin_sol;
+                    recording_component.analysis_manager->context.eig_sol = linearization_output.eig_sol;
                 }
             }
         }
     }
 
     void RunManager::step_measurements(StepContext& context) {
-        MeasurementsOutput output = measurements_component.step({ .aircraft = aircraft, .scheduler = scheduler, .context = context, .previous_wrench = physics_component.previous_wrench, .enabled = json_options.flags.avionics_flag });
-        context.Yt = output.measured_state;
+        MeasurementsOutput output = measurements_component.step({ .aircraft = aircraft, .scheduler = scheduler, .context = context, .WB_net_t_1 = physics_component.WB_net_t_1, .enabled = json_options.flags.avionics_flag });
+        context.Yt = output.Yt;
     }
 
     void RunManager::step_estimation(StepContext& context) {
-        EstimationOutput output = estimation_component.step({ .aircraft = aircraft, .scheduler = scheduler, .context = context, .trim_solution = trim_component.solution, .linearization = linearization_component.physical, .actual_inputs = control_component.u_actual_t_1, .enabled = json_options.flags.estimation_flag });
-        context.Zt = output.estimated_state;
+        EstimationOutput output = estimation_component.step({ .aircraft = aircraft, .scheduler = scheduler, .context = context, .trim_sol = trim_component.trim_sol, .lin_sol = linearization_component.lin_sol, .u_actual_t_1 = control_component.u_actual_t_1, .enabled = json_options.flags.estimation_flag });
+        context.Zt = output.Zt;
     }
 
     void RunManager::step_control(StepContext& context) {
-        ControlOutput output = control_component.step({ .aircraft = aircraft, .scheduler = scheduler, .context = context, .trim_solution = trim_component.solution, .linearization = linearization_component.virtual_model });
+        ControlOutput output = control_component.step({ .aircraft = aircraft, .scheduler = scheduler, .context = context, .trim_sol = trim_component.trim_sol, .virtual_lin_sol = linearization_component.virtual_lin_sol });
         context.setpoint = output.setpoint;
-        context.u_cmd = output.commanded_inputs;
-        context.u_actual = output.actual_inputs;
+        context.u_cmd = output.u_cmd;
+        context.u_actual = output.u_actual;
         context.current_mode = output.current_mode;
     }
 
     void RunManager::step_physics(StepContext& context) {
         PhysicsOutput output = physics_component.step({ .aircraft = aircraft, .context = context });
-        context.Xt1 = output.next_state;
-        context.WB_net = output.net_wrench;
-        context.WB_aerodynamic = output.aerodynamic_wrench;
-        context.WB_propulsive = output.propulsive_wrench;
+        context.Xt1 = output.Xt1;
+        context.WB_net = output.WB_net;
+        context.WB_aerodynamic = output.WB_aerodynamic;
+        context.WB_propulsive = output.WB_propulsive;
     }
 
     void RunManager::publish_step(int t, StepContext& context) {
@@ -221,17 +221,17 @@ namespace runner {
         aircraft.step(StepOpts);
 
         // advance internal state
-        physics_component.previous_wrench = context.WB_net;
+        physics_component.WB_net_t_1 = context.WB_net;
 
         // compute next-step geographic state
         geography::GeographicState geo_t1 = geography::compute_geographic_state(aircraft.FRDFrameECEF, aircraft.ECEFFrame);
 
         // check for runtime failures
         geography::HeightAGL height_agl{ geo_t1.alt.data - flight_gear_component.cached_msg_out.ground_elevation.data };
-        failures::FailureInputs failure_inputs {
+        failures::FailureManagerInput failure_input {
             .height_agl = height_agl
         };
-        failure_manager.check_runtime_failures(failure_inputs);
+        failure_manager.step(failure_input);
 
         flight_gear_component.send({ .geographic_state = geo_t1, .attitude = aircraft.FRDFrameNED.eulNB });
     }
