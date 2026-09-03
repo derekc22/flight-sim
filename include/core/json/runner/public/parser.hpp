@@ -4,6 +4,6 @@
 
 namespace json {
 
-    runner::JSONOptions parse_runner_config();
+	runner::JSONOptions parse_runner_config();
 
 }

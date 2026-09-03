@@ -6,10 +6,12 @@
 
 namespace json {
 
-    control::ControlManager parse_control_config(bool trim_flag) {
-        const auto config_path = resolve_run_config_entry_path("control_config");
-        const auto config = read_json_file(config_path);
-        return parse_control_manager(config, trim_flag);
-    }
+	control::ControlManager parse_control_config(
+	    bool trim_flag)
+	{
+		const auto config_path = resolve_run_config_entry_path("control_config");
+		const auto config = read_json_file(config_path);
+		return parse_control_manager(config, trim_flag);
+	}
 
-}
+} // namespace json

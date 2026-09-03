@@ -3,16 +3,18 @@
 
 namespace guidance {
 
-    GuidanceManagerOutput GuidanceManager::step(const GuidanceManagerInput& input) {
-        if (regulation.has_value()) {
-            return { .setpoint = regulation.value().step() };
-        }
-        if (tracking.has_value()) {
-            return { .setpoint = tracking.value().step() };
-        }
-        if (interpolated.has_value()) {
-            return { .setpoint = interpolated.value().step(input.kf) };
-        }
-        throw std::runtime_error("control::step invalid trajectory type");
-    }
-}
+	GuidanceManagerOutput GuidanceManager::step(
+	    const GuidanceManagerInput& input)
+	{
+		if (regulation.has_value()) {
+			return {.setpoint = regulation.value().step()};
+		}
+		if (tracking.has_value()) {
+			return {.setpoint = tracking.value().step()};
+		}
+		if (interpolated.has_value()) {
+			return {.setpoint = interpolated.value().step(input.kf)};
+		}
+		throw std::runtime_error("control::step invalid trajectory type");
+	}
+} // namespace guidance

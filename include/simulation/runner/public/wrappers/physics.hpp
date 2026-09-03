@@ -4,14 +4,11 @@
 
 namespace runner {
 
-    struct PhysicsWrapper {
-        // initialize prior-step net wrench
-        dynamics::Wrench WB_net_t_1{
-            .F = dynamics::Force { constants::Zero3 }, 
-            .M = dynamics::Moment{ constants::Zero3 } 
-        };
+	struct PhysicsWrapper {
+		// initialize prior-step net wrench
+		dynamics::Wrench WB_net_t_1{.F = dynamics::Force{constants::Zero3}, .M = dynamics::Moment{constants::Zero3}};
 
-        PhysicsWrapperOutput step(const PhysicsWrapperInput& input);
-    };
+		PhysicsWrapperOutput step(const PhysicsWrapperInput& input);
+	};
 
-}
+} // namespace runner

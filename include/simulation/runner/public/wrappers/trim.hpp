@@ -3,10 +3,10 @@
 
 namespace runner {
 
-    struct TrimWrapper {
-        trim::TrimSolution trim_sol;
+	struct TrimWrapper {
+		trim::TrimSolution trim_sol;
 
-        TrimWrapperOutput step(const TrimWrapperInput& input);
-    };
+		TrimWrapperOutput step(const TrimWrapperInput& input);
+	};
 
-}
+} // namespace runner

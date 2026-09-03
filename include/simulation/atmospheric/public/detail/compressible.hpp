@@ -4,12 +4,12 @@
 
 namespace atmospheric {
 
-    StaticAirTemperature T_from_T0(const StagnationAirTemperature& T0, const MachNumber& M);
+	StaticAirTemperature T_from_T0(const StagnationAirTemperature& T0, const MachNumber& M);
 
-    MachNumber mps_to_mach(const dynamics::TranslationalVelocity& v, const StaticAirTemperature& T);
+	MachNumber mps_to_mach(const dynamics::TranslationalVelocity& v, const StaticAirTemperature& T);
 
-    StagnationAtmosphericState static_to_stagnation(const StaticAtmosphericState& atm, const MachNumber& M);
+	StagnationAtmosphericState static_to_stagnation(const StaticAtmosphericState& atm, const MachNumber& M);
 
-    MachNumber compute_mach(const StagnationAirPressure& P0, const StaticAirPressure& P);
+	MachNumber compute_mach(const StagnationAirPressure& P0, const StaticAirPressure& P);
 
-}
+} // namespace atmospheric

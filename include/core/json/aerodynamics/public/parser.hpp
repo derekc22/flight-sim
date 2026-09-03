@@ -4,6 +4,6 @@
 
 namespace json {
 
-    aerodynamics::AerodynamicsManager parse_aerodynamics_config();
+	aerodynamics::AerodynamicsManager parse_aerodynamics_config();
 
 }

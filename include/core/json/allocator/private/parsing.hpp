@@ -4,6 +4,6 @@
 
 namespace json {
 
-    allocator::AllocatorManager parse_allocator_manager(const nlohmann::json& config);
+	allocator::AllocatorManager parse_allocator_manager(const nlohmann::json& config);
 
 }

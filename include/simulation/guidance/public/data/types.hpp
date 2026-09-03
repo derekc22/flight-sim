@@ -7,48 +7,44 @@
 
 namespace guidance {
 
-    struct GuidanceSetpoint {
-        dynamics::TranslationalVelocity vB_BI;
-        dynamics::AngularVelocity wB_BI;
-        dynamics::EulerAngles eulIB;
-    };
+	struct GuidanceSetpoint {
+		dynamics::TranslationalVelocity vB_BI;
+		dynamics::AngularVelocity wB_BI;
+		dynamics::EulerAngles eulIB;
+	};
 
-    struct AttitudeSetpoint : GuidanceSetpoint {};
+	struct AttitudeSetpoint : GuidanceSetpoint {};
 
-    struct VelocitySetpoint : GuidanceSetpoint {};
+	struct VelocitySetpoint : GuidanceSetpoint {};
 
-    struct LinearQuadraticSetpoint : GuidanceSetpoint {};
+	struct LinearQuadraticSetpoint : GuidanceSetpoint {};
 
-    struct NonlinearSetpoint : GuidanceSetpoint {};
+	struct NonlinearSetpoint : GuidanceSetpoint {};
 
-    enum class TrajectoryType {
-        Regulation,
-        Tracking,
-        Interpolated
-    };
+	enum class TrajectoryType { Regulation, Tracking, Interpolated };
 
-    // The guidance setpoint vector stores psi, which is not a state variable, hence the +1
-    inline constexpr std::size_t guidance_state_dim = constants::state_dim + 1;
+	// The guidance setpoint vector stores psi, which is not a state variable, hence the +1
+	inline constexpr std::size_t guidance_state_dim = constants::state_dim + 1;
 
-    using GuidanceSetpointVector = constants::MatrixX_T<double, guidance_state_dim, 1>;
+	using GuidanceSetpointVector = constants::MatrixX_T<double, guidance_state_dim, 1>;
 
-    struct TrajectoryComponents {
-        Eigen::MatrixXd v_traj;
-        Eigen::MatrixXd w_traj;
-        Eigen::MatrixXd eul_traj;
-        int n_rows = 0;
-    };
+	struct TrajectoryComponents {
+		Eigen::MatrixXd v_traj;
+		Eigen::MatrixXd w_traj;
+		Eigen::MatrixXd eul_traj;
+		int n_rows = 0;
+	};
 
-    struct Trajectory {
-        Eigen::MatrixXd data;
-    };
+	struct Trajectory {
+		Eigen::MatrixXd data;
+	};
 
-    struct GuidanceManagerInput {
-        int kf;
-    };
+	struct GuidanceManagerInput {
+		int kf;
+	};
 
-    struct GuidanceManagerOutput {
-        GuidanceSetpoint setpoint;
-    };
+	struct GuidanceManagerOutput {
+		GuidanceSetpoint setpoint;
+	};
 
-}
+} // namespace guidance

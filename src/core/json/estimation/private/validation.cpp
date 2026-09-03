@@ -5,10 +5,13 @@
 
 namespace json {
 
-    void validate_estimator(const nlohmann::json& estimator_json, bool trim_flag) {
-        if (fetch_estimator_type(estimator_json) == estimation::EstimatorType::LinearKalmanFilter && !trim_flag) {
-            throw std::runtime_error("json::validate_estimator: LinearKalmanFilter requires trim");
-        }
-    }
+	void validate_estimator(
+	    const nlohmann::json& estimator_json,
+	    bool trim_flag)
+	{
+		if (fetch_estimator_type(estimator_json) == estimation::EstimatorType::LinearKalmanFilter && !trim_flag) {
+			throw std::runtime_error("json::validate_estimator: LinearKalmanFilter requires trim");
+		}
+	}
 
-}
+} // namespace json

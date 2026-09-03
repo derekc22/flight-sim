@@ -3,6 +3,6 @@
 
 namespace guidance {
 
-    GuidanceSetpointVector unpack_guidance_setpoint(const dynamics::RigidBodyState& Xt);
+	GuidanceSetpointVector unpack_guidance_setpoint(const dynamics::RigidBodyState& Xt);
 
 }

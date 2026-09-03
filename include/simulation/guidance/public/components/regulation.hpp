@@ -3,10 +3,10 @@
 
 namespace guidance {
 
-    struct RegulationGuidance {
-        Trajectory trajectory;
+	struct RegulationGuidance {
+		Trajectory trajectory;
 
-        GuidanceSetpoint step();
-    };
+		GuidanceSetpoint step();
+	};
 
-}
+} // namespace guidance

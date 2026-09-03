@@ -5,7 +5,7 @@
 
 namespace json {
 
-    avionics::AttitudeHeadingReferenceSystem parse_attitude_heading_reference_system(const nlohmann::json& ahrs_json);
-    avionics::AvionicsManager parse_avionics_manager(const nlohmann::json& config);
+	avionics::AttitudeHeadingReferenceSystem parse_attitude_heading_reference_system(const nlohmann::json& ahrs_json);
+	avionics::AvionicsManager parse_avionics_manager(const nlohmann::json& config);
 
-}
+} // namespace json

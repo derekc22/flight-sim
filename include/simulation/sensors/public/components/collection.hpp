@@ -10,15 +10,15 @@
 
 namespace sensors {
 
-    struct Sensors {
-        AngleOfAttackVane aoa_vane;
-        Accelerometer accelerometer; // IMU
-        Gyroscope gyro; // IMU
-        PitotTube pitot_tube;
-        StaticPort static_port;
-        TotalAirTemperatureProbe tat_probe;
-        GNSSReceiver gnss;
-        Magnetometer magnetometer;
-    };
+	struct Sensors {
+		AngleOfAttackVane aoa_vane;
+		Accelerometer accelerometer; // IMU
+		Gyroscope gyro;              // IMU
+		PitotTube pitot_tube;
+		StaticPort static_port;
+		TotalAirTemperatureProbe tat_probe;
+		GNSSReceiver gnss;
+		Magnetometer magnetometer;
+	};
 
-}
+} // namespace sensors

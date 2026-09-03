@@ -7,11 +7,11 @@
 
 namespace estimation {
 
-    struct EstimationManager {
-        std::optional<LinearKalmanEstimator> linear_kalman_estimator;
-        std::optional<ExtendedKalmanEstimator> extended_kalman_estimator;
+	struct EstimationManager {
+		std::optional<LinearKalmanEstimator> linear_kalman_estimator;
+		std::optional<ExtendedKalmanEstimator> extended_kalman_estimator;
 
-        EstimationManagerOutput step(const EstimationManagerInput& input);
-    };
+		EstimationManagerOutput step(const EstimationManagerInput& input);
+	};
 
-}
+} // namespace estimation

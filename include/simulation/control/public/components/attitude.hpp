@@ -3,12 +3,12 @@
 
 namespace control {
 
-    struct AttitudeControl {
-        AttitudeControlImplementation implementation;
+	struct AttitudeControl {
+		AttitudeControlImplementation implementation;
 
-        AttitudeControl(const AttitudePIDParameters& params);
-        AttitudeControl(const DamperPIDParameters& params);
-        ControlComponentOutput step(const AttitudeControlInput& input, double dt);
-    };
+		AttitudeControl(const AttitudePIDParameters& params);
+		AttitudeControl(const DamperPIDParameters& params);
+		ControlComponentOutput step(const AttitudeControlInput& input, double dt);
+	};
 
-}
+} // namespace control

@@ -5,12 +5,12 @@
 
 namespace control {
 
-    struct LinearQuadraticRegulator {
-        LinearQuadraticPolicy policy;
+	struct LinearQuadraticRegulator {
+		LinearQuadraticPolicy policy;
 
-        LinearQuadraticRegulator(const LinearQuadraticRegulatorParameters& params);
-        VirtualControlOutput_T<double> step(const LinearQuadraticControlInput& input, double);
+		LinearQuadraticRegulator(const LinearQuadraticRegulatorParameters& params);
+		VirtualControlOutput_T<double> step(const LinearQuadraticControlInput& input, double);
 
-        LinearQuadraticPolicyInput make_linear_quadratic_policy_input(const LinearQuadraticControlInput& input);
-    };
-}
+		LinearQuadraticPolicyInput make_linear_quadratic_policy_input(const LinearQuadraticControlInput& input);
+	};
+} // namespace control

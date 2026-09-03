@@ -5,10 +5,10 @@
 
 namespace avionics {
 
-    struct Avionics {
-        AirDataComputer ADC;
-        AttitudeHeadingReferenceSystem AHRS;
-        InertialNavigationSystem INS;
-    };
+	struct Avionics {
+		AirDataComputer ADC;
+		AttitudeHeadingReferenceSystem AHRS;
+		InertialNavigationSystem INS;
+	};
 
-}
+} // namespace avionics

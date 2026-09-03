@@ -3,8 +3,9 @@
 
 namespace guidance {
 
-    GuidanceSetpoint RegulationGuidance::step() {
-        return pack_guidance_setpoint(trajectory.data.row(0).transpose());
-    }
+	GuidanceSetpoint RegulationGuidance::step()
+	{
+		return pack_guidance_setpoint(trajectory.data.row(0).transpose());
+	}
 
-}
+} // namespace guidance

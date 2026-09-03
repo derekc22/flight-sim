@@ -5,11 +5,11 @@
 
 namespace sensors {
 
-    struct SensorManager {
-        Sensors sensors;
-        std::optional<SensorMeasurements> hist;
+	struct SensorManager {
+		Sensors sensors;
+		std::optional<SensorMeasurements> hist;
 
-        SensorManagerOutput step(const SensorManagerInput& input);
-    };
+		SensorManagerOutput step(const SensorManagerInput& input);
+	};
 
-}
+} // namespace sensors

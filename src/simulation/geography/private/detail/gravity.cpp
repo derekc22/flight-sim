@@ -4,8 +4,10 @@
 
 namespace geography {
 
-    dynamics::Gravity gE(const dynamics::Position& pE) { 
-        return { -constants::g_earth * pE.data.normalized() }; 
-    }
+	dynamics::Gravity gE(
+	    const dynamics::Position& pE)
+	{
+		return {-constants::g_earth * pE.data.normalized()};
+	}
 
-}
+} // namespace geography

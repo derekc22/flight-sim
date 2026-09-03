@@ -4,16 +4,17 @@
 
 namespace control {
 
-    struct AttitudePID {
-        enum AttitudeAxis { Longitudinal, Lateral, Vertical };
-        PIDPolicy lateral_policy;
-        PIDPolicy longitudinal_policy;
-        PIDPolicy vertical_policy;
+	struct AttitudePID {
+		enum AttitudeAxis { Longitudinal, Lateral, Vertical };
 
-        AttitudePID(const AttitudePIDParameters& params);
-        VirtualControlOutput_T<double> step(const AttitudeControlInput& input, double dt);
+		PIDPolicy lateral_policy;
+		PIDPolicy longitudinal_policy;
+		PIDPolicy vertical_policy;
 
-        virtual PIDPolicyInput make_pid_policy_input(const AttitudeControlInput& input, AttitudeAxis axis);
-    };
+		AttitudePID(const AttitudePIDParameters& params);
+		VirtualControlOutput_T<double> step(const AttitudeControlInput& input, double dt);
 
-}
+		virtual PIDPolicyInput make_pid_policy_input(const AttitudeControlInput& input, AttitudeAxis axis);
+	};
+
+} // namespace control

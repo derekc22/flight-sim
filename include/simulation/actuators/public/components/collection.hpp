@@ -10,18 +10,18 @@
 
 namespace actuators {
 
-    struct SurfaceActuators {
-        ElevatorActuator elevator;
-        AileronActuator aileron;
-        RudderActuator rudder;
-        FlapActuator flap;
-        SpoilerActuator spoiler;
-    };
+	struct SurfaceActuators {
+		ElevatorActuator elevator;
+		AileronActuator aileron;
+		RudderActuator rudder;
+		FlapActuator flap;
+		SpoilerActuator spoiler;
+	};
 
-    struct PropulsorActuators {
-        FrontPropulsorActuator front_propulsor;
-        LeftPropulsorActuator left_propulsor;
-        RightPropulsorActuator right_propulsor;
-    };
+	struct PropulsorActuators {
+		FrontPropulsorActuator front_propulsor;
+		LeftPropulsorActuator left_propulsor;
+		RightPropulsorActuator right_propulsor;
+	};
 
-}
+} // namespace actuators

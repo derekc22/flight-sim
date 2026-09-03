@@ -3,8 +3,8 @@
 
 namespace linearization {
 
-    DiscretizedLocalLinearization discretize(const LocalLinearization& lin_sol, double dt);
+	DiscretizedLocalLinearization discretize(const LocalLinearization& lin_sol, double dt);
 
-    DiscretizedLocalLinearization discretize_euler(const LocalLinearization& lin_sol, double dt);
+	DiscretizedLocalLinearization discretize_euler(const LocalLinearization& lin_sol, double dt);
 
-}
+} // namespace linearization

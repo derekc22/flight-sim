@@ -5,6 +5,6 @@
 
 namespace json {
 
-    settings::Settings parse_settings(const nlohmann::json& config, const actuators::ActuatorManager& actuator_manager);
+	settings::Settings parse_settings(const nlohmann::json& config, const actuators::ActuatorManager& actuator_manager);
 
 }

@@ -3,6 +3,8 @@
 
 namespace actuators {
 
-    struct FrontPropulsorActuator : PropulsorActuator { using PropulsorActuator::PropulsorActuator; };
+	struct FrontPropulsorActuator : PropulsorActuator {
+		using PropulsorActuator::PropulsorActuator;
+	};
 
-}
+} // namespace actuators

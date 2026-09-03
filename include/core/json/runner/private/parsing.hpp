@@ -4,6 +4,6 @@
 
 namespace json {
 
-    runner::JSONOptions parse_runner_options(const nlohmann::json& config);
+	runner::JSONOptions parse_runner_options(const nlohmann::json& config);
 
 }

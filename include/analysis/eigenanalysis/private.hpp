@@ -5,6 +5,6 @@
 
 namespace analysis {
 
-    std::string format_complex(const std::complex<double>& z, int precision = 6);
+	std::string format_complex(const std::complex<double>& z, int precision = 6);
 
 }

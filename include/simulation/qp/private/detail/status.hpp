@@ -4,6 +4,6 @@
 
 namespace qp {
 
-    Status map_status(proxsuite::proxqp::QPSolverOutput status);
+	Status map_status(proxsuite::proxqp::QPSolverOutput status);
 
 }

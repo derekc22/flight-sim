@@ -3,6 +3,8 @@
 
 namespace actuators {
 
-    struct AileronActuator : SurfaceActuator { using SurfaceActuator::SurfaceActuator; };
+	struct AileronActuator : SurfaceActuator {
+		using SurfaceActuator::SurfaceActuator;
+	};
 
-}
+} // namespace actuators

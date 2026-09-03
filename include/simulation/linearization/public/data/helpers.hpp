@@ -4,6 +4,6 @@
 
 namespace linearization {
 
-    std::string print_linearization_solution(const LocalLinearization& lin);
+	std::string print_linearization_solution(const LocalLinearization& lin);
 
 }

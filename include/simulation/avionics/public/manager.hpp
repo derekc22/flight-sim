@@ -5,13 +5,13 @@
 
 namespace avionics {
 
-    struct AvionicsManager {
-        Avionics avionics;
-        std::optional<AvionicsMeasurements> hist;
+	struct AvionicsManager {
+		Avionics avionics;
+		std::optional<AvionicsMeasurements> hist;
 
-        AvionicsManagerOutput step(const AvionicsManagerInput& input);
+		AvionicsManagerOutput step(const AvionicsManagerInput& input);
 
-        Settings settings;
-    };
+		Settings settings;
+	};
 
-}
+} // namespace avionics

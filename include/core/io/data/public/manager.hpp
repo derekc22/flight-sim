@@ -6,40 +6,39 @@
 
 namespace io {
 
-    struct DataManager {
-        runner::JSONFlags json_flags;
+	struct DataManager {
+		runner::JSONFlags json_flags;
 
-        std::optional<DataMatrix> p_DM;
-        std::optional<DataMatrix> p_measured_DM;
-        std::optional<DataMatrix> p_estimated_DM;
-        std::optional<DataMatrix> eul_DM;
-        std::optional<DataMatrix> eul_measured_DM;
-        std::optional<DataMatrix> eul_estimated_DM;
-        std::optional<DataMatrix> eul_setpoint_DM;
-        std::optional<DataMatrix> w_DM;
-        std::optional<DataMatrix> w_measured_DM;
-        std::optional<DataMatrix> w_estimated_DM;
-        std::optional<DataMatrix> w_setpoint_DM;
-        std::optional<DataMatrix> v_DM;
-        std::optional<DataMatrix> v_measured_DM;
-        std::optional<DataMatrix> v_estimated_DM;
-        std::optional<DataMatrix> v_setpoint_DM;
-        std::optional<DataMatrix> u_surface_DM;
-        std::optional<DataMatrix> u_propulsor_DM;
-        std::optional<DataMatrix> u_surface_commanded_DM;
-        std::optional<DataMatrix> u_propulsor_commanded_DM;
-        std::optional<DataMatrix> F_net_DM;
-        std::optional<DataMatrix> M_net_DM;
-        std::optional<DataMatrix> F_aerodynamic_DM;
-        std::optional<DataMatrix> M_aerodynamic_DM;
-        std::optional<DataMatrix> F_propulsive_DM;
-        std::optional<DataMatrix> M_propulsive_DM;
-        std::optional<DataMatrix> windB_DM;
+		std::optional<DataMatrix> p_DM;
+		std::optional<DataMatrix> p_measured_DM;
+		std::optional<DataMatrix> p_estimated_DM;
+		std::optional<DataMatrix> eul_DM;
+		std::optional<DataMatrix> eul_measured_DM;
+		std::optional<DataMatrix> eul_estimated_DM;
+		std::optional<DataMatrix> eul_setpoint_DM;
+		std::optional<DataMatrix> w_DM;
+		std::optional<DataMatrix> w_measured_DM;
+		std::optional<DataMatrix> w_estimated_DM;
+		std::optional<DataMatrix> w_setpoint_DM;
+		std::optional<DataMatrix> v_DM;
+		std::optional<DataMatrix> v_measured_DM;
+		std::optional<DataMatrix> v_estimated_DM;
+		std::optional<DataMatrix> v_setpoint_DM;
+		std::optional<DataMatrix> u_surface_DM;
+		std::optional<DataMatrix> u_propulsor_DM;
+		std::optional<DataMatrix> u_surface_commanded_DM;
+		std::optional<DataMatrix> u_propulsor_commanded_DM;
+		std::optional<DataMatrix> F_net_DM;
+		std::optional<DataMatrix> M_net_DM;
+		std::optional<DataMatrix> F_aerodynamic_DM;
+		std::optional<DataMatrix> M_aerodynamic_DM;
+		std::optional<DataMatrix> F_propulsive_DM;
+		std::optional<DataMatrix> M_propulsive_DM;
+		std::optional<DataMatrix> windB_DM;
 
-        void step(const DataManagerInput& input);
-        void save(const std::string& data_dir_path);
-        DataManager(int tf, const runner::JSONFlags& json_flags);
+		void step(const DataManagerInput& input);
+		void save(const std::string& data_dir_path);
+		DataManager(int tf, const runner::JSONFlags& json_flags);
+	};
 
-    };
-
-}
+} // namespace io

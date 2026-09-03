@@ -3,6 +3,6 @@
 
 namespace json {
 
-    void validate_sensor_json(const nlohmann::json& sensor_json);
+	void validate_sensor_json(const nlohmann::json& sensor_json);
 
 }

@@ -3,6 +3,6 @@
 
 namespace json {
 
-    void validate_estimator(const nlohmann::json& estimator_json, bool trim_flag);
+	void validate_estimator(const nlohmann::json& estimator_json, bool trim_flag);
 
 }

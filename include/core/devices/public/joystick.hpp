@@ -7,19 +7,19 @@ struct SDL_Gamepad;
 
 namespace devices {
 
-    struct JoystickManager {
-        SDL_Gamepad* gamepad = nullptr;
-        bool prev_touchpad_down = false;
-        bool mode_toggled = false;
-        actuators::ActuatorLimits actuator_limits;
+	struct JoystickManager {
+		SDL_Gamepad* gamepad = nullptr;
+		bool prev_touchpad_down = false;
+		bool mode_toggled = false;
+		actuators::ActuatorLimits actuator_limits;
 
-        JoystickManager(const actuators::ActuatorLimits& actuator_limits);
-        ~JoystickManager();
-        JoystickManager(const JoystickManager&) = delete;
-        JoystickManager& operator=(const JoystickManager&) = delete;
+		JoystickManager(const actuators::ActuatorLimits& actuator_limits);
+		~JoystickManager();
+		JoystickManager(const JoystickManager&) = delete;
+		JoystickManager& operator=(const JoystickManager&) = delete;
 
-        JoystickOutputRaw poll();
-        JoystickManagerOutput step(const JoystickManagerInput& input);
-    };
+		JoystickOutputRaw poll();
+		JoystickManagerOutput step(const JoystickManagerInput& input);
+	};
 
-}
+} // namespace devices

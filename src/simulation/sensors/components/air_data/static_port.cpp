@@ -2,8 +2,11 @@
 
 namespace sensors {
 
-    StaticAirPressureMeasurement StaticPort::measure(const atmospheric::StaticAirPressure& P, double dt) {
-        return { step(P.data, prev_P_lag, dt) };
-    }
+	StaticAirPressureMeasurement StaticPort::measure(
+	    const atmospheric::StaticAirPressure& P,
+	    double dt)
+	{
+		return {step(P.data, prev_P_lag, dt)};
+	}
 
-}
+} // namespace sensors

@@ -3,7 +3,7 @@
 
 namespace aerodynamics {
 
-    dynamics::OrientationMatrix CBS(const AngleOfAttack& alpha);
-    dynamics::OrientationMatrix CSW(const SideslipAngle& beta);
+	dynamics::OrientationMatrix CBS(const AngleOfAttack& alpha);
+	dynamics::OrientationMatrix CSW(const SideslipAngle& beta);
 
-}
+} // namespace aerodynamics

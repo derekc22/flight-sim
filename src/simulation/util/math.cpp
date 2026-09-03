@@ -5,59 +5,93 @@
 
 namespace util {
 
-    double clamp(double x, double min_val, double max_val) {
-        if (max_val < min_val) { 
-            throw std::runtime_error("util::clamp: max_val must be greater than or equal to min_val"); 
-        }
-        if (max_val == min_val) return min_val;
-        if (x > max_val) return max_val;
-        if (x < min_val) return min_val;
-        return x;
-    }
+	double clamp(
+	    double x,
+	    double min_val,
+	    double max_val)
+	{
+		if (max_val < min_val) {
+			throw std::runtime_error("util::clamp: max_val must be greater than or equal to min_val");
+		}
+		if (max_val == min_val)
+			return min_val;
+		if (x > max_val)
+			return max_val;
+		if (x < min_val)
+			return min_val;
+		return x;
+	}
 
-    double clamp_symmetric(double x, double max_abs) {
-        if (max_abs <= 0.0) return 0.0;
-        return clamp(x, -max_abs, max_abs);
-    }
+	double clamp_symmetric(
+	    double x,
+	    double max_abs)
+	{
+		if (max_abs <= 0.0)
+			return 0.0;
+		return clamp(x, -max_abs, max_abs);
+	}
 
-    double clamp_positive(double x, double max_val) {
-        if (max_val <= 0.0) return 0.0;
-        return clamp(x, 0.0, max_val);
-    }
+	double clamp_positive(
+	    double x,
+	    double max_val)
+	{
+		if (max_val <= 0.0)
+			return 0.0;
+		return clamp(x, 0.0, max_val);
+	}
 
-    double clamp_to_1(double x) {
-        // clamps to [-1, 1]
-        return clamp(x, -1.0, 1.0);
-    }
+	double clamp_to_1(
+	    double x)
+	{
+		// clamps to [-1, 1]
+		return clamp(x, -1.0, 1.0);
+	}
 
-    double clamp_inside_1(double x) {
-        // clamps to [-1+eps, 1-eps]
-        return clamp(x, -1.0 + constants::eps, 1.0 - constants::eps);
-    }
+	double clamp_inside_1(
+	    double x)
+	{
+		// clamps to [-1+eps, 1-eps]
+		return clamp(x, -1.0 + constants::eps, 1.0 - constants::eps);
+	}
 
-    double wrap_to_pi(double x) {
-        // maps to (-pi, pi]
-        return std::remainder(x, 2.0 * constants::pi);
-    }
+	double wrap_to_pi(
+	    double x)
+	{
+		// maps to (-pi, pi]
+		return std::remainder(x, 2.0 * constants::pi);
+	}
 
-    double sqrt(double x) {
-        return std::sqrt(x);
-    }
+	double sqrt(
+	    double x)
+	{
+		return std::sqrt(x);
+	}
 
-    double abs(double x) {
-        return std::abs(x);
-    }
+	double abs(
+	    double x)
+	{
+		return std::abs(x);
+	}
 
-    double smooth_abs(double x) {
-        return sqrt(x * x + constants::eps * constants::eps) - constants::eps;
-    }
+	double smooth_abs(
+	    double x)
+	{
+		return sqrt(x * x + constants::eps * constants::eps) - constants::eps;
+	}
 
-    Eigen::VectorXd vec_clamp(const Eigen::VectorXd& x, const Eigen::VectorXd& x_min, const Eigen::VectorXd& x_max) {
-        return x.cwiseMax(x_min).cwiseMin(x_max);
-    }
+	Eigen::VectorXd vec_clamp(
+	    const Eigen::VectorXd& x,
+	    const Eigen::VectorXd& x_min,
+	    const Eigen::VectorXd& x_max)
+	{
+		return x.cwiseMax(x_min).cwiseMin(x_max);
+	}
 
-    bool vec_is_close(const Eigen::VectorXd& a, const Eigen::VectorXd& b) {
-        return a.size() == b.size() && a.isApprox(b, constants::eps_strict);
-    }
+	bool vec_is_close(
+	    const Eigen::VectorXd& a,
+	    const Eigen::VectorXd& b)
+	{
+		return a.size() == b.size() && a.isApprox(b, constants::eps_strict);
+	}
 
-}
+} // namespace util

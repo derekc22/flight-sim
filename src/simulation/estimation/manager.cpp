@@ -2,27 +2,27 @@
 
 namespace estimation {
 
-    EstimationManagerOutput EstimationManager::step(const EstimationManagerInput& input) {
-        dynamics::RigidBodyState Zt = input.Yt;
+	EstimationManagerOutput EstimationManager::step(
+	    const EstimationManagerInput& input)
+	{
+		dynamics::RigidBodyState Zt = input.Yt;
 
-        if (linear_kalman_estimator.has_value()) {
-            Zt = linear_kalman_estimator.value().step({
-                .Yt = input.Yt,
-                .operating_point = input.trim_sol.operating_point,
-                .lin_sol = input.lin_sol,
-                .u_actual_t_1 = input.u_actual_t_1
-            }, input.dt);
-        }
-        if (extended_kalman_estimator.has_value()) {
-            Zt = extended_kalman_estimator.value().step({
-                .Yt = input.Yt,
-                .u_actual_t_1 = input.u_actual_t_1,
-                .model = input.model,
-                .conditions = input.conditions
-            }, input.dt);
-        }
+		if (linear_kalman_estimator.has_value()) {
+			Zt = linear_kalman_estimator.value().step({.Yt = input.Yt,
+			                                              .operating_point = input.trim_sol.operating_point,
+			                                              .lin_sol = input.lin_sol,
+			                                              .u_actual_t_1 = input.u_actual_t_1},
+			    input.dt);
+		}
+		if (extended_kalman_estimator.has_value()) {
+			Zt = extended_kalman_estimator.value().step({.Yt = input.Yt,
+			                                                .u_actual_t_1 = input.u_actual_t_1,
+			                                                .model = input.model,
+			                                                .conditions = input.conditions},
+			    input.dt);
+		}
 
-        return { .Zt = Zt };
-    }
+		return {.Zt = Zt};
+	}
 
-}
+} // namespace estimation

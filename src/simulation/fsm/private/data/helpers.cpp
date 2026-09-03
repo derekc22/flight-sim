@@ -4,7 +4,9 @@
 
 namespace fsm {
 
-	std::string_view mode_to_string(FiniteState mode) {
+	std::string_view mode_to_string(
+	    FiniteState mode)
+	{
 		switch (mode) {
 			case FiniteState::Manual:
 				return "Manual";
@@ -12,7 +14,7 @@ namespace fsm {
 				return "AutopilotTrim";
 			case FiniteState::Autopilot:
 				return "Autopilot";
-			case FiniteState::None: 
+			case FiniteState::None:
 				return "None";
 
 			default:
@@ -20,4 +22,4 @@ namespace fsm {
 		}
 	}
 
-}
+} // namespace fsm

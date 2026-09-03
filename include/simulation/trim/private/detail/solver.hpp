@@ -5,8 +5,9 @@
 
 namespace trim {
 
-    void validate_trim_solve_options(const TrimSolveOptions& options);
+	void validate_trim_solve_options(const TrimSolveOptions& options);
 
-    TrimSolution solve_trim(const TrimProblem& problem, const autodiff::AutoDiffModel& model, TrimSolveOptions options = {});
+	TrimSolution
+	solve_trim(const TrimProblem& problem, const autodiff::AutoDiffModel& model, TrimSolveOptions options = {});
 
-}
+} // namespace trim

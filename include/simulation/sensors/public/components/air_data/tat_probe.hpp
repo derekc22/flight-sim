@@ -4,9 +4,9 @@
 
 namespace sensors {
 
-    struct TotalAirTemperatureProbe : Sensor {
-        std::optional<double> prev_T0_lag;
-        StagnationAirTemperatureMeasurement measure(const atmospheric::StagnationAirTemperature& T0, double dt);
-    };
+	struct TotalAirTemperatureProbe : Sensor {
+		std::optional<double> prev_T0_lag;
+		StagnationAirTemperatureMeasurement measure(const atmospheric::StagnationAirTemperature& T0, double dt);
+	};
 
-}
+} // namespace sensors

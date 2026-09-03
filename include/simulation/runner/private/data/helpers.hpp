@@ -4,6 +4,6 @@
 
 namespace runner {
 
-    vehicles::Aircraft load_vehicle(const std::string& aircraft_id, const JSONFlags& json_flags);
+	vehicles::Aircraft load_vehicle(const std::string& aircraft_id, const JSONFlags& json_flags);
 
 }

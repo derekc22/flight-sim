@@ -6,10 +6,11 @@
 
 namespace json {
 
-    aerodynamics::AerodynamicsManager parse_aerodynamics_config() {
-        const auto config_path = resolve_run_config_entry_path("aerodynamics_config");
-        const auto config = read_json_file(config_path);
-        return parse_aerodynamics_manager(config);
-    }
+	aerodynamics::AerodynamicsManager parse_aerodynamics_config()
+	{
+		const auto config_path = resolve_run_config_entry_path("aerodynamics_config");
+		const auto config = read_json_file(config_path);
+		return parse_aerodynamics_manager(config);
+	}
 
-}
+} // namespace json

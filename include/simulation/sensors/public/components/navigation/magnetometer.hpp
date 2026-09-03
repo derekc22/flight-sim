@@ -4,9 +4,9 @@
 
 namespace sensors {
 
-    struct Magnetometer : Sensor {
-        std::optional<double> prev_heading_lag;
-        HeadingMeasurement measure(const geography::Heading& heading, double dt);
-    };
+	struct Magnetometer : Sensor {
+		std::optional<double> prev_heading_lag;
+		HeadingMeasurement measure(const geography::Heading& heading, double dt);
+	};
 
-}
+} // namespace sensors

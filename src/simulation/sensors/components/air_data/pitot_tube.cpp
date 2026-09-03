@@ -2,8 +2,11 @@
 
 namespace sensors {
 
-    StagnationAirPressureMeasurement PitotTube::measure(const atmospheric::StagnationAirPressure& P0, double dt) {
-        return { step(P0.data, prev_P0_lag, dt) };
-    }
+	StagnationAirPressureMeasurement PitotTube::measure(
+	    const atmospheric::StagnationAirPressure& P0,
+	    double dt)
+	{
+		return {step(P0.data, prev_P0_lag, dt)};
+	}
 
-}
+} // namespace sensors

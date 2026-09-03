@@ -5,6 +5,10 @@
 
 namespace integrators {
 
-    WrenchEvaluation compute_net_wrench(const dynamics::RigidBodyState& Xt, RK4Model& model, const operating::OperatingConditions& conditions, const actuators::ActuatorInputs_T<double>& u, double dt);
+	WrenchEvaluation compute_net_wrench(const dynamics::RigidBodyState& Xt,
+	    RK4Model& model,
+	    const operating::OperatingConditions& conditions,
+	    const actuators::ActuatorInputs_T<double>& u,
+	    double dt);
 
 }

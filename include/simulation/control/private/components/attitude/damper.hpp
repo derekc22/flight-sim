@@ -5,9 +5,9 @@
 
 namespace control {
 
-    struct DamperPID : AttitudePID {
-        using AttitudePID::AttitudePID;
+	struct DamperPID : AttitudePID {
+		using AttitudePID::AttitudePID;
 
-        PIDPolicyInput make_pid_policy_input(const AttitudeControlInput& input, AttitudeAxis axis) override;
-    };
-}
+		PIDPolicyInput make_pid_policy_input(const AttitudeControlInput& input, AttitudeAxis axis) override;
+	};
+} // namespace control

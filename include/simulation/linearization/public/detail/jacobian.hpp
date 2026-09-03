@@ -5,8 +5,11 @@
 
 namespace linearization {
 
-    LocalLinearization linearize_operating_point(const autodiff::AutoDiffModel& model, const operating::OperatingPoint_T<double>& operating_point, const operating::OperatingConditions& conditions);
+	LocalLinearization linearize_operating_point(const autodiff::AutoDiffModel& model,
+	    const operating::OperatingPoint_T<double>& operating_point,
+	    const operating::OperatingConditions& conditions);
 
-    VirtualLocalLinearization linearize_virtual_operating_point(const autodiff::AutoDiffModel& model, const operating::VirtualOperatingPoint_T<double>& virtual_operating_point);
+	VirtualLocalLinearization linearize_virtual_operating_point(const autodiff::AutoDiffModel& model,
+	    const operating::VirtualOperatingPoint_T<double>& virtual_operating_point);
 
-}
+} // namespace linearization

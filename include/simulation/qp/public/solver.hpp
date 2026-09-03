@@ -5,12 +5,12 @@
 
 namespace qp {
 
-    struct Solver {
-        std::size_t dimension;
-        proxsuite::proxqp::dense::QP<double> solver;
+	struct Solver {
+		std::size_t dimension;
+		proxsuite::proxqp::dense::QP<double> solver;
 
-        Solver(std::size_t dimension);
-        Solution solve(const Problem& problem);
-    };
+		Solver(std::size_t dimension);
+		Solution solve(const Problem& problem);
+	};
 
-}
+} // namespace qp

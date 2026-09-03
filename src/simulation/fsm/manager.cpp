@@ -5,7 +5,8 @@
 
 namespace fsm {
 
-	FSMManager::FSMManager(const Settings& settings)
+	FSMManager::FSMManager(
+	    const Settings& settings)
 	{
 		if (settings.trim_enabled) {
 			autopilot_mode = FiniteState::AutopilotTrim;
@@ -14,16 +15,16 @@ namespace fsm {
 			autopilot_mode = FiniteState::Autopilot;
 		}
 
-		if (settings.joystick_enabled) {	
+		if (settings.joystick_enabled) {
 			current_mode = FiniteState::Manual;
-		}
-		else {
+		} else {
 			current_mode = autopilot_mode;
 		}
-
 	}
 
-	FSMManagerOutput FSMManager::step(const FSMManagerInput& input) {
+	FSMManagerOutput FSMManager::step(
+	    const FSMManagerInput& input)
+	{
 		FiniteState prev_mode = current_mode;
 
 		if (input.mode_toggled) {
@@ -44,13 +45,12 @@ namespace fsm {
 					throw std::runtime_error("fsm::FSMManager::step Unknown current mode");
 			}
 
-			spdlog::info("fsm::FSMManager::step: Switch from mode {} -> {}", 
-				mode_to_string(prev_mode),
-				mode_to_string(current_mode)
-			);
+			spdlog::info("fsm::FSMManager::step: Switch from mode {} -> {}",
+			    mode_to_string(prev_mode),
+			    mode_to_string(current_mode));
 		}
 
-		return { .current_mode = current_mode };
+		return {.current_mode = current_mode};
 	}
 
-}
+} // namespace fsm

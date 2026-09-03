@@ -3,11 +3,11 @@
 
 namespace control {
 
-    struct VelocityControl {
-        VelocityControlImplementation implementation;
+	struct VelocityControl {
+		VelocityControlImplementation implementation;
 
-        VelocityControl(const VelocityPIDParameters& params);
-        ControlComponentOutput step(const VelocityControlInput& input, double dt);
-    };
+		VelocityControl(const VelocityPIDParameters& params);
+		ControlComponentOutput step(const VelocityControlInput& input, double dt);
+	};
 
-}
+} // namespace control

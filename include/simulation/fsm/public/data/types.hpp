@@ -2,12 +2,7 @@
 
 namespace fsm {
 
-	enum class FiniteState {
-		Manual,
-		AutopilotTrim,
-		Autopilot,
-		None
-	};
+	enum class FiniteState { Manual, AutopilotTrim, Autopilot, None };
 
 	struct Settings {
 		bool trim_enabled;
@@ -23,4 +18,4 @@ namespace fsm {
 		FiniteState current_mode;
 	};
 
-}
+} // namespace fsm

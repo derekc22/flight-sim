@@ -8,7 +8,6 @@ namespace settings {
 
 		actuators::Settings actuator_settings;
 		avionics::Settings avionics_settings;
-
 	};
 
-}
+} // namespace settings

@@ -8,58 +8,58 @@
 
 namespace avionics {
 
-    // computed
-    struct StaticAirTemperatureMeasurement : atmospheric::StaticAirTemperature {};
+	// computed
+	struct StaticAirTemperatureMeasurement : atmospheric::StaticAirTemperature {};
 
-    struct MachNumberMeasurement : atmospheric::MachNumber {};
+	struct MachNumberMeasurement : atmospheric::MachNumber {};
 
-    struct OrientationMeasurement : dynamics::OrientationQuaternion {};
+	struct OrientationMeasurement : dynamics::OrientationQuaternion {};
 
-    struct FreeStreamVelocityMeasurement : aerodynamics::FreeStreamVelocity {};
+	struct FreeStreamVelocityMeasurement : aerodynamics::FreeStreamVelocity {};
 
-    struct PressureAltitudeMeasurement : geography::PressureAltitude {};
+	struct PressureAltitudeMeasurement : geography::PressureAltitude {};
 
-    struct VerticalSpeedMeasurement : dynamics::VerticalSpeed {};
+	struct VerticalSpeedMeasurement : dynamics::VerticalSpeed {};
 
-    struct AirDensityMeasurement : atmospheric::AirDensity {};
+	struct AirDensityMeasurement : atmospheric::AirDensity {};
 
-    struct AvionicsGroundTruth {
-        const dynamics::Gravity gB;
-        const atmospheric::StaticAirTemperature T;
-        const atmospheric::MachNumber Mach;
-        const dynamics::OrientationQuaternion qIB;
-        const aerodynamics::FreeStreamVelocity Vinf;
-        const geography::GeometricAltitude alt_BE;
-        const dynamics::VerticalSpeed alt_BE_dot;
-        const atmospheric::AirDensity rho;
-    };
-
-    struct AvionicsMeasurements {
-        sensors::PositionMeasurement pI_BI_ins;
-        sensors::TranslationalVelocityMeasurement vB_BI_ins;
-        StaticAirTemperatureMeasurement T;
-        MachNumberMeasurement Mach;
-        OrientationMeasurement qIB;
-        FreeStreamVelocityMeasurement Vinf;
-        PressureAltitudeMeasurement pressure_alt_BE;
-        VerticalSpeedMeasurement alt_BE_dot;
-        AirDensityMeasurement rho;
-    };
-
-	struct Settings {
-        bool use_ins = false;
+	struct AvionicsGroundTruth {
+		const dynamics::Gravity gB;
+		const atmospheric::StaticAirTemperature T;
+		const atmospheric::MachNumber Mach;
+		const dynamics::OrientationQuaternion qIB;
+		const aerodynamics::FreeStreamVelocity Vinf;
+		const geography::GeometricAltitude alt_BE;
+		const dynamics::VerticalSpeed alt_BE_dot;
+		const atmospheric::AirDensity rho;
 	};
 
-    struct AvionicsManagerInput {
-        const sensors::SensorMeasurements& sensor_meas;
-        const std::optional<sensors::SensorMeasurements>& sensor_hist;
-        const sensors::SensorGroundTruth& sensor_gt;
-        const AvionicsGroundTruth& avionics_gt;
-        double dt;
-    };
+	struct AvionicsMeasurements {
+		sensors::PositionMeasurement pI_BI_ins;
+		sensors::TranslationalVelocityMeasurement vB_BI_ins;
+		StaticAirTemperatureMeasurement T;
+		MachNumberMeasurement Mach;
+		OrientationMeasurement qIB;
+		FreeStreamVelocityMeasurement Vinf;
+		PressureAltitudeMeasurement pressure_alt_BE;
+		VerticalSpeedMeasurement alt_BE_dot;
+		AirDensityMeasurement rho;
+	};
 
-    struct AvionicsManagerOutput {
-        AvionicsMeasurements avionics_meas;
-    };
+	struct Settings {
+		bool use_ins = false;
+	};
 
-}
+	struct AvionicsManagerInput {
+		const sensors::SensorMeasurements& sensor_meas;
+		const std::optional<sensors::SensorMeasurements>& sensor_hist;
+		const sensors::SensorGroundTruth& sensor_gt;
+		const AvionicsGroundTruth& avionics_gt;
+		double dt;
+	};
+
+	struct AvionicsManagerOutput {
+		AvionicsMeasurements avionics_meas;
+	};
+
+} // namespace avionics

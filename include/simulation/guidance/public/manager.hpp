@@ -7,12 +7,12 @@
 
 namespace guidance {
 
-    struct GuidanceManager {
-        std::optional<RegulationGuidance> regulation;
-        std::optional<TrackingGuidance> tracking;
-        std::optional<InterpolatedGuidance> interpolated;
+	struct GuidanceManager {
+		std::optional<RegulationGuidance> regulation;
+		std::optional<TrackingGuidance> tracking;
+		std::optional<InterpolatedGuidance> interpolated;
 
-        GuidanceManagerOutput step(const GuidanceManagerInput& input);
-    };
+		GuidanceManagerOutput step(const GuidanceManagerInput& input);
+	};
 
-}
+} // namespace guidance

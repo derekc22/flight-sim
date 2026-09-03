@@ -3,9 +3,9 @@
 
 namespace failures {
 
-    struct FailureManager {
+	struct FailureManager {
 
-        FailureManagerOutput step(const FailureManagerInput& input);
-    };
+		FailureManagerOutput step(const FailureManagerInput& input);
+	};
 
-}
+} // namespace failures

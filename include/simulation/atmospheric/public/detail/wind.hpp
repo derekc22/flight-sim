@@ -3,6 +3,6 @@
 
 namespace atmospheric {
 
-    Wind build_wind(double heading_deg, double spd_kts);
+	Wind build_wind(double heading_deg, double spd_kts);
 
 }

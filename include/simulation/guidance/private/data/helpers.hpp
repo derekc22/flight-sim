@@ -3,6 +3,6 @@
 
 namespace guidance {
 
-    GuidanceSetpoint pack_guidance_setpoint(const GuidanceSetpointVector& guidance_vec);
+	GuidanceSetpoint pack_guidance_setpoint(const GuidanceSetpointVector& guidance_vec);
 
 }

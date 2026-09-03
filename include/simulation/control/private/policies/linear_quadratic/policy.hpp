@@ -4,10 +4,10 @@
 
 namespace control {
 
-    struct LinearQuadraticPolicy {
-        LinearQuadraticPolicyParameters params;
+	struct LinearQuadraticPolicy {
+		LinearQuadraticPolicyParameters params;
 
-        LinearQuadraticPolicy(const LinearQuadraticPolicyParameters& params);
-        VirtualControlOutputVector_T<double> step(const LinearQuadraticPolicyInput& input);
-    };
-}
+		LinearQuadraticPolicy(const LinearQuadraticPolicyParameters& params);
+		VirtualControlOutputVector_T<double> step(const LinearQuadraticPolicyInput& input);
+	};
+} // namespace control

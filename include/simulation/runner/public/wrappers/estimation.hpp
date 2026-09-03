@@ -3,10 +3,10 @@
 
 namespace runner {
 
-    struct EstimationWrapper {
-        dynamics::RigidBodyState Zt_1;
+	struct EstimationWrapper {
+		dynamics::RigidBodyState Zt_1;
 
-        EstimationWrapperOutput step(const EstimationWrapperInput& input);
-    };
+		EstimationWrapperOutput step(const EstimationWrapperInput& input);
+	};
 
-}
+} // namespace runner

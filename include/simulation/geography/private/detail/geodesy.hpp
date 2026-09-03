@@ -4,6 +4,6 @@
 
 namespace geography {
 
-    GeographicState lat_lon_alt_from_pE(const dynamics::Position & pE);
+	GeographicState lat_lon_alt_from_pE(const dynamics::Position& pE);
 
 }

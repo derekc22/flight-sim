@@ -3,6 +3,6 @@
 
 namespace json {
 
-    void validate_allocator(const nlohmann::json& config);
+	void validate_allocator(const nlohmann::json& config);
 
 }

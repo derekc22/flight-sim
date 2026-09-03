@@ -5,6 +5,6 @@
 
 namespace json {
 
-    actuators::ActuatorManager parse_actuator_config(structural::StructuralManager& structural_manager);
+	actuators::ActuatorManager parse_actuator_config(structural::StructuralManager& structural_manager);
 
 }

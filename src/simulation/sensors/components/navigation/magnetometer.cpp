@@ -2,8 +2,11 @@
 
 namespace sensors {
 
-    HeadingMeasurement Magnetometer::measure(const geography::Heading& heading, double dt) {
-        return { step(heading.data, prev_heading_lag, dt) };
-    }
+	HeadingMeasurement Magnetometer::measure(
+	    const geography::Heading& heading,
+	    double dt)
+	{
+		return {step(heading.data, prev_heading_lag, dt)};
+	}
 
-}
+} // namespace sensors

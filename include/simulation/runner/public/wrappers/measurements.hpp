@@ -4,11 +4,11 @@
 
 namespace runner {
 
-    struct MeasurementsWrapper {
-        sensors::SensorMeasurements sensor_meas_t_1;
-        dynamics::RigidBodyState Yt_1;
+	struct MeasurementsWrapper {
+		sensors::SensorMeasurements sensor_meas_t_1;
+		dynamics::RigidBodyState Yt_1;
 
-        MeasurementsWrapperOutput step(const MeasurementsWrapperInput& input);
-    };
+		MeasurementsWrapperOutput step(const MeasurementsWrapperInput& input);
+	};
 
-}
+} // namespace runner

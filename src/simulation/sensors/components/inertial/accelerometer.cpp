@@ -2,8 +2,11 @@
 
 namespace sensors {
 
-    TranslationalAccelerationMeasurement Accelerometer::measure(const dynamics::TranslationalAcceleration& fB, double dt) {
-        return { step(fB.data, prev_fB_lag, dt) };
-    }
+	TranslationalAccelerationMeasurement Accelerometer::measure(
+	    const dynamics::TranslationalAcceleration& fB,
+	    double dt)
+	{
+		return {step(fB.data, prev_fB_lag, dt)};
+	}
 
-}
+} // namespace sensors

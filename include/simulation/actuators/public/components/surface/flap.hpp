@@ -3,6 +3,8 @@
 
 namespace actuators {
 
-    struct FlapActuator : SurfaceActuator { using SurfaceActuator::SurfaceActuator; };
+	struct FlapActuator : SurfaceActuator {
+		using SurfaceActuator::SurfaceActuator;
+	};
 
-}
+} // namespace actuators

@@ -3,11 +3,11 @@
 
 namespace guidance {
 
-    struct TrackingGuidance {
-        Trajectory trajectory;
-        int k = 0;
+	struct TrackingGuidance {
+		Trajectory trajectory;
+		int k = 0;
 
-        GuidanceSetpoint step();
-    };
+		GuidanceSetpoint step();
+	};
 
-}
+} // namespace guidance

@@ -4,9 +4,9 @@
 
 namespace sensors {
 
-    struct PitotTube : Sensor {
-        std::optional<double> prev_P0_lag;
-        StagnationAirPressureMeasurement measure(const atmospheric::StagnationAirPressure& P0, double dt);
-    };
+	struct PitotTube : Sensor {
+		std::optional<double> prev_P0_lag;
+		StagnationAirPressureMeasurement measure(const atmospheric::StagnationAirPressure& P0, double dt);
+	};
 
-}
+} // namespace sensors

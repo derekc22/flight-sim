@@ -2,8 +2,11 @@
 
 namespace sensors {
 
-    AngleOfAttackMeasurement AngleOfAttackVane::measure(const aerodynamics::AngleOfAttack& alpha, double dt) {
-        return { step(alpha.data, prev_alpha_lag, dt) };
-    }
+	AngleOfAttackMeasurement AngleOfAttackVane::measure(
+	    const aerodynamics::AngleOfAttack& alpha,
+	    double dt)
+	{
+		return {step(alpha.data, prev_alpha_lag, dt)};
+	}
 
-}
+} // namespace sensors

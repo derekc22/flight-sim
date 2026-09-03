@@ -4,6 +4,6 @@
 
 namespace atmospheric {
 
-    StaticAtmosphericState std_atmosphere(const geography::GeometricAltitude& altitude);
+	StaticAtmosphericState std_atmosphere(const geography::GeometricAltitude& altitude);
 
 }
