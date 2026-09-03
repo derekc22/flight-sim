@@ -8,11 +8,10 @@ namespace runner {
     Scheduler::Scheduler(const ModuleRates& module_rates, int tf)
         : module_rates(module_rates)
     {
-        double frac_guidance_steps = module_rates.guidance_hz / constants::hz; // fraction of steps that will call guidance
-        guidance_tf = 1 +  // for the immediate call at t=0
-            static_cast<int>(
-                std::floor((tf - 1) * frac_guidance_steps) // number of remaining steps that will call guidance
-            );
+		// fraction of steps that will call guidance
+        double frac_guidance_steps = module_rates.guidance_hz / constants::hz;
+		// for the immediate call at t=0 + number of remaining steps that will call guidance
+        guidance_tf = 1 + static_cast<int>( std::floor((tf - 1) * frac_guidance_steps) );
     }
 
     void Scheduler::step(const SchedulerInput& input) {

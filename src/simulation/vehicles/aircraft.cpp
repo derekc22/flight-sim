@@ -501,7 +501,10 @@ namespace vehicles {
             }
 
             for (frames::Frame* dep : curr->dependents) {
-                if (visited.insert(dep).second) q.push(dep); // if a dependent has not already been visited, mark it as visited and add it to the queue
+				// if a dependent has not already been visited, mark it as visited and add it to the queue
+                if (visited.insert(dep).second) {
+					q.push(dep);
+				}
             }
         }
     }
