@@ -1,11 +1,12 @@
 #include <spdlog/spdlog.h>
 #include <sstream>
-#include "simulation/util/print/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
+#include "simulation/util/public/print.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/geography/public/detail/gravity.hpp"
 #include "simulation/aerodynamics/public/data/types.hpp"
 #include "simulation/atmospheric/public/data/types.hpp"
-#include "simulation/util/trig/public.hpp"
+#include "simulation/util/public/trig.hpp"
 
 namespace util {
 

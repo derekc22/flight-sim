@@ -1,8 +1,8 @@
 #include "core/json/public/files.hpp"
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
 #include "simulation/runner/public/wrappers/recording.hpp"
 #include "simulation/runner/public/scheduling/scheduler.hpp"
-#include "simulation/util/print/public.hpp"
+#include "simulation/util/public/print.hpp"
 
 namespace runner {
 

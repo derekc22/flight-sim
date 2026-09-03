@@ -1,5 +1,6 @@
 #pragma once
 #include <type_traits>
+#include "simulation/constants/public/linalg.hpp"
 #include "simulation/integrators/public/detail/wrench.hpp"
 #include "simulation/aerodynamics/public/detail/loads.hpp"
 #include "simulation/propulsion/public/manager.hpp"

@@ -7,8 +7,9 @@
 #include <cstddef>
 #include "simulation/structural/public/manager.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
-#include "simulation/constants/public.hpp"
-#include "simulation/util/linalg/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
+#include "simulation/constants/public/linalg.hpp"
+#include "simulation/util/public/linalg.hpp"
 
 namespace structural {
 
@@ -110,11 +111,11 @@ namespace structural {
         return m;
     }
 
-    StructuralState StructuralManager::compute_structural_state() {
+    StructuralManagerOutput StructuralManager::step(const StructuralManagerInput&) {
         dynamics::Mass mass = dynamics::Mass{ compute_mass() };
         CenterOfGravity pB_GB = CenterOfGravity{ compute_CG(mass) };
         dynamics::InertiaTensor JB = dynamics::InertiaTensor{ compute_JB(pB_GB) };
-        return { mass, pB_GB, JB };
+        return { .struc_t = { mass, pB_GB, JB } };
     }
 
 }

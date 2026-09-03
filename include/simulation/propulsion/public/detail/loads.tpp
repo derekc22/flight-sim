@@ -1,4 +1,6 @@
 #pragma once
+#include "simulation/constants/public/scalars.hpp"
+#include "simulation/constants/public/linalg.hpp"
 #include "simulation/propulsion/public/detail/loads.hpp"
 
 namespace propulsion {

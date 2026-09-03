@@ -3,12 +3,13 @@
 #include "simulation/actuators/public/manager.hpp"
 #include "simulation/allocator/public/data/helpers.hpp"
 #include "simulation/allocator/public/manager.hpp"
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
+#include "simulation/constants/public/dimensions.hpp"
 #include "simulation/control/public/manager.hpp"
 #include "simulation/guidance/public/manager.hpp"
 #include "simulation/runner/public/wrappers/control.hpp"
 #include "simulation/runner/public/scheduling/scheduler.hpp"
-#include "simulation/util/public.hpp"
+#include "simulation/util/public/math.hpp"
 #include "simulation/vehicles/public/aircraft.hpp"
 
 namespace runner {

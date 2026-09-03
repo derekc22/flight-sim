@@ -1,7 +1,8 @@
 #pragma once
 #include <optional>
 #include <Eigen/Dense>
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/linalg.hpp"
+#include "simulation/constants/public/dimensions.hpp"
 
 namespace control {
 

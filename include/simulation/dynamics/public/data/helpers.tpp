@@ -1,4 +1,5 @@
 #pragma once
+#include "simulation/constants/public/linalg.hpp"
 
 namespace dynamics {
 

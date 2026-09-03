@@ -1,4 +1,6 @@
 #pragma once
+#include "simulation/constants/public/linalg.hpp"
+#include "simulation/constants/public/dimensions.hpp"
 #include "simulation/operating/public/data/helpers.hpp"
 
 namespace operating {

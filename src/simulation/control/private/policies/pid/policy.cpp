@@ -1,6 +1,6 @@
 #include "simulation/control/private/policies/pid/policy.hpp"
-#include "simulation/constants/public.hpp"
-#include "simulation/util/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
+#include "simulation/util/public/filters.hpp"
 
 namespace control {
 

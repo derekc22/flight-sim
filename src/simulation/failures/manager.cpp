@@ -1,5 +1,5 @@
 #include <spdlog/spdlog.h>
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
 #include "simulation/failures/public/manager.hpp"
 
 namespace failures {

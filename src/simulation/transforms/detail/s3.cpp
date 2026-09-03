@@ -3,10 +3,9 @@
 #include <algorithm>
 #include <string>
 #include <vector>
-#include "simulation/constants/public.hpp"
 #include "simulation/transforms/private/detail/s3.hpp"
 #include "simulation/transforms/public/detail/s3.hpp"
-#include "simulation/util/public.hpp"
+#include "simulation/util/public/math.hpp"
 
 namespace transforms {
 

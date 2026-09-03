@@ -2,7 +2,7 @@
 #include <string>
 #include "simulation/control/private/policies/linear_quadratic/slicot_care.hpp"
 #include "simulation/control/private/policies/linear_quadratic/slicot_care_wrapper.h"
-#include "simulation/util/validate/public.hpp"
+#include "simulation/util/public/validation.hpp"
 
 namespace control {
 

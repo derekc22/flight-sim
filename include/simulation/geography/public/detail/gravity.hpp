@@ -1,5 +1,5 @@
 #pragma once
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/linalg.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 
 namespace geography {

@@ -6,7 +6,8 @@
 
 #include "simulation/transforms/private/detail/s3.hpp"
 #include "simulation/transforms/public/detail/s3.hpp"
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
+#include "simulation/constants/public/linalg.hpp"
 #include "simulation/transforms/helpers.hpp"
 
 namespace {

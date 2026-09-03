@@ -1,3 +1,4 @@
+#include "simulation/constants/public/scalars.hpp"
 #include "simulation/autodiff/public/detail/evaluation.hpp"
 #include "simulation/operating/public/data/helpers.hpp"
 #include "simulation/trim/private/data/helpers.hpp"

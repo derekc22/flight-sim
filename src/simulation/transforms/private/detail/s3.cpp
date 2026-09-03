@@ -3,11 +3,11 @@
 #include <algorithm>
 #include <string>
 #include <vector>
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/linalg.hpp"
 #include "simulation/transforms/private/detail/s3.hpp"
 #include "simulation/transforms/private/detail/so3.hpp"
 #include "simulation/transforms/public/detail/s3.hpp"
-#include "simulation/util/trig/public.hpp"
+#include "simulation/util/public/trig.hpp"
 
 namespace transforms {
 

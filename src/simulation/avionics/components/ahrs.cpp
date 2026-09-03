@@ -1,7 +1,8 @@
+#include "simulation/constants/public/scalars.hpp"
 #include "simulation/avionics/public/components/ahrs.hpp"
 #include "simulation/geography/public/detail/gravity.hpp"
 #include "simulation/integrators/public/detail/euler.hpp"
-#include "simulation/util/public.hpp"
+#include "simulation/util/public/math.hpp"
 
 namespace avionics {
 

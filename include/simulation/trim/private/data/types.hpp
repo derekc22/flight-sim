@@ -1,6 +1,8 @@
 #pragma once
 #include <cstddef>
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
+#include "simulation/constants/public/linalg.hpp"
+#include "simulation/constants/public/dimensions.hpp"
 #include "simulation/operating/public/data/types.hpp"
 
 namespace trim {

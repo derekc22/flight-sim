@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <algorithm>
 #include <vector>
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/linalg.hpp"
 #include "simulation/transforms/private/detail/se3.hpp"
 #include "simulation/transforms/public/detail/se3.hpp"
 

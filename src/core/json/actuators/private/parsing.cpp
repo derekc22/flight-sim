@@ -8,7 +8,7 @@
 #include "core/json/actuators/private/validation.hpp"
 #include "simulation/actuators/public/manager.hpp"
 #include "simulation/actuators/public/data/helpers.hpp"
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
 #include "simulation/structural/public/manager.hpp"
 
 namespace json {

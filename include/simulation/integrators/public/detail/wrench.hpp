@@ -1,7 +1,7 @@
 #pragma once
 #include "simulation/actuators/public/data/helpers.hpp"
 #include "simulation/atmospheric/public/data/types.hpp"
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/linalg.hpp"
 #include "simulation/integrators/public/data/types.hpp"
 
 namespace integrators {

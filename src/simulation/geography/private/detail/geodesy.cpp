@@ -1,9 +1,9 @@
 #include <cmath>
 #include <Eigen/Dense>
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
 #include "simulation/geography/private/detail/geodesy.hpp"
-#include "simulation/util/public.hpp"
-#include "simulation/util/trig/public.hpp"
+#include "simulation/util/public/math.hpp"
+#include "simulation/util/public/trig.hpp"
 
 namespace geography {
 

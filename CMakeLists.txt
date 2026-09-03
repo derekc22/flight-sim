@@ -61,7 +61,7 @@ find_package(OpenCV REQUIRED)
 # Collect all source files
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.cpp")
 file(GLOB_RECURSE IO_CV2_SOURCES CONFIGURE_DEPENDS "src/core/io/camera/*.cpp")
-list(FILTER SOURCES EXCLUDE REGEX "src/simulation/control/private/policies/linear_quadratic/care\\.cpp$")
+list(FILTER SOURCES EXCLUDE REGEX "src/simulation/control/private/policies/linear_quadratic/slicot_care\\.cpp$")
 list(REMOVE_ITEM SOURCES ${IO_CV2_SOURCES})
 set(TESTED_SOURCES ${SOURCES})
 list(FILTER TESTED_SOURCES EXCLUDE REGEX "src/main\\.cpp$")

@@ -2,7 +2,7 @@
 #include <string>
 #include "core/json/analysis/public/writer.hpp"
 #include "core/json/private/detail/files.hpp"
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
 
 namespace json {
 

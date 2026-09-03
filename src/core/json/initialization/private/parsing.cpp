@@ -5,7 +5,7 @@
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/geography/public/data/types.hpp"
 #include "simulation/vehicles/public/data/types.hpp"
-#include "simulation/util/trig/public.hpp"
+#include "simulation/util/public/trig.hpp"
 
 namespace json {
 

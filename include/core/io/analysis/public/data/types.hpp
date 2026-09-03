@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include "analysis/eigenanalysis/public.hpp"
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/dimensions.hpp"
 #include "simulation/linearization/public/data/types.hpp"
 #include "simulation/runner/public/data/types.hpp"
 #include "simulation/trim/public/data/types.hpp"

@@ -1,5 +1,5 @@
 #pragma once
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/linalg.hpp"
 #include "simulation/runner/public/data/types.hpp"
 
 namespace runner {

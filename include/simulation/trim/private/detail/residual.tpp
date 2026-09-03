@@ -1,6 +1,7 @@
 #pragma once
 #include "simulation/aerodynamics/public/detail/state.hpp"
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
+#include "simulation/constants/public/linalg.hpp"
 #include "simulation/dynamics/public/data/helpers.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/dynamics/public/detail/derivatives.hpp"

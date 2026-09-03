@@ -1,11 +1,11 @@
 #include <cmath>
 #include <stdexcept>
 #include <Eigen/Dense>
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
 #include "simulation/frames/public/detail/kinematics.hpp"
 #include "simulation/geography/private/detail/geodesy.hpp"
 #include "simulation/geography/public/detail/geodesy.hpp"
-#include "simulation/util/trig/public.hpp"
+#include "simulation/util/public/trig.hpp"
 
 namespace geography {
 

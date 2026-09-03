@@ -7,7 +7,7 @@
 #include "core/json/public/data/helpers.hpp"
 #include "simulation/aerodynamics/public/data/types.hpp"
 #include "simulation/aerodynamics/public/manager.hpp"
-#include "simulation/util/validate/public.hpp"
+#include "simulation/util/public/validation.hpp"
 
 namespace json {
 

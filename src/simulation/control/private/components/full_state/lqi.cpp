@@ -2,10 +2,11 @@
 #include <algorithm>
 #include "simulation/control/private/components/full_state/lqi.hpp"
 #include "simulation/control/private/components/full_state/lqr.hpp"
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
+#include "simulation/constants/public/dimensions.hpp"
 #include "simulation/linearization/public/data/types.hpp"
 #include "simulation/control/private/components/full_state/helpers.hpp"
-#include "simulation/util/public.hpp"
+#include "simulation/util/public/math.hpp"
 #include "simulation/dynamics/public/data/helpers.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 

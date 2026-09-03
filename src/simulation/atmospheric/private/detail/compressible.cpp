@@ -1,7 +1,7 @@
 #include <cmath>
 #include "simulation/atmospheric/private/detail/compressible.hpp"
 #include "simulation/atmospheric/public/detail/compressible.hpp"
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
 
 namespace atmospheric {
 

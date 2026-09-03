@@ -2,7 +2,7 @@
 #include <string>
 #include <nlohmann/json.hpp>
 #include "core/json/guidance/private/validation.hpp"
-#include "simulation/util/validate/public.hpp"
+#include "simulation/util/public/validation.hpp"
 
 namespace json {
 

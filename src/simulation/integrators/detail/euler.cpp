@@ -1,10 +1,11 @@
 #include <Eigen/Dense>
+#include "simulation/constants/public/scalars.hpp"
 #include "simulation/integrators/private/detail/euler.hpp"
 #include "simulation/integrators/public/detail/euler.hpp"
 #include "simulation/dynamics/public/detail/derivatives.hpp"
 #include "simulation/structural/public/data/types.hpp"
 #include "simulation/transforms/public/detail/s3.hpp"
-#include "simulation/util/trig/public.hpp"
+#include "simulation/util/public/trig.hpp"
 
 namespace integrators {
 

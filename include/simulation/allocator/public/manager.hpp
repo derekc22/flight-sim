@@ -1,4 +1,6 @@
 #pragma once
+#include "simulation/constants/public/linalg.hpp"
+#include "simulation/constants/public/dimensions.hpp"
 #include "simulation/allocator/public/data/types.hpp"
 #include "simulation/qp/public/solver.hpp"
 

@@ -14,7 +14,7 @@
 #include "core/io/rerun/private/detail/streaming.hpp"
 #include "core/io/rerun/public/manager.hpp"
 #include "simulation/actuators/public/data/helpers.hpp"
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/runner/public/data/types.hpp"
 

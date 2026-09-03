@@ -2,8 +2,8 @@
 #include "simulation/atmospheric/public/detail/wind.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/geography/public/data/types.hpp"
-#include "simulation/util/trig/public.hpp"
-#include "simulation/util/units/public.hpp"
+#include "simulation/util/public/trig.hpp"
+#include "simulation/util/public/units.hpp"
 
 namespace messages {
 

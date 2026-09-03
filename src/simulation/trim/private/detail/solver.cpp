@@ -2,6 +2,8 @@
 #include <limits>
 #include <stdexcept>
 #include <spdlog/spdlog.h>
+#include "simulation/constants/public/linalg.hpp"
+#include "simulation/constants/public/dimensions.hpp"
 #include "simulation/actuators/public/data/helpers.hpp"
 #include "simulation/qp/public/solver.hpp"
 #include "simulation/trim/private/data/helpers.hpp"

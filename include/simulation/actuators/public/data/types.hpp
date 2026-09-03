@@ -3,7 +3,8 @@
 #include <optional>
 #include <string>
 #include <vector>
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/linalg.hpp"
+#include "simulation/constants/public/dimensions.hpp"
 
 namespace actuators {
 

@@ -3,7 +3,7 @@
 #include <string>
 #include "simulation/actuators/public/data/types.hpp"
 #include "simulation/atmospheric/public/data/types.hpp"
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/linalg.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/structural/public/data/types.hpp"
 

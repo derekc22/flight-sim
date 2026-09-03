@@ -1,5 +1,6 @@
 #include <cppad/example/cppad_eigen.hpp>
 #include <cppad/cppad.hpp>
+#include "simulation/constants/public/dimensions.hpp"
 #include "simulation/autodiff/public/detail/cppad.hpp"
 #include "simulation/trim/private/detail/residual.hpp"
 

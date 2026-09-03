@@ -1,7 +1,7 @@
 #include <stdexcept>
 #include <Eigen/Dense>
 #include "core/io/data/public/data/types.hpp"
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
 
 namespace io {
 

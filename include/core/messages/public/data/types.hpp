@@ -1,6 +1,6 @@
 #pragma once
 #include "simulation/atmospheric/public/data/types.hpp"
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/linalg.hpp"
 #include "simulation/geography/public/data/types.hpp"
 
 namespace messages {

@@ -23,7 +23,7 @@ namespace structural {
 
         double compute_spin_inertia(const Geometry& geom, const Eigen::Vector3d& axis);
 
-        StructuralState compute_structural_state();
+        StructuralManagerOutput step(const StructuralManagerInput& input);
     };
 
 

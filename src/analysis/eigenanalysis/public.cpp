@@ -5,7 +5,7 @@
 #include <string>
 #include "analysis/eigenanalysis/private.hpp"
 #include "analysis/eigenanalysis/public.hpp"
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/dimensions.hpp"
 #include "simulation/linearization/public/data/types.hpp"
 
 namespace analysis {

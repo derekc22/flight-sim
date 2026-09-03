@@ -16,10 +16,6 @@ namespace util {
     double abs(double x);
     double smooth_abs(double x);
 
-    double first_order_lag(double val, double prev_val, double tau, double dt);
-    Eigen::Vector3d first_order_lag(const Eigen::Vector3d& val, const Eigen::Vector3d& prev_val, double tau, double dt);
-    Eigen::Quaterniond first_order_lag(const Eigen::Quaterniond& val, const Eigen::Quaterniond& prev_val, double tau, double dt);
-
     Eigen::VectorXd vec_clamp(const Eigen::VectorXd& x, const Eigen::VectorXd& x_min, const Eigen::VectorXd& x_max);
     bool vec_is_close(const Eigen::VectorXd& a, const Eigen::VectorXd& b);
 
@@ -27,4 +23,4 @@ namespace util {
     void fill_arr(std::array<T, N>& x, std::size_t start, std::size_t stop, const T& val);
 }
 
-#include "simulation/util/public.tpp"
+#include "simulation/util/public/math.tpp"

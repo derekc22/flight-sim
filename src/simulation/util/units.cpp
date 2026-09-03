@@ -1,4 +1,4 @@
-#include "simulation/util/units/public.hpp"
+#include "simulation/util/public/units.hpp"
 
 namespace util {
 

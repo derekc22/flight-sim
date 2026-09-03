@@ -4,7 +4,7 @@
 #include <string>
 #include <unordered_set>
 #include "simulation/aerodynamics/public/data/helpers.hpp"
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/linalg.hpp"
 #include "simulation/frames/public/detail/kinematics.hpp"
 #include "simulation/geography/public/detail/geodesy.hpp"
 #include "simulation/geography/public/detail/gravity.hpp"

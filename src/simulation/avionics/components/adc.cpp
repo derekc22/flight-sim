@@ -1,7 +1,7 @@
 #include <cmath>
 #include "simulation/avionics/public/components/adc.hpp"
-#include "simulation/constants/public.hpp"
-#include "simulation/util/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
+#include "simulation/util/public/math.hpp"
 
 namespace avionics {
 

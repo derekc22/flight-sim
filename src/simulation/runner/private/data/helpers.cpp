@@ -36,7 +36,7 @@ namespace runner {
 
         // set initial conditions from config
         vehicles::StepOptions InitStepOpts = json::parse_initialization_config(json_flags.trim_flag);
-        structural::StructuralState struc_t = aircraft.structural_manager.compute_structural_state();
+        structural::StructuralState struc_t = aircraft.structural_manager.step({}).struc_t;
         InitStepOpts.CGFrameFRDStepOpts = vehicles::CGFrameFRDStepOptions{ .pB_GB = dynamics::Position{ struc_t.pB_GB.data } };
         aircraft.step(InitStepOpts);
 

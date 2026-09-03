@@ -1,5 +1,6 @@
 #pragma once
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/linalg.hpp"
+#include "simulation/constants/public/dimensions.hpp"
 
 namespace allocator {
 

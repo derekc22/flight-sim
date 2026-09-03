@@ -1,6 +1,6 @@
 #pragma once
 #include <unordered_set>
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/linalg.hpp"
 #include "simulation/frames/public/data/types.hpp"
 
 namespace frames {

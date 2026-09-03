@@ -1,6 +1,7 @@
 #pragma once
 #include <Eigen/Dense>
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/linalg.hpp"
+#include "simulation/constants/public/dimensions.hpp"
 
 namespace dynamics { struct OrientationQuaternion; struct EulerAngles; struct OrientationQuaternionRate; } // forward declare
 

@@ -1,6 +1,7 @@
 #include <stdexcept>
-#include "simulation/constants/public.hpp"
-#include "simulation/util/cppad/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
+#include "simulation/constants/public/linalg.hpp"
+#include "simulation/util/public/cppad.hpp"
 
 namespace util {
 

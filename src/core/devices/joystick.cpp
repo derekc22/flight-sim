@@ -4,7 +4,7 @@
 #include <string>
 #include <SDL3/SDL.h>
 #include "core/devices/public/joystick.hpp"
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
 
 namespace devices {
 

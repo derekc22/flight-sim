@@ -1,5 +1,5 @@
 #include <Eigen/Dense>
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
 #include "simulation/geography/private/detail/gravity.hpp"
 
 namespace geography {

@@ -6,7 +6,8 @@
 #include "simulation/transforms/private/detail/se3.hpp"
 #include "simulation/transforms/public/detail/se3.hpp"
 #include "simulation/transforms/public/detail/so3.hpp"
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
+#include "simulation/constants/public/linalg.hpp"
 
 static void expect_matrix4_near(const Eigen::Matrix4d& A, const Eigen::Matrix4d& B) {
     EXPECT_TRUE(A.isApprox(B, constants::eps_strict));

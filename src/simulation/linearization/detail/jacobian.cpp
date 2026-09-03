@@ -2,7 +2,9 @@
 #include <cppad/cppad.hpp>
 #include "simulation/autodiff/public/detail/cppad.hpp"
 #include "simulation/autodiff/public/detail/evaluation.hpp"
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
+#include "simulation/constants/public/linalg.hpp"
+#include "simulation/constants/public/dimensions.hpp"
 #include "simulation/dynamics/public/data/helpers.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/linearization/public/detail/jacobian.hpp"

@@ -1,6 +1,6 @@
 #include "simulation/control/private/components/velocity/pid.hpp"
 #include "simulation/control/public/components/velocity.hpp"
-#include "simulation/util/public.hpp"
+#include "simulation/util/public/math.hpp"
 
 namespace control {
 

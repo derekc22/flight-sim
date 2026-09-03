@@ -3,7 +3,7 @@
 #include "simulation/aerodynamics/public/detail/state.hpp"
 #include "simulation/dynamics/public/detail/derivatives.hpp"
 #include "simulation/trim/public/data/helpers.hpp"
-#include "simulation/util/trig/public.hpp"
+#include "simulation/util/public/trig.hpp"
 
 namespace trim {
 

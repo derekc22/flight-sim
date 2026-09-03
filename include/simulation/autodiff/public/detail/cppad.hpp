@@ -3,7 +3,7 @@
 #include <Eigen/Dense>
 #include <cppad/example/cppad_eigen.hpp>
 #include <cppad/cppad.hpp>
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/linalg.hpp"
 
 namespace autodiff {
 

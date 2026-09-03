@@ -1,11 +1,12 @@
 #pragma once
 #include "simulation/atmospheric/public/data/types.hpp"
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
+#include "simulation/constants/public/linalg.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
-#include "simulation/util/cppad/public.hpp"
-#include "simulation/util/linalg/public.hpp"
-#include "simulation/util/public.hpp"
-#include "simulation/util/trig/public.hpp"
+#include "simulation/util/public/cppad.hpp"
+#include "simulation/util/public/linalg.hpp"
+#include "simulation/util/public/math.hpp"
+#include "simulation/util/public/trig.hpp"
 
 namespace aerodynamics {
 

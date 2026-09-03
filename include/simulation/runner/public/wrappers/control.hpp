@@ -2,7 +2,7 @@
 #include <array>
 #include <optional>
 #include "core/devices/public/joystick.hpp"
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/dimensions.hpp"
 #include "simulation/runner/public/data/types.hpp"
 
 namespace runner {

@@ -1,7 +1,7 @@
 #include <array>
 #include <cmath>
 #include "simulation/atmospheric/private/detail/state.hpp"
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
 
 namespace atmospheric {
 

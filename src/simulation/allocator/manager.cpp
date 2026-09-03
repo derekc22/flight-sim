@@ -1,4 +1,7 @@
 #include <cmath>
+#include "simulation/constants/public/scalars.hpp"
+#include "simulation/constants/public/linalg.hpp"
+#include "simulation/constants/public/dimensions.hpp"
 #include "simulation/actuators/public/data/helpers.hpp"
 #include "simulation/actuators/public/manager.hpp"
 #include "simulation/allocator/private/detail/effectiveness.hpp"

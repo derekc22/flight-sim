@@ -1,7 +1,7 @@
 #include <Eigen/Dense>
 #include "simulation/dynamics/private/detail/derivatives.hpp"
-#include "simulation/util/linalg/public.hpp"
-#include "simulation/util/trig/public.hpp"
+#include "simulation/util/public/linalg.hpp"
+#include "simulation/util/public/trig.hpp"
 
 namespace dynamics {
 

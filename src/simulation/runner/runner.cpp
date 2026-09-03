@@ -6,7 +6,6 @@
 #include "simulation/aerodynamics/public/detail/state.hpp"
 #include "simulation/atmospheric/public/detail/state.hpp"
 #include "simulation/autodiff/public/data/helpers.hpp"
-#include "simulation/constants/public.hpp"
 #include "simulation/dynamics/public/detail/state.hpp"
 #include "simulation/geography/public/detail/geodesy.hpp"
 #include "simulation/runner/private/data/helpers.hpp"
@@ -77,7 +76,7 @@ namespace runner {
         dynamics::RigidBodyState XEt = dynamics::compute_rigid_body_state(aircraft.CGFrameFRD, aircraft.ECEFFrame);
 
         // compute structural state
-        structural::StructuralState struc_t = aircraft.structural_manager.compute_structural_state();
+        structural::StructuralState struc_t = aircraft.structural_manager.step({}).struc_t;
 
         // compute aerodynamic state
         aerodynamics::AerodynamicState aero_t = aerodynamics::compute_aerodynamic_state(aircraft.CGFrameFRD, aircraft.NEDFrameECEF, windB);

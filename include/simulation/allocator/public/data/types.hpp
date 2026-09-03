@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include <optional>
+#include "simulation/constants/public/dimensions.hpp"
 #include "simulation/control/public/data/types.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/operating/public/data/types.hpp"

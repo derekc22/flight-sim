@@ -4,7 +4,7 @@
 #include "core/json/runner/private/parsing.hpp"
 #include "core/json/runner/private/validation.hpp"
 #include "simulation/runner/public/data/types.hpp"
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
 
 namespace json {
 

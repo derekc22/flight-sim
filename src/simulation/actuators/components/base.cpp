@@ -1,9 +1,10 @@
 #include <Eigen/Core>
 #include <optional>
 #include "simulation/actuators/public/components/base.hpp"
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/linalg.hpp"
 #include "simulation/transforms/public/detail/so3.hpp"
-#include "simulation/util/public.hpp"
+#include "simulation/util/public/filters.hpp"
+#include "simulation/util/public/math.hpp"
 
 namespace actuators {
 

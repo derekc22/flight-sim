@@ -5,7 +5,7 @@
 #include <Eigen/Dense>
 #include "simulation/actuators/public/components/collection.hpp"
 #include "simulation/actuators/public/data/types.hpp"
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/dimensions.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/guidance/public/data/types.hpp"
 #include "simulation/linearization/public/data/types.hpp"

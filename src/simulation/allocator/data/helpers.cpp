@@ -1,3 +1,4 @@
+#include "simulation/constants/public/dimensions.hpp"
 #include "simulation/allocator/public/data/helpers.hpp"
 #include "simulation/dynamics/public/data/helpers.hpp"
 

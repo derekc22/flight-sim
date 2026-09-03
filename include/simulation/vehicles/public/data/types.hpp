@@ -1,5 +1,6 @@
 #pragma once
 #include <optional>
+#include "simulation/constants/public/scalars.hpp"
 #include "simulation/aerodynamics/public/data/types.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/frames/public/data/types.hpp"

@@ -1,8 +1,9 @@
 #include <optional>
 #include <random>
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
+#include "simulation/constants/public/linalg.hpp"
 #include "simulation/sensors/public/components/base.hpp"
-#include "simulation/util/public.hpp"
+#include "simulation/util/public/filters.hpp"
 
 namespace sensors {
 

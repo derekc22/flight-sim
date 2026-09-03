@@ -1,5 +1,6 @@
 #include <cmath>
 #include <thread>
+#include "simulation/constants/public/scalars.hpp"
 #include "simulation/runner/public/scheduling/scheduler.hpp"
 
 namespace runner {

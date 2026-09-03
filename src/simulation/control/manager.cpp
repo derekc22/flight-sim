@@ -72,12 +72,12 @@ namespace control {
         ControlComponentInputs component_inputs;
 
         if (attitude_control.has_value()) {
-			component_inputs.attitude_input.emplace(
-				AttitudeControlInput{
-					.Zt = Zt,
-			    	.setpoint = guidance::AttitudeSetpoint{ setpoint },
-					.delta_mu_vec_t_1 = delta_mu_vec_t_1
-			    }
+            component_inputs.attitude_input.emplace(
+                AttitudeControlInput{
+                    .Zt = Zt,
+                    .setpoint = guidance::AttitudeSetpoint{ setpoint },
+                    .delta_mu_vec_t_1 = delta_mu_vec_t_1
+                }
             );
         }
         if (velocity_control.has_value()) {
@@ -91,19 +91,19 @@ namespace control {
         }
         if (full_state_control.has_value()) {
             component_inputs.full_state_input.emplace(
-				    FullStateControlInput{
-					.Zt = Zt,
-					.virtual_linearization = virtual_lin_sol,
-					.Z_sol_trim = trim_sol.operating_point.state,
+                FullStateControlInput{
+                    .Zt = Zt,
+                    .virtual_linearization = virtual_lin_sol,
+                    .Z_sol_trim = trim_sol.operating_point.state,
                     .surface_actuators = surface_actuators,
                     .propulsor_actuators = propulsor_actuators,
-				    .setpoint = setpoint,
-					.delta_mu_vec_t_1 = delta_mu_vec_t_1
-				    }
+                    .setpoint = setpoint,
+                    .delta_mu_vec_t_1 = delta_mu_vec_t_1
+                }
             );
         }
 
-		return component_inputs;
-	}
+        return component_inputs;
+    }
 
 }

@@ -1,7 +1,6 @@
 #include "core/io/data/public/manager.hpp"
 #include "core/io/public/files.hpp"
 #include "simulation/actuators/public/data/helpers.hpp"
-#include "simulation/constants/public.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/runner/public/data/types.hpp"
 

@@ -1,3 +1,4 @@
+#include "simulation/constants/public/scalars.hpp"
 #include "simulation/integrators/public/detail/rk4.hpp"
 #include "simulation/runner/public/wrappers/physics.hpp"
 #include "simulation/vehicles/public/aircraft.hpp"

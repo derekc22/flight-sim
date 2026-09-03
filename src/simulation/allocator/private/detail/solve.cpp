@@ -1,6 +1,9 @@
 #include <cmath>
 #include <vector>
 #include <spdlog/spdlog.h>
+#include "simulation/constants/public/scalars.hpp"
+#include "simulation/constants/public/linalg.hpp"
+#include "simulation/constants/public/dimensions.hpp"
 #include "simulation/allocator/private/detail/solve.hpp"
 
 namespace allocator {

@@ -1,5 +1,7 @@
 #pragma once
 #include <array>
+#include "simulation/constants/public/linalg.hpp"
+#include "simulation/constants/public/dimensions.hpp"
 #include "simulation/actuators/public/data/helpers.hpp"
 #include "simulation/control/public/data/types.hpp"
 #include "simulation/qp/public/solver.hpp"

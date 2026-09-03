@@ -1,4 +1,4 @@
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/dimensions.hpp"
 #include "simulation/dynamics/public/data/helpers.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/guidance/public/data/helpers.hpp"

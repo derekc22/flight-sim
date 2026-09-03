@@ -1,3 +1,4 @@
+#include "simulation/constants/public/linalg.hpp"
 #include "simulation/propulsion/public/detail/loads.hpp"
 
 namespace propulsion {

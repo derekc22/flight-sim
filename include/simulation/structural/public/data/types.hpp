@@ -2,7 +2,7 @@
 #include <Eigen/Dense>
 #include <string>
 #include "simulation/dynamics/public/data/types.hpp"
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/linalg.hpp"
 
 namespace structural {
 
@@ -23,6 +23,12 @@ namespace structural {
         dynamics::Mass mass;
         CenterOfGravity pB_GB;
         dynamics::InertiaTensor JB;
+    };
+
+    struct StructuralManagerInput {};
+
+    struct StructuralManagerOutput {
+        StructuralState struc_t;
     };
 
     template <typename T>

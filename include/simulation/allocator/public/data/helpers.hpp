@@ -1,4 +1,5 @@
 #pragma once
+#include "simulation/constants/public/dimensions.hpp"
 #include "simulation/allocator/public/data/types.hpp"
 
 namespace allocator {

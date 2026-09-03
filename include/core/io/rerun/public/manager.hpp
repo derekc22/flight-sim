@@ -9,7 +9,7 @@
 #include <thread>
 #include <vector>
 #include "core/io/rerun/public/data/types.hpp"
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
 #include "simulation/runner/public/data/types.hpp"
 #include "simulation/transforms/public/detail/s3.hpp"
 

@@ -1,7 +1,7 @@
 #include "simulation/control/private/components/full_state/lqi.hpp"
 #include "simulation/control/private/components/full_state/lqr.hpp"
 #include "simulation/control/public/components/full_state.hpp"
-#include "simulation/util/public.hpp"
+#include "simulation/util/public/math.hpp"
 
 namespace control {
 

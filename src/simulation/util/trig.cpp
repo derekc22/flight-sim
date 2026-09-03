@@ -1,6 +1,6 @@
 #include <cmath>
-#include "simulation/constants/public.hpp"
-#include "simulation/util/trig/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
+#include "simulation/util/public/trig.hpp"
 
 namespace util {
 

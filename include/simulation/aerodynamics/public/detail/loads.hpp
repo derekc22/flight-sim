@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include "simulation/constants/public/linalg.hpp"
 #include "simulation/actuators/public/data/types.hpp"
 #include "simulation/aerodynamics/public/data/types.hpp"
 #include "simulation/atmospheric/public/data/types.hpp"

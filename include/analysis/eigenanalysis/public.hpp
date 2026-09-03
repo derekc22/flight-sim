@@ -2,7 +2,8 @@
 #include <Eigen/Dense>
 #include <complex>
 #include <string>
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/linalg.hpp"
+#include "simulation/constants/public/dimensions.hpp"
 #include "simulation/linearization/public/data/types.hpp"
 
 namespace analysis {

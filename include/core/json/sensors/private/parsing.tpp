@@ -5,7 +5,7 @@
 #include "core/json/public/data/helpers.hpp"
 #include "core/json/sensors/private/validation.hpp"
 #include "simulation/sensors/public/components/base.hpp"
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/linalg.hpp"
 
 namespace json {
 

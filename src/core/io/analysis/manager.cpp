@@ -6,7 +6,6 @@
 #include "analysis/eigenanalysis/public.hpp"
 #include "simulation/linearization/public/data/helpers.hpp"
 #include "simulation/trim/public/data/helpers.hpp"
-#include "simulation/constants/public.hpp"
 
 namespace io {
 

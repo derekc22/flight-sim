@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include <nlohmann/json.hpp>
 #include "core/json/runner/private/validation.hpp"
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
 
 namespace json {
 

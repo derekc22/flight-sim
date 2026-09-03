@@ -1,6 +1,6 @@
 #include <Eigen/Core>
 #include "simulation/aerodynamics/public/data/helpers.hpp"
-#include "simulation/util/trig/public.hpp"
+#include "simulation/util/public/trig.hpp"
 
 namespace aerodynamics {
 

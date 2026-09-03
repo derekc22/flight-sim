@@ -2,7 +2,6 @@
 #include <tuple>
 #include "simulation/actuators/public/data/helpers.hpp"
 #include "simulation/autodiff/public/detail/evaluation.hpp"
-#include "simulation/constants/public.hpp"
 #include "simulation/dynamics/public/data/helpers.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/estimation/public/components/extended_kalman.hpp"

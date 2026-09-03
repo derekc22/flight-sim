@@ -1,5 +1,5 @@
 #include <Eigen/Dense>
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
 #include "simulation/geography/private/detail/gravity.hpp"
 #include "simulation/geography/public/detail/gravity.hpp"
 #include "simulation/transforms/public/detail/so3.hpp"

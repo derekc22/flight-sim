@@ -1,8 +1,8 @@
 #pragma once
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
 #include "simulation/propulsion/public/detail/state.hpp"
-#include "simulation/util/cppad/public.hpp"
-#include "simulation/util/public.hpp"
+#include "simulation/util/public/cppad.hpp"
+#include "simulation/util/public/math.hpp"
 
 namespace propulsion {
 

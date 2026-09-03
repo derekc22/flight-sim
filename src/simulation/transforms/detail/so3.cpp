@@ -2,8 +2,7 @@
 #include <cmath>
 #include <stdexcept>
 #include <algorithm>
-#include "simulation/constants/public.hpp"
-#include "simulation/util/public.hpp"
+#include "simulation/util/public/math.hpp"
 #include "simulation/transforms/private/detail/so3.hpp"
 #include "simulation/transforms/public/detail/s3.hpp"
 #include "simulation/transforms/public/detail/so3.hpp"

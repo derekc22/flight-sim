@@ -5,8 +5,8 @@
 #include "core/json/allocator/private/validation.hpp"
 #include "core/json/public/data/helpers.hpp"
 #include "simulation/allocator/public/manager.hpp"
-#include "simulation/constants/public.hpp"
-#include "simulation/util/validate/public.hpp"
+#include "simulation/constants/public/dimensions.hpp"
+#include "simulation/util/public/validation.hpp"
 
 namespace json {
 

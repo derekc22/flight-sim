@@ -1,7 +1,8 @@
 #pragma once
 #include <cstddef>
 #include <Eigen/Dense>
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/linalg.hpp"
+#include "simulation/constants/public/dimensions.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 
 namespace guidance {

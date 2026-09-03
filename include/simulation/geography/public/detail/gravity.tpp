@@ -1,7 +1,9 @@
 #pragma once
+#include "simulation/constants/public/scalars.hpp"
+#include "simulation/constants/public/linalg.hpp"
 #include "simulation/geography/public/detail/gravity.hpp"
-#include "simulation/util/cppad/public.hpp"
-#include "simulation/util/trig/public.hpp"
+#include "simulation/util/public/cppad.hpp"
+#include "simulation/util/public/trig.hpp"
 
 namespace geography {
 

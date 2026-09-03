@@ -115,6 +115,40 @@ src/simulation/<orchestrator>/
 
 `Runner` is the current top-level orchestrator. Its wrappers coordinate subsystem managers and exchange per-step data through explicit payloads and `StepContext`. Scheduling and external-system adapters remain separate from subsystem wrappers.
 
+## Shared Support Modules
+
+Cross-cutting constants and utility functions use semantic filenames under a shared `public/` directory rather than manager, component, or detail roles.
+
+```text
+include/simulation/constants/
+  public/
+    scalars.hpp
+    linalg.hpp
+    dimensions.hpp
+
+include/simulation/util/
+  public/
+    math.hpp
+    math.tpp
+    cppad.hpp
+    filters.hpp
+    linalg.hpp
+    print.hpp
+    trig.hpp
+    units.hpp
+    validation.hpp
+    validation.tpp
+
+src/simulation/util/
+  math.cpp
+  cppad.cpp
+  filters.cpp
+  linalg.cpp
+  print.cpp
+  trig.cpp
+  units.cpp
+```
+
 ## File Roles
 
 ### `data/types`
@@ -142,6 +176,8 @@ Component-specific private algorithms may live under `private/components/<owner>
 ### `manager`
 
 Owns orchestration, persistent module state, component selection, input-payload distribution, and output-payload aggregation. Calculation detail should remain in components or `detail/`.
+
+`step(input) -> output` is the standard per-tick entry point, not the manager's only permitted method. Managers may use named member methods for coherent orchestration phases; simple managers may orchestrate directly in `step()` without artificial helpers. A member method's visibility under the project's struct convention is not a reason to inline it.
 
 ## Source Mirroring
 

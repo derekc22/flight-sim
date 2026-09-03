@@ -4,7 +4,7 @@
 #include <Eigen/Dense>
 #include <nlohmann/json.hpp>
 #include "core/json/actuators/private/validation.hpp"
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
 
 namespace json {
 

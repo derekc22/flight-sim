@@ -6,9 +6,9 @@
 #include "core/json/estimation/private/parsing.hpp"
 #include "core/json/estimation/private/validation.hpp"
 #include "core/json/public/data/helpers.hpp"
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/dimensions.hpp"
 #include "simulation/estimation/public/manager.hpp"
-#include "simulation/util/validate/public.hpp"
+#include "simulation/util/public/validation.hpp"
 
 namespace json {
 

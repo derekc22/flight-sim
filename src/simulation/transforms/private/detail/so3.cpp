@@ -3,9 +3,10 @@
 #include <stdexcept>
 #include <algorithm>
 #include <vector>
-#include "simulation/constants/public.hpp"
-#include "simulation/util/public.hpp"
-#include "simulation/util/trig/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
+#include "simulation/constants/public/linalg.hpp"
+#include "simulation/util/public/math.hpp"
+#include "simulation/util/public/trig.hpp"
 #include "simulation/transforms/private/detail/so3.hpp"
 #include "simulation/transforms/public/detail/so3.hpp"
 

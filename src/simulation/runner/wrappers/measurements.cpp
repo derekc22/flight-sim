@@ -1,6 +1,6 @@
 #include "simulation/avionics/public/data/helpers.hpp"
 #include "simulation/avionics/public/manager.hpp"
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
 #include "simulation/runner/public/wrappers/measurements.hpp"
 #include "simulation/runner/public/scheduling/scheduler.hpp"
 #include "simulation/sensors/public/data/helpers.hpp"

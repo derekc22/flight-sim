@@ -3,8 +3,8 @@
 #include <stdexcept>
 #include <string>
 #include <Eigen/Dense>
-#include "simulation/constants/public.hpp"
-#include "simulation/util/validate/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
+#include "simulation/util/public/validation.hpp"
 
 namespace util {
 

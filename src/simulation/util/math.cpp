@@ -1,7 +1,7 @@
 #include <cmath>
 #include <stdexcept>
-#include "simulation/constants/public.hpp"
-#include "simulation/util/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
+#include "simulation/util/public/math.hpp"
 
 namespace util {
 
@@ -50,30 +50,6 @@ namespace util {
 
     double smooth_abs(double x) {
         return sqrt(x * x + constants::eps * constants::eps) - constants::eps;
-    }
-
-    double first_order_lag(double val, double prev_val, double tau, double dt) {
-        if (tau <= 0.0) { return val; }
-
-        double alpha = std::exp(-dt / tau);
-        return (1-alpha) * val + alpha * prev_val;
-    }
-
-    Eigen::Vector3d first_order_lag(const Eigen::Vector3d& val, const Eigen::Vector3d& prev_val, double tau, double dt) {
-        if (tau <= 0.0) { return val; }
-
-        double alpha = std::exp(-dt / tau);
-        return (1-alpha) * val + alpha * prev_val;
-    }
-
-    Eigen::Quaterniond first_order_lag(const Eigen::Quaterniond& val, const Eigen::Quaterniond& prev_val, double tau, double dt) {
-        if (tau <= 0.0) { return val; }
-
-        double alpha = std::exp(-dt / tau);
-        Eigen::Quaterniond val_adjusted = val;
-        if (prev_val.coeffs().dot(val.coeffs()) < 0.0) val_adjusted.coeffs() *= -1.0;
-
-        return prev_val.slerp(1-alpha, val_adjusted);
     }
 
     Eigen::VectorXd vec_clamp(const Eigen::VectorXd& x, const Eigen::VectorXd& x_min, const Eigen::VectorXd& x_max) {

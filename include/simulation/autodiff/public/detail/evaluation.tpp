@@ -1,6 +1,6 @@
 #pragma once
 #include "simulation/autodiff/public/detail/evaluation.hpp"
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/linalg.hpp"
 #include "simulation/dynamics/public/data/helpers.hpp"
 #include "simulation/dynamics/public/detail/derivatives.hpp"
 #include "simulation/geography/public/detail/gravity.hpp"

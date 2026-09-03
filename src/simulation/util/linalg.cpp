@@ -1,7 +1,8 @@
 #include <cmath>
-#include "simulation/constants/public.hpp"
-#include "simulation/util/linalg/public.hpp"
-#include "simulation/util/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
+#include "simulation/constants/public/linalg.hpp"
+#include "simulation/util/public/linalg.hpp"
+#include "simulation/util/public/math.hpp"
 
 namespace util {
 

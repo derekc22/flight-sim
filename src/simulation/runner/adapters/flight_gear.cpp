@@ -1,4 +1,4 @@
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/linalg.hpp"
 #include "simulation/frames/public/detail/kinematics.hpp"
 #include "simulation/runner/public/adapters/flight_gear.hpp"
 #include "simulation/vehicles/public/aircraft.hpp"

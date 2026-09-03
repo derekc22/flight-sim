@@ -7,7 +7,8 @@
 #include "simulation/transforms/private/detail/so3.hpp"
 #include "simulation/transforms/public/detail/s3.hpp"
 #include "simulation/transforms/public/detail/so3.hpp"
-#include "simulation/constants/public.hpp"
+#include "simulation/constants/public/scalars.hpp"
+#include "simulation/constants/public/linalg.hpp"
 #include "simulation/transforms/helpers.hpp"
 
 static void expect_matrix_near(const Eigen::Matrix3d& A, const Eigen::Matrix3d& B) {
