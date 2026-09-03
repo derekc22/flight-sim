@@ -1,4 +1,3 @@
-#include <stdexcept>
 #include "simulation/control/private/components/attitude/damper.hpp"
 #include "simulation/control/private/components/attitude/pid.hpp"
 #include "simulation/control/public/components/attitude.hpp"
@@ -6,27 +5,20 @@
 
 namespace control {
 
-    AttitudeControl::AttitudeControl(ControllerType controller_type, const AttitudePIDParameters& params) : controller_type(controller_type) {
-        // Creates and returns a stateful lambda that owns a Controller initialized with params
-        // Each call forwards the ControllerClassInput to the stored controller's step(input) method and returns the result
-        // mutable is required because lambda objects treat captured values as const by default, but step(input) may modify the stored controller
-        switch (controller_type) {
-            case ControllerType::AttitudePID:
-                implementation = [controller = AttitudePID{ params }](const AttitudeControlInput& input, double dt) mutable {
-                    return controller.step(input, dt);
-                };
-                break;
+    // Creates a stateful lambda that owns a controller initialized with params
+    // Each call forwards input and dt to the stored controller's step() method and returns the result
+    // mutable is required because captured values are const by default, but step() may modify the stored controller
+    AttitudeControl::AttitudeControl(const AttitudePIDParameters& params) :
+        implementation([controller = AttitudePID{ params }](const AttitudeControlInput& input, double dt) mutable {
+            return controller.step(input, dt);
+        })
+    {}
 
-            case ControllerType::DamperPID:
-                implementation = [controller = DamperPID{ params }](const AttitudeControlInput& input, double dt) mutable {
-                    return controller.step(input, dt);
-                };
-                break;
-
-            default:
-                throw std::runtime_error("control::AttitudeControl unknown control type");
-        }
-    }
+    AttitudeControl::AttitudeControl(const DamperPIDParameters& params) :
+        implementation([controller = DamperPID{ params }](const AttitudeControlInput& input, double dt) mutable {
+            return controller.step(input, dt);
+        })
+    {}
 
     ControlComponentOutput AttitudeControl::step(const AttitudeControlInput& input, double dt) {
         ControlComponentOutput output{ .mu = implementation(input, dt) };

@@ -1,7 +1,7 @@
 #include <stdexcept>
 #include <string>
-#include "simulation/control/private/policies/linear_quadratic/care.hpp"
-#include "simulation/control/private/policies/linear_quadratic/care_wrapper.h"
+#include "simulation/control/private/policies/linear_quadratic/slicot_care.hpp"
+#include "simulation/control/private/policies/linear_quadratic/slicot_care_wrapper.h"
 #include "simulation/util/validate/public.hpp"
 
 namespace control {

@@ -5,8 +5,7 @@
 
 namespace control {
 
-    FullStateControl::FullStateControl(ControllerType controller_type, const LinearQuadraticRegulatorParameters& params) :
-        controller_type(controller_type),
+    FullStateControl::FullStateControl(const LinearQuadraticRegulatorParameters& params) :
         implementation(
             [controller = LinearQuadraticRegulator{ params }](const FullStateControlInput& input, double dt) mutable {
                 return controller.step(input, dt);
@@ -14,8 +13,7 @@ namespace control {
         )
     {}
 
-    FullStateControl::FullStateControl(ControllerType controller_type, const LinearQuadraticIntegratorParameters& params) :
-        controller_type(controller_type),
+    FullStateControl::FullStateControl(const LinearQuadraticIntegratorParameters& params) :
         implementation(
             [controller = LinearQuadraticIntegrator{ params }](const FullStateControlInput& input, double dt) mutable {
                 return controller.step(input, dt);

@@ -4,8 +4,7 @@
 
 namespace control {
 
-    VelocityControl::VelocityControl(ControllerType controller_type, const VelocityPIDParameters& params) :
-        controller_type(controller_type),
+    VelocityControl::VelocityControl(const VelocityPIDParameters& params) :
         implementation(
             [controller = VelocityPID{ params }](const VelocityControlInput& input, double dt) mutable {
                 return controller.step(input, dt);

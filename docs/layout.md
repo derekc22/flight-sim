@@ -80,6 +80,41 @@ src/simulation/<module>/
     detail/
 ```
 
+## Top-Level Orchestrators
+
+Top-level orchestrators compose subsystems but are not themselves subsystem managers. Wrappers isolate orchestration responsibilities and runner-level persistent state without representing independent subsystems.
+
+```text
+include/simulation/<orchestrator>/
+  public/
+    adapters/
+      <adapter>.hpp
+    data/
+      types.hpp
+    scheduling/
+      scheduler.hpp
+    wrappers/
+      <wrapper>.hpp
+    <orchestrator>.hpp
+  private/
+    data/
+      helpers.hpp        # optional
+
+src/simulation/<orchestrator>/
+  adapters/
+    <adapter>.cpp
+  scheduling/
+    scheduler.cpp
+  wrappers/
+    <wrapper>.cpp
+  private/
+    data/
+      helpers.cpp        # optional
+  <orchestrator>.cpp
+```
+
+`Runner` is the current top-level orchestrator. Its wrappers coordinate subsystem managers and exchange per-step data through explicit payloads and `StepContext`. Scheduling and external-system adapters remain separate from subsystem wrappers.
+
 ## File Roles
 
 ### `data/types`
@@ -116,6 +151,9 @@ Source directories mirror the semantic category of their public or private decla
 public/data/helpers.hpp       -> src/<module>/data/helpers.cpp
 public/data/types.hpp         -> src/<module>/data/types.cpp
 public/components/foo.hpp     -> src/<module>/components/foo.cpp
+public/adapters/foo.hpp       -> src/<orchestrator>/adapters/foo.cpp
+public/scheduling/foo.hpp     -> src/<orchestrator>/scheduling/foo.cpp
+public/wrappers/foo.hpp       -> src/<orchestrator>/wrappers/foo.cpp
 public/detail/foo.hpp         -> src/<module>/detail/foo.cpp
 public/manager.hpp            -> src/<module>/manager.cpp
 private/detail/foo.hpp        -> src/<module>/private/detail/foo.cpp

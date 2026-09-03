@@ -46,6 +46,8 @@ namespace control {
         double tau = 0.0;
     };
 
+    struct DamperPIDParameters : AttitudePIDParameters {};
+
     struct VelocityPIDParameters {
         double Kp;
         double Ki;

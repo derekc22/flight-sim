@@ -4,10 +4,10 @@
 namespace control {
 
     struct AttitudeControl {
-        ControllerType controller_type;
         AttitudeControlImplementation implementation;
 
-        AttitudeControl(ControllerType controller_type, const AttitudePIDParameters& params);
+        AttitudeControl(const AttitudePIDParameters& params);
+        AttitudeControl(const DamperPIDParameters& params);
         ControlComponentOutput step(const AttitudeControlInput& input, double dt);
     };
 

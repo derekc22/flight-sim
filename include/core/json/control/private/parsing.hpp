@@ -6,7 +6,7 @@
 
 namespace json {
 
-    control::AttitudePIDParameters parse_damper_pid_parameters(const nlohmann::json& controller_json);
+    control::DamperPIDParameters parse_damper_pid_parameters(const nlohmann::json& controller_json);
     control::AttitudePIDParameters parse_attitude_pid_parameters(const nlohmann::json& controller_json);
     control::VelocityPIDParameters parse_velocity_pid_parameters(const nlohmann::json& controller_json);
     control::LinearQuadraticRegulatorParameters parse_linear_quadratic_regulator_parameters(const nlohmann::json& controller_json);

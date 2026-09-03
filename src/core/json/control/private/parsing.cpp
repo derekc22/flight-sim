@@ -8,7 +8,7 @@
 
 namespace json {
 
-    control::AttitudePIDParameters parse_damper_pid_parameters(const nlohmann::json& controller_json) {
+    control::DamperPIDParameters parse_damper_pid_parameters(const nlohmann::json& controller_json) {
         const auto& parameters_json = controller_json.at("parameters");
         if (!parameters_json.is_object()) { 
             throw std::runtime_error("json::parse_damper_pid_parameters expected parameters object"); 
@@ -27,7 +27,7 @@ namespace json {
             throw std::runtime_error("json::parse_damper_pid_parameters requires non-negative tau");
         }
 
-        control::AttitudePIDParameters params{};
+        control::DamperPIDParameters params{};
         params.Kp_roll = parameters_json.at("Kp_roll").get<double>();
         params.Ki_roll = parameters_json.at("Ki_roll").get<double>();
         params.Kd_roll = parameters_json.at("Kd_roll").get<double>();
@@ -132,12 +132,12 @@ namespace json {
         switch (controller_type) {
             case control::ControllerType::AttitudePID: {
                 control::AttitudePIDParameters params = parse_attitude_pid_parameters(controller_json);
-                return control::AttitudeControl(controller_type, params);
+                return control::AttitudeControl(params);
             }
 
             case control::ControllerType::DamperPID: {
-                control::AttitudePIDParameters params = parse_damper_pid_parameters(controller_json);
-                return control::AttitudeControl(controller_type, params);
+                control::DamperPIDParameters params = parse_damper_pid_parameters(controller_json);
+                return control::AttitudeControl(params);
             }
 
             default:
@@ -149,7 +149,7 @@ namespace json {
         switch (controller_type) {
             case control::ControllerType::VelocityPID: {
                 control::VelocityPIDParameters params = parse_velocity_pid_parameters(controller_json);
-                return control::VelocityControl(controller_type, params);
+                return control::VelocityControl(params);
             }
 
             default:
@@ -161,12 +161,12 @@ namespace json {
         switch (controller_type) {
             case control::ControllerType::LinearQuadraticRegulator: {
                 control::LinearQuadraticRegulatorParameters params = parse_linear_quadratic_regulator_parameters(controller_json);
-                return control::FullStateControl(controller_type, params);
+                return control::FullStateControl(params);
             }
 
             case control::ControllerType::LinearQuadraticIntegrator: {
                 control::LinearQuadraticIntegratorParameters params = parse_linear_quadratic_integrator_parameters(controller_json);
-                return control::FullStateControl(controller_type, params);
+                return control::FullStateControl(params);
             }
 
             case control::ControllerType::LinearQuadraticTracker:
