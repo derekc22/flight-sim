@@ -1,4 +1,4 @@
-#include "simulation/control/private/components/full_state/helpers.hpp"
+#include "simulation/control/private/components/linear_quadratic/helpers.hpp"
 #include "simulation/dynamics/public/data/helpers.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/guidance/public/data/types.hpp"

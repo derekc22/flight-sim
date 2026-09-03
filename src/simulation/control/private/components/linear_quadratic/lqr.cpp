@@ -1,8 +1,8 @@
-#include "simulation/control/private/components/full_state/lqr.hpp"
+#include "simulation/control/private/components/linear_quadratic/lqr.hpp"
 #include "simulation/dynamics/public/data/helpers.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/guidance/public/data/types.hpp"
-#include "simulation/control/private/components/full_state/helpers.hpp"
+#include "simulation/control/private/components/linear_quadratic/helpers.hpp"
 
 namespace control {
 
@@ -10,7 +10,7 @@ namespace control {
         policy({ .Q = params.Q, .R = params.R, .K = params.K })
     {};
 
-    LinearQuadraticPolicyInput LinearQuadraticRegulator::make_linear_quadratic_policy_input(const FullStateControlInput& input) {
+    LinearQuadraticPolicyInput LinearQuadraticRegulator::make_linear_quadratic_policy_input(const LinearQuadraticControlInput& input) {
         dynamics::RigidBodyState Zt = input.Zt;
         dynamics::StateVector_T<double> zt_deviation = dynamics::unpack_state(Zt) - unpack_state(input.setpoint);
 
@@ -21,7 +21,7 @@ namespace control {
         };
     }
 
-    VirtualControlOutput_T<double> LinearQuadraticRegulator::step(const FullStateControlInput& input, double) {
+    VirtualControlOutput_T<double> LinearQuadraticRegulator::step(const LinearQuadraticControlInput& input, double) {
         VirtualControlOutputVector_T<double> mu_deviation = policy.step(
             make_linear_quadratic_policy_input(input)
         );

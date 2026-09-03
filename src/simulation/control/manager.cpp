@@ -41,8 +41,8 @@ namespace control {
                 output.actuator_mask[i] = output.actuator_mask[i] || component_output.actuator_mask[i];
             }
         }
-        if (full_state_control.has_value() && inputs.full_state_input.has_value()) {
-            const ControlComponentOutput component_output = full_state_control.value().step(inputs.full_state_input.value(), dt);
+        if (linear_quadratic_control.has_value() && inputs.linear_quadratic_input.has_value()) {
+            const ControlComponentOutput component_output = linear_quadratic_control.value().step(inputs.linear_quadratic_input.value(), dt);
             mu.F += component_output.mu.F;
             mu.M += component_output.mu.M;
             for (std::size_t i = 0; i < output.active_mask.size(); ++i) {
@@ -89,9 +89,9 @@ namespace control {
                 }
             );
         }
-        if (full_state_control.has_value()) {
-            component_inputs.full_state_input.emplace(
-                FullStateControlInput{
+        if (linear_quadratic_control.has_value()) {
+            component_inputs.linear_quadratic_input.emplace(
+                LinearQuadraticControlInput{
                     .Zt = Zt,
                     .virtual_linearization = virtual_lin_sol,
                     .Z_sol_trim = trim_sol.operating_point.state,

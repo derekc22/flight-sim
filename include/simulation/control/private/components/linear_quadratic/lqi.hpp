@@ -1,6 +1,6 @@
 #pragma once
 #include <Eigen/Dense>
-#include "simulation/control/private/components/full_state/lqr.hpp"
+#include "simulation/control/private/components/linear_quadratic/lqr.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/constants/public/linalg.hpp"
 #include "simulation/constants/public/dimensions.hpp"
@@ -15,9 +15,9 @@ namespace control {
         IntegratedStateVector integral = Eigen::Vector3d::Zero();
 
         LinearQuadraticIntegrator(const LinearQuadraticIntegratorParameters& params);
-        VirtualControlOutput_T<double> step(const FullStateControlInput& input, double dt);
+        VirtualControlOutput_T<double> step(const LinearQuadraticControlInput& input, double dt);
 
-        LinearQuadraticPolicyInput make_linear_quadratic_policy_input(const FullStateControlInput& input, const IntegratedStateVector& integral_candidate);
+        LinearQuadraticPolicyInput make_linear_quadratic_policy_input(const LinearQuadraticControlInput& input, const IntegratedStateVector& integral_candidate);
         IntegratedStateVector integrate_state_err(const dynamics::StateVector_T<double>& zt, const dynamics::StateVector_T<double>& zt_des, double dt);
     };
 

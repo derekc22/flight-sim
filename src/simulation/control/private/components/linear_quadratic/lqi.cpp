@@ -1,11 +1,11 @@
 #include <Eigen/Dense>
 #include <algorithm>
-#include "simulation/control/private/components/full_state/lqi.hpp"
-#include "simulation/control/private/components/full_state/lqr.hpp"
+#include "simulation/control/private/components/linear_quadratic/lqi.hpp"
+#include "simulation/control/private/components/linear_quadratic/lqr.hpp"
 #include "simulation/constants/public/scalars.hpp"
 #include "simulation/constants/public/dimensions.hpp"
 #include "simulation/linearization/public/data/types.hpp"
-#include "simulation/control/private/components/full_state/helpers.hpp"
+#include "simulation/control/private/components/linear_quadratic/helpers.hpp"
 #include "simulation/util/public/math.hpp"
 #include "simulation/dynamics/public/data/helpers.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
@@ -39,7 +39,7 @@ namespace control {
     }
 
 
-    LinearQuadraticPolicyInput LinearQuadraticIntegrator::make_linear_quadratic_policy_input(const FullStateControlInput& input, const IntegratedStateVector& integral_new) {
+    LinearQuadraticPolicyInput LinearQuadraticIntegrator::make_linear_quadratic_policy_input(const LinearQuadraticControlInput& input, const IntegratedStateVector& integral_new) {
         size_t n = constants::state_dim;
         size_t m = constants::virtual_input_dim;
         size_t i = integrated_state_dim;
@@ -75,7 +75,7 @@ namespace control {
         };
     }
 
-    VirtualControlOutput_T<double> LinearQuadraticIntegrator::step(const FullStateControlInput& input, double dt) {
+    VirtualControlOutput_T<double> LinearQuadraticIntegrator::step(const LinearQuadraticControlInput& input, double dt) {
 
         // integral candidate
         IntegratedStateVector integral_new = integrate_state_err(

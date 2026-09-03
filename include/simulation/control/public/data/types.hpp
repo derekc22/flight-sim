@@ -87,7 +87,7 @@ namespace control {
         dynamics::WrenchVector_T<double> delta_mu_vec_t_1;
     };
 
-    struct FullStateControlInput {
+    struct LinearQuadraticControlInput {
         const dynamics::RigidBodyState& Zt;
         const linearization::VirtualLocalLinearization& virtual_linearization;
         const dynamics::State_T<double>& Z_sol_trim;
@@ -100,14 +100,14 @@ namespace control {
     struct ControlComponentInputs {
         std::optional<AttitudeControlInput> attitude_input;
         std::optional<VelocityControlInput> velocity_input;
-        std::optional<FullStateControlInput> full_state_input;
+        std::optional<LinearQuadraticControlInput> linear_quadratic_input;
     };
 
     using AttitudeControlImplementation = std::function<VirtualControlOutput_T<double>(const AttitudeControlInput&, double dt)>;
 
     using VelocityControlImplementation = std::function<VirtualControlOutput_T<double>(const VelocityControlInput&, double dt)>;
 
-    using FullStateControlImplementation = std::function<VirtualControlOutput_T<double>(const FullStateControlInput&, double dt)>;
+    using LinearQuadraticControlImplementation = std::function<VirtualControlOutput_T<double>(const LinearQuadraticControlInput&, double dt)>;
 
     struct ControlComponentOutput {
         VirtualControlOutput_T<double> mu;

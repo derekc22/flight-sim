@@ -115,25 +115,25 @@ namespace json {
 
         if (config.contains("attitude")) {
             const auto& attitude_guidance_json = config.at("attitude");
-            const control::ControllerType controller_type = control_manager.attitude_control.has_value() ? control_manager.attitude_control.value().controller_type : control::ControllerType::None;
+            const control::ControllerType controller_type = control_manager.attitude_controller_type;
             traj_components = parse_attitude_control_setpoint(attitude_guidance_json, controller_type, traj_components);
         }
 
         if (config.contains("velocity")) {
             const auto& velocity_guidance_json = config.at("velocity");
-            const control::ControllerType controller_type = control_manager.velocity_control.has_value() ? control_manager.velocity_control.value().controller_type : control::ControllerType::None;
+            const control::ControllerType controller_type = control_manager.velocity_controller_type;
             traj_components = parse_velocity_control_setpoint(velocity_guidance_json, controller_type, traj_components);
         }
 
         if (config.contains("linear_quadratic")) {
             const auto& linear_quadratic_guidance_json = config.at("linear_quadratic");
-            const control::ControllerType controller_type = control_manager.full_state_control.has_value() ? control_manager.full_state_control.value().controller_type : control::ControllerType::None;
+            const control::ControllerType controller_type = control_manager.linear_quadratic_controller_type;
             traj_components = parse_linear_quadratic_control_setpoint(linear_quadratic_guidance_json, controller_type, traj_components);
         }
 
         if (config.contains("nonlinear")) {
             const auto& nonlinear_guidance_json = config.at("nonlinear");
-            const control::ControllerType controller_type = control_manager.full_state_control.has_value() ? control_manager.full_state_control.value().controller_type : control::ControllerType::None;
+            const control::ControllerType controller_type = control_manager.nonlinear_controller_type;
             traj_components = parse_nonlinear_control_setpoint(nonlinear_guidance_json, controller_type, traj_components);
         }
 

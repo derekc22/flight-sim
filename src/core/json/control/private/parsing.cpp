@@ -157,32 +157,23 @@ namespace json {
         }
     }
 
-    control::FullStateControl make_full_state_control(control::ControllerType controller_type, const nlohmann::json& controller_json) {
+    control::LinearQuadraticControl make_linear_quadratic_control(control::ControllerType controller_type, const nlohmann::json& controller_json) {
         switch (controller_type) {
             case control::ControllerType::LinearQuadraticRegulator: {
                 control::LinearQuadraticRegulatorParameters params = parse_linear_quadratic_regulator_parameters(controller_json);
-                return control::FullStateControl(params);
+                return control::LinearQuadraticControl(params);
             }
 
             case control::ControllerType::LinearQuadraticIntegrator: {
                 control::LinearQuadraticIntegratorParameters params = parse_linear_quadratic_integrator_parameters(controller_json);
-                return control::FullStateControl(params);
+                return control::LinearQuadraticControl(params);
             }
 
             case control::ControllerType::LinearQuadraticTracker:
                 throw std::runtime_error("TODO: NOT IMPLEMENTED");
 
-            case control::ControllerType::FeedbackLinearization:
-                throw std::runtime_error("TODO: NOT IMPLEMENTED");
-
-            case control::ControllerType::NonlinearDynamicInversion:
-                throw std::runtime_error("TODO: NOT IMPLEMENTED");
-
-            case control::ControllerType::IncrementalNonlinearDynamicInversion:
-                throw std::runtime_error("TODO: NOT IMPLEMENTED");
-
             default:
-                throw std::runtime_error("json::make_full_state_control unknown control type");
+                throw std::runtime_error("json::make_linear_quadratic_control unknown control type");
         }
     }
 
@@ -204,19 +195,32 @@ namespace json {
         return map_controller_type(controller_type_str);
     }
 
-    void parse_attitude_control(const nlohmann::json& controller_json, std::optional<control::AttitudeControl>& component) {
-        control::ControllerType controller_type = fetch_controller_type(controller_json);
+    void parse_attitude_control(const nlohmann::json& controller_json, std::optional<control::AttitudeControl>& component, control::ControllerType& controller_type) {
+        controller_type = fetch_controller_type(controller_json);
         component = make_attitude_control(controller_type, controller_json);
     }
 
-    void parse_velocity_control(const nlohmann::json& controller_json, std::optional<control::VelocityControl>& component) {
-        control::ControllerType controller_type = fetch_controller_type(controller_json);
+    void parse_velocity_control(const nlohmann::json& controller_json, std::optional<control::VelocityControl>& component, control::ControllerType& controller_type) {
+        controller_type = fetch_controller_type(controller_json);
         component = make_velocity_control(controller_type, controller_json);
     }
 
-    void parse_full_state_control(const nlohmann::json& controller_json, std::optional<control::FullStateControl>& component) {
-        control::ControllerType controller_type = fetch_controller_type(controller_json);
-        component = make_full_state_control(controller_type, controller_json);
+    void parse_linear_quadratic_control(const nlohmann::json& controller_json, std::optional<control::LinearQuadraticControl>& component, control::ControllerType& controller_type) {
+        controller_type = fetch_controller_type(controller_json);
+        component = make_linear_quadratic_control(controller_type, controller_json);
+    }
+
+    void parse_nonlinear_control(const nlohmann::json& controller_json, control::ControllerType& controller_type) {
+        controller_type = fetch_controller_type(controller_json);
+        switch (controller_type) {
+            case control::ControllerType::FeedbackLinearization:
+            case control::ControllerType::NonlinearDynamicInversion:
+            case control::ControllerType::IncrementalNonlinearDynamicInversion:
+                throw std::runtime_error("TODO: NOT IMPLEMENTED");
+
+            default:
+                throw std::runtime_error("json::parse_nonlinear_control unknown control type");
+        }
     }
 
     control::ControlManager parse_control_manager(const nlohmann::json& config, bool trim_flag) {
@@ -225,22 +229,22 @@ namespace json {
 
         if (config.contains("attitude")) {
             const auto& attitude_controller_json = config.at("attitude");
-            parse_attitude_control(attitude_controller_json, control_manager.attitude_control);
+            parse_attitude_control(attitude_controller_json, control_manager.attitude_control, control_manager.attitude_controller_type);
         }
 
         if (config.contains("velocity")) {
             const auto& velocity_controller_json = config.at("velocity");
-            parse_velocity_control(velocity_controller_json, control_manager.velocity_control);
+            parse_velocity_control(velocity_controller_json, control_manager.velocity_control, control_manager.velocity_controller_type);
         }
 
         if (config.contains("linear_quadratic")) {
             const auto& linear_quadratic_controller_json = config.at("linear_quadratic");
-            parse_full_state_control(linear_quadratic_controller_json, control_manager.full_state_control);
+            parse_linear_quadratic_control(linear_quadratic_controller_json, control_manager.linear_quadratic_control, control_manager.linear_quadratic_controller_type);
         }
 
         if (config.contains("nonlinear")) {
             const auto& nonlinear_controller_json = config.at("nonlinear");
-            parse_full_state_control(nonlinear_controller_json, control_manager.full_state_control);
+            parse_nonlinear_control(nonlinear_controller_json, control_manager.nonlinear_controller_type);
         }
 
         return control_manager;

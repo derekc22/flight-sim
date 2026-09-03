@@ -1,16 +1,21 @@
 #pragma once
 #include <optional>
 #include "simulation/control/public/components/attitude.hpp"
-#include "simulation/control/public/components/full_state.hpp"
+#include "simulation/control/public/components/linear_quadratic.hpp"
 #include "simulation/control/public/components/velocity.hpp"
 #include "simulation/control/public/data/types.hpp"
 
 namespace control {
 
     struct ControlManager {
+        ControllerType attitude_controller_type = ControllerType::None;
+        ControllerType velocity_controller_type = ControllerType::None;
+        ControllerType linear_quadratic_controller_type = ControllerType::None;
+        ControllerType nonlinear_controller_type = ControllerType::None;
+
         std::optional<AttitudeControl> attitude_control;
         std::optional<VelocityControl> velocity_control;
-        std::optional<FullStateControl> full_state_control;
+        std::optional<LinearQuadraticControl> linear_quadratic_control;
 
         ControlManagerOutput step(const ControlManagerInput& input);
         ControlManagerOutput aggregate_components(const ControlComponentInputs& inputs, double dt);
