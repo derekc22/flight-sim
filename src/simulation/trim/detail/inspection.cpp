@@ -10,7 +10,7 @@
 
 namespace trim {
 
-    TrimSolution inspect_trim(vehicles::Aircraft& aircraft, autodiff::AutoDiffModel& model, const atmospheric::Wind& wind) {
+    TrimSolution inspect_trim(vehicles::Aircraft& aircraft, const autodiff::AutoDiffModel& model, const atmospheric::Wind& wind) {
 
         const actuators::PropulsorActuatorInputs_T<double>& propulsor_limit_max = model.actuator_limits.limit_max.propulsor_inputs;
         const actuators::PropulsorActuatorInputs_T<double>& propulsor_limit_min = model.actuator_limits.limit_min.propulsor_inputs;

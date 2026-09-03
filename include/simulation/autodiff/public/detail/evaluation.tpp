@@ -9,7 +9,7 @@
 namespace autodiff {
 
     template <typename T>
-    dynamics::Wrench_T<T> compute_net_wrench_T(const operating::OperatingPoint_T<T>& operating_point, AutoDiffModel& model, const operating::OperatingConditions& conditions, T dt) {
+    dynamics::Wrench_T<T> compute_net_wrench_T(const operating::OperatingPoint_T<T>& operating_point, const AutoDiffModel& model, const operating::OperatingConditions& conditions, T dt) {
         const dynamics::State_T<T> x = operating_point.state;
         actuators::ActuatorInputs_T<T> u = operating_point.input;
 
@@ -44,18 +44,18 @@ namespace autodiff {
     }
 
     template <typename T>
-    dynamics::StateDot_T<T> compute_state_dot_T(const operating::OperatingPoint_T<T>& operating_point, AutoDiffModel& model, const operating::OperatingConditions& conditions, T dt) {
+    dynamics::StateDot_T<T> compute_state_dot_T(const operating::OperatingPoint_T<T>& operating_point, const AutoDiffModel& model, const operating::OperatingConditions& conditions, T dt) {
         const dynamics::Wrench_T<T> net_wrench = compute_net_wrench_T<T>(operating_point, model, conditions, dt);
         return compute_state_dot_from_net_wrench_T(operating_point.state, model, net_wrench);
     }
 
     template <typename T>
-    dynamics::StateDot_T<T> compute_state_dot_T(const operating::VirtualOperatingPoint_T<T>& operating_point, AutoDiffModel& model) {
+    dynamics::StateDot_T<T> compute_state_dot_T(const operating::VirtualOperatingPoint_T<T>& operating_point, const AutoDiffModel& model) {
         return compute_state_dot_from_net_wrench_T(operating_point.state, model, operating_point.input);
     }
 
     template <typename T>
-    dynamics::StateDot_T<T> compute_state_dot_from_net_wrench_T(const dynamics::State_T<T>& x, AutoDiffModel& model, const dynamics::Wrench_T<T>& net_wrench) {
+    dynamics::StateDot_T<T> compute_state_dot_from_net_wrench_T(const dynamics::State_T<T>& x, const AutoDiffModel& model, const dynamics::Wrench_T<T>& net_wrench) {
         const dynamics::Twist_T<T> twist = dynamics::build_twist_from_state_T(x);
         const constants::Vector3_T<T> v_dot = dynamics::ddtB_vB_BI_T<T>(twist.v, twist.w, model.struc_t.mass.data, net_wrench.F);
         const constants::Vector3_T<T> w_dot = dynamics::ddtB_wB_BI_T<T>(twist.w, model.struc_t.JB.data, net_wrench.M);

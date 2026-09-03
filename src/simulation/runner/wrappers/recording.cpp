@@ -1,12 +1,12 @@
 #include "core/json/public/files.hpp"
 #include "simulation/constants/public.hpp"
-#include "simulation/runner/public/components/recording.hpp"
-#include "simulation/runner/public/components/scheduler.hpp"
+#include "simulation/runner/public/wrappers/recording.hpp"
+#include "simulation/runner/public/scheduling/scheduler.hpp"
 #include "simulation/util/print/public.hpp"
 
 namespace runner {
 
-    Recording::Recording(const CLIOptions& cli_options, const JSONOptions& json_options) {
+    RecordingWrapper::RecordingWrapper(const CLIOptions& cli_options, const JSONOptions& json_options) {
         // create data manager
         if (cli_options.flags.data_flag) {
             data_manager.emplace(json_options.tf, json_options.flags);
@@ -22,7 +22,7 @@ namespace runner {
         }
     }
 
-    void Recording::step(const RecordingInput& input) {
+    void RecordingWrapper::step(const RecordingWrapperInput& input) {
         // update data context
         io::DataContext data_context{
             .Xt=input.context.Xt,
@@ -58,7 +58,7 @@ namespace runner {
         }
     }
 
-    void Recording::cleanup(const CLIOptions& cli_options) {
+    void RecordingWrapper::cleanup(const CLIOptions& cli_options) {
         std::string data_dir_path = cli_options.data_dir_path;
         std::string log_dir_path = cli_options.log_dir_path;
         std::string report_dir_path = cli_options.report_dir_path;

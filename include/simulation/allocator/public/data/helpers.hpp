@@ -11,7 +11,7 @@ namespace allocator {
         const control::ControlOutput& u_actual_t_1,
         const std::optional<control::ControlOutput>& u_preferred,
         const operating::OperatingConditions& conditions, 
-        autodiff::AutoDiffModel& model
+        const autodiff::AutoDiffModel& model
     );
 
 }

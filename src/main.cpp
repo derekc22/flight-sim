@@ -1,7 +1,7 @@
 #include <string>
 #include <spdlog/spdlog.h>
 #include "simulation/runner/public/data/types.hpp"
-#include "simulation/runner/public/manager.hpp"
+#include "simulation/runner/public/runner.hpp"
 #include "core/json/runner/public/parser.hpp"
 
 int main(int argc, char* argv[]) {
@@ -39,10 +39,10 @@ int main(int argc, char* argv[]) {
     runner::JSONOptions json_options = json::parse_runner_config();
 
     // build runner
-    runner::RunManager run_manager{cli_options, json_options};
+    runner::Runner runner{cli_options, json_options};
 
     // run simulation
-    run_manager.run();
+    runner.run();
 
     return 0;
 }

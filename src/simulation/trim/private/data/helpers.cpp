@@ -24,7 +24,7 @@ namespace trim {
         return w;
     }
 
-    TrimSolution build_trim_solution(const operating::StateInputVector_T<double>& xu, const TrimResidualVector_T<double>& residual, const TrimResidualVector_T<double>& weighted_residual, autodiff::AutoDiffModel& model, const operating::OperatingConditions& conditions, bool converged, std::size_t iterations) {
+    TrimSolution build_trim_solution(const operating::StateInputVector_T<double>& xu, const TrimResidualVector_T<double>& residual, const TrimResidualVector_T<double>& weighted_residual, const autodiff::AutoDiffModel& model, const operating::OperatingConditions& conditions, bool converged, std::size_t iterations) {
         TrimSolution out;
         out.operating_point.state = operating::pack_state_T<double>(xu);
         out.operating_point.input = operating::pack_actuator_inputs_T<double>(xu, model.fixed_actuator_inputs);

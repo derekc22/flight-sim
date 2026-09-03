@@ -11,7 +11,7 @@
 namespace trim {
 
     template <typename T>
-    TrimResidualVector_T<T> compute_trim_residual_vector_T(const operating::StateInputVector_T<T>& xu, autodiff::AutoDiffModel& model, const TrimTarget& target, const operating::OperatingConditions& conditions) {
+    TrimResidualVector_T<T> compute_trim_residual_vector_T(const operating::StateInputVector_T<T>& xu, const autodiff::AutoDiffModel& model, const TrimTarget& target, const operating::OperatingConditions& conditions) {
         const operating::OperatingPoint_T<T> operating_point = operating::pack_state_input_T(xu);
         const dynamics::State_T<T> x = operating_point.state;
 

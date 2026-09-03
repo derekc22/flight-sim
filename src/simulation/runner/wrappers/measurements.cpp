@@ -1,15 +1,15 @@
 #include "simulation/avionics/public/data/helpers.hpp"
 #include "simulation/avionics/public/manager.hpp"
 #include "simulation/constants/public.hpp"
-#include "simulation/runner/public/components/measurements.hpp"
-#include "simulation/runner/public/components/scheduler.hpp"
+#include "simulation/runner/public/wrappers/measurements.hpp"
+#include "simulation/runner/public/scheduling/scheduler.hpp"
 #include "simulation/sensors/public/data/helpers.hpp"
 #include "simulation/sensors/public/manager.hpp"
 #include "simulation/vehicles/public/aircraft.hpp"
 
 namespace runner {
 
-    MeasurementsOutput Measurements::step(const MeasurementsInput& input) {
+    MeasurementsWrapperOutput MeasurementsWrapper::step(const MeasurementsWrapperInput& input) {
         // extract reusable quantities
         sensors::SensorManager& sensor_manager = input.aircraft.sensor_manager;
         avionics::AvionicsManager& avionics_manager = input.aircraft.avionics_manager;

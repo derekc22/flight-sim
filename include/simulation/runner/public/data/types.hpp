@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include "analysis/eigenanalysis/public.hpp"
+#include "core/devices/public/data/types.hpp"
 #include "simulation/actuators/public/data/types.hpp"
 #include "simulation/aerodynamics/public/data/types.hpp"
 #include "simulation/atmospheric/public/data/types.hpp"
@@ -89,28 +90,28 @@ namespace runner {
         bool fast;
     };
 
-    struct TrimInput {
+    struct TrimWrapperInput {
         vehicles::Aircraft& aircraft;
-        autodiff::AutoDiffModel& autodiff_model;
+        const autodiff::AutoDiffModel& autodiff_model;
         const atmospheric::Wind& windB;
     };
 
-    struct TrimOutput {
+    struct TrimWrapperOutput {
         trim::TrimSolution trim_sol;
     };
 
-    struct LinearizationInput {
-        autodiff::AutoDiffModel& autodiff_model;
+    struct LinearizationWrapperInput {
+        const autodiff::AutoDiffModel& autodiff_model;
         const trim::TrimSolution& trim_sol;
     };
 
-    struct LinearizationOutput {
+    struct LinearizationWrapperOutput {
         linearization::LocalLinearization lin_sol;
         linearization::VirtualLocalLinearization virtual_lin_sol;
         analysis::EigenAnalysis eig_sol;
     };
 
-    struct MeasurementsInput {
+    struct MeasurementsWrapperInput {
         vehicles::Aircraft& aircraft;
         Scheduler& scheduler;
         const StepContext& context;
@@ -118,11 +119,11 @@ namespace runner {
         bool enabled;
     };
 
-    struct MeasurementsOutput {
+    struct MeasurementsWrapperOutput {
         dynamics::RigidBodyState Yt;
     };
 
-    struct EstimationInput {
+    struct EstimationWrapperInput {
         vehicles::Aircraft& aircraft;
         Scheduler& scheduler;
         const StepContext& context;
@@ -132,64 +133,65 @@ namespace runner {
         bool enabled;
     };
 
-    struct EstimationOutput {
+    struct EstimationWrapperOutput {
         dynamics::RigidBodyState Zt;
     };
 
-    struct ControlInput {
+    struct ControlWrapperInput {
         vehicles::Aircraft& aircraft;
         Scheduler& scheduler;
         const StepContext& context;
         const trim::TrimSolution& trim_sol;
         const linearization::VirtualLocalLinearization& virtual_lin_sol;
-    };
-
-    struct ControlOutput {
-        guidance::GuidanceSetpoint setpoint;
-        control::ControlOutput u_cmd;
-        actuators::ActuatorInputs_T<double> u_actual;
+        const devices::JoystickManagerOutput& joystick_output;
         fsm::FiniteState current_mode;
     };
 
-    struct PhysicsInput {
+    struct ControlWrapperOutput {
+        guidance::GuidanceSetpoint setpoint;
+        control::ControlOutput u_cmd;
+        actuators::ActuatorInputs_T<double> u_actual;
+    };
+
+    struct PhysicsWrapperInput {
         vehicles::Aircraft& aircraft;
         const StepContext& context;
     };
 
-    struct PhysicsOutput {
+    struct PhysicsWrapperOutput {
         dynamics::RigidBodyState Xt1;
         dynamics::Wrench WB_net;
         dynamics::Wrench WB_aerodynamic;
         dynamics::Wrench WB_propulsive;
     };
 
-    struct FlightGearInput {
+    struct FlightGearAdapterInput {
         vehicles::Aircraft& aircraft;
         bool wind_enabled;
     };
 
-    struct FlightGearOutput {
+    struct FlightGearAdapterOutput {
         atmospheric::Wind windI;
         atmospheric::Wind windB;
     };
 
-    struct FlightGearSendInput {
+    struct FlightGearAdapterSendInput {
         const geography::GeographicState& geographic_state;
         const dynamics::EulerAngles& attitude;
     };
 
-    struct RecordingInput {
+    struct RecordingWrapperInput {
         int t;
         const StepContext& context;
         Scheduler& scheduler;
         const JSONFlags& flags;
     };
 
-    struct RunManagerInput {
+    struct RunnerInput {
         int t;
     };
 
-    struct RunManagerOutput {
+    struct RunnerOutput {
         StepContext context;
     };
 

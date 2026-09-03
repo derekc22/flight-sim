@@ -7,6 +7,6 @@ namespace vehicles { struct Aircraft; } // forward declare
 
 namespace trim {
 
-    TrimSolution inspect_trim(vehicles::Aircraft& aircraft, autodiff::AutoDiffModel& model, const atmospheric::Wind& wind);
+    TrimSolution inspect_trim(vehicles::Aircraft& aircraft, const autodiff::AutoDiffModel& model, const atmospheric::Wind& wind);
 
 }

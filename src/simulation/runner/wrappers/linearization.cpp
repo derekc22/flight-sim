@@ -1,10 +1,10 @@
 #include "analysis/eigenanalysis/public.hpp"
 #include "simulation/linearization/public/detail/jacobian.hpp"
-#include "simulation/runner/public/components/linearization.hpp"
+#include "simulation/runner/public/wrappers/linearization.hpp"
 
 namespace runner {
 
-    LinearizationOutput Linearization::step(const LinearizationInput& input) {
+    LinearizationWrapperOutput LinearizationWrapper::step(const LinearizationWrapperInput& input) {
         // compute linearization
         lin_sol = linearization::linearize_operating_point(
             input.autodiff_model,

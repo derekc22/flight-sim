@@ -6,17 +6,14 @@
 #include "simulation/constants/public.hpp"
 #include "simulation/control/public/manager.hpp"
 #include "simulation/guidance/public/manager.hpp"
-#include "simulation/runner/public/components/control.hpp"
-#include "simulation/runner/public/components/scheduler.hpp"
+#include "simulation/runner/public/wrappers/control.hpp"
+#include "simulation/runner/public/scheduling/scheduler.hpp"
 #include "simulation/util/public.hpp"
 #include "simulation/vehicles/public/aircraft.hpp"
 
 namespace runner {
 
-    Control::Control(const JSONFlags& flags, const actuators::SurfaceActuators& surface_actuators, const actuators::PropulsorActuators& propulsor_actuators) :
-        // create state machine
-        fsm_manager({ .trim_enabled = flags.trim_flag, .control_enabled = flags.control_flag, .joystick_enabled = flags.joystick_flag })
-    {
+    ControlWrapper::ControlWrapper(const JSONFlags& flags, const actuators::SurfaceActuators& surface_actuators, const actuators::PropulsorActuators& propulsor_actuators) {
         // set u_actual_t_1 to match actuators' neutral initialization
         u_actual_t_1 = actuators::get_neutral_actuator_inputs(
             surface_actuators,
@@ -33,7 +30,19 @@ namespace runner {
         }
     }
 
-    ControlOutput Control::step(const ControlInput& input) {
+    devices::JoystickManagerOutput ControlWrapper::poll_joystick() {
+        // declare for state machine
+        devices::JoystickManagerOutput joystick_output{};
+
+        // fetch from joystick
+        if (joystick_manager) {
+            joystick_output = joystick_manager->step({ .u_cmd_t_1 = u_cmd_t_1 });
+        }
+
+        return joystick_output;
+    }
+
+    ControlWrapperOutput ControlWrapper::step(const ControlWrapperInput& input) {
         control::ControlManager& control_manager = input.aircraft.control_manager;
         actuators::ActuatorManager& actuator_manager = input.aircraft.actuator_manager;
         guidance::GuidanceManager& guidance_manager = input.aircraft.guidance_manager;
@@ -54,31 +63,18 @@ namespace runner {
         // initialize control command
         control::ControlOutput u_cmd{};
 
-        // declare for state machine
-        bool mode_toggled = false;
-        devices::JoystickManagerOutput joystick_output;
-
-        // fetch from joystick
-        if (joystick_manager) {
-            joystick_output = joystick_manager->step({ .u_cmd_t_1 = u_cmd_t_1 });
-            mode_toggled = joystick_output.mode_toggled;
-        }
-
-        // step state machine
-        fsm::FiniteState current_mode = fsm_manager.step({ .mode_toggled = mode_toggled }).current_mode;
-
-        if (current_mode == fsm::FiniteState::Manual) {
-            u_cmd = joystick_output.u_cmd;
+        if (input.current_mode == fsm::FiniteState::Manual) {
+            u_cmd = input.joystick_output.u_cmd;
         }
 
         // no need to rate-limit as the trim command is fixed
-        else if (current_mode == fsm::FiniteState::AutopilotTrim) {
+        else if (input.current_mode == fsm::FiniteState::AutopilotTrim) {
             mu_cmd = {};
             util::fill_arr(active_mask, 0, 6, true);
             util::fill_arr(actuator_mask, 0, 6, true);
         }
 
-        else if (current_mode == fsm::FiniteState::Autopilot) {
+        else if (input.current_mode == fsm::FiniteState::Autopilot) {
             if (input.scheduler.guidance_tick >= constants::hz) {
                 setpoint = guidance_manager.step({ .kf = input.scheduler.guidance_tf }).setpoint;
                 setpoint_t_1 = setpoint;
@@ -119,7 +115,7 @@ namespace runner {
         }
 
         // step control allocator
-        if (current_mode == fsm::FiniteState::AutopilotTrim || current_mode == fsm::FiniteState::Autopilot) {
+        if (input.current_mode == fsm::FiniteState::AutopilotTrim || input.current_mode == fsm::FiniteState::Autopilot) {
             allocator::AllocatorManagerOutput allocator_output = allocator_manager.step(
                 allocator::build_allocator_input(
                     mu_cmd,
@@ -152,8 +148,7 @@ namespace runner {
         return {
             .setpoint = setpoint,
             .u_cmd = u_cmd,
-            .u_actual = u_actual,
-            .current_mode = current_mode
+            .u_actual = u_actual
         };
     }
 

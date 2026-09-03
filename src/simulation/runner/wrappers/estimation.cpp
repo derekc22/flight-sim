@@ -1,12 +1,12 @@
 #include "simulation/constants/public.hpp"
 #include "simulation/estimation/public/manager.hpp"
-#include "simulation/runner/public/components/estimation.hpp"
-#include "simulation/runner/public/components/scheduler.hpp"
+#include "simulation/runner/public/wrappers/estimation.hpp"
+#include "simulation/runner/public/scheduling/scheduler.hpp"
 #include "simulation/vehicles/public/aircraft.hpp"
 
 namespace runner {
 
-    EstimationOutput Estimation::step(const EstimationInput& input) {
+    EstimationWrapperOutput EstimationWrapper::step(const EstimationWrapperInput& input) {
         estimation::EstimationManager& estimation_manager = input.aircraft.estimation_manager;
 
         // initialize estimated state to measurements

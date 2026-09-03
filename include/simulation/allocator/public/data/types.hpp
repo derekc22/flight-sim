@@ -16,7 +16,7 @@ namespace allocator {
 		operating::OperatingPoint_T<double> operating_point;	// (zt, ut_1)
         std::optional<control::ControlOutput> u_preferred;
         operating::OperatingConditions conditions;
-        autodiff::AutoDiffModel& model;
+        const autodiff::AutoDiffModel& model;
     };
 
     struct AllocatorManagerOutput {

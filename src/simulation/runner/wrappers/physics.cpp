@@ -1,10 +1,10 @@
 #include "simulation/integrators/public/detail/rk4.hpp"
-#include "simulation/runner/public/components/physics.hpp"
+#include "simulation/runner/public/wrappers/physics.hpp"
 #include "simulation/vehicles/public/aircraft.hpp"
 
 namespace runner {
 
-    PhysicsOutput Physics::step(const PhysicsInput& input) {
+    PhysicsWrapperOutput PhysicsWrapper::step(const PhysicsWrapperInput& input) {
         aerodynamics::AerodynamicsManager& aerodynamics_manager = input.aircraft.aerodynamics_manager;
         actuators::PropulsorActuators& propulsor_actuators = input.aircraft.actuator_manager.propulsor_actuators;
 

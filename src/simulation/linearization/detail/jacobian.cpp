@@ -10,7 +10,7 @@
 
 namespace linearization {
 
-    LocalLinearization linearize_operating_point(autodiff::AutoDiffModel& model, const operating::OperatingPoint_T<double>& operating_point, const operating::OperatingConditions& conditions) {
+    LocalLinearization linearize_operating_point(const autodiff::AutoDiffModel& model, const operating::OperatingPoint_T<double>& operating_point, const operating::OperatingConditions& conditions) {
 
         const operating::StateInputVector_T<double> xu = operating::unpack_state_input_T<double>(operating_point.state, operating_point.input);
 
@@ -37,7 +37,7 @@ namespace linearization {
     }
 
 
-    VirtualLocalLinearization linearize_virtual_operating_point(autodiff::AutoDiffModel& model, const operating::VirtualOperatingPoint_T<double>& virtual_operating_point) {
+    VirtualLocalLinearization linearize_virtual_operating_point(const autodiff::AutoDiffModel& model, const operating::VirtualOperatingPoint_T<double>& virtual_operating_point) {
         
         const operating::VirtualStateInputVector_T<double> xu_virtual = operating::unpack_virtual_state_input_T<double>(virtual_operating_point.state, virtual_operating_point.input);
 

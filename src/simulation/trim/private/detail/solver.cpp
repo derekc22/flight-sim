@@ -23,7 +23,7 @@ namespace trim {
         if (options.min_step_scale <= 0.0 || options.min_step_scale > 1.0) throw std::invalid_argument("trim::validate_trim_solve_options: min_step_scale must be in (0, 1]");
     }
 
-    TrimSolution solve_trim(const TrimProblem& problem, autodiff::AutoDiffModel& model, TrimSolveOptions options) {
+    TrimSolution solve_trim(const TrimProblem& problem, const autodiff::AutoDiffModel& model, TrimSolveOptions options) {
         validate_trim_solve_options(options);
 
         operating::StateInputVector_T<double> xu = operating::unpack_state_input_T<double>(problem.initial_guess.state, problem.initial_guess.input);

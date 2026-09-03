@@ -26,7 +26,7 @@ namespace estimation {
     struct ExtendedKalmanEstimatorInput {
         dynamics::RigidBodyState Yt;
         actuators::ActuatorInputs_T<double> u_actual_t_1;
-        autodiff::AutoDiffModel& model;
+        const autodiff::AutoDiffModel& model;
         operating::OperatingConditions conditions;
     };
 
@@ -49,7 +49,7 @@ namespace estimation {
         const dynamics::RigidBodyState& Yt;
         const trim::TrimSolution& trim_sol;
         const linearization::LocalLinearization& lin_sol;
-        autodiff::AutoDiffModel& model;
+        const autodiff::AutoDiffModel& model;
         const control::ControlOutput& u_actual_t_1;
         const operating::OperatingConditions& conditions;
         double dt;

@@ -1,6 +1,6 @@
 #include <cmath>
 #include <thread>
-#include "simulation/runner/public/components/scheduler.hpp"
+#include "simulation/runner/public/scheduling/scheduler.hpp"
 
 namespace runner {
 

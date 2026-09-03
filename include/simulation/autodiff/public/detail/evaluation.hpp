@@ -6,16 +6,16 @@
 namespace autodiff {
 
     template <typename T>
-    dynamics::Wrench_T<T> compute_net_wrench_T(const operating::OperatingPoint_T<T>& operating_point, AutoDiffModel& model, const operating::OperatingConditions& conditions, T dt);
+    dynamics::Wrench_T<T> compute_net_wrench_T(const operating::OperatingPoint_T<T>& operating_point, const AutoDiffModel& model, const operating::OperatingConditions& conditions, T dt);
 
     template <typename T>
-    dynamics::StateDot_T<T> compute_state_dot_T(const operating::OperatingPoint_T<T>& operating_point, AutoDiffModel& model, const operating::OperatingConditions& conditions, T dt);
+    dynamics::StateDot_T<T> compute_state_dot_T(const operating::OperatingPoint_T<T>& operating_point, const AutoDiffModel& model, const operating::OperatingConditions& conditions, T dt);
 
     template <typename T>
-    dynamics::StateDot_T<T> compute_state_dot_T(const operating::VirtualOperatingPoint_T<T>& operating_point, AutoDiffModel& model);
+    dynamics::StateDot_T<T> compute_state_dot_T(const operating::VirtualOperatingPoint_T<T>& operating_point, const AutoDiffModel& model);
 
     template <typename T>
-    dynamics::StateDot_T<T> compute_state_dot_from_net_wrench_T(const dynamics::State_T<T>& x, AutoDiffModel& model, const dynamics::Wrench_T<T>& net_wrench);
+    dynamics::StateDot_T<T> compute_state_dot_from_net_wrench_T(const dynamics::State_T<T>& x, const AutoDiffModel& model, const dynamics::Wrench_T<T>& net_wrench);
 
 }
 

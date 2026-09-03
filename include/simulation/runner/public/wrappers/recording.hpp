@@ -7,13 +7,13 @@
 
 namespace runner {
 
-    struct Recording {
+    struct RecordingWrapper {
         std::optional<io::DataManager> data_manager;
         std::optional<io::RerunManager> rerun_manager;
         std::optional<io::AnalysisManager> analysis_manager;
 
-        Recording(const CLIOptions& cli_options, const JSONOptions& json_options);
-        void step(const RecordingInput& input);
+        RecordingWrapper(const CLIOptions& cli_options, const JSONOptions& json_options);
+        void step(const RecordingWrapperInput& input);
         void cleanup(const CLIOptions& cli_options);
     };
 

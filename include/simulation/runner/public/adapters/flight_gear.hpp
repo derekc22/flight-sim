@@ -5,16 +5,16 @@
 
 namespace runner {
 
-    struct FlightGear {
+    struct FlightGearAdapter {
         // initialize udp out cache
         messages::ProcessedFlightGearMessageOut cached_msg_out{};
 
         connection::UDPOut udp_out;
         connection::UDPIn udp_in;
 
-        FlightGear();
-        FlightGearOutput receive(const FlightGearInput& input);
-        void send(const FlightGearSendInput& input);
+        FlightGearAdapter();
+        FlightGearAdapterOutput receive(const FlightGearAdapterInput& input);
+        void send(const FlightGearAdapterSendInput& input);
     };
 
 }
