@@ -1,6 +1,7 @@
 #pragma once
 
-namespace geography {
+namespace geography
+{
 
 	struct Latitude {
 		double data;

@@ -1,7 +1,8 @@
 #pragma once
 #include "simulation/control/public/data/types.hpp"
 
-namespace control {
+namespace control
+{
 
 	struct AttitudeControl {
 		AttitudeControlImplementation implementation;

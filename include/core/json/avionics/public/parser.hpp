@@ -1,7 +1,8 @@
 #pragma once
 #include "simulation/avionics/public/manager.hpp"
 
-namespace json {
+namespace json
+{
 
 	avionics::AvionicsManager parse_avionics_config();
 

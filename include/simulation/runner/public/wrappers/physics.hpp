@@ -2,7 +2,8 @@
 #include "simulation/constants/public/linalg.hpp"
 #include "simulation/runner/public/data/types.hpp"
 
-namespace runner {
+namespace runner
+{
 
 	struct PhysicsWrapper {
 		// initialize prior-step net wrench

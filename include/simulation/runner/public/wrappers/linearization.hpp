@@ -1,7 +1,8 @@
 #pragma once
 #include "simulation/runner/public/data/types.hpp"
 
-namespace runner {
+namespace runner
+{
 
 	struct LinearizationWrapper {
 		linearization::LocalLinearization lin_sol;

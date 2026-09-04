@@ -1,18 +1,20 @@
 #include "simulation/dynamics/public/detail/state.hpp"
+
 #include "simulation/frames/public/detail/kinematics.hpp"
 
-namespace dynamics {
+namespace dynamics
+{
 
 	RigidBodyState get_rigid_body_state(
-	    const frames::Frame& F)
+		const frames::Frame& F)
 	{
 		const frames::FrameView fv = F.view();
 		return {.p = fv.H->p(), .v = *fv.v, .q = *fv.q, .w = *fv.w};
 	}
 
 	RigidBodyState compute_rigid_body_state(
-	    const frames::Frame& F,
-	    const frames::Frame& R)
+		const frames::Frame& F,
+		const frames::Frame& R)
 	{
 		dynamics::HomogeneousTransformationMatrix HRF = frames::H_from_R(F, R);
 		dynamics::OrientationQuaternion qRF;
@@ -24,7 +26,7 @@ namespace dynamics {
 	}
 
 	dynamics::RigidBodyState invert_rigid_body_state(
-	    const dynamics::RigidBodyState& X_BA)
+		const dynamics::RigidBodyState& X_BA)
 	{
 		dynamics::OrientationMatrix CAB;
 		CAB.set(X_BA.q);
@@ -35,15 +37,17 @@ namespace dynamics {
 
 		dynamics::Position pB_AB{-CAB.data * X_BA.p.data};
 
-		return {.p = pB_AB,
-		    .v = dynamics::TranslationalVelocity{-CBA.data * (X_BA.v.data + X_BA.w.data.cross(pB_AB.data))},
-		    .q = qBA,
-		    .w = dynamics::AngularVelocity{-CBA.data * X_BA.w.data}};
+		return {
+			.p = pB_AB,
+			.v = dynamics::TranslationalVelocity{-CBA.data * (X_BA.v.data + X_BA.w.data.cross(pB_AB.data))},
+			.q = qBA,
+			.w = dynamics::AngularVelocity{-CBA.data * X_BA.w.data}
+		};
 	}
 
 	dynamics::RigidBodyState compose_rigid_body_state(
-	    const dynamics::RigidBodyState& X_BA,
-	    const dynamics::RigidBodyState& X_AR)
+		const dynamics::RigidBodyState& X_BA,
+		const dynamics::RigidBodyState& X_AR)
 	{
 		dynamics::OrientationMatrix CRA;
 		CRA.set(X_AR.q);
@@ -55,18 +59,22 @@ namespace dynamics {
 		dynamics::OrientationQuaternion qRB;
 		qRB.set(CRB);
 
-		return {.p = dynamics::Position{X_AR.p.data + CRA.data.transpose() * X_BA.p.data},
-		    // vBR = vAR + vBA + wAR x pBA
-		    .v = dynamics::TranslationalVelocity{X_BA.v.data +
-		        CAB.data * (X_AR.v.data + X_AR.w.data.cross(X_BA.p.data))},
-		    .q = qRB,
-		    .w = dynamics::AngularVelocity{X_BA.w.data + CAB.data * X_AR.w.data}};
+		return {
+			.p = dynamics::Position{X_AR.p.data + CRA.data.transpose() * X_BA.p.data},
+			// vBR = vAR + vBA + wAR x pBA
+			.v =
+				dynamics::TranslationalVelocity{
+					X_BA.v.data + CAB.data * (X_AR.v.data + X_AR.w.data.cross(X_BA.p.data))
+				},
+			.q = qRB,
+			.w = dynamics::AngularVelocity{X_BA.w.data + CAB.data * X_AR.w.data}
+		};
 	}
 
 	dynamics::RigidBodyState rebase_cg_state(
-	    const dynamics::RigidBodyState& X_GN,
-	    const dynamics::Position& pB_GB,
-	    const frames::Frame& CGFrame)
+		const dynamics::RigidBodyState& X_GN,
+		const dynamics::Position& pB_GB,
+		const frames::Frame& CGFrame)
 	{
 		dynamics::RigidBodyState X_GB = dynamics::get_rigid_body_state(CGFrame);
 		X_GB.p = pB_GB;

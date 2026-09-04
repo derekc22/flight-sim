@@ -1,9 +1,10 @@
 #pragma once
+#include <Eigen/Dense>
 #include <array>
 #include <cstddef>
-#include <Eigen/Dense>
 
-namespace util {
+namespace util
+{
 
 	double clamp(double x, double min_value, double max_value);
 	double clamp_symmetric(double x, double max_abs);

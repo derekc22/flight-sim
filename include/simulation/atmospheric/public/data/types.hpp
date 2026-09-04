@@ -1,7 +1,8 @@
 #pragma once
 #include <Eigen/Dense>
 
-namespace atmospheric {
+namespace atmospheric
+{
 
 	struct Wind {
 		Eigen::Vector3d data;

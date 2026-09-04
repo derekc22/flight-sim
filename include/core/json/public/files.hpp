@@ -1,9 +1,10 @@
 #pragma once
 #include <filesystem>
-#include <string>
 #include <nlohmann/json.hpp>
+#include <string>
 
-namespace json {
+namespace json
+{
 
 	nlohmann::json read_json_file(const std::filesystem::path& path);
 	std::filesystem::path resolve_run_config_entry_path(const std::string& key);

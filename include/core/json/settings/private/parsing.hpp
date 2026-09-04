@@ -1,9 +1,11 @@
 #pragma once
-#include <nlohmann/json.hpp>
 #include "simulation/actuators/public/manager.hpp"
 #include "simulation/settings/public/data/types.hpp"
 
-namespace json {
+#include <nlohmann/json.hpp>
+
+namespace json
+{
 
 	settings::Settings parse_settings(const nlohmann::json& config, const actuators::ActuatorManager& actuator_manager);
 

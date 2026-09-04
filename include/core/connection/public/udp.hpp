@@ -1,10 +1,12 @@
 #pragma once
+#include "core/messages/public/data/types.hpp"
+
 #include <netinet/in.h>
 #include <optional>
 #include <string>
-#include "core/messages/public/data/types.hpp"
 
-namespace connection {
+namespace connection
+{
 
 	struct UDPIn {
 		UDPIn(const std::string& host, int port);

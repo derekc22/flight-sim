@@ -1,17 +1,20 @@
+#include "core/json/private/detail/files.hpp"
+
+#include "core/json/public/files.hpp"
+
 #include <array>
 #include <filesystem>
 #include <format>
 #include <fstream>
+#include <nlohmann/json.hpp>
 #include <stdexcept>
 #include <string>
-#include <nlohmann/json.hpp>
-#include "core/json/private/detail/files.hpp"
-#include "core/json/public/files.hpp"
 
-namespace json {
+namespace json
+{
 
 	nlohmann::json read_json_file(
-	    const std::filesystem::path& path)
+		const std::filesystem::path& path)
 	{
 		std::ifstream file(path);
 		if (!file.is_open()) {
@@ -24,7 +27,7 @@ namespace json {
 	}
 
 	std::filesystem::path resolve_run_config_entry_path(
-	    const std::string& key)
+		const std::string& key)
 	{
 		const auto run_path = std::filesystem::path("config") / "run.json";
 		const auto run_config = read_json_file(run_path);
@@ -32,7 +35,7 @@ namespace json {
 	}
 
 	void dump_run_configs(
-	    const std::string& dir_path)
+		const std::string& dir_path)
 	{
 		const auto run_path = std::filesystem::path("config") / "run.json";
 		const auto run_config = read_json_file(run_path);
@@ -48,7 +51,7 @@ namespace json {
 	}
 
 	void dump_analyze_configs(
-	    const std::string& dir_path)
+		const std::string& dir_path)
 	{
 		const auto analyze_path = std::filesystem::path("config") / "analyze.json";
 		const auto analyze_config = read_json_file(analyze_path);
@@ -63,7 +66,7 @@ namespace json {
 				}
 				if (!value.is_string()) {
 					throw std::runtime_error(
-					    std::format("json::dump_analyze_configs: expected string path for key '{}'", key));
+						std::format("json::dump_analyze_configs: expected string path for key '{}'", key));
 				}
 				const auto config_path = resolve_config_path(analyze_path, value.get<std::string>());
 				write_json(read_json_file(config_path), dir_path, key);

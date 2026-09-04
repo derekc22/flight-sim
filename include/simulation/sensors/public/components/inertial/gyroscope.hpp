@@ -2,7 +2,8 @@
 #include "simulation/sensors/public/components/base.hpp"
 #include "simulation/sensors/public/data/types.hpp"
 
-namespace sensors {
+namespace sensors
+{
 
 	struct Gyroscope : Sensor {
 		std::optional<Eigen::Vector3d> prev_wB_BI_lag;

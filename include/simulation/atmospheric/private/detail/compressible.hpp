@@ -1,7 +1,8 @@
 #pragma once
 #include "simulation/atmospheric/public/data/types.hpp"
 
-namespace atmospheric {
+namespace atmospheric
+{
 
 	StagnationAirTemperature T0_from_T(const StaticAirTemperature& T, const MachNumber& M);
 

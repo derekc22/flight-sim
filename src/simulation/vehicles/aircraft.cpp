@@ -1,19 +1,22 @@
 
-#include <queue>
-#include <stdexcept>
-#include <string>
-#include <unordered_set>
+#include "simulation/vehicles/public/aircraft.hpp"
+
 #include "simulation/aerodynamics/public/data/helpers.hpp"
 #include "simulation/constants/public/linalg.hpp"
 #include "simulation/frames/public/detail/kinematics.hpp"
 #include "simulation/geography/public/detail/geodesy.hpp"
 #include "simulation/geography/public/detail/gravity.hpp"
-#include "simulation/vehicles/public/aircraft.hpp"
 
-namespace vehicles {
+#include <queue>
+#include <stdexcept>
+#include <string>
+#include <unordered_set>
+
+namespace vehicles
+{
 
 	void Aircraft::step(
-	    const StepOptions& opts)
+		const StepOptions& opts)
 	{
 
 		StepOptions::validate(opts);
@@ -116,8 +119,8 @@ namespace vehicles {
 	}
 
 	void Aircraft::step(
-	    frames::NEDFrameECEF& F,
-	    const _StepOptions& opts)
+		frames::NEDFrameECEF& F,
+		const _StepOptions& opts)
 	{
 
 		bool recursive = !opts;
@@ -126,15 +129,15 @@ namespace vehicles {
 		if (!recursive) {
 			// final guard
 			if (opts.H.has_value() || opts.C.has_value() || opts.p.has_value() || opts.q.has_value() ||
-			    opts.eul.has_value() || opts.C_dot.has_value() || opts.q_dot.has_value() || opts.w.has_value() ||
-			    opts.eul_dot.has_value() || opts.wq.has_value() || opts.v.has_value() || opts.g.has_value()) {
+				opts.eul.has_value() || opts.C_dot.has_value() || opts.q_dot.has_value() || opts.w.has_value() ||
+				opts.eul_dot.has_value() || opts.wq.has_value() || opts.v.has_value() || opts.g.has_value()) {
 				std::string err_msg = "vehicles::Aircraft::_step: Invalid _StepOptions input passed for NEDFrameECEF";
 				throw std::invalid_argument(err_msg);
 			}
 
 			if (opts.lat.has_value() && opts.lon.has_value() && opts.alt.has_value()) {
 				NEDFrameECEFSetOpts.p =
-				    geography::pE_from_lat_lon_alt(geography::GeographicState{*opts.lat, *opts.lon, *opts.alt});
+					geography::pE_from_lat_lon_alt(geography::GeographicState{*opts.lat, *opts.lon, *opts.alt});
 				NEDFrameECEFSetOpts.C = geography::CEN_from_lat_lon(*opts.lat, *opts.lon);
 			}
 
@@ -146,7 +149,7 @@ namespace vehicles {
 
 		else {
 			std::string err_msg = "vehicles::Aircraft::_step: NEDFrameECEF is not a dependent to any step-able frame. "
-			                      "It can never be recursively stepped. Something has gone wrong.";
+								  "It can never be recursively stepped. Something has gone wrong.";
 			throw std::invalid_argument(err_msg);
 		}
 
@@ -158,8 +161,8 @@ namespace vehicles {
 	}
 
 	void Aircraft::step(
-	    frames::FRDFrameECEF& F,
-	    const _StepOptions& opts)
+		frames::FRDFrameECEF& F,
+		const _StepOptions& opts)
 	{
 
 		bool recursive = !opts;
@@ -219,7 +222,7 @@ namespace vehicles {
 
 			if (opts.lat.has_value() && opts.lon.has_value() && opts.alt.has_value()) {
 				dynamics::Position p =
-				    geography::pE_from_lat_lon_alt(geography::GeographicState{*opts.lat, *opts.lon, *opts.alt});
+					geography::pE_from_lat_lon_alt(geography::GeographicState{*opts.lat, *opts.lon, *opts.alt});
 				FRDFrameECEFSetOpts.p = p;
 			}
 
@@ -249,8 +252,8 @@ namespace vehicles {
 	}
 
 	void Aircraft::step(
-	    frames::FRDFrameNED& F,
-	    const _StepOptions& opts)
+		frames::FRDFrameNED& F,
+		const _StepOptions& opts)
 	{
 
 		bool recursive = !opts;
@@ -318,7 +321,7 @@ namespace vehicles {
 
 		else {
 			FRDFrameNEDSetOpts.p =
-			    dynamics::Position{frames::transform_point(FRDFrameECEF.HEB.p().data, ECEFFrame, NEDFrameECEF)};
+				dynamics::Position{frames::transform_point(FRDFrameECEF.HEB.p().data, ECEFFrame, NEDFrameECEF)};
 			dynamics::OrientationMatrix C{FRDFrameECEF.HEB.C().data * NEDFrameECEF.HEN.C().data.transpose()};
 			FRDFrameNEDSetOpts.C = C;
 			FRDFrameNEDSetOpts.w = FRDFrameECEF.wB_BE;
@@ -329,8 +332,8 @@ namespace vehicles {
 	}
 
 	void Aircraft::step(
-	    frames::CGFrameFRD& F,
-	    const _StepOptions& opts)
+		frames::CGFrameFRD& F,
+		const _StepOptions& opts)
 	{
 
 		bool recursive = !opts;
@@ -340,8 +343,8 @@ namespace vehicles {
 
 			// final guard
 			if (opts.H.has_value() || opts.C.has_value() || opts.q.has_value() || opts.eul.has_value() ||
-			    opts.C_dot.has_value() || opts.q_dot.has_value() || opts.w.has_value() || opts.eul_dot.has_value() ||
-			    opts.wq.has_value() || opts.v.has_value() || opts.g.has_value()) {
+				opts.C_dot.has_value() || opts.q_dot.has_value() || opts.w.has_value() || opts.eul_dot.has_value() ||
+				opts.wq.has_value() || opts.v.has_value() || opts.g.has_value()) {
 				std::string err_msg = "vehicles::Aircraft::_step: Invalid _StepOptions input passed for CGFrameFRD";
 				throw std::invalid_argument(err_msg);
 			}
@@ -374,8 +377,8 @@ namespace vehicles {
 	}
 
 	void Aircraft::step(
-	    frames::STABFrameFRD& F,
-	    const _StepOptions& opts)
+		frames::STABFrameFRD& F,
+		const _StepOptions& opts)
 	{
 
 		bool recursive = !opts;
@@ -385,8 +388,8 @@ namespace vehicles {
 
 			// final guard
 			if (opts.H.has_value() || opts.C.has_value() || opts.p.has_value() || opts.q.has_value() ||
-			    opts.eul.has_value() || opts.C_dot.has_value() || opts.q_dot.has_value() || opts.w.has_value() ||
-			    opts.eul_dot.has_value() || opts.wq.has_value() || opts.v.has_value() || opts.g.has_value()) {
+				opts.eul.has_value() || opts.C_dot.has_value() || opts.q_dot.has_value() || opts.w.has_value() ||
+				opts.eul_dot.has_value() || opts.wq.has_value() || opts.v.has_value() || opts.g.has_value()) {
 				std::string err_msg = "vehicles::Aircraft::_step: Invalid _StepOptions input passed for STABFrameFRD";
 				throw std::invalid_argument(err_msg);
 			}
@@ -418,8 +421,8 @@ namespace vehicles {
 	}
 
 	void Aircraft::step(
-	    frames::WINDFrameSTAB& F,
-	    const _StepOptions& opts)
+		frames::WINDFrameSTAB& F,
+		const _StepOptions& opts)
 	{
 
 		bool recursive = !opts;
@@ -429,8 +432,8 @@ namespace vehicles {
 
 			// final guard
 			if (opts.H.has_value() || opts.C.has_value() || opts.p.has_value() || opts.q.has_value() ||
-			    opts.eul.has_value() || opts.C_dot.has_value() || opts.q_dot.has_value() || opts.w.has_value() ||
-			    opts.eul_dot.has_value() || opts.wq.has_value() || opts.v.has_value() || opts.g.has_value()) {
+				opts.eul.has_value() || opts.C_dot.has_value() || opts.q_dot.has_value() || opts.w.has_value() ||
+				opts.eul_dot.has_value() || opts.wq.has_value() || opts.v.has_value() || opts.g.has_value()) {
 				std::string err_msg = "vehicles::Aircraft::_step: Invalid _StepOptions input passed for WINDFrameSTAB";
 				throw std::invalid_argument(err_msg);
 			}
@@ -462,7 +465,7 @@ namespace vehicles {
 	}
 
 	void Aircraft::step_dependents(
-	    frames::Frame& root)
+		frames::Frame& root)
 	{
 		std::queue<frames::Frame*> q;
 		std::unordered_set<frames::Frame*> visited;
@@ -488,7 +491,7 @@ namespace vehicles {
 	}
 
 	void Aircraft::step_dependent(
-	    frames::Frame& F)
+		frames::Frame& F)
 	{
 		if (F.id == frames::FrameID::NEDFrameECEF)
 			return step(static_cast<frames::NEDFrameECEF&>(F), {});
@@ -504,7 +507,7 @@ namespace vehicles {
 			return step(static_cast<frames::WINDFrameSTAB&>(F), {});
 
 		std::string err_msg =
-		    "vehicles::Aircraft::step_dependent: Attempting to recursively step an unknown frame type";
+			"vehicles::Aircraft::step_dependent: Attempting to recursively step an unknown frame type";
 		throw std::invalid_argument(err_msg);
 	}
 
@@ -561,43 +564,43 @@ namespace vehicles {
 		FRDFrameECEF.add_as_direct_dependent(&FRDFrameNED); // {FRDFrameNED} -> {FRDFrameECEF}
 
 		FRDFrameNED.add_as_direct_dependent(&FRDFrameECEF); // {FRDFrameECEF} -> {FRDFrameNED}
-		FRDFrameNED.add_as_direct_dependent(&CGFrameFRD);   // {CGFrameFRD} -> {FRDFrameNED}
+		FRDFrameNED.add_as_direct_dependent(&CGFrameFRD);	// {CGFrameFRD} -> {FRDFrameNED}
 		FRDFrameNED.add_as_direct_dependent(&STABFrameFRD); // {STABFrameFRD} -> {FRDFrameNED}
 
 		STABFrameFRD.add_as_direct_dependent(&WINDFrameSTAB); // {WINDFrameSTAB} -> {STABFrameFRD}
 	}
 
 	Aircraft::Aircraft(
-	    const std::string& id,
-	    const structural::StructuralManager& structural_manager,
-	    const aerodynamics::AerodynamicsManager& aerodynamics_manager,
-	    const actuators::ActuatorManager& actuator_manager,
-	    const control::ControlManager& control_manager,
-	    const sensors::SensorManager& sensor_manager,
-	    const avionics::AvionicsManager& avionics_manager,
-	    const guidance::GuidanceManager& guidance_manager,
-	    const estimation::EstimationManager& estimation_manager,
-	    const allocator::AllocatorManager& allocator_manager)
-	    : id(id),
+		const std::string& id,
+		const structural::StructuralManager& structural_manager,
+		const aerodynamics::AerodynamicsManager& aerodynamics_manager,
+		const actuators::ActuatorManager& actuator_manager,
+		const control::ControlManager& control_manager,
+		const sensors::SensorManager& sensor_manager,
+		const avionics::AvionicsManager& avionics_manager,
+		const guidance::GuidanceManager& guidance_manager,
+		const estimation::EstimationManager& estimation_manager,
+		const allocator::AllocatorManager& allocator_manager)
+		: id(id),
 
-	      ECEFFrame{},
-	      NEDFrameECEF{&ECEFFrame},
-	      FRDFrameECEF{&ECEFFrame},
-	      FRDFrameNED{&NEDFrameECEF},
-	      CGFrameFRD{&FRDFrameNED},
-	      STABFrameFRD{&FRDFrameNED},
-	      WINDFrameSTAB{&STABFrameFRD},
+		  ECEFFrame{},
+		  NEDFrameECEF{&ECEFFrame},
+		  FRDFrameECEF{&ECEFFrame},
+		  FRDFrameNED{&NEDFrameECEF},
+		  CGFrameFRD{&FRDFrameNED},
+		  STABFrameFRD{&FRDFrameNED},
+		  WINDFrameSTAB{&STABFrameFRD},
 
-	      structural_manager(structural_manager),
-	      aerodynamics_manager(aerodynamics_manager),
-	      actuator_manager(actuator_manager),
-	      propulsion_manager{},
-	      control_manager(control_manager),
-	      sensor_manager(sensor_manager),
-	      avionics_manager(avionics_manager),
-	      guidance_manager(guidance_manager),
-	      estimation_manager(estimation_manager),
-	      allocator_manager(allocator_manager)
+		  structural_manager(structural_manager),
+		  aerodynamics_manager(aerodynamics_manager),
+		  actuator_manager(actuator_manager),
+		  propulsion_manager{},
+		  control_manager(control_manager),
+		  sensor_manager(sensor_manager),
+		  avionics_manager(avionics_manager),
+		  guidance_manager(guidance_manager),
+		  estimation_manager(estimation_manager),
+		  allocator_manager(allocator_manager)
 	{
 		init_frames();
 	}

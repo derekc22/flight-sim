@@ -1,11 +1,13 @@
 #pragma once
-#include <Eigen/Dense>
 #include "simulation/actuators/public/data/helpers.hpp"
 #include "simulation/atmospheric/public/data/types.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/guidance/public/data/types.hpp"
 
-namespace io {
+#include <Eigen/Dense>
+
+namespace io
+{
 
 	struct DataMatrix {
 		int n_rows;

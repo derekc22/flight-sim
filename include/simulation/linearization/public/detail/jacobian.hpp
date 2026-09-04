@@ -3,13 +3,14 @@
 #include "simulation/linearization/public/data/types.hpp"
 #include "simulation/operating/public/data/types.hpp"
 
-namespace linearization {
+namespace linearization
+{
 
 	LocalLinearization linearize_operating_point(const autodiff::AutoDiffModel& model,
-	    const operating::OperatingPoint_T<double>& operating_point,
-	    const operating::OperatingConditions& conditions);
+		const operating::OperatingPoint_T<double>& operating_point,
+		const operating::OperatingConditions& conditions);
 
 	VirtualLocalLinearization linearize_virtual_operating_point(const autodiff::AutoDiffModel& model,
-	    const operating::VirtualOperatingPoint_T<double>& virtual_operating_point);
+		const operating::VirtualOperatingPoint_T<double>& virtual_operating_point);
 
 } // namespace linearization

@@ -1,15 +1,18 @@
-#include <Eigen/Dense>
-#include <stdexcept>
-#include <algorithm>
-#include <string>
-#include <vector>
-#include "simulation/constants/public/linalg.hpp"
 #include "simulation/transforms/private/detail/s3.hpp"
+
+#include "simulation/constants/public/linalg.hpp"
 #include "simulation/transforms/private/detail/so3.hpp"
 #include "simulation/transforms/public/detail/s3.hpp"
 #include "simulation/util/public/trig.hpp"
 
-namespace transforms {
+#include <Eigen/Dense>
+#include <algorithm>
+#include <stdexcept>
+#include <string>
+#include <vector>
+
+namespace transforms
+{
 
 	/** @deprecated */
 	// Eigen::Quaterniond quat_mul(const Eigen::Quaterniond& q1, const Eigen::Quaterniond& q2) {
@@ -25,31 +28,31 @@ namespace transforms {
 	// }
 
 	Eigen::Quaterniond qx(
-	    double phi)
+		double phi)
 	{
 		double h = 0.5 * phi;
 		return Eigen::Quaterniond(util::cos(h), util::sin(h), 0.0, 0.0); // (w,x,y,z)
 	}
 
 	Eigen::Quaterniond qy(
-	    double theta)
+		double theta)
 	{
 		double h = 0.5 * theta;
 		return Eigen::Quaterniond(util::cos(h), 0.0, util::sin(h), 0.0);
 	}
 
 	Eigen::Quaterniond qz(
-	    double psi)
+		double psi)
 	{
 		double h = 0.5 * psi;
 		return Eigen::Quaterniond(util::cos(h), 0.0, 0.0, util::sin(h));
 	}
 
 	Eigen::Quaterniond eul_to_quatR_extr(
-	    double a,
-	    double b,
-	    double c,
-	    EulerOrder order)
+		double a,
+		double b,
+		double c,
+		EulerOrder order)
 	{
 		Eigen::Quaterniond q;
 
@@ -105,59 +108,59 @@ namespace transforms {
 	// So, as with eul_to_R_intr, the function 'eul_to_quatR_intr' does not technically make sense
 	// However, for consistency with the extrinsic case, it is still implemented since transposing the result of this function indeed gives the correct result for an intrinsic frame rotation/coordinate transformation
 	Eigen::Quaterniond eul_to_quatR_intr(
-	    double a,
-	    double b,
-	    double c,
-	    EulerOrder order)
+		double a,
+		double b,
+		double c,
+		EulerOrder order)
 	{
 		return normalize_and_canonicalize(eul_to_quatR_extr(-a, -b, -c, order).conjugate());
 	}
 
 	Eigen::Quaterniond eul_to_quatC_extr(
-	    double a,
-	    double b,
-	    double c,
-	    EulerOrder order)
+		double a,
+		double b,
+		double c,
+		EulerOrder order)
 	{
 		return normalize_and_canonicalize(eul_to_quatR_extr(a, b, c, order).conjugate());
 	}
 
 	Eigen::Quaterniond eul_to_quatC_intr(
-	    double a,
-	    double b,
-	    double c,
-	    EulerOrder order)
+		double a,
+		double b,
+		double c,
+		EulerOrder order)
 	{
 		return normalize_and_canonicalize(eul_to_quatR_intr(a, b, c, order).conjugate());
 	}
 
 	Eigen::Vector3d quatR_to_eul_intr(
-	    const Eigen::Quaterniond& q,
-	    EulerOrder order)
+		const Eigen::Quaterniond& q,
+		EulerOrder order)
 	{
 		Eigen::Matrix3d R = quat_to_rot(q);
 		return R_to_eul_intr(R, order);
 	}
 
 	Eigen::Vector3d quatC_to_eul_intr(
-	    const Eigen::Quaterniond& q,
-	    EulerOrder order)
+		const Eigen::Quaterniond& q,
+		EulerOrder order)
 	{
 		Eigen::Matrix3d C = quat_to_rot(q);
 		return C_to_eul_intr(C, order);
 	}
 
 	Eigen::Vector3d quatR_to_eul_extr(
-	    const Eigen::Quaterniond& q,
-	    EulerOrder order)
+		const Eigen::Quaterniond& q,
+		EulerOrder order)
 	{
 		Eigen::Matrix3d R = quat_to_rot(q);
 		return R_to_eul_extr(R, order);
 	}
 
 	Eigen::Vector3d quatC_to_eul_extr(
-	    const Eigen::Quaterniond& q,
-	    EulerOrder order)
+		const Eigen::Quaterniond& q,
+		EulerOrder order)
 	{
 		Eigen::Matrix3d C = quat_to_rot(q);
 		return C_to_eul_extr(C, order);
@@ -170,7 +173,7 @@ namespace transforms {
 	// All vector rotations (as opposed to frame rotations) are, by definition, extrinsic. The concept of an "intrinsic" rotation only applies to frames
 	// That is, the concept of an "intrinsic" vector rotation is not defined
 	Eigen::Quaterniond chain_quat_post(
-	    const std::vector<Eigen::Quaterniond>& q_list)
+		const std::vector<Eigen::Quaterniond>& q_list)
 	{
 		Eigen::Quaterniond qtot = constants::qI;
 		for (const auto& q : q_list) {
@@ -181,7 +184,7 @@ namespace transforms {
 
 	// Given the orientation (of the frame/vector) obtained via the nth rotation, how is the n+1 rotation applied
 	Eigen::Quaterniond chain_quat_pre(
-	    const std::vector<Eigen::Quaterniond>& q_list)
+		const std::vector<Eigen::Quaterniond>& q_list)
 	{
 		Eigen::Quaterniond qtot = constants::qI;
 

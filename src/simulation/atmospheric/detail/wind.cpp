@@ -1,12 +1,14 @@
 #include "simulation/atmospheric/public/detail/wind.hpp"
+
 #include "simulation/util/public/trig.hpp"
 #include "simulation/util/public/units.hpp"
 
-namespace atmospheric {
+namespace atmospheric
+{
 
 	Wind build_wind(
-	    double heading_deg,
-	    double spd_kts)
+		double heading_deg,
+		double spd_kts)
 	{
 		double psi_wind = util::deg_to_rad(heading_deg);
 		double v_wind = util::kts_to_mps(spd_kts);

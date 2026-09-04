@@ -1,17 +1,19 @@
+#include "core/connection/public/udp.hpp"
+
 #include <arpa/inet.h>
-#include <fcntl.h>
-#include <sys/socket.h>
-#include <unistd.h>
 #include <cerrno>
 #include <cstdio>
 #include <cstring>
-#include "core/connection/public/udp.hpp"
+#include <fcntl.h>
+#include <sys/socket.h>
+#include <unistd.h>
 
-namespace connection {
+namespace connection
+{
 
 	UDPIn::UDPIn(
-	    const std::string& host,
-	    int port)
+		const std::string& host,
+		int port)
 	{
 		fd_ = ::socket(AF_INET, SOCK_DGRAM, 0);
 		if (fd_ < 0)
@@ -29,33 +31,33 @@ namespace connection {
 	}
 
 	bool UDPIn::send(
-	    const messages::FlightGearMessageIn& in_msg)
+		const messages::FlightGearMessageIn& in_msg)
 	{
 		if (fd_ < 0)
 			return false;
 
 		char buffer[256];
 		const int n = std::snprintf(buffer,
-		    sizeof(buffer),
-		    "%.6f,%.6f,%.6f,%.6f,%.6f,%.6f\n",
-		    in_msg.altitude_ft,
-		    in_msg.latitude_deg,
-		    in_msg.longitude_deg,
-		    in_msg.roll_deg,
-		    in_msg.pitch_deg,
-		    in_msg.heading_deg);
+			sizeof(buffer),
+			"%.6f,%.6f,%.6f,%.6f,%.6f,%.6f\n",
+			in_msg.altitude_ft,
+			in_msg.latitude_deg,
+			in_msg.longitude_deg,
+			in_msg.roll_deg,
+			in_msg.pitch_deg,
+			in_msg.heading_deg);
 
 		if (n <= 0)
 			return false;
 
 		const ssize_t sent =
-		    ::sendto(fd_, buffer, static_cast<size_t>(n), 0, reinterpret_cast<sockaddr*>(&dst_), sizeof(dst_));
+			::sendto(fd_, buffer, static_cast<size_t>(n), 0, reinterpret_cast<sockaddr*>(&dst_), sizeof(dst_));
 
 		return sent == n;
 	}
 
 	UDPOut::UDPOut(
-	    int port)
+		int port)
 	{
 		fd_ = ::socket(AF_INET, SOCK_DGRAM, 0);
 		if (fd_ < 0)
@@ -106,7 +108,7 @@ namespace connection {
 
 		messages::FlightGearMessageOut out_msg{};
 		if (std::sscanf(
-		        buffer, "%f,%f,%f", &out_msg.wind_heading_deg, &out_msg.wind_speed_kt, &out_msg.ground_elev_ft) != 3) {
+				buffer, "%f,%f,%f", &out_msg.wind_heading_deg, &out_msg.wind_speed_kt, &out_msg.ground_elev_ft) != 3) {
 			return std::nullopt;
 		}
 

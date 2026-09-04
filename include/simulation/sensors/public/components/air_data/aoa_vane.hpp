@@ -2,7 +2,8 @@
 #include "simulation/sensors/public/components/base.hpp"
 #include "simulation/sensors/public/data/types.hpp"
 
-namespace sensors {
+namespace sensors
+{
 
 	struct AngleOfAttackVane : Sensor {
 		std::optional<double> prev_alpha_lag;

@@ -1,14 +1,16 @@
+#include "simulation/runner/public/wrappers/recording.hpp"
+
 #include "core/json/public/files.hpp"
 #include "simulation/constants/public/scalars.hpp"
-#include "simulation/runner/public/wrappers/recording.hpp"
 #include "simulation/runner/public/scheduling/scheduler.hpp"
 #include "simulation/util/public/print.hpp"
 
-namespace runner {
+namespace runner
+{
 
 	RecordingWrapper::RecordingWrapper(
-	    const CLIOptions& cli_options,
-	    const JSONOptions& json_options)
+		const CLIOptions& cli_options,
+		const JSONOptions& json_options)
 	{
 		// create data manager
 		if (cli_options.flags.data_flag) {
@@ -26,21 +28,23 @@ namespace runner {
 	}
 
 	void RecordingWrapper::step(
-	    const RecordingWrapperInput& input)
+		const RecordingWrapperInput& input)
 	{
 		// update data context
-		io::DataContext data_context{.Xt = input.context.Xt,
-		    .Yt = input.context.Yt,
-		    .Zt = input.context.Zt,
-		    .u_surface = input.context.u_actual.surface_inputs,
-		    .u_propulsor = input.context.u_actual.propulsor_inputs,
-		    .u_surface_commanded = input.context.u_cmd.surface_inputs,
-		    .u_propulsor_commanded = input.context.u_cmd.propulsor_inputs,
-		    .WB_net = input.context.WB_net,
-		    .WB_aerodynamic = input.context.WB_aerodynamic,
-		    .WB_propulsive = input.context.WB_propulsive,
-		    .setpoint = input.context.setpoint,
-		    .windB = input.context.windB};
+		io::DataContext data_context{
+			.Xt = input.context.Xt,
+			.Yt = input.context.Yt,
+			.Zt = input.context.Zt,
+			.u_surface = input.context.u_actual.surface_inputs,
+			.u_propulsor = input.context.u_actual.propulsor_inputs,
+			.u_surface_commanded = input.context.u_cmd.surface_inputs,
+			.u_propulsor_commanded = input.context.u_cmd.propulsor_inputs,
+			.WB_net = input.context.WB_net,
+			.WB_aerodynamic = input.context.WB_aerodynamic,
+			.WB_propulsive = input.context.WB_propulsive,
+			.setpoint = input.context.setpoint,
+			.windB = input.context.windB
+		};
 
 		// step data manager
 		if (data_manager) {
@@ -56,14 +60,14 @@ namespace runner {
 			// log state
 			if (input.flags.verbose_flag) {
 				util::print_state(
-				    input.t, input.context.Xt, input.context.geo_t, input.context.aero_t, input.context.windI);
+					input.t, input.context.Xt, input.context.geo_t, input.context.aero_t, input.context.windI);
 			}
 			input.scheduler.log_tick -= constants::hz;
 		}
 	}
 
 	void RecordingWrapper::cleanup(
-	    const CLIOptions& cli_options)
+		const CLIOptions& cli_options)
 	{
 		std::string data_dir_path = cli_options.data_dir_path;
 		std::string log_dir_path = cli_options.log_dir_path;

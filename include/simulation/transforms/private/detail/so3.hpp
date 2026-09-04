@@ -1,10 +1,12 @@
 #pragma once
-#include <string>
-#include <vector>
-#include <Eigen/Dense>
 #include "simulation/transforms/public/data/types.hpp"
 
-namespace transforms {
+#include <Eigen/Dense>
+#include <string>
+#include <vector>
+
+namespace transforms
+{
 
 	Eigen::Matrix3d Rx(double phi);
 	Eigen::Matrix3d Ry(double theta);

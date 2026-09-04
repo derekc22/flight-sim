@@ -1,12 +1,14 @@
 #pragma once
-#include <optional>
 #include "simulation/aerodynamics/public/data/types.hpp"
 #include "simulation/atmospheric/public/data/types.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/geography/public/data/types.hpp"
 #include "simulation/sensors/public/data/types.hpp"
 
-namespace avionics {
+#include <optional>
+
+namespace avionics
+{
 
 	// computed
 	struct StaticAirTemperatureMeasurement : atmospheric::StaticAirTemperature {};

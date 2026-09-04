@@ -1,10 +1,12 @@
-#include <stdexcept>
 #include "simulation/guidance/public/manager.hpp"
 
-namespace guidance {
+#include <stdexcept>
+
+namespace guidance
+{
 
 	GuidanceManagerOutput GuidanceManager::step(
-	    const GuidanceManagerInput& input)
+		const GuidanceManagerInput& input)
 	{
 		if (regulation.has_value()) {
 			return {.setpoint = regulation.value().step()};

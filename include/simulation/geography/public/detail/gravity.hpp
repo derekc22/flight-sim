@@ -2,7 +2,8 @@
 #include "simulation/constants/public/linalg.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 
-namespace geography {
+namespace geography
+{
 
 	dynamics::Gravity gN();
 

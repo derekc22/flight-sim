@@ -1,23 +1,25 @@
 #include "simulation/control/private/policies/pid/policy.hpp"
+
 #include "simulation/constants/public/scalars.hpp"
 #include "simulation/util/public/filters.hpp"
 
-namespace control {
+namespace control
+{
 
 	PIDPolicy::PIDPolicy(
-	    const PIDPolicyParameters& params)
-	    : params(params)
+		const PIDPolicyParameters& params)
+		: params(params)
 	{
 	}
 
 	double PIDPolicy::step(
-	    const PIDPolicyInput& input,
-	    double dt)
+		const PIDPolicyInput& input,
+		double dt)
 	{
 		double err = input.x_des - input.x;
 
-		double d_term = input.x_dot.has_value() ? input.x_dot.value()    // PI-D
-		                                        : (prev_err - err) / dt; // PID
+		double d_term = input.x_dot.has_value() ? input.x_dot.value()	 // PI-D
+												: (prev_err - err) / dt; // PID
 
 		// filtered derivative
 		d_filtered = util::first_order_lag(d_term, d_filtered, params.tau, dt);

@@ -1,10 +1,13 @@
-#include <nlohmann/json.hpp>
-#include "core/json/aerodynamics/private/parsing.hpp"
 #include "core/json/aerodynamics/public/parser.hpp"
+
+#include "core/json/aerodynamics/private/parsing.hpp"
 #include "core/json/public/files.hpp"
 #include "simulation/aerodynamics/public/manager.hpp"
 
-namespace json {
+#include <nlohmann/json.hpp>
+
+namespace json
+{
 
 	aerodynamics::AerodynamicsManager parse_aerodynamics_config()
 	{

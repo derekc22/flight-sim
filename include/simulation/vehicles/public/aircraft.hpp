@@ -1,5 +1,4 @@
 #pragma once
-#include <string>
 #include "simulation/actuators/public/manager.hpp"
 #include "simulation/aerodynamics/public/manager.hpp"
 #include "simulation/allocator/public/manager.hpp"
@@ -13,7 +12,10 @@
 #include "simulation/structural/public/manager.hpp"
 #include "simulation/vehicles/public/data/types.hpp"
 
-namespace vehicles {
+#include <string>
+
+namespace vehicles
+{
 
 	struct Aircraft {
 		std::string id;
@@ -40,15 +42,15 @@ namespace vehicles {
 		allocator::AllocatorManager allocator_manager;
 
 		Aircraft(const std::string& id,
-		    const structural::StructuralManager& structural_manager,
-		    const aerodynamics::AerodynamicsManager& aerodynamics_manager,
-		    const actuators::ActuatorManager& actuator_manager,
-		    const control::ControlManager& control_manager,
-		    const sensors::SensorManager& sensor_manager,
-		    const avionics::AvionicsManager& avionics_manager,
-		    const guidance::GuidanceManager& guidance_manager,
-		    const estimation::EstimationManager& estimation_manager,
-		    const allocator::AllocatorManager& allocator_manager);
+			const structural::StructuralManager& structural_manager,
+			const aerodynamics::AerodynamicsManager& aerodynamics_manager,
+			const actuators::ActuatorManager& actuator_manager,
+			const control::ControlManager& control_manager,
+			const sensors::SensorManager& sensor_manager,
+			const avionics::AvionicsManager& avionics_manager,
+			const guidance::GuidanceManager& guidance_manager,
+			const estimation::EstimationManager& estimation_manager,
+			const allocator::AllocatorManager& allocator_manager);
 
 		void step(const StepOptions& opts);
 

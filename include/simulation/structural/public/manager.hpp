@@ -1,11 +1,13 @@
 #pragma once
+#include "simulation/structural/public/data/types.hpp"
+
 #include <cstddef>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include "simulation/structural/public/data/types.hpp"
 
-namespace structural {
+namespace structural
+{
 
 	struct StructuralManager {
 		std::vector<Geometry> geometries;

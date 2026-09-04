@@ -1,17 +1,20 @@
-#include <cmath>
-#include <stdexcept>
-#include <Eigen/Dense>
+#include "simulation/geography/private/detail/geodesy.hpp"
+
 #include "simulation/constants/public/scalars.hpp"
 #include "simulation/frames/public/detail/kinematics.hpp"
-#include "simulation/geography/private/detail/geodesy.hpp"
 #include "simulation/geography/public/detail/geodesy.hpp"
 #include "simulation/util/public/trig.hpp"
 
-namespace geography {
+#include <Eigen/Dense>
+#include <cmath>
+#include <stdexcept>
+
+namespace geography
+{
 
 	GeographicState compute_geographic_state(
-	    const frames::Frame& F,
-	    const frames::Frame& E)
+		const frames::Frame& F,
+		const frames::Frame& E)
 	{
 		if (E.id != frames::FrameID::ECEFFrame) {
 			throw std::invalid_argument("geography::compute_geographic_state: E must be ECEFFrame");
@@ -21,19 +24,19 @@ namespace geography {
 	}
 
 	dynamics::OrientationMatrix CEN_from_lat_lon(
-	    const Latitude& latitude,
-	    const Longitude& longitude)
+		const Latitude& latitude,
+		const Longitude& longitude)
 	{
 		Eigen::Matrix3d CEN;
 		double lat = latitude.data;
 		double lon = longitude.data;
 		CEN << -util::sin(lat) * util::cos(lon), -util::sin(lat) * util::sin(lon), util::cos(lat), -util::sin(lon),
-		    util::cos(lon), 0, -util::cos(lat) * util::cos(lon), -util::cos(lat) * util::sin(lon), -util::sin(lat);
+			util::cos(lon), 0, -util::cos(lat) * util::cos(lon), -util::cos(lat) * util::sin(lon), -util::sin(lat);
 		return {CEN};
 	};
 
 	dynamics::Position pE_from_lat_lon_alt(
-	    const GeographicState& geo)
+		const GeographicState& geo)
 	{
 		double lat = geo.lat.data;
 		double lon = geo.lon.data;

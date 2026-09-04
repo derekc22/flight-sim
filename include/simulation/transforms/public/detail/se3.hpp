@@ -1,8 +1,10 @@
 #pragma once
-#include <Eigen/Dense>
 #include "simulation/transforms/public/data/types.hpp"
 
-namespace transforms {
+#include <Eigen/Dense>
+
+namespace transforms
+{
 
 	Eigen::Matrix3d C_from_H(const Eigen::Matrix4d& H);
 	Eigen::Matrix3d R_from_H(const Eigen::Matrix4d& H);

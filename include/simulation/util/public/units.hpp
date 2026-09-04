@@ -1,6 +1,7 @@
 #pragma once
 
-namespace util {
+namespace util
+{
 
 	double kts_to_mps(double kts);
 	double ms_to_kts(double ms);

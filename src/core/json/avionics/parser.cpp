@@ -1,10 +1,13 @@
-#include <nlohmann/json.hpp>
-#include "core/json/avionics/private/parsing.hpp"
 #include "core/json/avionics/public/parser.hpp"
+
+#include "core/json/avionics/private/parsing.hpp"
 #include "core/json/public/files.hpp"
 #include "simulation/avionics/public/manager.hpp"
 
-namespace json {
+#include <nlohmann/json.hpp>
+
+namespace json
+{
 
 	avionics::AvionicsManager parse_avionics_config()
 	{

@@ -1,10 +1,12 @@
 #pragma once
+#include "simulation/constants/public/linalg.hpp"
+#include "simulation/dynamics/public/data/types.hpp"
+
 #include <Eigen/Dense>
 #include <string>
-#include "simulation/dynamics/public/data/types.hpp"
-#include "simulation/constants/public/linalg.hpp"
 
-namespace structural {
+namespace structural
+{
 
 	struct Geometry {
 		std::string id;

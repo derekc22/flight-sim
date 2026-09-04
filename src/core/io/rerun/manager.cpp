@@ -1,37 +1,40 @@
-#include <algorithm>
-#include <cmath>
-#include <cstdlib>
-#include <exception>
-#include <stdexcept>
-#include <string>
-#include <format>
-#include <chrono>
-#include <thread>
-#include <utility>
-#include <opencv2/opencv.hpp>
-#include <spdlog/spdlog.h>
+#include "core/io/rerun/public/manager.hpp"
+
 #include "core/io/camera/public/capture.hpp"
 #include "core/io/rerun/private/detail/streaming.hpp"
-#include "core/io/rerun/public/manager.hpp"
 #include "simulation/actuators/public/data/helpers.hpp"
 #include "simulation/constants/public/scalars.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/runner/public/data/types.hpp"
 
-namespace io {
+#include <algorithm>
+#include <chrono>
+#include <cmath>
+#include <cstdlib>
+#include <exception>
+#include <format>
+#include <opencv2/opencv.hpp>
+#include <spdlog/spdlog.h>
+#include <stdexcept>
+#include <string>
+#include <thread>
+#include <utility>
+
+namespace io
+{
 
 	RerunManager::RerunManager(
-	    const runner::JSONFlags& json_flags,
-	    double log_hz)
-	    : json_flags(json_flags),
-	      log_hz(log_hz),
-	      max_traj_size(std::max<std::size_t>(1,
-	          static_cast<std::size_t>(std::ceil(30.0 * log_hz)) // 30 seconds-worth of data
-	          )),
-	      max_queue_size(std::max<std::size_t>(1,
-	          static_cast<std::size_t>(std::ceil(2.0 * log_hz)) // 2 seconds-worth of data
-	          )),
-	      rec("flight-sim")
+		const runner::JSONFlags& json_flags,
+		double log_hz)
+		: json_flags(json_flags),
+		  log_hz(log_hz),
+		  max_traj_size(std::max<std::size_t>(1,
+			  static_cast<std::size_t>(std::ceil(30.0 * log_hz)) // 30 seconds-worth of data
+			  )),
+		  max_queue_size(std::max<std::size_t>(1,
+			  static_cast<std::size_t>(std::ceil(2.0 * log_hz)) // 2 seconds-worth of data
+			  )),
+		  rec("flight-sim")
 	{
 		rerun::SpawnOptions options;
 		options.port = 9876;
@@ -75,7 +78,7 @@ namespace io {
 	}
 
 	void RerunManager::step(
-	    const RerunManagerInput& input)
+		const RerunManagerInput& input)
 	{
 		int t = input.t;
 		const DataContext& data_context = input.data_context;
@@ -98,7 +101,7 @@ namespace io {
 	}
 
 	void RerunManager::stream_context(
-	    const RerunContext& context)
+		const RerunContext& context)
 	{
 		rec.set_time_sequence("step", context.t);
 		rec.set_time_duration_secs("sim_time", context.t * constants::dt);
@@ -110,76 +113,76 @@ namespace io {
 		}
 
 		trajectory.emplace_back(static_cast<float>(context.data_context.Xt.p.data.x()),
-		    static_cast<float>(context.data_context.Xt.p.data.y()),
-		    static_cast<float>(context.data_context.Xt.p.data.z()));
+			static_cast<float>(context.data_context.Xt.p.data.y()),
+			static_cast<float>(context.data_context.Xt.p.data.z()));
 		clip_trajectory(trajectory, max_traj_size);
 		stream_vehicle_trajectory(rec, trajectory);
 
 		if (json_flags.estimation_flag) {
 			estimated_trajectory.emplace_back(static_cast<float>(context.data_context.Zt.p.data.x()),
-			    static_cast<float>(context.data_context.Zt.p.data.y()),
-			    static_cast<float>(context.data_context.Zt.p.data.z()));
+				static_cast<float>(context.data_context.Zt.p.data.y()),
+				static_cast<float>(context.data_context.Zt.p.data.z()));
 			clip_trajectory(estimated_trajectory, max_traj_size);
 			stream_estimated_vehicle_trajectory(rec, estimated_trajectory);
 		}
 
 		stream_body_arrow(
-		    rec, "world/vehicle/vectors/v", context.data_context.Xt.v.data, 1.0, rerun::Color(0, 180, 255), "v");
+			rec, "world/vehicle/vectors/v", context.data_context.Xt.v.data, 1.0, rerun::Color(0, 180, 255), "v");
 		stream_body_arrow(
-		    rec, "world/vehicle/vectors/w", context.data_context.Xt.w.data, 50.0, rerun::Color(255, 80, 200), "w");
+			rec, "world/vehicle/vectors/w", context.data_context.Xt.w.data, 50.0, rerun::Color(255, 80, 200), "w");
 
 		if (json_flags.estimation_flag) {
 			stream_body_arrow(rec,
-			    "world/estimated_vehicle/vectors/v",
-			    context.data_context.Zt.v.data,
-			    1.0,
-			    rerun::Color(0, 180, 255),
-			    "v");
+				"world/estimated_vehicle/vectors/v",
+				context.data_context.Zt.v.data,
+				1.0,
+				rerun::Color(0, 180, 255),
+				"v");
 			stream_body_arrow(rec,
-			    "world/estimated_vehicle/vectors/w",
-			    context.data_context.Zt.w.data,
-			    50.0,
-			    rerun::Color(255, 80, 200),
-			    "w");
+				"world/estimated_vehicle/vectors/w",
+				context.data_context.Zt.w.data,
+				50.0,
+				rerun::Color(255, 80, 200),
+				"w");
 		}
 
 		stream_body_arrow(rec,
-		    "world/vehicle/vectors/F_net",
-		    context.data_context.WB_net.F.data,
-		    0.01,
-		    rerun::Color(255, 80, 80),
-		    "F_net");
+			"world/vehicle/vectors/F_net",
+			context.data_context.WB_net.F.data,
+			0.01,
+			rerun::Color(255, 80, 80),
+			"F_net");
 		stream_body_arrow(rec,
-		    "world/vehicle/vectors/F_aerodynamic",
-		    context.data_context.WB_aerodynamic.F.data,
-		    0.01,
-		    rerun::Color(255, 160, 40),
-		    "F_aerodynamic");
+			"world/vehicle/vectors/F_aerodynamic",
+			context.data_context.WB_aerodynamic.F.data,
+			0.01,
+			rerun::Color(255, 160, 40),
+			"F_aerodynamic");
 		stream_body_arrow(rec,
-		    "world/vehicle/vectors/F_propulsive",
-		    context.data_context.WB_propulsive.F.data,
-		    0.001,
-		    rerun::Color(80, 220, 120),
-		    "F_propulsive");
+			"world/vehicle/vectors/F_propulsive",
+			context.data_context.WB_propulsive.F.data,
+			0.001,
+			rerun::Color(80, 220, 120),
+			"F_propulsive");
 
 		stream_body_arrow(rec,
-		    "world/vehicle/vectors/M_net",
-		    context.data_context.WB_net.M.data,
-		    0.01,
-		    rerun::Color(210, 120, 255),
-		    "M_net");
+			"world/vehicle/vectors/M_net",
+			context.data_context.WB_net.M.data,
+			0.01,
+			rerun::Color(210, 120, 255),
+			"M_net");
 		stream_body_arrow(rec,
-		    "world/vehicle/vectors/M_aerodynamic",
-		    context.data_context.WB_aerodynamic.M.data,
-		    0.01,
-		    rerun::Color(255, 220, 80),
-		    "M_aerodynamic");
+			"world/vehicle/vectors/M_aerodynamic",
+			context.data_context.WB_aerodynamic.M.data,
+			0.01,
+			rerun::Color(255, 220, 80),
+			"M_aerodynamic");
 		stream_body_arrow(rec,
-		    "world/vehicle/vectors/M_propulsive",
-		    context.data_context.WB_propulsive.M.data,
-		    0.01,
-		    rerun::Color(120, 255, 210),
-		    "M_propulsive");
+			"world/vehicle/vectors/M_propulsive",
+			context.data_context.WB_propulsive.M.data,
+			0.01,
+			rerun::Color(120, 255, 210),
+			"M_propulsive");
 
 		dynamics::EulerAngles eul_t;
 		eul_t.set(context.data_context.Xt.q);
@@ -189,21 +192,21 @@ namespace io {
 		stream_vector(rec, "state/v", context.data_context.Xt.v.data, velocity_labels);
 
 		stream_vector(rec,
-		    "actuators/surface/actual",
-		    actuators::unpack_surface_actuator_inputs(context.data_context.u_surface),
-		    surface_labels);
+			"actuators/surface/actual",
+			actuators::unpack_surface_actuator_inputs(context.data_context.u_surface),
+			surface_labels);
 		stream_vector(rec,
-		    "actuators/surface/commanded",
-		    actuators::unpack_surface_actuator_inputs(context.data_context.u_surface_commanded),
-		    surface_labels);
+			"actuators/surface/commanded",
+			actuators::unpack_surface_actuator_inputs(context.data_context.u_surface_commanded),
+			surface_labels);
 		stream_vector(rec,
-		    "actuators/propulsor/actual",
-		    actuators::unpack_propulsor_actuator_inputs(context.data_context.u_propulsor),
-		    propulsor_labels);
+			"actuators/propulsor/actual",
+			actuators::unpack_propulsor_actuator_inputs(context.data_context.u_propulsor),
+			propulsor_labels);
 		stream_vector(rec,
-		    "actuators/propulsor/commanded",
-		    actuators::unpack_propulsor_actuator_inputs(context.data_context.u_propulsor_commanded),
-		    propulsor_labels);
+			"actuators/propulsor/commanded",
+			actuators::unpack_propulsor_actuator_inputs(context.data_context.u_propulsor_commanded),
+			propulsor_labels);
 
 		stream_vector(rec, "forces/net", context.data_context.WB_net.F.data, xyz_labels);
 		stream_vector(rec, "moments/net", context.data_context.WB_net.M.data, xyz_labels);
@@ -240,11 +243,11 @@ namespace io {
 
 		if (json_flags.wind_flag) {
 			stream_body_arrow(rec,
-			    "world/vehicle/vectors/wind",
-			    context.data_context.windB.data,
-			    1.0,
-			    rerun::Color(180, 180, 180),
-			    "wind");
+				"world/vehicle/vectors/wind",
+				context.data_context.windB.data,
+				1.0,
+				rerun::Color(180, 180, 180),
+				"wind");
 			stream_vector(rec, "wind/body", context.data_context.windB.data, xyz_labels);
 		}
 
@@ -264,7 +267,9 @@ namespace io {
 
 			{
 				std::unique_lock<std::mutex> lock(queue_mutex);
-				queue_cv.wait(lock, [this] { return stop_worker || !context_queue.empty(); });
+				queue_cv.wait(lock, [this] {
+					return stop_worker || !context_queue.empty();
+				});
 
 				if (stop_worker && context_queue.empty()) {
 					return;

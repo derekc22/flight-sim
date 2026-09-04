@@ -1,11 +1,13 @@
-#include <stdexcept>
-#include <nlohmann/json.hpp>
 #include "core/json/sensors/private/validation.hpp"
 
-namespace json {
+#include <nlohmann/json.hpp>
+#include <stdexcept>
+
+namespace json
+{
 
 	void validate_sensor_json(
-	    const nlohmann::json& sensor_json)
+		const nlohmann::json& sensor_json)
 	{
 		if (!sensor_json.contains("mean")) {
 			throw std::runtime_error("json::validate_sensor_json: sensor noise mean not present");

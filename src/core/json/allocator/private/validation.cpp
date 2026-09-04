@@ -1,11 +1,13 @@
-#include <stdexcept>
-#include <nlohmann/json.hpp>
 #include "core/json/allocator/private/validation.hpp"
 
-namespace json {
+#include <nlohmann/json.hpp>
+#include <stdexcept>
+
+namespace json
+{
 
 	void validate_allocator(
-	    const nlohmann::json& config)
+		const nlohmann::json& config)
 	{
 		if (!config.is_object()) {
 			throw std::runtime_error("json::validate_allocator expected object");

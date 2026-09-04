@@ -3,7 +3,8 @@
 #include "core/messages/public/data/helpers.hpp"
 #include "simulation/runner/public/data/types.hpp"
 
-namespace runner {
+namespace runner
+{
 
 	struct FlightGearAdapter {
 		// initialize udp out cache

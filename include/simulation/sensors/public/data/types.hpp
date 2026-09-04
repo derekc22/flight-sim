@@ -4,7 +4,8 @@
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/geography/public/data/types.hpp"
 
-namespace sensors {
+namespace sensors
+{
 
 	// directly measured
 	struct AngleOfAttackMeasurement : aerodynamics::AngleOfAttack {};

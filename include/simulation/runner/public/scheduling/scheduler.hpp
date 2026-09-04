@@ -1,9 +1,11 @@
 #pragma once
-#include <chrono>
 #include "simulation/constants/public/scalars.hpp"
 #include "simulation/runner/public/data/types.hpp"
 
-namespace runner {
+#include <chrono>
+
+namespace runner
+{
 
 	struct Scheduler {
 		ModuleRates module_rates;

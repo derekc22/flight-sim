@@ -1,8 +1,10 @@
 #pragma once
 #include "simulation/transforms/public/data/types.hpp"
+
 #include <Eigen/Dense>
 
-namespace transforms {
+namespace transforms
+{
 
 	Eigen::Quaterniond eul_to_quatR(double a, double b, double c, EulerOrder order);
 	Eigen::Quaterniond eul_to_quatC(double a, double b, double c, EulerOrder order, RotationType type);

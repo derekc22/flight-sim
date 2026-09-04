@@ -1,16 +1,18 @@
-#include <filesystem>
-#include <fstream>
-#include <stdexcept>
-#include <string>
-#include <spdlog/spdlog.h>
-#include <nlohmann/json.hpp>
 #include "core/json/private/detail/files.hpp"
 
-namespace json {
+#include <filesystem>
+#include <fstream>
+#include <nlohmann/json.hpp>
+#include <spdlog/spdlog.h>
+#include <stdexcept>
+#include <string>
+
+namespace json
+{
 
 	std::filesystem::path resolve_config_path(
-	    const std::filesystem::path& entry_path,
-	    const std::string& config_path)
+		const std::filesystem::path& entry_path,
+		const std::string& config_path)
 	{
 		const std::filesystem::path path{config_path};
 		if (path.is_absolute()) {
@@ -20,9 +22,9 @@ namespace json {
 	}
 
 	void write_json(
-	    const nlohmann::json& config,
-	    const std::string& dir_path,
-	    const std::string& fname)
+		const nlohmann::json& config,
+		const std::string& dir_path,
+		const std::string& fname)
 	{
 		const auto file_path = std::filesystem::path(dir_path) / (fname + ".json");
 		std::ofstream file_json(file_path);

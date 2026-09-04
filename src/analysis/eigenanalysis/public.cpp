@@ -1,17 +1,20 @@
+#include "analysis/eigenanalysis/public.hpp"
+
+#include "analysis/eigenanalysis/private.hpp"
+#include "simulation/constants/public/dimensions.hpp"
+#include "simulation/linearization/public/data/types.hpp"
+
 #include <Eigen/Eigenvalues>
 #include <iomanip>
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#include "analysis/eigenanalysis/private.hpp"
-#include "analysis/eigenanalysis/public.hpp"
-#include "simulation/constants/public/dimensions.hpp"
-#include "simulation/linearization/public/data/types.hpp"
 
-namespace analysis {
+namespace analysis
+{
 
 	EigenAnalysis linearization_eigen_analysis(
-	    const linearization::LocalLinearization& lin_sol)
+		const linearization::LocalLinearization& lin_sol)
 	{
 		Eigen::EigenSolver<linearization::StateJacobian> solver(lin_sol.A);
 		if (solver.info() != Eigen::Success) {
@@ -19,13 +22,13 @@ namespace analysis {
 		}
 
 		return EigenAnalysis{
-		    .eigenvalues = solver.eigenvalues(),
-		    .eigenvectors = solver.eigenvectors(),
+			.eigenvalues = solver.eigenvalues(),
+			.eigenvectors = solver.eigenvectors(),
 		};
 	}
 
 	std::string print_eigen_analysis(
-	    const EigenAnalysis& eig)
+		const EigenAnalysis& eig)
 	{
 		std::ostringstream out;
 		for (int mode = 0; mode < constants::state_dim; ++mode) {

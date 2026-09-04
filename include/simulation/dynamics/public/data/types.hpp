@@ -1,15 +1,18 @@
 #pragma once
-#include <Eigen/Dense>
-#include "simulation/constants/public/linalg.hpp"
 #include "simulation/constants/public/dimensions.hpp"
+#include "simulation/constants/public/linalg.hpp"
 
-namespace dynamics {
+#include <Eigen/Dense>
+
+namespace dynamics
+{
 	struct OrientationQuaternion;
 	struct EulerAngles;
 	struct OrientationQuaternionRate;
 } // namespace dynamics
 
-namespace dynamics {
+namespace dynamics
+{
 
 	struct Position {
 		Eigen::Vector3d data; // e.g. pI_BI [m]
@@ -41,9 +44,9 @@ namespace dynamics {
 	struct EulerAngles {
 		// "ZYX", intrinsic. Stored as [yaw, pitch, roll]
 		Eigen::Vector3d data; // e.g. eulIB [rad]
-		double psi() const;   // yaw
+		double psi() const;	  // yaw
 		double theta() const; // pitch
-		double phi() const;   // roll
+		double phi() const;	  // roll
 		void set(const OrientationMatrix& C);
 		void set(const OrientationQuaternion& q);
 	};
@@ -111,10 +114,10 @@ namespace dynamics {
 	};
 
 	struct RigidBodyState {
-		Position p;              // e.g. pI_BI
+		Position p;				 // e.g. pI_BI
 		TranslationalVelocity v; // e.g. vB_BI
 		OrientationQuaternion q; // e.g. qIB
-		AngularVelocity w;       // e.g. wB_BI
+		AngularVelocity w;		 // e.g. wB_BI
 	};
 
 	struct RigidBodyStateDot {

@@ -1,15 +1,17 @@
 
 #include "simulation/control/private/components/velocity/pid.hpp"
+
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/guidance/public/data/types.hpp"
 
-namespace control {
+namespace control
+{
 
 	VelocityPID::VelocityPID(const VelocityPIDParameters& params)
-	    : policy({.Kp = params.Kp, .Ki = params.Ki, .Kd = params.Kd, .tau = params.tau}) {};
+		: policy({.Kp = params.Kp, .Ki = params.Ki, .Kd = params.Kd, .tau = params.tau}) {};
 
 	PIDPolicyInput VelocityPID::make_pid_policy_input(
-	    const VelocityControlInput& input)
+		const VelocityControlInput& input)
 	{
 		dynamics::RigidBodyState Zt = input.Zt;
 		guidance::VelocitySetpoint setpoint = input.setpoint;
@@ -18,8 +20,8 @@ namespace control {
 	}
 
 	VirtualControlOutput_T<double> VelocityPID::step(
-	    const VelocityControlInput& input,
-	    double dt)
+		const VelocityControlInput& input,
+		double dt)
 	{
 		VirtualControlOutput_T<double> out{};
 

@@ -1,19 +1,22 @@
-#include <Eigen/Dense>
-#include <stdexcept>
-#include <string>
-#include <tuple>
-#include <nlohmann/json.hpp>
 #include "core/json/estimation/private/parsing.hpp"
+
 #include "core/json/estimation/private/validation.hpp"
 #include "core/json/public/data/helpers.hpp"
 #include "simulation/constants/public/dimensions.hpp"
 #include "simulation/estimation/public/manager.hpp"
 #include "simulation/util/public/validation.hpp"
 
-namespace json {
+#include <Eigen/Dense>
+#include <nlohmann/json.hpp>
+#include <stdexcept>
+#include <string>
+#include <tuple>
+
+namespace json
+{
 
 	std::tuple<Eigen::MatrixXd, Eigen::MatrixXd, Eigen::MatrixXd> parse_kalman_filter_parameters(
-	    const nlohmann::json& estimator_json)
+		const nlohmann::json& estimator_json)
 	{
 		const auto& parameters_json = estimator_json.at("parameters");
 		if (!parameters_json.is_object()) {
@@ -36,22 +39,22 @@ namespace json {
 	}
 
 	estimation::LinearKalmanFilterParameters parse_linear_kalman_filter_parameters(
-	    const nlohmann::json& estimator_json)
+		const nlohmann::json& estimator_json)
 	{
 		auto [P0, Q, R] = parse_kalman_filter_parameters(estimator_json);
 		return {P0, Q, R};
 	}
 
 	estimation::ExtendedKalmanFilterParameters parse_extended_kalman_filter_parameters(
-	    const nlohmann::json& estimator_json)
+		const nlohmann::json& estimator_json)
 	{
 		auto [P0, Q, R] = parse_kalman_filter_parameters(estimator_json);
 		return {P0, Q, R};
 	}
 
 	estimation::LinearKalmanEstimator make_linear_kalman_estimator(
-	    estimation::EstimatorType estimator_type,
-	    const nlohmann::json& estimator_json)
+		estimation::EstimatorType estimator_type,
+		const nlohmann::json& estimator_json)
 	{
 		switch (estimator_type) {
 			case estimation::EstimatorType::LinearKalmanFilter: {
@@ -65,13 +68,13 @@ namespace json {
 	}
 
 	estimation::ExtendedKalmanEstimator make_extended_kalman_estimator(
-	    estimation::EstimatorType estimator_type,
-	    const nlohmann::json& estimator_json)
+		estimation::EstimatorType estimator_type,
+		const nlohmann::json& estimator_json)
 	{
 		switch (estimator_type) {
 			case estimation::EstimatorType::ExtendedKalmanFilter: {
 				estimation::ExtendedKalmanFilterParameters params =
-				    parse_extended_kalman_filter_parameters(estimator_json);
+					parse_extended_kalman_filter_parameters(estimator_json);
 				return estimation::ExtendedKalmanEstimator(params);
 			}
 
@@ -81,7 +84,7 @@ namespace json {
 	}
 
 	estimation::EstimatorType map_estimator_type(
-	    const std::string& estimator_type_str)
+		const std::string& estimator_type_str)
 	{
 		if (estimator_type_str == "None") {
 			return estimation::EstimatorType::None;
@@ -96,29 +99,29 @@ namespace json {
 	}
 
 	estimation::EstimatorType fetch_estimator_type(
-	    const nlohmann::json& estimator_json)
+		const nlohmann::json& estimator_json)
 	{
 		std::string estimator_type_str = estimator_json.at("estimator_type").get<std::string>();
 		return map_estimator_type(estimator_type_str);
 	}
 
 	void parse_linear_kalman_estimator(
-	    const nlohmann::json& estimator_json,
-	    std::optional<estimation::LinearKalmanEstimator>& estimator)
+		const nlohmann::json& estimator_json,
+		std::optional<estimation::LinearKalmanEstimator>& estimator)
 	{
 		estimator = make_linear_kalman_estimator(fetch_estimator_type(estimator_json), estimator_json);
 	}
 
 	void parse_extended_kalman_estimator(
-	    const nlohmann::json& estimator_json,
-	    std::optional<estimation::ExtendedKalmanEstimator>& estimator)
+		const nlohmann::json& estimator_json,
+		std::optional<estimation::ExtendedKalmanEstimator>& estimator)
 	{
 		estimator = make_extended_kalman_estimator(fetch_estimator_type(estimator_json), estimator_json);
 	}
 
 	estimation::EstimationManager parse_estimation_manager(
-	    const nlohmann::json& config,
-	    bool trim_flag)
+		const nlohmann::json& config,
+		bool trim_flag)
 	{
 		validate_estimator(config, trim_flag);
 		estimation::EstimationManager estimation_manager;

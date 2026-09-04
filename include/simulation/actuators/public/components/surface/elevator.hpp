@@ -1,7 +1,8 @@
 #pragma once
 #include "simulation/actuators/public/components/base.hpp"
 
-namespace actuators {
+namespace actuators
+{
 
 	struct ElevatorActuator : SurfaceActuator {
 		using SurfaceActuator::SurfaceActuator;

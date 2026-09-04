@@ -1,12 +1,14 @@
-#include <stdexcept>
-#include <opencv2/opencv.hpp>
 #include "core/io/camera/public/capture.hpp"
 
-namespace io {
+#include <opencv2/opencv.hpp>
+#include <stdexcept>
+
+namespace io
+{
 
 	cv::Mat get_flightgear_image(
-	    int width,
-	    int height)
+		int width,
+		int height)
 	{
 		cv::VideoCapture cap("http://127.0.0.1:8080/screenshot");
 

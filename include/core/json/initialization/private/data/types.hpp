@@ -1,10 +1,12 @@
 #pragma once
-#include <optional>
 #include "simulation/aerodynamics/public/data/types.hpp"
 #include "simulation/frames/public/data/types.hpp"
 #include "simulation/geography/public/data/types.hpp"
 
-namespace json {
+#include <optional>
+
+namespace json
+{
 
 	struct ParsedStepOptions : frames::StandardFrameFieldsOptional {
 		std::optional<geography::Latitude> lat;

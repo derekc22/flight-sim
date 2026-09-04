@@ -1,10 +1,12 @@
-#include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/guidance/private/data/helpers.hpp"
 
-namespace guidance {
+#include "simulation/dynamics/public/data/types.hpp"
+
+namespace guidance
+{
 
 	GuidanceSetpoint pack_guidance_setpoint(
-	    const GuidanceSetpointVector& guidance_vec)
+		const GuidanceSetpointVector& guidance_vec)
 	{
 		dynamics::TranslationalVelocity v{guidance_vec.segment<3>(0)};
 		dynamics::AngularVelocity w{guidance_vec.segment<3>(3)};

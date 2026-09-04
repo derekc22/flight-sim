@@ -1,7 +1,8 @@
 #pragma once
 #include <nlohmann/json.hpp>
 
-namespace json {
+namespace json
+{
 
 	void validate_NEDFrameECEF_initialization(const nlohmann::json& frame_json);
 	void validate_FRDFrameECEF_initialization(const nlohmann::json& frame_json);

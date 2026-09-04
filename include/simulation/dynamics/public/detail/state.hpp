@@ -1,11 +1,13 @@
 #pragma once
 #include "simulation/dynamics/public/data/types.hpp"
 
-namespace frames {
+namespace frames
+{
 	struct Frame;
 } // namespace frames
 
-namespace dynamics {
+namespace dynamics
+{
 
 	RigidBodyState get_rigid_body_state(const frames::Frame& F);
 

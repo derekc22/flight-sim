@@ -1,19 +1,22 @@
-#include <Eigen/Dense>
-#include "simulation/constants/public/scalars.hpp"
 #include "simulation/integrators/private/detail/euler.hpp"
-#include "simulation/integrators/public/detail/euler.hpp"
+
+#include "simulation/constants/public/scalars.hpp"
 #include "simulation/dynamics/public/detail/derivatives.hpp"
+#include "simulation/integrators/public/detail/euler.hpp"
 #include "simulation/structural/public/data/types.hpp"
 #include "simulation/transforms/public/detail/s3.hpp"
 #include "simulation/util/public/trig.hpp"
 
-namespace integrators {
+#include <Eigen/Dense>
+
+namespace integrators
+{
 
 	dynamics::Position trans_kin(
-	    const dynamics::Position& pt,
-	    const dynamics::TranslationalVelocity& vt,
-	    const dynamics::TranslationalAcceleration& at,
-	    double dt)
+		const dynamics::Position& pt,
+		const dynamics::TranslationalVelocity& vt,
+		const dynamics::TranslationalAcceleration& at,
+		double dt)
 	{
 		const Eigen::Vector3d pt1 = pt.data + vt.data * dt + 0.5 * at.data * (dt * dt);
 
@@ -21,9 +24,9 @@ namespace integrators {
 	}
 
 	dynamics::OrientationQuaternion quat_kin(
-	    const dynamics::OrientationQuaternion& qIB_t,
-	    const dynamics::AngularVelocity& wB_BI_t,
-	    double dt)
+		const dynamics::OrientationQuaternion& qIB_t,
+		const dynamics::AngularVelocity& wB_BI_t,
+		double dt)
 	{
 		const Eigen::Vector3d w = wB_BI_t.data;
 		const double Omega = w.norm();
@@ -43,9 +46,9 @@ namespace integrators {
 	}
 
 	dynamics::TranslationalVelocity trans_kin_vel(
-	    const dynamics::TranslationalVelocity& vt,
-	    const dynamics::TranslationalAcceleration& at,
-	    double dt)
+		const dynamics::TranslationalVelocity& vt,
+		const dynamics::TranslationalAcceleration& at,
+		double dt)
 	{
 		const Eigen::Vector3d vt1 = vt.data + at.data * dt;
 
@@ -53,11 +56,11 @@ namespace integrators {
 	}
 
 	dynamics::RigidBodyState step_rigid_body(
-	    const dynamics::RigidBodyState& Xt,
-	    const dynamics::Mass& mass,
-	    const dynamics::InertiaTensor& JB,
-	    const dynamics::Wrench& WB_net_t,
-	    double dt)
+		const dynamics::RigidBodyState& Xt,
+		const dynamics::Mass& mass,
+		const dynamics::InertiaTensor& JB,
+		const dynamics::Wrench& WB_net_t,
+		double dt)
 	{
 
 		// ddtB_vB_BI_t is the body derivative of body-expressed velocity,
@@ -72,11 +75,12 @@ namespace integrators {
 		// Translational dynamics in body coordinates
 		const dynamics::TranslationalVelocity vB_BI_t1 = trans_dyn_vel(Xt.v, Xt.w, mass, FB_net_t, dt);
 		const Eigen::Vector3d ddtB_vB_BI_t =
-		    dynamics::ddtB_vB_BI(Xt.v, Xt.w, mass, FB_net_t).data; // produces a body derivative
+			dynamics::ddtB_vB_BI(Xt.v, Xt.w, mass, FB_net_t).data; // produces a body derivative
 		const Eigen::Vector3d ddtI_vB_BI_t =
-		    dynamics::ddtB_to_ddtI(ddtB_vB_BI_t, Xt.v.data, Xt.w.data); // produces an inertial derivative
+			dynamics::ddtB_to_ddtI(ddtB_vB_BI_t, Xt.v.data, Xt.w.data); // produces an inertial derivative
 		const dynamics::TranslationalAcceleration aB_BI_t{
-		    ddtI_vB_BI_t}; // since pI_BI_t1 and vI_BI_t are inertial, aB_BI_t needs to be an inertial derivative
+			ddtI_vB_BI_t
+		}; // since pI_BI_t1 and vI_BI_t are inertial, aB_BI_t needs to be an inertial derivative
 
 		// Rotational dynamics in body coordinates
 		const dynamics::AngularVelocity wB_BI_t1 = rot_dyn(Xt.w, JB, MB_net_t, dt);

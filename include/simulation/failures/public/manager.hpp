@@ -1,7 +1,8 @@
 #pragma once
 #include "simulation/failures/public/data/types.hpp"
 
-namespace failures {
+namespace failures
+{
 
 	struct FailureManager {
 

@@ -1,11 +1,13 @@
-#include <stdexcept>
-#include <string_view>
 #include "simulation/fsm/private/data/helpers.hpp"
 
-namespace fsm {
+#include <stdexcept>
+#include <string_view>
+
+namespace fsm
+{
 
 	std::string_view mode_to_string(
-	    FiniteState mode)
+		FiniteState mode)
 	{
 		switch (mode) {
 			case FiniteState::Manual:

@@ -2,7 +2,8 @@
 #include "simulation/control/private/policies/pid/policy.hpp"
 #include "simulation/control/public/data/types.hpp"
 
-namespace control {
+namespace control
+{
 
 	struct VelocityPID {
 		PIDPolicy policy;

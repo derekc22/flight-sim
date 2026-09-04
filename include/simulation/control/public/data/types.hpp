@@ -1,8 +1,4 @@
 #pragma once
-#include <array>
-#include <functional>
-#include <optional>
-#include <Eigen/Dense>
 #include "simulation/actuators/public/components/collection.hpp"
 #include "simulation/actuators/public/data/types.hpp"
 #include "simulation/constants/public/dimensions.hpp"
@@ -11,7 +7,13 @@
 #include "simulation/linearization/public/data/types.hpp"
 #include "simulation/trim/public/data/types.hpp"
 
-namespace control {
+#include <Eigen/Dense>
+#include <array>
+#include <functional>
+#include <optional>
+
+namespace control
+{
 
 	enum class ControllerType {
 		None,
@@ -102,13 +104,13 @@ namespace control {
 	};
 
 	using AttitudeControlImplementation =
-	    std::function<VirtualControlOutput_T<double>(const AttitudeControlInput&, double dt)>;
+		std::function<VirtualControlOutput_T<double>(const AttitudeControlInput&, double dt)>;
 
 	using VelocityControlImplementation =
-	    std::function<VirtualControlOutput_T<double>(const VelocityControlInput&, double dt)>;
+		std::function<VirtualControlOutput_T<double>(const VelocityControlInput&, double dt)>;
 
 	using LinearQuadraticControlImplementation =
-	    std::function<VirtualControlOutput_T<double>(const LinearQuadraticControlInput&, double dt)>;
+		std::function<VirtualControlOutput_T<double>(const LinearQuadraticControlInput&, double dt)>;
 
 	struct ControlComponentOutput {
 		VirtualControlOutput_T<double> mu;

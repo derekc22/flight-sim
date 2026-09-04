@@ -1,15 +1,17 @@
 #include "core/io/data/public/manager.hpp"
+
 #include "core/io/public/files.hpp"
 #include "simulation/actuators/public/data/helpers.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/runner/public/data/types.hpp"
 
-namespace io {
+namespace io
+{
 
 	DataManager::DataManager(
-	    int tf,
-	    const runner::JSONFlags& json_flags)
-	    : json_flags(json_flags)
+		int tf,
+		const runner::JSONFlags& json_flags)
+		: json_flags(json_flags)
 	{
 		p_DM = DataMatrix(tf, 3 + 1);
 		eul_DM = DataMatrix(tf, 3 + 1);
@@ -52,7 +54,7 @@ namespace io {
 	}
 
 	void DataManager::step(
-	    const DataManagerInput& input)
+		const DataManagerInput& input)
 	{
 		int t = input.t;
 		const DataContext& context = input.context;
@@ -105,7 +107,7 @@ namespace io {
 	}
 
 	void DataManager::save(
-	    const std::string& data_dir_path)
+		const std::string& data_dir_path)
 	{
 
 		write_csv(p_DM->data, data_dir_path, "p");

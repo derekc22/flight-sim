@@ -2,7 +2,8 @@
 #include "simulation/atmospheric/public/data/types.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 
-namespace atmospheric {
+namespace atmospheric
+{
 
 	StaticAirTemperature T_from_T0(const StagnationAirTemperature& T0, const MachNumber& M);
 

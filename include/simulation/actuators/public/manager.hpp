@@ -2,7 +2,8 @@
 #include "simulation/actuators/public/components/collection.hpp"
 #include "simulation/actuators/public/data/types.hpp"
 
-namespace actuators {
+namespace actuators
+{
 
 	struct ActuatorManager {
 		SurfaceActuators surface_actuators;

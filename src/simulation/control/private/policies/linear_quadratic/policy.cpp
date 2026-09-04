@@ -1,17 +1,20 @@
-#include <algorithm>
-#include "simulation/control/private/policies/linear_quadratic/slicot_care.hpp"
 #include "simulation/control/private/policies/linear_quadratic/policy.hpp"
 
-namespace control {
+#include "simulation/control/private/policies/linear_quadratic/slicot_care.hpp"
+
+#include <algorithm>
+
+namespace control
+{
 
 	LinearQuadraticPolicy::LinearQuadraticPolicy(
-	    const LinearQuadraticPolicyParameters& params)
-	    : params(params)
+		const LinearQuadraticPolicyParameters& params)
+		: params(params)
 	{
 	}
 
 	VirtualControlOutputVector_T<double> LinearQuadraticPolicy::step(
-	    const LinearQuadraticPolicyInput& input)
+		const LinearQuadraticPolicyInput& input)
 	{
 
 		if (!params.K.has_value()) {

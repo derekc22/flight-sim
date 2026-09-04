@@ -1,27 +1,28 @@
 #include "simulation/util/public/units.hpp"
 
-namespace util {
+namespace util
+{
 
 	double kts_to_mps(
-	    double kts)
+		double kts)
 	{
 		return kts / 1.94384;
 	}
 
 	double ms_to_kts(
-	    double ms)
+		double ms)
 	{
 		return ms * 1.94384;
 	}
 
 	double ft_to_m(
-	    double ft)
+		double ft)
 	{
 		return ft / 3.281;
 	}
 
 	double m_to_ft(
-	    double m)
+		double m)
 	{
 		return m * 3.281;
 	}

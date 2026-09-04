@@ -2,7 +2,8 @@
 #include "simulation/control/private/data/types.hpp"
 #include "simulation/control/public/data/types.hpp"
 
-namespace control {
+namespace control
+{
 
 	struct LinearQuadraticPolicy {
 		LinearQuadraticPolicyParameters params;

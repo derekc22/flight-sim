@@ -8,12 +8,13 @@
 #include "simulation/sensors/public/components/navigation/gnss.hpp"
 #include "simulation/sensors/public/components/navigation/magnetometer.hpp"
 
-namespace sensors {
+namespace sensors
+{
 
 	struct Sensors {
 		AngleOfAttackVane aoa_vane;
 		Accelerometer accelerometer; // IMU
-		Gyroscope gyro;              // IMU
+		Gyroscope gyro;				 // IMU
 		PitotTube pitot_tube;
 		StaticPort static_port;
 		TotalAirTemperatureProbe tat_probe;

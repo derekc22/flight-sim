@@ -1,27 +1,30 @@
-#include <stdexcept>
-#include <string>
-#include <nlohmann/json.hpp>
 #include "core/json/control/private/parsing.hpp"
+
 #include "core/json/control/private/validation.hpp"
 #include "core/json/public/data/helpers.hpp"
 #include "simulation/control/public/manager.hpp"
 
-namespace json {
+#include <nlohmann/json.hpp>
+#include <stdexcept>
+#include <string>
+
+namespace json
+{
 
 	control::DamperPIDParameters parse_damper_pid_parameters(
-	    const nlohmann::json& controller_json)
+		const nlohmann::json& controller_json)
 	{
 		const auto& parameters_json = controller_json.at("parameters");
 		if (!parameters_json.is_object()) {
 			throw std::runtime_error("json::parse_damper_pid_parameters expected parameters object");
 		}
 		if (!parameters_json.contains("Kp_roll") || !parameters_json.contains("Ki_roll") ||
-		    !parameters_json.contains("Kd_roll") || !parameters_json.contains("Kp_pitch") ||
-		    !parameters_json.contains("Ki_pitch") || !parameters_json.contains("Kd_pitch") ||
-		    !parameters_json.contains("Kp_yaw") || !parameters_json.contains("Ki_yaw") ||
-		    !parameters_json.contains("Kd_yaw")) {
+			!parameters_json.contains("Kd_roll") || !parameters_json.contains("Kp_pitch") ||
+			!parameters_json.contains("Ki_pitch") || !parameters_json.contains("Kd_pitch") ||
+			!parameters_json.contains("Kp_yaw") || !parameters_json.contains("Ki_yaw") ||
+			!parameters_json.contains("Kd_yaw")) {
 			throw std::runtime_error("json::parse_damper_pid_parameters requires Kp, Ki, and Kd for the lateral, "
-			                         "longitudinal, and vertical axes");
+									 "longitudinal, and vertical axes");
 		}
 		if (!parameters_json.contains("tau")) {
 			throw std::runtime_error("json::parse_damper_pid_parameters requires tau");
@@ -45,19 +48,19 @@ namespace json {
 	}
 
 	control::AttitudePIDParameters parse_attitude_pid_parameters(
-	    const nlohmann::json& controller_json)
+		const nlohmann::json& controller_json)
 	{
 		const auto& parameters_json = controller_json.at("parameters");
 		if (!parameters_json.is_object()) {
 			throw std::runtime_error("json::parse_attitude_pid_parameters expected parameters object");
 		}
 		if (!parameters_json.contains("Kp_roll") || !parameters_json.contains("Ki_roll") ||
-		    !parameters_json.contains("Kd_roll") || !parameters_json.contains("Kp_pitch") ||
-		    !parameters_json.contains("Ki_pitch") || !parameters_json.contains("Kd_pitch") ||
-		    !parameters_json.contains("Kp_yaw") || !parameters_json.contains("Ki_yaw") ||
-		    !parameters_json.contains("Kd_yaw")) {
+			!parameters_json.contains("Kd_roll") || !parameters_json.contains("Kp_pitch") ||
+			!parameters_json.contains("Ki_pitch") || !parameters_json.contains("Kd_pitch") ||
+			!parameters_json.contains("Kp_yaw") || !parameters_json.contains("Ki_yaw") ||
+			!parameters_json.contains("Kd_yaw")) {
 			throw std::runtime_error("json::parse_attitude_pid_parameters requires Kp, Ki, and Kd for the lateral, "
-			                         "longitudinal, and vertical axes");
+									 "longitudinal, and vertical axes");
 		}
 		if (!parameters_json.contains("tau")) {
 			throw std::runtime_error("json::parse_attitude_pid_parameters requires tau");
@@ -81,7 +84,7 @@ namespace json {
 	}
 
 	control::VelocityPIDParameters parse_velocity_pid_parameters(
-	    const nlohmann::json& controller_json)
+		const nlohmann::json& controller_json)
 	{
 		const auto& parameters_json = controller_json.at("parameters");
 		if (!parameters_json.is_object()) {
@@ -106,7 +109,7 @@ namespace json {
 	}
 
 	control::LinearQuadraticRegulatorParameters parse_linear_quadratic_regulator_parameters(
-	    const nlohmann::json& controller_json)
+		const nlohmann::json& controller_json)
 	{
 		const auto& parameters_json = controller_json.at("parameters");
 		if (!parameters_json.is_object()) {
@@ -123,7 +126,7 @@ namespace json {
 	}
 
 	control::LinearQuadraticIntegratorParameters parse_linear_quadratic_integrator_parameters(
-	    const nlohmann::json& controller_json)
+		const nlohmann::json& controller_json)
 	{
 		const auto& parameters_json = controller_json.at("parameters");
 		if (!parameters_json.is_object()) {
@@ -141,8 +144,8 @@ namespace json {
 	}
 
 	control::AttitudeControl make_attitude_control(
-	    control::ControllerType controller_type,
-	    const nlohmann::json& controller_json)
+		control::ControllerType controller_type,
+		const nlohmann::json& controller_json)
 	{
 		switch (controller_type) {
 			case control::ControllerType::AttitudePID: {
@@ -161,8 +164,8 @@ namespace json {
 	}
 
 	control::VelocityControl make_velocity_control(
-	    control::ControllerType controller_type,
-	    const nlohmann::json& controller_json)
+		control::ControllerType controller_type,
+		const nlohmann::json& controller_json)
 	{
 		switch (controller_type) {
 			case control::ControllerType::VelocityPID: {
@@ -176,19 +179,19 @@ namespace json {
 	}
 
 	control::LinearQuadraticControl make_linear_quadratic_control(
-	    control::ControllerType controller_type,
-	    const nlohmann::json& controller_json)
+		control::ControllerType controller_type,
+		const nlohmann::json& controller_json)
 	{
 		switch (controller_type) {
 			case control::ControllerType::LinearQuadraticRegulator: {
 				control::LinearQuadraticRegulatorParameters params =
-				    parse_linear_quadratic_regulator_parameters(controller_json);
+					parse_linear_quadratic_regulator_parameters(controller_json);
 				return control::LinearQuadraticControl(params);
 			}
 
 			case control::ControllerType::LinearQuadraticIntegrator: {
 				control::LinearQuadraticIntegratorParameters params =
-				    parse_linear_quadratic_integrator_parameters(controller_json);
+					parse_linear_quadratic_integrator_parameters(controller_json);
 				return control::LinearQuadraticControl(params);
 			}
 
@@ -201,7 +204,7 @@ namespace json {
 	}
 
 	control::ControllerType map_controller_type(
-	    const std::string& controller_type_str)
+		const std::string& controller_type_str)
 	{
 		if (controller_type_str == "AttitudePID") {
 			return control::ControllerType::AttitudePID;
@@ -234,42 +237,42 @@ namespace json {
 	}
 
 	control::ControllerType fetch_controller_type(
-	    const nlohmann::json& controller_json)
+		const nlohmann::json& controller_json)
 	{
 		std::string controller_type_str = controller_json.at("controller_type").get<std::string>();
 		return map_controller_type(controller_type_str);
 	}
 
 	void parse_attitude_control(
-	    const nlohmann::json& controller_json,
-	    std::optional<control::AttitudeControl>& component,
-	    control::ControllerType& controller_type)
+		const nlohmann::json& controller_json,
+		std::optional<control::AttitudeControl>& component,
+		control::ControllerType& controller_type)
 	{
 		controller_type = fetch_controller_type(controller_json);
 		component = make_attitude_control(controller_type, controller_json);
 	}
 
 	void parse_velocity_control(
-	    const nlohmann::json& controller_json,
-	    std::optional<control::VelocityControl>& component,
-	    control::ControllerType& controller_type)
+		const nlohmann::json& controller_json,
+		std::optional<control::VelocityControl>& component,
+		control::ControllerType& controller_type)
 	{
 		controller_type = fetch_controller_type(controller_json);
 		component = make_velocity_control(controller_type, controller_json);
 	}
 
 	void parse_linear_quadratic_control(
-	    const nlohmann::json& controller_json,
-	    std::optional<control::LinearQuadraticControl>& component,
-	    control::ControllerType& controller_type)
+		const nlohmann::json& controller_json,
+		std::optional<control::LinearQuadraticControl>& component,
+		control::ControllerType& controller_type)
 	{
 		controller_type = fetch_controller_type(controller_json);
 		component = make_linear_quadratic_control(controller_type, controller_json);
 	}
 
 	void parse_nonlinear_control(
-	    const nlohmann::json& controller_json,
-	    control::ControllerType& controller_type)
+		const nlohmann::json& controller_json,
+		control::ControllerType& controller_type)
 	{
 		controller_type = fetch_controller_type(controller_json);
 		switch (controller_type) {
@@ -284,8 +287,8 @@ namespace json {
 	}
 
 	control::ControlManager parse_control_manager(
-	    const nlohmann::json& config,
-	    bool trim_flag)
+		const nlohmann::json& config,
+		bool trim_flag)
 	{
 		validate_controllers(config, trim_flag);
 		control::ControlManager control_manager;
@@ -293,20 +296,20 @@ namespace json {
 		if (config.contains("attitude")) {
 			const auto& attitude_controller_json = config.at("attitude");
 			parse_attitude_control(
-			    attitude_controller_json, control_manager.attitude_control, control_manager.attitude_controller_type);
+				attitude_controller_json, control_manager.attitude_control, control_manager.attitude_controller_type);
 		}
 
 		if (config.contains("velocity")) {
 			const auto& velocity_controller_json = config.at("velocity");
 			parse_velocity_control(
-			    velocity_controller_json, control_manager.velocity_control, control_manager.velocity_controller_type);
+				velocity_controller_json, control_manager.velocity_control, control_manager.velocity_controller_type);
 		}
 
 		if (config.contains("linear_quadratic")) {
 			const auto& linear_quadratic_controller_json = config.at("linear_quadratic");
 			parse_linear_quadratic_control(linear_quadratic_controller_json,
-			    control_manager.linear_quadratic_control,
-			    control_manager.linear_quadratic_controller_type);
+				control_manager.linear_quadratic_control,
+				control_manager.linear_quadratic_controller_type);
 		}
 
 		if (config.contains("nonlinear")) {

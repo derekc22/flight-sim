@@ -1,11 +1,14 @@
-#include <spdlog/spdlog.h>
-#include "simulation/constants/public/scalars.hpp"
 #include "simulation/failures/public/manager.hpp"
 
-namespace failures {
+#include "simulation/constants/public/scalars.hpp"
+
+#include <spdlog/spdlog.h>
+
+namespace failures
+{
 
 	FailureManagerOutput FailureManager::step(
-	    const FailureManagerInput& input)
+		const FailureManagerInput& input)
 	{
 		// check collision
 		bool terrain_collision = input.height_agl.data <= constants::collision_threshold;

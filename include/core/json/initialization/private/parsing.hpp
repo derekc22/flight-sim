@@ -1,9 +1,11 @@
 #pragma once
-#include <nlohmann/json.hpp>
 #include "core/json/initialization/private/data/types.hpp"
 #include "simulation/vehicles/public/data/types.hpp"
 
-namespace json {
+#include <nlohmann/json.hpp>
+
+namespace json
+{
 
 	ParsedStepOptions parse_step_options(const nlohmann::json& frame_json);
 

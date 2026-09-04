@@ -1,16 +1,19 @@
-#include <nlohmann/json.hpp>
 #include "core/json/initialization/private/parsing.hpp"
+
 #include "core/json/public/data/helpers.hpp"
 #include "simulation/aerodynamics/public/data/types.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/geography/public/data/types.hpp"
-#include "simulation/vehicles/public/data/types.hpp"
 #include "simulation/util/public/trig.hpp"
+#include "simulation/vehicles/public/data/types.hpp"
 
-namespace json {
+#include <nlohmann/json.hpp>
+
+namespace json
+{
 
 	ParsedStepOptions parse_step_options(
-	    const nlohmann::json& frame_json)
+		const nlohmann::json& frame_json)
 	{
 		ParsedStepOptions fields;
 
@@ -67,50 +70,50 @@ namespace json {
 	}
 
 	vehicles::NEDFrameECEFStepOptions parse_NEDFrameECEF_step_options(
-	    const nlohmann::json& frame_json)
+		const nlohmann::json& frame_json)
 	{
 		const ParsedStepOptions fields = parse_step_options(frame_json);
 		return {.lat_NE = fields.lat, .lon_NE = fields.lon, .alt_NE = fields.alt};
 	}
 
 	vehicles::FRDFrameECEFStepOptions parse_FRDFrameECEF_step_options(
-	    const nlohmann::json& frame_json)
+		const nlohmann::json& frame_json)
 	{
 		const ParsedStepOptions fields = parse_step_options(frame_json);
 		return {
-		    .HEB = fields.H,
-		    .CEB = fields.C,
-		    .pE_BE = fields.p,
-		    .qEB = fields.q,
-		    .eulEB = fields.eul,
-		    .CEB_dot = fields.C_dot,
-		    .qEB_dot = fields.q_dot,
-		    .wB_BE = fields.w,
-		    .eulEB_dot = fields.eul_dot,
-		    .wq_BE = fields.wq,
-		    .vB_BE = fields.v,
-		    .lat_BE = fields.lat,
-		    .lon_BE = fields.lon,
-		    .alt_BE = fields.alt,
+			.HEB = fields.H,
+			.CEB = fields.C,
+			.pE_BE = fields.p,
+			.qEB = fields.q,
+			.eulEB = fields.eul,
+			.CEB_dot = fields.C_dot,
+			.qEB_dot = fields.q_dot,
+			.wB_BE = fields.w,
+			.eulEB_dot = fields.eul_dot,
+			.wq_BE = fields.wq,
+			.vB_BE = fields.v,
+			.lat_BE = fields.lat,
+			.lon_BE = fields.lon,
+			.alt_BE = fields.alt,
 		};
 	}
 
 	vehicles::FRDFrameNEDStepOptions parse_FRDFrameNED_step_options(
-	    const nlohmann::json& frame_json)
+		const nlohmann::json& frame_json)
 	{
 		const ParsedStepOptions fields = parse_step_options(frame_json);
 		return {
-		    .HNB = fields.H,
-		    .CNB = fields.C,
-		    .pN_BN = fields.p,
-		    .qNB = fields.q,
-		    .eulNB = fields.eul,
-		    .CNB_dot = fields.C_dot,
-		    .qNB_dot = fields.q_dot,
-		    .wB_BN = fields.w,
-		    .eulNB_dot = fields.eul_dot,
-		    .wq_BN = fields.wq,
-		    .vB_BN = fields.v,
+			.HNB = fields.H,
+			.CNB = fields.C,
+			.pN_BN = fields.p,
+			.qNB = fields.q,
+			.eulNB = fields.eul,
+			.CNB_dot = fields.C_dot,
+			.qNB_dot = fields.q_dot,
+			.wB_BN = fields.w,
+			.eulNB_dot = fields.eul_dot,
+			.wq_BN = fields.wq,
+			.vB_BN = fields.v,
 		};
 	}
 

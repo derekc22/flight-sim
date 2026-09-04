@@ -1,19 +1,21 @@
 #include "simulation/aerodynamics/public/detail/state.hpp"
+
 #include "simulation/dynamics/public/detail/state.hpp"
 
-namespace aerodynamics {
+namespace aerodynamics
+{
 
 	AerodynamicState compute_aerodynamic_state(
-	    const frames::Frame& F,
-	    const frames::Frame& R,
-	    const atmospheric::Wind& windB)
+		const frames::Frame& F,
+		const frames::Frame& R,
+		const atmospheric::Wind& windB)
 	{
 		return compute_aerodynamic_state(dynamics::compute_rigid_body_state(F, R), windB);
 	}
 
 	AerodynamicState compute_aerodynamic_state(
-	    const dynamics::RigidBodyState& X,
-	    const atmospheric::Wind& windB)
+		const dynamics::RigidBodyState& X,
+		const atmospheric::Wind& windB)
 	{
 		const dynamics::Twist_T<double> twist{.v = X.v.data, .w = X.w.data};
 

@@ -1,9 +1,11 @@
 #pragma once
-#include <Eigen/Dense>
-#include <optional>
 #include "simulation/actuators/public/data/types.hpp"
 
-namespace actuators {
+#include <Eigen/Dense>
+#include <optional>
+
+namespace actuators
+{
 
 	struct Actuator {
 		double limit_max;
@@ -29,12 +31,12 @@ namespace actuators {
 		std::optional<PropellerAssembly> propellers;
 
 		PropulsorActuator(double limit_max,
-		    double limit_min,
-		    double tau,
-		    double inclination_angle,
-		    double toe_angle,
-		    const Eigen::Vector3d& pB_propB,
-		    std::optional<PropellerAssembly> propellers = std::nullopt);
+			double limit_min,
+			double tau,
+			double inclination_angle,
+			double toe_angle,
+			const Eigen::Vector3d& pB_propB,
+			std::optional<PropellerAssembly> propellers = std::nullopt);
 		PropulsorActuator();
 	};
 

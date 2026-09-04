@@ -1,14 +1,17 @@
-#include <nlohmann/json.hpp>
 #include "core/json/settings/private/parsing.hpp"
+
 #include "core/json/settings/private/validation.hpp"
 #include "simulation/actuators/public/manager.hpp"
 #include "simulation/settings/public/data/types.hpp"
 
-namespace json {
+#include <nlohmann/json.hpp>
+
+namespace json
+{
 
 	settings::Settings parse_settings(
-	    const nlohmann::json& config,
-	    const actuators::ActuatorManager& actuator_manager)
+		const nlohmann::json& config,
+		const actuators::ActuatorManager& actuator_manager)
 	{
 		settings::Settings simulation_settings;
 
@@ -17,11 +20,11 @@ namespace json {
 		const auto& fixed_actuator_inputs_json = actuator_settings_json.at("fixed_actuator_inputs");
 		if (fixed_actuator_inputs_json.contains("flap")) {
 			simulation_settings.actuator_settings.fixed_actuator_inputs.flap =
-			    fixed_actuator_inputs_json.at("flap").get<double>();
+				fixed_actuator_inputs_json.at("flap").get<double>();
 		}
 		if (fixed_actuator_inputs_json.contains("spoiler")) {
 			simulation_settings.actuator_settings.fixed_actuator_inputs.spoiler =
-			    fixed_actuator_inputs_json.at("spoiler").get<double>();
+				fixed_actuator_inputs_json.at("spoiler").get<double>();
 		}
 		validate_actuator_settings(simulation_settings.actuator_settings, actuator_manager);
 

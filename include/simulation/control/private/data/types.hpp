@@ -1,10 +1,12 @@
 #pragma once
-#include <optional>
-#include <Eigen/Dense>
-#include "simulation/constants/public/linalg.hpp"
 #include "simulation/constants/public/dimensions.hpp"
+#include "simulation/constants/public/linalg.hpp"
 
-namespace control {
+#include <Eigen/Dense>
+#include <optional>
+
+namespace control
+{
 
 	struct PIDPolicyInput {
 		double x;

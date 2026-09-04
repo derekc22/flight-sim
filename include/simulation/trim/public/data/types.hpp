@@ -1,9 +1,11 @@
 #pragma once
-#include <cstddef>
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/operating/public/data/types.hpp"
 
-namespace trim {
+#include <cstddef>
+
+namespace trim
+{
 
 	template <typename T> struct TrimResidual_T {
 		T vx_dot = T(0.0);

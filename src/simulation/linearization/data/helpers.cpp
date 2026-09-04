@@ -1,11 +1,13 @@
-#include <sstream>
-#include <string>
 #include "simulation/linearization/public/data/helpers.hpp"
 
-namespace linearization {
+#include <sstream>
+#include <string>
+
+namespace linearization
+{
 
 	std::string print_linearization_solution(
-	    const LocalLinearization& lin_sol)
+		const LocalLinearization& lin_sol)
 	{
 		std::ostringstream out;
 		out << "A:\n" << lin_sol.A << "\n";

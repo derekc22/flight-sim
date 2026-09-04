@@ -6,14 +6,15 @@
 #include "simulation/geography/public/detail/gravity.hpp"
 #include "simulation/integrators/public/detail/wrench.hpp"
 
-namespace autodiff {
+namespace autodiff
+{
 
 	template <typename T>
 	dynamics::Wrench_T<T> compute_net_wrench_T(
-	    const operating::OperatingPoint_T<T>& operating_point,
-	    const AutoDiffModel& model,
-	    const operating::OperatingConditions& conditions,
-	    T dt)
+		const operating::OperatingPoint_T<T>& operating_point,
+		const AutoDiffModel& model,
+		const operating::OperatingConditions& conditions,
+		T dt)
 	{
 		const dynamics::State_T<T> x = operating_point.state;
 		actuators::ActuatorInputs_T<T> u = operating_point.input;
@@ -35,13 +36,13 @@ namespace autodiff {
 		const constants::Vector3_T<T> gB = geography::gB_T(x.phi, x.theta);
 
 		const integrators::WrenchEvaluation_T<T> evaluation = integrators::compute_wrench_set_T<T>(model,
-		    twist,
-		    conditions.atm,
-		    u,
-		    conditions.windB,
-		    gB,
-		    dt,
-		    conditions.steady_state // set omega_dot = 0 if computing gradients for trim (steady state)
+			twist,
+			conditions.atm,
+			u,
+			conditions.windB,
+			gB,
+			dt,
+			conditions.steady_state // set omega_dot = 0 if computing gradients for trim (steady state)
 		);
 
 		return evaluation.WB_set.net;
@@ -49,10 +50,10 @@ namespace autodiff {
 
 	template <typename T>
 	dynamics::StateDot_T<T> compute_state_dot_T(
-	    const operating::OperatingPoint_T<T>& operating_point,
-	    const AutoDiffModel& model,
-	    const operating::OperatingConditions& conditions,
-	    T dt)
+		const operating::OperatingPoint_T<T>& operating_point,
+		const AutoDiffModel& model,
+		const operating::OperatingConditions& conditions,
+		T dt)
 	{
 		const dynamics::Wrench_T<T> net_wrench = compute_net_wrench_T<T>(operating_point, model, conditions, dt);
 		return compute_state_dot_from_net_wrench_T(operating_point.state, model, net_wrench);
@@ -60,33 +61,33 @@ namespace autodiff {
 
 	template <typename T>
 	dynamics::StateDot_T<T> compute_state_dot_T(
-	    const operating::VirtualOperatingPoint_T<T>& operating_point,
-	    const AutoDiffModel& model)
+		const operating::VirtualOperatingPoint_T<T>& operating_point,
+		const AutoDiffModel& model)
 	{
 		return compute_state_dot_from_net_wrench_T(operating_point.state, model, operating_point.input);
 	}
 
 	template <typename T>
 	dynamics::StateDot_T<T> compute_state_dot_from_net_wrench_T(
-	    const dynamics::State_T<T>& x,
-	    const AutoDiffModel& model,
-	    const dynamics::Wrench_T<T>& net_wrench)
+		const dynamics::State_T<T>& x,
+		const AutoDiffModel& model,
+		const dynamics::Wrench_T<T>& net_wrench)
 	{
 		const dynamics::Twist_T<T> twist = dynamics::build_twist_from_state_T(x);
 		const constants::Vector3_T<T> v_dot =
-		    dynamics::ddtB_vB_BI_T<T>(twist.v, twist.w, model.struc_t.mass.data, net_wrench.F);
+			dynamics::ddtB_vB_BI_T<T>(twist.v, twist.w, model.struc_t.mass.data, net_wrench.F);
 		const constants::Vector3_T<T> w_dot = dynamics::ddtB_wB_BI_T<T>(twist.w, model.struc_t.JB.data, net_wrench.M);
 		const constants::Vector3_T<T> eul_dot = dynamics::wB_BI_to_eul_dot_T<T>(twist.w, x.theta, x.phi);
 
 		return {
-		    .vx_dot = v_dot.x(),
-		    .vy_dot = v_dot.y(),
-		    .vz_dot = v_dot.z(),
-		    .p_dot = w_dot.x(),
-		    .q_dot = w_dot.y(),
-		    .r_dot = w_dot.z(),
-		    .phi_dot = eul_dot.x(),
-		    .theta_dot = eul_dot.y(),
+			.vx_dot = v_dot.x(),
+			.vy_dot = v_dot.y(),
+			.vz_dot = v_dot.z(),
+			.p_dot = w_dot.x(),
+			.q_dot = w_dot.y(),
+			.r_dot = w_dot.z(),
+			.phi_dot = eul_dot.x(),
+			.theta_dot = eul_dot.y(),
 		};
 	}
 

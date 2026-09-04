@@ -1,9 +1,11 @@
 #pragma once
-#include <Eigen/Dense>
-#include <tuple>
 #include "simulation/frames/public/frame.hpp"
 
-namespace frames {
+#include <Eigen/Dense>
+#include <tuple>
+
+namespace frames
+{
 
 	/** @brief Performs a coordinate transformation on a vector vA from frame {A} to frame {B}, producing vB */
 	Eigen::Vector3d transform_vec(const Eigen::Vector3d& vA, const Frame& A, const Frame& B);

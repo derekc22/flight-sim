@@ -1,9 +1,11 @@
 #pragma once
-#include <optional>
 #include "simulation/avionics/public/components/collection.hpp"
 #include "simulation/avionics/public/data/types.hpp"
 
-namespace avionics {
+#include <optional>
+
+namespace avionics
+{
 
 	struct AvionicsManager {
 		Avionics avionics;

@@ -3,7 +3,8 @@
 #include "simulation/avionics/public/components/ahrs.hpp"
 #include "simulation/avionics/public/components/ins.hpp"
 
-namespace avionics {
+namespace avionics
+{
 
 	struct Avionics {
 		AirDataComputer ADC;

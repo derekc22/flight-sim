@@ -1,15 +1,18 @@
-#include <cmath>
-#include <stdexcept>
-#include <string>
-#include <Eigen/Dense>
-#include <nlohmann/json.hpp>
 #include "core/json/actuators/private/validation.hpp"
+
 #include "simulation/constants/public/scalars.hpp"
 
-namespace json {
+#include <Eigen/Dense>
+#include <cmath>
+#include <nlohmann/json.hpp>
+#include <stdexcept>
+#include <string>
+
+namespace json
+{
 
 	void validate_actuator_json(
-	    const nlohmann::json& actuator_json)
+		const nlohmann::json& actuator_json)
 	{
 		if (!actuator_json.contains("limit_max")) {
 			throw std::runtime_error("json::validate_actuator_json: actuator maximum limit not present");
@@ -27,7 +30,7 @@ namespace json {
 
 		if (limit_max < limit_min) {
 			throw std::runtime_error(
-			    "json::validate_actuator_json: actuator maximum limit must be greater than or equal to minimum limit");
+				"json::validate_actuator_json: actuator maximum limit must be greater than or equal to minimum limit");
 		}
 		if (tau < 0.0) {
 			throw std::runtime_error("json::validate_actuator_json: actuator tau must be non-negative");
@@ -35,7 +38,7 @@ namespace json {
 	}
 
 	void validate_propulsor_actuator_json(
-	    const nlohmann::json& propulsor_actuator_json)
+		const nlohmann::json& propulsor_actuator_json)
 	{
 		validate_actuator_json(propulsor_actuator_json);
 		if (!propulsor_actuator_json.contains("geometry_id")) {
@@ -51,36 +54,36 @@ namespace json {
 		double limit_min = propulsor_actuator_json.at("limit_min").get<double>();
 		if (limit_min < 0.0) {
 			throw std::runtime_error(
-			    "json::validate_propulsor_actuator_json: propulsor limit_min must be non-negative");
+				"json::validate_propulsor_actuator_json: propulsor limit_min must be non-negative");
 		}
 	}
 
 	void validate_propulsor_actuator_placement(
-	    const Eigen::Vector3d& p_propulsor,
-	    const std::string& key)
+		const Eigen::Vector3d& p_propulsor,
+		const std::string& key)
 	{
 		if (key == "front_propulsor") {
 			if (p_propulsor(1) != 0.0) {
 				throw std::runtime_error(
-				    "json::validate_propulsor_actuator_placement: front propulsor must have p_propulsor[1] = 0");
+					"json::validate_propulsor_actuator_placement: front propulsor must have p_propulsor[1] = 0");
 			}
 		}
 		if (key == "left_propulsor") {
 			if (p_propulsor(1) > 0.0) {
 				throw std::runtime_error(
-				    "json::validate_propulsor_actuator_placement: left propulsor must have p_propulsor[1] <= 0");
+					"json::validate_propulsor_actuator_placement: left propulsor must have p_propulsor[1] <= 0");
 			}
 		}
 		if (key == "right_propulsor") {
 			if (p_propulsor(1) < 0.0) {
 				throw std::runtime_error(
-				    "json::validate_propulsor_actuator_placement: right propulsor must have p_propulsor[1] >= 0");
+					"json::validate_propulsor_actuator_placement: right propulsor must have p_propulsor[1] >= 0");
 			}
 		}
 	}
 
 	void validate_propellers_json(
-	    const nlohmann::json& propellers_json)
+		const nlohmann::json& propellers_json)
 	{
 		if (!propellers_json.contains("geometry_ids")) {
 			throw std::runtime_error("json::validate_propellers_json: propellers geometry_ids not present");

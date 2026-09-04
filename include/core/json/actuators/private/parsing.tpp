@@ -1,17 +1,19 @@
 #pragma once
-#include <string>
-#include <nlohmann/json.hpp>
 #include "core/json/actuators/private/validation.hpp"
-#include "simulation/actuators/public/manager.hpp"
 #include "simulation/actuators/public/data/helpers.hpp"
+#include "simulation/actuators/public/manager.hpp"
 #include "simulation/structural/public/manager.hpp"
 
-namespace json {
+#include <nlohmann/json.hpp>
+#include <string>
+
+namespace json
+{
 
 	template <typename SurfaceActuatorType>
 	SurfaceActuatorType parse_surface_actuator(
-	    const nlohmann::json& config,
-	    const std::string& key)
+		const nlohmann::json& config,
+		const std::string& key)
 	{
 		if (config.at(key).is_null()) {
 			return SurfaceActuatorType{};
@@ -21,15 +23,15 @@ namespace json {
 		validate_actuator_json(surface_actuator_json);
 
 		return SurfaceActuatorType(surface_actuator_json.at("limit_max").get<double>(),
-		    surface_actuator_json.at("limit_min").get<double>(),
-		    surface_actuator_json.at("tau").get<double>());
+			surface_actuator_json.at("limit_min").get<double>(),
+			surface_actuator_json.at("tau").get<double>());
 	}
 
 	template <typename PropulsorActuatorType>
 	PropulsorActuatorType parse_propulsor_actuator(
-	    const nlohmann::json& config,
-	    const std::string& key,
-	    structural::StructuralManager& structural_manager)
+		const nlohmann::json& config,
+		const std::string& key,
+		structural::StructuralManager& structural_manager)
 	{
 		if (config.at(key).is_null()) {
 			return PropulsorActuatorType{};
@@ -43,15 +45,15 @@ namespace json {
 		validate_propulsor_actuator_placement(geom.pB_geomB, key);
 
 		PropulsorActuatorType propulsor(propulsor_actuator_json.at("limit_max").get<double>(),
-		    propulsor_actuator_json.at("limit_min").get<double>(),
-		    propulsor_actuator_json.at("tau").get<double>(),
-		    propulsor_actuator_json.at("inclination_angle").get<double>(),
-		    propulsor_actuator_json.at("toe_angle").get<double>(),
-		    geom.pB_geomB);
+			propulsor_actuator_json.at("limit_min").get<double>(),
+			propulsor_actuator_json.at("tau").get<double>(),
+			propulsor_actuator_json.at("inclination_angle").get<double>(),
+			propulsor_actuator_json.at("toe_angle").get<double>(),
+			geom.pB_geomB);
 
 		if (propulsor_actuator_json.contains("propellers")) {
 			propulsor.propellers =
-			    parse_propellers(propulsor_actuator_json.at("propellers"), structural_manager, propulsor.n_prop);
+				parse_propellers(propulsor_actuator_json.at("propellers"), structural_manager, propulsor.n_prop);
 		}
 
 		return propulsor;

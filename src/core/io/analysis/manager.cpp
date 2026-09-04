@@ -1,27 +1,30 @@
-#include <Eigen/Dense>
-#include <string>
 #include "core/io/analysis/public/manager.hpp"
+
+#include "analysis/eigenanalysis/public.hpp"
 #include "core/io/public/files.hpp"
 #include "core/json/analysis/public/writer.hpp"
-#include "analysis/eigenanalysis/public.hpp"
 #include "simulation/linearization/public/data/helpers.hpp"
 #include "simulation/trim/public/data/helpers.hpp"
 
-namespace io {
+#include <Eigen/Dense>
+#include <string>
+
+namespace io
+{
 
 	AnalysisManager::AnalysisManager(
-	    const std::string& aircraft_id,
-	    const runner::JSONFlags& json_flags,
-	    const runner::ModuleRates& module_rates)
-	    : json_flags(json_flags)
+		const std::string& aircraft_id,
+		const runner::JSONFlags& json_flags,
+		const runner::ModuleRates& module_rates)
+		: json_flags(json_flags)
 	{
 		matlab_context.aircraft_id = aircraft_id;
 		matlab_context.module_rates = module_rates;
 	}
 
 	void AnalysisManager::save(
-	    const std::string& data_dir_path,
-	    const std::string& report_dir_path)
+		const std::string& data_dir_path,
+		const std::string& report_dir_path)
 	{
 		if (json_flags.trim_flag) {
 			write_txt(trim::print_trim_solution(context.trim_sol), report_dir_path, "trim_sol");

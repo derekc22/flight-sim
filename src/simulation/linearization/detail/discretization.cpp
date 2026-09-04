@@ -1,11 +1,13 @@
-#include <unsupported/Eigen/MatrixFunctions>
 #include "simulation/linearization/public/detail/discretization.hpp"
 
-namespace linearization {
+#include <unsupported/Eigen/MatrixFunctions>
+
+namespace linearization
+{
 
 	DiscretizedLocalLinearization discretize(
-	    const LocalLinearization& lin_sol,
-	    double dt)
+		const LocalLinearization& lin_sol,
+		double dt)
 	{
 		int nx = lin_sol.A.rows();
 		int nu = lin_sol.B.cols();
@@ -25,8 +27,8 @@ namespace linearization {
 	}
 
 	DiscretizedLocalLinearization discretize_euler(
-	    const LocalLinearization& lin_sol,
-	    double dt)
+		const LocalLinearization& lin_sol,
+		double dt)
 	{
 		int nx = lin_sol.A.rows();
 

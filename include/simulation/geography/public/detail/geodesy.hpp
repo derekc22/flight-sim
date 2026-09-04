@@ -2,11 +2,13 @@
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/geography/public/data/types.hpp"
 
-namespace frames {
+namespace frames
+{
 	struct Frame;
 }
 
-namespace geography {
+namespace geography
+{
 
 	GeographicState compute_geographic_state(const frames::Frame& F, const frames::Frame& E);
 

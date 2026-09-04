@@ -2,7 +2,8 @@
 #include "simulation/aerodynamics/public/manager.hpp"
 #include "simulation/structural/public/data/types.hpp"
 
-namespace json {
+namespace json
+{
 
 	aerodynamics::AerodynamicsManager parse_aerodynamics_config();
 

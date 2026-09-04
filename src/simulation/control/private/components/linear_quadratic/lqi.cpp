@@ -1,20 +1,23 @@
-#include <Eigen/Dense>
-#include <algorithm>
 #include "simulation/control/private/components/linear_quadratic/lqi.hpp"
-#include "simulation/control/private/components/linear_quadratic/lqr.hpp"
-#include "simulation/constants/public/scalars.hpp"
+
 #include "simulation/constants/public/dimensions.hpp"
-#include "simulation/linearization/public/data/types.hpp"
+#include "simulation/constants/public/scalars.hpp"
 #include "simulation/control/private/components/linear_quadratic/helpers.hpp"
-#include "simulation/util/public/math.hpp"
+#include "simulation/control/private/components/linear_quadratic/lqr.hpp"
 #include "simulation/dynamics/public/data/helpers.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
+#include "simulation/linearization/public/data/types.hpp"
+#include "simulation/util/public/math.hpp"
 
-namespace control {
+#include <Eigen/Dense>
+#include <algorithm>
+
+namespace control
+{
 
 	LinearQuadraticIntegrator::LinearQuadraticIntegrator(
-	    const LinearQuadraticIntegratorParameters& params)
-	    : LinearQuadraticRegulator(params)
+		const LinearQuadraticIntegratorParameters& params)
+		: LinearQuadraticRegulator(params)
 	{
 		size_t n = constants::state_dim;
 		size_t i = integrated_state_dim;
@@ -24,15 +27,15 @@ namespace control {
 		Q_aug.block(n, n, i, i) = params.Qi;
 
 		policy = LinearQuadraticPolicy({
-		    .Q = Q_aug,
-		    .R = params.R,
+			.Q = Q_aug,
+			.R = params.R,
 		});
 	};
 
 	IntegratedStateVector LinearQuadraticIntegrator::integrate_state_err(
-	    const dynamics::StateVector_T<double>& zt,
-	    const dynamics::StateVector_T<double>& zt_des,
-	    double dt)
+		const dynamics::StateVector_T<double>& zt,
+		const dynamics::StateVector_T<double>& zt_des,
+		double dt)
 	{
 		IntegratedStateVector zt_integrated; // grab phi, theta, r
 		zt_integrated << zt(6), zt(7), zt(5);
@@ -44,8 +47,8 @@ namespace control {
 	}
 
 	LinearQuadraticPolicyInput LinearQuadraticIntegrator::make_linear_quadratic_policy_input(
-	    const LinearQuadraticControlInput& input,
-	    const IntegratedStateVector& integral_new)
+		const LinearQuadraticControlInput& input,
+		const IntegratedStateVector& integral_new)
 	{
 		size_t n = constants::state_dim;
 		size_t m = constants::virtual_input_dim;
@@ -79,16 +82,16 @@ namespace control {
 	}
 
 	VirtualControlOutput_T<double> LinearQuadraticIntegrator::step(
-	    const LinearQuadraticControlInput& input,
-	    double dt)
+		const LinearQuadraticControlInput& input,
+		double dt)
 	{
 
 		// integral candidate
 		IntegratedStateVector integral_new =
-		    integrate_state_err(dynamics::unpack_state(input.Zt), unpack_state(input.setpoint), dt);
+			integrate_state_err(dynamics::unpack_state(input.Zt), unpack_state(input.setpoint), dt);
 
 		VirtualControlOutputVector_T<double> mu_deviation =
-		    policy.step(make_linear_quadratic_policy_input(input, integral_new));
+			policy.step(make_linear_quadratic_policy_input(input, integral_new));
 
 		if (input.delta_mu_vec_t_1.norm() <= constants::eps) {
 			integral = integral_new;

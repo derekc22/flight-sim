@@ -1,7 +1,8 @@
 #pragma once
 #include "simulation/fsm/public/data/types.hpp"
 
-namespace fsm {
+namespace fsm
+{
 
 	struct FSMManager {
 		FiniteState autopilot_mode = FiniteState::None;

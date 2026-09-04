@@ -1,26 +1,29 @@
-#include <Eigen/Core>
-#include <optional>
 #include "simulation/actuators/public/components/base.hpp"
+
 #include "simulation/constants/public/linalg.hpp"
 #include "simulation/transforms/public/detail/so3.hpp"
 #include "simulation/util/public/filters.hpp"
 #include "simulation/util/public/math.hpp"
 
-namespace actuators {
+#include <Eigen/Core>
+#include <optional>
+
+namespace actuators
+{
 
 	Actuator::Actuator(
-	    double limit_max,
-	    double limit_min,
-	    double tau)
-	    : limit_max(limit_max), limit_min(limit_min), tau(tau)
+		double limit_max,
+		double limit_min,
+		double tau)
+		: limit_max(limit_max), limit_min(limit_min), tau(tau)
 	{
 	}
 
 	Actuator::Actuator() : Actuator(0.0, 0.0, 0.0) {};
 
 	double Actuator::step(
-	    double cmd,
-	    double dt)
+		double cmd,
+		double dt)
 	{
 		double cmd_clamped = util::clamp(cmd, limit_min, limit_max);
 		double init_lag_state = util::clamp(0.0, limit_min, limit_max);
@@ -32,18 +35,18 @@ namespace actuators {
 	}
 
 	PropulsorActuator::PropulsorActuator(
-	    double limit_max,
-	    double limit_min,
-	    double tau,
-	    double inclination_angle,
-	    double toe_angle,
-	    const Eigen::Vector3d& pB_propB,
-	    std::optional<PropellerAssembly> propellers)
-	    : Actuator(limit_max, limit_min, tau),
-	      inclination_angle(inclination_angle),
-	      toe_angle(toe_angle),
-	      pB_propB(pB_propB),
-	      propellers(propellers)
+		double limit_max,
+		double limit_min,
+		double tau,
+		double inclination_angle,
+		double toe_angle,
+		const Eigen::Vector3d& pB_propB,
+		std::optional<PropellerAssembly> propellers)
+		: Actuator(limit_max, limit_min, tau),
+		  inclination_angle(inclination_angle),
+		  toe_angle(toe_angle),
+		  pB_propB(pB_propB),
+		  propellers(propellers)
 	{
 		Eigen::Matrix3d RBP = transforms::eul_to_R(toe_angle, inclination_angle, 0.0, transforms::EulerOrder::ZYX);
 		n_prop = RBP * constants::ei;

@@ -1,26 +1,30 @@
 #pragma once
 
-#include <string>
-#include <vector>
 #include "simulation/transforms/public/data/types.hpp"
 
-namespace transforms_test {
+#include <string>
+#include <vector>
 
-	inline const std::vector<transforms::EulerOrder> euler_orders = {transforms::EulerOrder::ZYX,
-	    transforms::EulerOrder::ZXY,
-	    transforms::EulerOrder::YZX,
-	    transforms::EulerOrder::YXZ,
-	    transforms::EulerOrder::XZY,
-	    transforms::EulerOrder::XYZ,
-	    transforms::EulerOrder::ZXZ,
-	    transforms::EulerOrder::ZYZ,
-	    transforms::EulerOrder::XYX,
-	    transforms::EulerOrder::XZX,
-	    transforms::EulerOrder::YXY,
-	    transforms::EulerOrder::YZY};
+namespace transforms_test
+{
+
+	inline const std::vector<transforms::EulerOrder> euler_orders = {
+		transforms::EulerOrder::ZYX,
+		transforms::EulerOrder::ZXY,
+		transforms::EulerOrder::YZX,
+		transforms::EulerOrder::YXZ,
+		transforms::EulerOrder::XZY,
+		transforms::EulerOrder::XYZ,
+		transforms::EulerOrder::ZXZ,
+		transforms::EulerOrder::ZYZ,
+		transforms::EulerOrder::XYX,
+		transforms::EulerOrder::XZX,
+		transforms::EulerOrder::YXY,
+		transforms::EulerOrder::YZY
+	};
 
 	inline std::string euler_order_to_string(
-	    transforms::EulerOrder order)
+		transforms::EulerOrder order)
 	{
 		switch (order) {
 			case transforms::EulerOrder::ZYX:

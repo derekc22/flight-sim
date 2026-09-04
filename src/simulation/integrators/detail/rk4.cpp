@@ -1,15 +1,17 @@
 #include "simulation/integrators/private/detail/rk4.hpp"
+
 #include "simulation/integrators/private/detail/wrench.hpp"
 #include "simulation/integrators/public/detail/rk4.hpp"
 
-namespace integrators {
+namespace integrators
+{
 
 	RK4Output step_rigid_body_rk4(
-	    const dynamics::RigidBodyState& Xt,
-	    RK4Model& model,
-	    const operating::OperatingConditions& conditions,
-	    const actuators::ActuatorInputs_T<double>& u,
-	    double dt)
+		const dynamics::RigidBodyState& Xt,
+		RK4Model& model,
+		const operating::OperatingConditions& conditions,
+		const actuators::ActuatorInputs_T<double>& u,
+		double dt)
 	{
 		const dynamics::Mass mass = model.struc_t.mass;
 		const dynamics::InertiaTensor JB = model.struc_t.JB;

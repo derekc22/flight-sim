@@ -2,7 +2,8 @@
 #include "simulation/sensors/public/components/base.hpp"
 #include "simulation/sensors/public/data/types.hpp"
 
-namespace sensors {
+namespace sensors
+{
 
 	struct TotalAirTemperatureProbe : Sensor {
 		std::optional<double> prev_T0_lag;

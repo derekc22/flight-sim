@@ -1,8 +1,10 @@
 #include "simulation/frames/public/frame.hpp"
-#include "simulation/transforms/public/detail/s3.hpp"
-#include "simulation/dynamics/public/detail/derivatives.hpp"
 
-namespace frames {
+#include "simulation/dynamics/public/detail/derivatives.hpp"
+#include "simulation/transforms/public/detail/s3.hpp"
+
+namespace frames
+{
 	MutableFrameView ECEFFrame::view()
 	{
 		return {&H, &q, &eul, &C_dot, &q_dot, &w, &eul_dot, &wq, &v, &g};
@@ -74,14 +76,14 @@ namespace frames {
 	}
 
 	void Frame::_set(
-	    const dynamics::HomogeneousTransformationMatrix& H)
+		const dynamics::HomogeneousTransformationMatrix& H)
 	{
 		_set(H.C());
 		_set(H.p());
 	}
 
 	void Frame::_set(
-	    const dynamics::OrientationMatrix& C)
+		const dynamics::OrientationMatrix& C)
 	{
 		MutableFrameView mfv = view();
 		mfv.H->set(C);
@@ -90,14 +92,14 @@ namespace frames {
 	}
 
 	void Frame::_set(
-	    const dynamics::Position& p)
+		const dynamics::Position& p)
 	{
 		MutableFrameView mfv = view();
 		mfv.H->set(p);
 	}
 
 	void Frame::_set(
-	    const dynamics::OrientationQuaternion& q)
+		const dynamics::OrientationQuaternion& q)
 	{
 		MutableFrameView mfv = view();
 		dynamics::OrientationQuaternion q_{transforms::normalize_and_canonicalize(q.data)};
@@ -107,7 +109,7 @@ namespace frames {
 	}
 
 	void Frame::_set(
-	    const dynamics::EulerAngles& eul)
+		const dynamics::EulerAngles& eul)
 	{
 		MutableFrameView mfv = view();
 		mfv.H->set(eul);
@@ -116,7 +118,7 @@ namespace frames {
 	}
 
 	void Frame::_set(
-	    const dynamics::OrientationMatrixRate& C_dot)
+		const dynamics::OrientationMatrixRate& C_dot)
 	{
 		MutableFrameView mfv = view();
 		*mfv.C_dot = C_dot;
@@ -128,7 +130,7 @@ namespace frames {
 	}
 
 	void Frame::_set(
-	    const dynamics::OrientationQuaternionRate& q_dot)
+		const dynamics::OrientationQuaternionRate& q_dot)
 	{
 		MutableFrameView mfv = view();
 		mfv.C_dot->set(q_dot, *mfv.q, mfv.H->C());
@@ -140,7 +142,7 @@ namespace frames {
 	}
 
 	void Frame::_set(
-	    const dynamics::AngularVelocity& w)
+		const dynamics::AngularVelocity& w)
 	{
 		MutableFrameView mfv = view();
 		mfv.C_dot->set(mfv.H->C(), w);
@@ -151,7 +153,7 @@ namespace frames {
 	}
 
 	void Frame::_set(
-	    const dynamics::EulerAngleRates& eul_dot)
+		const dynamics::EulerAngleRates& eul_dot)
 	{
 		MutableFrameView mfv = view();
 		dynamics::AngularVelocity w = dynamics::eul_dot_to_wB_BI(eul_dot, *mfv.eul);
@@ -163,7 +165,7 @@ namespace frames {
 	}
 
 	void Frame::_set(
-	    const dynamics::AngularVelocityQuaternion& wq)
+		const dynamics::AngularVelocityQuaternion& wq)
 	{
 		MutableFrameView mfv = view();
 		dynamics::AngularVelocity w = wq.w();
@@ -175,14 +177,14 @@ namespace frames {
 	}
 
 	void Frame::_set(
-	    const dynamics::TranslationalVelocity& v)
+		const dynamics::TranslationalVelocity& v)
 	{
 		MutableFrameView mfv = view();
 		*mfv.v = v;
 	}
 
 	void Frame::_set(
-	    const dynamics::Gravity& g)
+		const dynamics::Gravity& g)
 	{
 		MutableFrameView mfv = view();
 		*mfv.g = g;
@@ -198,18 +200,18 @@ namespace frames {
 		for (auto it = dependent_on.begin(); it != dependent_on.end();) {
 			Frame* parent = *it;
 			parent->dependents.erase(this); // Remove A from P’s dependents
-			it = dependent_on.erase(it);    // Remove P from A’s dependent_on
+			it = dependent_on.erase(it);	// Remove P from A’s dependent_on
 		}
 		// Child side (for each child C in dependents):
 		for (auto it = dependents.begin(); it != dependents.end();) {
 			Frame* dep = *it;
 			dep->dependent_on.erase(this); // Remove A from C’s dependent_on
-			it = dependents.erase(it);     // Remove C from A’s dependents
+			it = dependents.erase(it);	   // Remove C from A’s dependents
 		}
 	}
 
 	void Frame::add_as_direct_dependent(
-	    Frame* p)
+		Frame* p)
 	{
 		dependents.insert(p);
 		p->dependent_on.insert(this);
@@ -224,7 +226,7 @@ namespace frames {
 	WINDFrameSTAB::WINDFrameSTAB(STABFrameFRD* pSTABFrameFRD) : Frame(FrameID::WINDFrameSTAB, pSTABFrameFRD) {};
 
 	void Frame::set(
-	    const SetOptions& opts)
+		const SetOptions& opts)
 	{
 		if (opts.H.has_value()) {
 			_set(*opts.H);

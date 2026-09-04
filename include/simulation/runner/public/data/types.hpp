@@ -1,5 +1,4 @@
 #pragma once
-#include <string>
 #include "analysis/eigenanalysis/public.hpp"
 #include "core/devices/public/data/types.hpp"
 #include "simulation/actuators/public/data/types.hpp"
@@ -16,11 +15,15 @@
 #include "simulation/structural/public/data/types.hpp"
 #include "simulation/trim/public/data/types.hpp"
 
-namespace vehicles {
+#include <string>
+
+namespace vehicles
+{
 	struct Aircraft;
 }
 
-namespace runner {
+namespace runner
+{
 
 	struct Scheduler;
 

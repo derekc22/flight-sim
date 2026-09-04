@@ -1,7 +1,8 @@
 #pragma once
 #include "simulation/linearization/public/data/types.hpp"
 
-namespace linearization {
+namespace linearization
+{
 
 	DiscretizedLocalLinearization discretize(const LocalLinearization& lin_sol, double dt);
 

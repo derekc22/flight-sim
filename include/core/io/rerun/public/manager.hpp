@@ -1,4 +1,9 @@
 #pragma once
+#include "core/io/rerun/public/data/types.hpp"
+#include "simulation/constants/public/scalars.hpp"
+#include "simulation/runner/public/data/types.hpp"
+#include "simulation/transforms/public/detail/s3.hpp"
+
 #include <atomic>
 #include <condition_variable>
 #include <cstddef>
@@ -8,12 +13,9 @@
 #include <rerun.hpp>
 #include <thread>
 #include <vector>
-#include "core/io/rerun/public/data/types.hpp"
-#include "simulation/constants/public/scalars.hpp"
-#include "simulation/runner/public/data/types.hpp"
-#include "simulation/transforms/public/detail/s3.hpp"
 
-namespace io {
+namespace io
+{
 
 	struct RerunManager {
 		runner::JSONFlags json_flags;
@@ -29,7 +31,7 @@ namespace io {
 		rerun::RecordingStream rec;
 
 		Eigen::Quaterniond q_model_to_body =
-		    transforms::eul_to_quatR(-constants::pi / 2, constants::pi / 2, 0.0, transforms::EulerOrder::ZYX);
+			transforms::eul_to_quatR(-constants::pi / 2, constants::pi / 2, 0.0, transforms::EulerOrder::ZYX);
 
 		std::vector<rerun::Vec3D> trajectory;
 		std::vector<rerun::Vec3D> estimated_trajectory;

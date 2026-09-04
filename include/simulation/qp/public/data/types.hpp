@@ -1,9 +1,17 @@
 #pragma once
 #include <Eigen/Dense>
 
-namespace qp {
+namespace qp
+{
 
-	enum class Status { Solved, MaxIterations, PrimalInfeasible, DualInfeasible, ClosestPrimalFeasible, NotRun };
+	enum class Status {
+		Solved,
+		MaxIterations,
+		PrimalInfeasible,
+		DualInfeasible,
+		ClosestPrimalFeasible,
+		NotRun
+	};
 
 	struct Problem {
 		Eigen::MatrixXd hessian;

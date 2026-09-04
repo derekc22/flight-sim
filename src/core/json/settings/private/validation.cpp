@@ -1,23 +1,25 @@
-#include <stdexcept>
-#include <string>
-#include <nlohmann/json.hpp>
 #include "core/json/settings/private/validation.hpp"
 
-namespace json {
+#include <nlohmann/json.hpp>
+#include <stdexcept>
+#include <string>
+
+namespace json
+{
 
 	void validate_fixed_actuator_inputs_json(
-	    const nlohmann::json& fixed_actuator_inputs_json)
+		const nlohmann::json& fixed_actuator_inputs_json)
 	{
 		if (!fixed_actuator_inputs_json.is_object()) {
 			throw std::runtime_error(
-			    "json::validate_fixed_actuator_inputs_json: fixed_actuator_inputs must be an object");
+				"json::validate_fixed_actuator_inputs_json: fixed_actuator_inputs must be an object");
 		}
 	}
 
 	void validate_fixed_control(
-	    double cmd,
-	    const actuators::Actuator& actuator,
-	    const std::string& key)
+		double cmd,
+		const actuators::Actuator& actuator,
+		const std::string& key)
 	{
 		if (cmd < actuator.limit_min || cmd > actuator.limit_max) {
 			throw std::runtime_error("json::validate_fixed_control: " + key + " command exceeds actuator limits");
@@ -25,17 +27,17 @@ namespace json {
 	}
 
 	void validate_actuator_settings(
-	    const actuators::Settings& actuator_settings,
-	    const actuators::ActuatorManager& actuator_manager)
+		const actuators::Settings& actuator_settings,
+		const actuators::ActuatorManager& actuator_manager)
 	{
 		validate_fixed_control(
-		    actuator_settings.fixed_actuator_inputs.flap, actuator_manager.surface_actuators.flap, "flap");
+			actuator_settings.fixed_actuator_inputs.flap, actuator_manager.surface_actuators.flap, "flap");
 		validate_fixed_control(
-		    actuator_settings.fixed_actuator_inputs.spoiler, actuator_manager.surface_actuators.spoiler, "spoiler");
+			actuator_settings.fixed_actuator_inputs.spoiler, actuator_manager.surface_actuators.spoiler, "spoiler");
 	}
 
 	void validate_actuator_settings_json(
-	    const nlohmann::json& config)
+		const nlohmann::json& config)
 	{
 		if (config.contains("actuators")) {
 			const auto& actuator_settings_json = config.at("actuators");
@@ -46,11 +48,11 @@ namespace json {
 				const auto& fixed_actuator_inputs_json = actuator_settings_json.at("fixed_actuator_inputs");
 				if (!fixed_actuator_inputs_json.is_object()) {
 					throw std::runtime_error(
-					    "json::validate_fixed_actuator_inputs_json: fixed_actuator_inputs must be an object");
+						"json::validate_fixed_actuator_inputs_json: fixed_actuator_inputs must be an object");
 				}
 			} else {
 				throw std::runtime_error(
-				    "json::validate_actuator_settings_json fixed_actuator_inputs configuration must be specified");
+					"json::validate_actuator_settings_json fixed_actuator_inputs configuration must be specified");
 			}
 		} else {
 			throw std::runtime_error("json::validate_actuator_settings_json actuators configuration must be specified");
@@ -58,7 +60,7 @@ namespace json {
 	}
 
 	void validate_avionics_settings_json(
-	    const nlohmann::json& config)
+		const nlohmann::json& config)
 	{
 		if (config.contains("avionics")) {
 			const auto& avionics_settings_json = config.at("avionics");

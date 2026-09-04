@@ -2,7 +2,8 @@
 #include <Eigen/Dense>
 #include <nlohmann/json.hpp>
 
-namespace json {
+namespace json
+{
 
 	Eigen::Vector3d parse_Vector3d(const nlohmann::json& values);
 	Eigen::Vector4d parse_Vector4d(const nlohmann::json& values);

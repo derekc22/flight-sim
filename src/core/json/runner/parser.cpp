@@ -1,10 +1,13 @@
-#include <nlohmann/json.hpp>
-#include "core/json/runner/private/parsing.hpp"
 #include "core/json/runner/public/parser.hpp"
+
 #include "core/json/public/files.hpp"
+#include "core/json/runner/private/parsing.hpp"
 #include "simulation/runner/public/data/types.hpp"
 
-namespace json {
+#include <nlohmann/json.hpp>
+
+namespace json
+{
 
 	runner::JSONOptions parse_runner_config()
 	{

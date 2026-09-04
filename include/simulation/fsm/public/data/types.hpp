@@ -1,8 +1,14 @@
 #pragma once
 
-namespace fsm {
+namespace fsm
+{
 
-	enum class FiniteState { Manual, AutopilotTrim, Autopilot, None };
+	enum class FiniteState {
+		Manual,
+		AutopilotTrim,
+		Autopilot,
+		None
+	};
 
 	struct Settings {
 		bool trim_enabled;

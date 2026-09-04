@@ -1,9 +1,10 @@
 #include "simulation/qp/private/detail/status.hpp"
 
-namespace qp {
+namespace qp
+{
 
 	Status map_status(
-	    proxsuite::proxqp::QPSolverOutput status)
+		proxsuite::proxqp::QPSolverOutput status)
 	{
 		switch (status) {
 			case proxsuite::proxqp::QPSolverOutput::PROXQP_SOLVED:

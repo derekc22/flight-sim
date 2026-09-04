@@ -1,12 +1,14 @@
 #pragma once
-#include <Eigen/Dense>
 #include "simulation/actuators/public/data/types.hpp"
 #include "simulation/atmospheric/public/data/types.hpp"
-#include "simulation/constants/public/linalg.hpp"
 #include "simulation/constants/public/dimensions.hpp"
+#include "simulation/constants/public/linalg.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 
-namespace operating {
+#include <Eigen/Dense>
+
+namespace operating
+{
 
 	template <typename T> using StateInputVector_T = constants::MatrixX_T<T, constants::state_input_dim, 1>;
 

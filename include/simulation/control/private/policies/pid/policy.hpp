@@ -1,7 +1,8 @@
 #pragma once
 #include "simulation/control/private/data/types.hpp"
 
-namespace control {
+namespace control
+{
 
 	struct PIDPolicy {
 		PIDPolicyParameters params;

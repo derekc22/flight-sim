@@ -3,7 +3,8 @@
 #include "simulation/trim/private/data/types.hpp"
 #include "simulation/trim/public/data/types.hpp"
 
-namespace trim {
+namespace trim
+{
 
 	void validate_trim_solve_options(const TrimSolveOptions& options);
 

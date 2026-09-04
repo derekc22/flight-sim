@@ -1,10 +1,12 @@
-#include <stdexcept>
 #include "simulation/qp/private/detail/validation.hpp"
 
-namespace qp {
+#include <stdexcept>
+
+namespace qp
+{
 
 	std::size_t validate_dimension(
-	    std::size_t dimension)
+		std::size_t dimension)
 	{
 		if (dimension == 0)
 			throw std::invalid_argument("qp::Solver dimension must be positive");
@@ -12,8 +14,8 @@ namespace qp {
 	}
 
 	void validate_problem(
-	    const Problem& problem,
-	    std::size_t dimension)
+		const Problem& problem,
+		std::size_t dimension)
 	{
 		const Eigen::Index n = static_cast<Eigen::Index>(dimension);
 		if (problem.hessian.rows() != n || problem.hessian.cols() != n)

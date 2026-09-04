@@ -1,23 +1,26 @@
-#include <utility>
+#include "simulation/runner/public/wrappers/control.hpp"
+
 #include "simulation/actuators/public/data/helpers.hpp"
 #include "simulation/actuators/public/manager.hpp"
 #include "simulation/allocator/public/data/helpers.hpp"
 #include "simulation/allocator/public/manager.hpp"
-#include "simulation/constants/public/scalars.hpp"
 #include "simulation/constants/public/dimensions.hpp"
+#include "simulation/constants/public/scalars.hpp"
 #include "simulation/control/public/manager.hpp"
 #include "simulation/guidance/public/manager.hpp"
-#include "simulation/runner/public/wrappers/control.hpp"
 #include "simulation/runner/public/scheduling/scheduler.hpp"
 #include "simulation/util/public/math.hpp"
 #include "simulation/vehicles/public/aircraft.hpp"
 
-namespace runner {
+#include <utility>
+
+namespace runner
+{
 
 	ControlWrapper::ControlWrapper(
-	    const JSONFlags& flags,
-	    const actuators::SurfaceActuators& surface_actuators,
-	    const actuators::PropulsorActuators& propulsor_actuators)
+		const JSONFlags& flags,
+		const actuators::SurfaceActuators& surface_actuators,
+		const actuators::PropulsorActuators& propulsor_actuators)
 	{
 		// set u_actual_t_1 to match actuators' neutral initialization
 		u_actual_t_1 = actuators::get_neutral_actuator_inputs(surface_actuators, propulsor_actuators);
@@ -25,7 +28,7 @@ namespace runner {
 		// create joystick manager
 		if (flags.joystick_flag) {
 			actuators::ActuatorLimits actuator_limits =
-			    actuators::pack_actuator_limits(surface_actuators, propulsor_actuators);
+				actuators::pack_actuator_limits(surface_actuators, propulsor_actuators);
 			joystick_manager.emplace(actuator_limits);
 		}
 	}
@@ -44,7 +47,7 @@ namespace runner {
 	}
 
 	ControlWrapperOutput ControlWrapper::step(
-	    const ControlWrapperInput& input)
+		const ControlWrapperInput& input)
 	{
 		control::ControlManager& control_manager = input.aircraft.control_manager;
 		actuators::ActuatorManager& actuator_manager = input.aircraft.actuator_manager;
@@ -89,14 +92,15 @@ namespace runner {
 			if (input.scheduler.control_tick >= constants::hz) {
 				double control_dt = input.scheduler.control_elapsed_ticks * constants::dt;
 
-				control::ControlManagerOutput virtual_ctrl_out = control_manager.step({.Zt = input.context.Zt,
-				    .trim_sol = input.trim_sol,
-				    .virtual_lin_sol = input.virtual_lin_sol,
-				    .surface_actuators = surface_actuators,
-				    .propulsor_actuators = propulsor_actuators,
-				    .setpoint = setpoint,
-				    .delta_mu_vec_t_1 = delta_mu_vec_t_1,
-				    .dt = control_dt});
+				control::ControlManagerOutput virtual_ctrl_out = control_manager.step(
+					{.Zt = input.context.Zt,
+						.trim_sol = input.trim_sol,
+						.virtual_lin_sol = input.virtual_lin_sol,
+						.surface_actuators = surface_actuators,
+						.propulsor_actuators = propulsor_actuators,
+						.setpoint = setpoint,
+						.delta_mu_vec_t_1 = delta_mu_vec_t_1,
+						.dt = control_dt});
 				mu_cmd = virtual_ctrl_out.mu;
 				active_mask = virtual_ctrl_out.active_mask;
 				actuator_mask = virtual_ctrl_out.actuator_mask;
@@ -116,16 +120,16 @@ namespace runner {
 
 		// step control allocator
 		if (input.current_mode == fsm::FiniteState::AutopilotTrim ||
-		    input.current_mode == fsm::FiniteState::Autopilot) {
+			input.current_mode == fsm::FiniteState::Autopilot) {
 			allocator::AllocatorManagerOutput allocator_output =
-			    allocator_manager.step(allocator::build_allocator_input(mu_cmd,
-			        active_mask,
-			        actuator_mask,
-			        input.context.Zt,
-			        u_actual_t_1,
-			        input.trim_sol.converged ? std::make_optional(input.trim_sol.operating_point.input) : std::nullopt,
-			        input.context.transient_conditions,
-			        input.context.autodiff_model));
+				allocator_manager.step(allocator::build_allocator_input(mu_cmd,
+					active_mask,
+					actuator_mask,
+					input.context.Zt,
+					u_actual_t_1,
+					input.trim_sol.converged ? std::make_optional(input.trim_sol.operating_point.input) : std::nullopt,
+					input.context.transient_conditions,
+					input.context.autodiff_model));
 			u_cmd = allocator_output.u;
 			delta_mu_vec_t_1 = allocator_output.delta_mu_vec_t_1;
 		}

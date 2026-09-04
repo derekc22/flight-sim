@@ -1,27 +1,30 @@
-#include <Eigen/Dense>
-#include <vector>
-#include <stdexcept>
-#include <cmath>
-#include <string>
-#include <unordered_map>
-#include <cstddef>
 #include "simulation/structural/public/manager.hpp"
-#include "simulation/dynamics/public/data/types.hpp"
-#include "simulation/constants/public/scalars.hpp"
+
 #include "simulation/constants/public/linalg.hpp"
+#include "simulation/constants/public/scalars.hpp"
+#include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/util/public/linalg.hpp"
 
-namespace structural {
+#include <Eigen/Dense>
+#include <cmath>
+#include <cstddef>
+#include <stdexcept>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+namespace structural
+{
 
 	StructuralManager::StructuralManager(
-	    const std::vector<Geometry>& geoms)
-	    : geometries(geoms)
+		const std::vector<Geometry>& geoms)
+		: geometries(geoms)
 	{
 		geometry_id_map = build_geometry_id_map();
 	}
 
 	Geometry& StructuralManager::get_geometry(
-	    const std::string& id)
+		const std::string& id)
 	{
 		const auto it = geometry_id_map.find(id);
 		if (it == geometry_id_map.end()) {
@@ -43,7 +46,7 @@ namespace structural {
 	}
 
 	Eigen::Vector3d StructuralManager::compute_CG(
-	    const dynamics::Mass& mass)
+		const dynamics::Mass& mass)
 	{
 		Eigen::Vector3d pB_GB = constants::Zero3;
 		for (const Geometry& geom : geometries) {
@@ -54,7 +57,7 @@ namespace structural {
 	}
 
 	Eigen::Matrix3d StructuralManager::compute_JB(
-	    const CenterOfGravity& pB_GB)
+		const CenterOfGravity& pB_GB)
 	{
 		Eigen::Matrix3d j = constants::Zero3x3;
 
@@ -92,7 +95,7 @@ namespace structural {
 	}
 
 	Eigen::Matrix3d StructuralManager::compute_local_JB(
-	    const Geometry& geom)
+		const Geometry& geom)
 	{
 		double m = geom.mass;
 		double lx = geom.x_size;
@@ -108,8 +111,8 @@ namespace structural {
 	}
 
 	double StructuralManager::compute_spin_inertia(
-	    const Geometry& geom,
-	    const Eigen::Vector3d& axis)
+		const Geometry& geom,
+		const Eigen::Vector3d& axis)
 	{
 		Eigen::Vector3d axis_hat = util::norm(axis);
 		if (axis_hat.norm() < constants::eps) {
@@ -128,7 +131,7 @@ namespace structural {
 	}
 
 	StructuralManagerOutput StructuralManager::step(
-	    const StructuralManagerInput&)
+		const StructuralManagerInput&)
 	{
 		dynamics::Mass mass = dynamics::Mass{compute_mass()};
 		CenterOfGravity pB_GB = CenterOfGravity{compute_CG(mass)};

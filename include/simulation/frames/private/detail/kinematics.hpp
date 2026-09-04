@@ -1,9 +1,11 @@
 #pragma once
-#include <Eigen/Dense>
-#include <tuple>
 #include "simulation/frames/public/frame.hpp"
 
-namespace frames {
+#include <Eigen/Dense>
+#include <tuple>
+
+namespace frames
+{
 
 	/** @brief Obtains the rotation matrix from an arbitrary root R to the frame F */
 	Eigen::Matrix3d CRF(const Frame& F, const Frame& R);

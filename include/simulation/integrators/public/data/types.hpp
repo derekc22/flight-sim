@@ -5,7 +5,8 @@
 #include "simulation/propulsion/public/manager.hpp"
 #include "simulation/structural/public/data/types.hpp"
 
-namespace integrators {
+namespace integrators
+{
 
 	struct RK4Model {
 		const structural::StructuralState& struc_t;

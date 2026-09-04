@@ -1,11 +1,13 @@
 #pragma once
-#include <cstddef>
-#include "simulation/constants/public/scalars.hpp"
-#include "simulation/constants/public/linalg.hpp"
 #include "simulation/constants/public/dimensions.hpp"
+#include "simulation/constants/public/linalg.hpp"
+#include "simulation/constants/public/scalars.hpp"
 #include "simulation/operating/public/data/types.hpp"
 
-namespace trim {
+#include <cstddef>
+
+namespace trim
+{
 
 	inline constexpr std::size_t trim_residual_dim = constants::state_input_dim;
 

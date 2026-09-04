@@ -1,11 +1,13 @@
 #pragma once
-#include <array>
-#include <optional>
 #include "core/devices/public/joystick.hpp"
 #include "simulation/constants/public/dimensions.hpp"
 #include "simulation/runner/public/data/types.hpp"
 
-namespace runner {
+#include <array>
+#include <optional>
+
+namespace runner
+{
 
 	struct ControlWrapper {
 		std::optional<devices::JoystickManager> joystick_manager;
@@ -21,8 +23,8 @@ namespace runner {
 		dynamics::WrenchVector_T<double> delta_mu_vec_t_1{};
 
 		ControlWrapper(const JSONFlags& flags,
-		    const actuators::SurfaceActuators& surface_actuators,
-		    const actuators::PropulsorActuators& propulsor_actuators);
+			const actuators::SurfaceActuators& surface_actuators,
+			const actuators::PropulsorActuators& propulsor_actuators);
 		devices::JoystickManagerOutput poll_joystick();
 		ControlWrapperOutput step(const ControlWrapperInput& input);
 	};

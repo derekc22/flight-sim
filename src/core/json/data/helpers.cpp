@@ -1,12 +1,14 @@
-#include <stdexcept>
-#include <Eigen/Dense>
-#include <nlohmann/json.hpp>
 #include "core/json/public/data/helpers.hpp"
 
-namespace json {
+#include <Eigen/Dense>
+#include <nlohmann/json.hpp>
+#include <stdexcept>
+
+namespace json
+{
 
 	Eigen::Vector3d parse_Vector3d(
-	    const nlohmann::json& values)
+		const nlohmann::json& values)
 	{
 		if (!values.is_array() || values.size() != 3) {
 			throw std::runtime_error("expected a 3-element array");
@@ -15,19 +17,21 @@ namespace json {
 	}
 
 	Eigen::Vector4d parse_Vector4d(
-	    const nlohmann::json& values)
+		const nlohmann::json& values)
 	{
 		if (!values.is_array() || values.size() != 4) {
 			throw std::runtime_error("expected a 4-element array");
 		}
-		return {values.at(0).get<double>(),
-		    values.at(1).get<double>(),
-		    values.at(2).get<double>(),
-		    values.at(3).get<double>()};
+		return {
+			values.at(0).get<double>(),
+			values.at(1).get<double>(),
+			values.at(2).get<double>(),
+			values.at(3).get<double>()
+		};
 	}
 
 	Eigen::Matrix3d parse_Matrix3d(
-	    const nlohmann::json& values)
+		const nlohmann::json& values)
 	{
 		if (!values.is_array() || values.size() != 3) {
 			throw std::runtime_error("expected a 3x3 array");
@@ -47,7 +51,7 @@ namespace json {
 	}
 
 	Eigen::Matrix4d parse_Matrix4d(
-	    const nlohmann::json& values)
+		const nlohmann::json& values)
 	{
 		if (!values.is_array() || values.size() != 4) {
 			throw std::runtime_error("expected a 4x4 array");
@@ -67,7 +71,7 @@ namespace json {
 	}
 
 	Eigen::MatrixXd parse_MatrixXd(
-	    const nlohmann::json& values)
+		const nlohmann::json& values)
 	{
 		if (!values.is_array()) {
 			throw std::runtime_error("expected matrix array");
@@ -93,7 +97,7 @@ namespace json {
 	}
 
 	Eigen::Quaterniond parse_Quaterniond(
-	    const nlohmann::json& values)
+		const nlohmann::json& values)
 	{
 		const Eigen::Vector4d q = parse_Vector4d(values);
 		return {q(0), q(1), q(2), q(3)};

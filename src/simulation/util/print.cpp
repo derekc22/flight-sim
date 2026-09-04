@@ -1,19 +1,22 @@
-#include <spdlog/spdlog.h>
-#include <sstream>
-#include "simulation/constants/public/scalars.hpp"
 #include "simulation/util/public/print.hpp"
-#include "simulation/dynamics/public/data/types.hpp"
-#include "simulation/geography/public/detail/gravity.hpp"
+
 #include "simulation/aerodynamics/public/data/types.hpp"
 #include "simulation/atmospheric/public/data/types.hpp"
+#include "simulation/constants/public/scalars.hpp"
+#include "simulation/dynamics/public/data/types.hpp"
+#include "simulation/geography/public/detail/gravity.hpp"
 #include "simulation/util/public/trig.hpp"
 
-namespace util {
+#include <spdlog/spdlog.h>
+#include <sstream>
+
+namespace util
+{
 
 	std::string print_vec(
-	    const char* name,
-	    const Eigen::Vector3d& x,
-	    const char* unit)
+		const char* name,
+		const Eigen::Vector3d& x,
+		const char* unit)
 	{
 		std::ostringstream ss;
 		ss << std::fixed << std::setprecision(3);
@@ -25,11 +28,11 @@ namespace util {
 	}
 
 	void print_state(
-	    int t,
-	    const dynamics::RigidBodyState& Xt,
-	    const geography::GeographicState& geo,
-	    const aerodynamics::AerodynamicState& aero,
-	    const atmospheric::Wind& windI)
+		int t,
+		const dynamics::RigidBodyState& Xt,
+		const geography::GeographicState& geo,
+		const aerodynamics::AerodynamicState& aero,
+		const atmospheric::Wind& windI)
 	{
 
 		const Eigen::Vector3d& p = Xt.p.data;

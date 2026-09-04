@@ -3,7 +3,8 @@
 
 #include "simulation/control/private/components/attitude/pid.hpp"
 
-namespace control {
+namespace control
+{
 
 	struct DamperPID : AttitudePID {
 		using AttitudePID::AttitudePID;

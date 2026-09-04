@@ -3,7 +3,8 @@
 #include <optional>
 #include <random>
 
-namespace sensors {
+namespace sensors
+{
 
 	/** @note For simplicity, the internal dynamics of some sensors will remain unmodelled 
         Instead, these sensors will simply output a noised, lagged version of the corresponding ground-truth quantity

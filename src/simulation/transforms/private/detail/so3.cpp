@@ -1,19 +1,22 @@
-#include <Eigen/Dense>
-#include <cmath>
-#include <stdexcept>
-#include <algorithm>
-#include <vector>
-#include "simulation/constants/public/scalars.hpp"
+#include "simulation/transforms/private/detail/so3.hpp"
+
 #include "simulation/constants/public/linalg.hpp"
+#include "simulation/constants/public/scalars.hpp"
+#include "simulation/transforms/public/detail/so3.hpp"
 #include "simulation/util/public/math.hpp"
 #include "simulation/util/public/trig.hpp"
-#include "simulation/transforms/private/detail/so3.hpp"
-#include "simulation/transforms/public/detail/so3.hpp"
 
-namespace transforms {
+#include <Eigen/Dense>
+#include <algorithm>
+#include <cmath>
+#include <stdexcept>
+#include <vector>
+
+namespace transforms
+{
 
 	Eigen::Matrix3d Rx(
-	    double phi)
+		double phi)
 	{
 		Eigen::Matrix3d Rx;
 		Rx << 1, 0, 0, 0, util::cos(phi), -util::sin(phi), 0, util::sin(phi), util::cos(phi);
@@ -21,7 +24,7 @@ namespace transforms {
 	};
 
 	Eigen::Matrix3d Ry(
-	    double theta)
+		double theta)
 	{
 		Eigen::Matrix3d Ry;
 		Ry << util::cos(theta), 0, util::sin(theta), 0, 1, 0, -util::sin(theta), 0, util::cos(theta);
@@ -29,7 +32,7 @@ namespace transforms {
 	};
 
 	Eigen::Matrix3d Rz(
-	    double psi)
+		double psi)
 	{
 		Eigen::Matrix3d Rz;
 		Rz << util::cos(psi), -util::sin(psi), 0, util::sin(psi), util::cos(psi), 0, 0, 0, 1;
@@ -37,10 +40,10 @@ namespace transforms {
 	};
 
 	Eigen::Matrix3d eul_to_R_extr(
-	    double a,
-	    double b,
-	    double c,
-	    EulerOrder order)
+		double a,
+		double b,
+		double c,
+		EulerOrder order)
 	{
 		switch (order) {
 			case EulerOrder::ZYX:
@@ -81,35 +84,35 @@ namespace transforms {
 	// So the function 'eul_to_R_intr' does not technically make sense
 	// However, for consistency with the extrinsic case, it is still implemented since transposing the result of this function indeed gives the correct result for an intrinsic frame rotation/coordinate transformation
 	Eigen::Matrix3d eul_to_R_intr(
-	    double a,
-	    double b,
-	    double c,
-	    EulerOrder order)
+		double a,
+		double b,
+		double c,
+		EulerOrder order)
 	{
 		return eul_to_R_extr(-a, -b, -c, order).transpose();
 	}
 
 	Eigen::Matrix3d eul_to_C_extr(
-	    double a,
-	    double b,
-	    double c,
-	    EulerOrder order)
+		double a,
+		double b,
+		double c,
+		EulerOrder order)
 	{
 		return eul_to_R_extr(a, b, c, order).transpose();
 	};
 
 	Eigen::Matrix3d eul_to_C_intr(
-	    double a,
-	    double b,
-	    double c,
-	    EulerOrder order)
+		double a,
+		double b,
+		double c,
+		EulerOrder order)
 	{
 		return eul_to_R_intr(a, b, c, order).transpose();
 	};
 
 	Eigen::Vector3d R_to_eul_extr(
-	    const Eigen::Matrix3d& R,
-	    EulerOrder order)
+		const Eigen::Matrix3d& R,
+		EulerOrder order)
 	{
 		double a = 0.0, b = 0.0, c = 0.0;
 
@@ -268,24 +271,24 @@ namespace transforms {
 	}
 
 	Eigen::Vector3d R_to_eul_intr(
-	    const Eigen::Matrix3d& R,
-	    EulerOrder order)
+		const Eigen::Matrix3d& R,
+		EulerOrder order)
 	{
 		// R_intr(a, b, c) = R_extr(-a, -b, -c).T
 		return -1 * R_to_eul_extr(R.transpose(), order);
 	}
 
 	Eigen::Vector3d C_to_eul_extr(
-	    const Eigen::Matrix3d& C,
-	    EulerOrder order)
+		const Eigen::Matrix3d& C,
+		EulerOrder order)
 	{
 		// C_extr(a, b, c) = R_extr(a, b, c).T = R_intr(-a, -b, -c)
 		return R_to_eul_extr(C.transpose(), order);
 	}
 
 	Eigen::Vector3d C_to_eul_intr(
-	    const Eigen::Matrix3d& C,
-	    EulerOrder order)
+		const Eigen::Matrix3d& C,
+		EulerOrder order)
 	{
 		// C_intr(a, b, c) = R_intr(a, b, c).T = R_extr(-a, -b, -c)
 		return R_to_eul_intr(C.transpose(), order);
@@ -299,7 +302,7 @@ namespace transforms {
 	// That is, the concept of an "intrinsic" vector rotation is not defined
 	// Given the orientation (of the frame/vector) obtained via the nth rotation, how is the n+1 rotation applied
 	Eigen::Matrix3d chain_rot_post(
-	    const std::vector<Eigen::Matrix3d>& rot_list)
+		const std::vector<Eigen::Matrix3d>& rot_list)
 	{
 		Eigen::Matrix3d rot_tot = constants::I3;
 		for (const auto& rot : rot_list) {
@@ -310,7 +313,7 @@ namespace transforms {
 
 	// Given the orientation (of the frame/vector) obtained via the nth rotation, how is the n+1 rotation applied
 	Eigen::Matrix3d chain_rot_pre(
-	    const std::vector<Eigen::Matrix3d>& rot_list)
+		const std::vector<Eigen::Matrix3d>& rot_list)
 	{
 		Eigen::Matrix3d rot_tot = constants::I3;
 

@@ -1,16 +1,19 @@
 #pragma once
-#include <array>
-#include <optional>
 #include "simulation/constants/public/dimensions.hpp"
 #include "simulation/control/public/data/types.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/operating/public/data/types.hpp"
 
-namespace autodiff {
+#include <array>
+#include <optional>
+
+namespace autodiff
+{
 	struct AutoDiffModel;
 }
 
-namespace allocator {
+namespace allocator
+{
 
 	struct AllocatorManagerInput {
 		control::VirtualControlOutputVector_T<double> mu;

@@ -1,11 +1,13 @@
 #pragma once
-#include <cstddef>
-#include <Eigen/Dense>
-#include "simulation/constants/public/linalg.hpp"
 #include "simulation/constants/public/dimensions.hpp"
+#include "simulation/constants/public/linalg.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 
-namespace guidance {
+#include <Eigen/Dense>
+#include <cstddef>
+
+namespace guidance
+{
 
 	struct GuidanceSetpoint {
 		dynamics::TranslationalVelocity vB_BI;
@@ -21,7 +23,11 @@ namespace guidance {
 
 	struct NonlinearSetpoint : GuidanceSetpoint {};
 
-	enum class TrajectoryType { Regulation, Tracking, Interpolated };
+	enum class TrajectoryType {
+		Regulation,
+		Tracking,
+		Interpolated
+	};
 
 	// The guidance setpoint vector stores psi, which is not a state variable, hence the +1
 	inline constexpr std::size_t guidance_state_dim = constants::state_dim + 1;

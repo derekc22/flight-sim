@@ -2,7 +2,8 @@
 #include "simulation/constants/public/linalg.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 
-namespace dynamics {
+namespace dynamics
+{
 
 	/** @warning Function signatures with an 'I' indicate that arguments MUST be specified WRT an inertial frame (i.e. the ECEF frame or NED frame)
         Note that the NED frame is assumed inertial in this codebase as it remains fixed for the duration of the flight - as opposed to translating/re-orienting as the aircraft moves (which would be non-inertial)
@@ -34,9 +35,9 @@ namespace dynamics {
 
 	template <typename T>
 	constants::Vector3_T<T> ddtB_vB_BI_T(const constants::Vector3_T<T>& vB,
-	    const constants::Vector3_T<T>& wB_BI,
-	    double mass,
-	    const constants::Vector3_T<T>& FB_net);
+		const constants::Vector3_T<T>& wB_BI,
+		double mass,
+		const constants::Vector3_T<T>& FB_net);
 
 	template <typename T>
 	constants::Vector3_T<T>

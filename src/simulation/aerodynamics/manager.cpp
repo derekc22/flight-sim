@@ -1,13 +1,16 @@
-#include <utility>
-#include "simulation/aerodynamics/public/detail/loads.hpp"
 #include "simulation/aerodynamics/public/manager.hpp"
+
+#include "simulation/aerodynamics/public/detail/loads.hpp"
 #include "simulation/aerodynamics/public/detail/state.hpp"
 
-namespace aerodynamics {
+#include <utility>
+
+namespace aerodynamics
+{
 
 	AerodynamicsManager::AerodynamicsManager(
-	    std::vector<Surface> s)
-	    : surfaces(std::move(s))
+		std::vector<Surface> s)
+		: surfaces(std::move(s))
 	{
 		compute_surface_geometry();
 	}
@@ -21,11 +24,12 @@ namespace aerodynamics {
 	}
 
 	AerodynamicsManagerOutput AerodynamicsManager::step(
-	    const AerodynamicsManagerInput& input)
+		const AerodynamicsManagerInput& input)
 	{
-		return {.aero_t = compute_aerodynamic_state(input.X, input.windB),
-		    .WB_aerodynamic =
-		        step_aero_forces_moments(surfaces, input.pB_GB, input.X, input.atm, input.u, input.windB)};
+		return {
+			.aero_t = compute_aerodynamic_state(input.X, input.windB),
+			.WB_aerodynamic = step_aero_forces_moments(surfaces, input.pB_GB, input.X, input.atm, input.u, input.windB)
+		};
 	}
 
 } // namespace aerodynamics

@@ -1,9 +1,10 @@
 #pragma once
-#include <string>
 #include <Eigen/Dense>
 #include <nlohmann/json.hpp>
+#include <string>
 
-namespace json {
+namespace json
+{
 
 	void validate_actuator_json(const nlohmann::json& actuator_json);
 	void validate_propulsor_actuator_json(const nlohmann::json& propulsor_actuator_json);

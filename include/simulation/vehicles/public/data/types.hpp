@@ -1,12 +1,14 @@
 #pragma once
-#include <optional>
-#include "simulation/constants/public/scalars.hpp"
 #include "simulation/aerodynamics/public/data/types.hpp"
+#include "simulation/constants/public/scalars.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/frames/public/data/types.hpp"
 #include "simulation/geography/public/data/types.hpp"
 
-namespace vehicles {
+#include <optional>
+
+namespace vehicles
+{
 
 	struct NEDFrameECEFStepOptions {
 
@@ -63,7 +65,7 @@ namespace vehicles {
 		std::optional<geography::Longitude> lon_BE;
 		std::optional<geography::GeometricAltitude> alt_BE;
 
-		std::optional<dynamics::RigidBodyState> X_BE;     // container
+		std::optional<dynamics::RigidBodyState> X_BE;	  // container
 		std::optional<geography::GeographicState> geo_BE; // container
 	};
 

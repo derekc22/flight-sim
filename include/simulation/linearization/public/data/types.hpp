@@ -1,9 +1,11 @@
 #pragma once
-#include <Eigen/Dense>
-#include "simulation/constants/public/linalg.hpp"
 #include "simulation/constants/public/dimensions.hpp"
+#include "simulation/constants/public/linalg.hpp"
 
-namespace linearization {
+#include <Eigen/Dense>
+
+namespace linearization
+{
 
 	using StateJacobian = constants::MatrixX_T<double, constants::state_dim, constants::state_dim>;
 	using InputJacobian = constants::MatrixX_T<double, constants::state_dim, constants::input_dim>;
@@ -27,7 +29,7 @@ namespace linearization {
 
 	using VirtualInputJacobian = constants::MatrixX_T<double, constants::state_dim, constants::virtual_input_dim>;
 	using VirtualDirectFeedthroughJacobian =
-	    constants::MatrixX_T<double, constants::state_dim, constants::virtual_input_dim>;
+		constants::MatrixX_T<double, constants::state_dim, constants::virtual_input_dim>;
 
 	struct VirtualLocalLinearization {
 		StateJacobian A_virtual = StateJacobian::Zero();

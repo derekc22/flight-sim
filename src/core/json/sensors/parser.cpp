@@ -1,10 +1,13 @@
-#include <nlohmann/json.hpp>
-#include "core/json/sensors/private/parsing.hpp"
 #include "core/json/sensors/public/parser.hpp"
+
 #include "core/json/public/files.hpp"
+#include "core/json/sensors/private/parsing.hpp"
 #include "simulation/sensors/public/manager.hpp"
 
-namespace json {
+#include <nlohmann/json.hpp>
+
+namespace json
+{
 
 	sensors::SensorManager parse_sensors_config()
 	{

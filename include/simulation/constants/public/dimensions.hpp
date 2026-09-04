@@ -1,7 +1,8 @@
 #pragma once
 #include <cstddef>
 
-namespace constants {
+namespace constants
+{
 
 	// Modeled state and input dimensions
 	inline constexpr std::size_t state_dim = 8;

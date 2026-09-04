@@ -1,12 +1,15 @@
-#include <stdexcept>
-#include <nlohmann/json.hpp>
-#include "core/json/initialization/private/parsing.hpp"
 #include "core/json/initialization/private/validation.hpp"
 
-namespace json {
+#include "core/json/initialization/private/parsing.hpp"
+
+#include <nlohmann/json.hpp>
+#include <stdexcept>
+
+namespace json
+{
 
 	void validate_NEDFrameECEF_initialization(
-	    const nlohmann::json& frame_json)
+		const nlohmann::json& frame_json)
 	{
 		const ParsedStepOptions fields = parse_step_options(frame_json);
 		if (!fields.lat.has_value() || !fields.lon.has_value() || !fields.alt.has_value()) {
@@ -15,7 +18,7 @@ namespace json {
 	}
 
 	void validate_FRDFrameECEF_initialization(
-	    const nlohmann::json& frame_json)
+		const nlohmann::json& frame_json)
 	{
 		const ParsedStepOptions fields = parse_step_options(frame_json);
 		const bool has_H = fields.H.has_value();
@@ -41,23 +44,23 @@ namespace json {
 
 		if (!has_position) {
 			throw std::runtime_error(
-			    "json::validate_FRDFrameECEF_initialization: one position representation required");
+				"json::validate_FRDFrameECEF_initialization: one position representation required");
 		}
 		if (!has_orientation) {
 			throw std::runtime_error(
-			    "json::validate_FRDFrameECEF_initialization: one orientation representation required");
+				"json::validate_FRDFrameECEF_initialization: one orientation representation required");
 		}
 		if (!has_linear_velocity) {
 			throw std::runtime_error("json::validate_FRDFrameECEF_initialization: v required");
 		}
 		if (!has_angular_velocity) {
 			throw std::runtime_error(
-			    "json::validate_FRDFrameECEF_initialization: one angular velocity representation required");
+				"json::validate_FRDFrameECEF_initialization: one angular velocity representation required");
 		}
 	}
 
 	void validate_FRDFrameNED_initialization(
-	    const nlohmann::json& frame_json)
+		const nlohmann::json& frame_json)
 	{
 		const ParsedStepOptions fields = parse_step_options(frame_json);
 		const bool has_H = fields.H.has_value();
@@ -82,35 +85,35 @@ namespace json {
 		}
 		if (!has_orientation) {
 			throw std::runtime_error(
-			    "json::validate_FRDFrameNED_initialization: one orientation representation required");
+				"json::validate_FRDFrameNED_initialization: one orientation representation required");
 		}
 		if (!has_linear_velocity) {
 			throw std::runtime_error("json::validate_FRDFrameNED_initialization: v required");
 		}
 		if (!has_angular_velocity) {
 			throw std::runtime_error(
-			    "json::validate_FRDFrameNED_initialization: one angular velocity representation required");
+				"json::validate_FRDFrameNED_initialization: one angular velocity representation required");
 		}
 	}
 
 	void validate_initialization_config(
-	    const nlohmann::json& config,
-	    bool trim_flag)
+		const nlohmann::json& config,
+		bool trim_flag)
 	{
 		if (!config.contains("NEDFrameECEF") && !config.contains("FRDFrameECEF")) {
 			throw std::runtime_error(
-			    "json::validate_initialization_config: One of NEDFrameECEF, FRDFrameECEF required");
+				"json::validate_initialization_config: One of NEDFrameECEF, FRDFrameECEF required");
 		}
 		if (!config.contains("FRDFrameECEF") && !config.contains("FRDFrameNED")) {
 			throw std::runtime_error("json::validate_initialization_config: One of FRDFrameECEF, FRDFrameNED required");
 		}
 		if (config.contains("WINDFrameSTAB")) {
 			throw std::runtime_error("json::validate_initialization_config: WINDFrameSTAB is an aerodynamic frame. "
-			                         "User initialization is not allowed");
+									 "User initialization is not allowed");
 		}
 		if (config.contains("STABFrameFRD")) {
 			throw std::runtime_error("json::validate_initialization_config: STABFrameFRD is an aerodynamic frame. User "
-			                         "initialization is not allowed");
+									 "initialization is not allowed");
 		}
 		if (trim_flag && !config.contains("FRDFrameNED")) {
 			throw std::runtime_error("json::validate_initialization_config: FRDFrameNED required for trim");

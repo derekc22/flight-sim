@@ -1,26 +1,29 @@
-#include <Eigen/Dense>
-#include <tuple>
+#include "simulation/estimation/public/components/extended_kalman.hpp"
+
 #include "simulation/actuators/public/data/helpers.hpp"
 #include "simulation/autodiff/public/detail/evaluation.hpp"
 #include "simulation/dynamics/public/data/helpers.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
-#include "simulation/estimation/public/components/extended_kalman.hpp"
 #include "simulation/estimation/public/data/helpers.hpp"
 #include "simulation/linearization/public/detail/discretization.hpp"
 #include "simulation/linearization/public/detail/jacobian.hpp"
 #include "simulation/operating/public/data/types.hpp"
 
-namespace estimation {
+#include <Eigen/Dense>
+#include <tuple>
+
+namespace estimation
+{
 
 	ExtendedKalmanEstimator::ExtendedKalmanEstimator(
-	    const ExtendedKalmanFilterParameters& params)
-	    : params(params)
+		const ExtendedKalmanFilterParameters& params)
+		: params(params)
 	{
 	}
 
 	dynamics::RigidBodyState ExtendedKalmanEstimator::step(
-	    const ExtendedKalmanEstimatorInput& input,
-	    double dt)
+		const ExtendedKalmanEstimatorInput& input,
+		double dt)
 	{
 		dynamics::StateVector_T<double> yt = dynamics::unpack_state(input.Yt);
 		actuators::ActuatorInputsVector_T<double> ut_1 = actuators::unpack_actuator_inputs_T(input.u_actual_t_1);
@@ -40,9 +43,9 @@ namespace estimation {
 	}
 
 	std::tuple<KalmanState, linearization::OutputJacobian> ExtendedKalmanEstimator::predict(
-	    const ExtendedKalmanEstimatorInput& input,
-	    const actuators::ActuatorInputsVector_T<double>& ut_1,
-	    double dt)
+		const ExtendedKalmanEstimatorInput& input,
+		const actuators::ActuatorInputsVector_T<double>& ut_1,
+		double dt)
 	{
 		KalmanState prev = state.value();
 
@@ -52,12 +55,12 @@ namespace estimation {
 
 		// A @ zt_1 + B @ ut_1 -> f(zt_1, ut_1)
 		dynamics::StateDot_T<double> zt_1_dot =
-		    autodiff::compute_state_dot_T(operating_point, input.model, input.conditions, dt);
+			autodiff::compute_state_dot_T(operating_point, input.model, input.conditions, dt);
 		dynamics::StateVector_T<double> zt_bar = prev.zt + dynamics::unpack_state_dot_T(zt_1_dot) * dt;
 
 		// A -> Ft
 		linearization::LocalLinearization lin_sol =
-		    linearization::linearize_operating_point(input.model, operating_point, input.conditions);
+			linearization::linearize_operating_point(input.model, operating_point, input.conditions);
 		linearization::StateJacobian Ft = linearization::discretize_euler(lin_sol, dt).A;
 
 		Eigen::MatrixXd Pt_bar = Ft * prev.Pt * Ft.transpose() + params.R;
@@ -66,8 +69,8 @@ namespace estimation {
 	}
 
 	KalmanState ExtendedKalmanEstimator::correct(
-	    const dynamics::StateVector_T<double>& yt,
-	    const linearization::OutputJacobian& output_jacobian)
+		const dynamics::StateVector_T<double>& yt,
+		const linearization::OutputJacobian& output_jacobian)
 	{
 		KalmanState pred = state.value();
 
@@ -75,7 +78,7 @@ namespace estimation {
 		linearization::OutputJacobian Ht = output_jacobian;
 
 		Eigen::MatrixXd Kt =
-		    pred.Pt * Ht.transpose() * (Ht * pred.Pt * Ht.transpose() + params.Q).inverse(); // Kalman gain
+			pred.Pt * Ht.transpose() * (Ht * pred.Pt * Ht.transpose() + params.Q).inverse(); // Kalman gain
 
 		// C @ zt_bar = I @ zt_bar -> h(zt_bar) = zt_bar
 		dynamics::StateVector_T<double> Lt = yt - pred.zt; // Innovation

@@ -1,13 +1,15 @@
 #include "simulation/frames/private/detail/kinematics.hpp"
+
 #include "simulation/frames/public/detail/kinematics.hpp"
 #include "simulation/transforms/public/detail/se3.hpp"
 
-namespace frames {
+namespace frames
+{
 
 	Eigen::Vector3d transform_vec(
-	    const Eigen::Vector3d& vA,
-	    const Frame& A,
-	    const Frame& B)
+		const Eigen::Vector3d& vA,
+		const Frame& A,
+		const Frame& B)
 	{
 		Eigen::Matrix3d CAB = CRF(B, A);
 		Eigen::Vector3d vB = CAB * vA;
@@ -15,9 +17,9 @@ namespace frames {
 	}
 
 	Eigen::Vector3d transform_point(
-	    const Eigen::Vector3d& pA,
-	    const Frame& A,
-	    const Frame& B)
+		const Eigen::Vector3d& pA,
+		const Frame& A,
+		const Frame& B)
 	{
 		Eigen::Matrix4d HAB = HRF(B, A);
 		Eigen::Vector3d pB = transforms::apply_H(HAB, pA);
@@ -25,15 +27,15 @@ namespace frames {
 	}
 
 	dynamics::HomogeneousTransformationMatrix H_from_R(
-	    const Frame& F,
-	    const Frame& R)
+		const Frame& F,
+		const Frame& R)
 	{
 		return {HRF(F, R)};
 	}
 
 	std::tuple<dynamics::TranslationalVelocity, dynamics::AngularVelocity> vel_from_R(
-	    const Frame& F,
-	    const Frame& R)
+		const Frame& F,
+		const Frame& R)
 	{
 		auto [vF_FE, wF_FE] = vel_from_E(F);
 		auto [vR_RE, wR_RE] = vel_from_E(R);

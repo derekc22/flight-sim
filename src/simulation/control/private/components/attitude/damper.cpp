@@ -1,13 +1,16 @@
 
-#include <stdexcept>
 #include "simulation/control/private/components/attitude/damper.hpp"
+
 #include "simulation/dynamics/public/data/types.hpp"
 
-namespace control {
+#include <stdexcept>
+
+namespace control
+{
 
 	PIDPolicyInput DamperPID::make_pid_policy_input(
-	    const AttitudeControlInput& input,
-	    AttitudeAxis axis)
+		const AttitudeControlInput& input,
+		AttitudeAxis axis)
 	{
 		dynamics::RigidBodyState Zt = input.Zt;
 

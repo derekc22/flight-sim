@@ -1,21 +1,24 @@
-#include <cmath>
-#include <vector>
-#include <spdlog/spdlog.h>
-#include "simulation/constants/public/scalars.hpp"
-#include "simulation/constants/public/linalg.hpp"
-#include "simulation/constants/public/dimensions.hpp"
 #include "simulation/allocator/private/detail/solve.hpp"
 
-namespace allocator {
+#include "simulation/constants/public/dimensions.hpp"
+#include "simulation/constants/public/linalg.hpp"
+#include "simulation/constants/public/scalars.hpp"
+
+#include <cmath>
+#include <spdlog/spdlog.h>
+#include <vector>
+
+namespace allocator
+{
 
 	control::ControlOutput solve_qp_constrained(
-	    qp::Solver& solver,
-	    const constants::MatrixX_T<double, constants::input_dim, constants::input_dim>& hessian,
-	    const actuators::ActuatorInputsVector_T<double>& gradient,
-	    const actuators::ActuatorInputsVector_T<double>& u_0,
-	    const actuators::ActuatorInputsVector_T<double>& actuator_target,
-	    const actuators::ActuatorLimitsVector& limits,
-	    const std::array<bool, constants::input_dim>& actuator_mask)
+		qp::Solver& solver,
+		const constants::MatrixX_T<double, constants::input_dim, constants::input_dim>& hessian,
+		const actuators::ActuatorInputsVector_T<double>& gradient,
+		const actuators::ActuatorInputsVector_T<double>& u_0,
+		const actuators::ActuatorInputsVector_T<double>& actuator_target,
+		const actuators::ActuatorLimitsVector& limits,
+		const std::array<bool, constants::input_dim>& actuator_mask)
 	{
 		Eigen::VectorXd lower = limits.col(0) - u_0;
 		Eigen::VectorXd upper = limits.col(1) - u_0;
@@ -33,7 +36,7 @@ namespace allocator {
 
 		if (solution.status != qp::Status::Solved) {
 			spdlog::error(
-			    "allocator::AllocatorManager::step QP solve failed with status {}", static_cast<int>(solution.status));
+				"allocator::AllocatorManager::step QP solve failed with status {}", static_cast<int>(solution.status));
 			return actuators::pack_actuator_inputs_T(u_0);
 		}
 
@@ -43,12 +46,12 @@ namespace allocator {
 	}
 
 	control::ControlOutput solve_qp_unconstrained(
-	    const constants::MatrixX_T<double, constants::input_dim, constants::input_dim>& hessian,
-	    const actuators::ActuatorInputsVector_T<double>& gradient,
-	    const actuators::ActuatorInputsVector_T<double>& u_0,
-	    const actuators::ActuatorInputsVector_T<double>& actuator_target,
-	    const actuators::ActuatorLimitsVector& limits,
-	    const std::array<bool, constants::input_dim>& actuator_mask)
+		const constants::MatrixX_T<double, constants::input_dim, constants::input_dim>& hessian,
+		const actuators::ActuatorInputsVector_T<double>& gradient,
+		const actuators::ActuatorInputsVector_T<double>& u_0,
+		const actuators::ActuatorInputsVector_T<double>& actuator_target,
+		const actuators::ActuatorLimitsVector& limits,
+		const std::array<bool, constants::input_dim>& actuator_mask)
 	{
 		std::vector<Eigen::Index> free_indices;
 		actuators::ActuatorInputsVector_T<double> x = actuators::ActuatorInputsVector_T<double>::Zero();

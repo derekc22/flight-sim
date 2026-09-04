@@ -1,14 +1,17 @@
-#include <stdexcept>
-#include <string>
-#include <nlohmann/json.hpp>
 #include "core/json/guidance/private/validation.hpp"
+
 #include "simulation/util/public/validation.hpp"
 
-namespace json {
+#include <nlohmann/json.hpp>
+#include <stdexcept>
+#include <string>
+
+namespace json
+{
 
 	void validate_attitude_control_setpoint(
-	    const nlohmann::json& guidance_json,
-	    const control::ControllerType& controller_type)
+		const nlohmann::json& guidance_json,
+		const control::ControllerType& controller_type)
 	{
 		if (controller_type == control::ControllerType::DamperPID) {
 			if (guidance_json.contains("v")) {
@@ -36,8 +39,8 @@ namespace json {
 	}
 
 	void validate_velocity_control_setpoint(
-	    const nlohmann::json& guidance_json,
-	    const control::ControllerType& controller_type)
+		const nlohmann::json& guidance_json,
+		const control::ControllerType& controller_type)
 	{
 		if (controller_type == control::ControllerType::VelocityPID) {
 			if (!guidance_json.contains("v")) {
@@ -53,34 +56,34 @@ namespace json {
 	}
 
 	void validate_linear_quadratic_control_setpoint(
-	    const nlohmann::json& guidance_json,
-	    const control::ControllerType& controller_type)
+		const nlohmann::json& guidance_json,
+		const control::ControllerType& controller_type)
 	{
 		if (controller_type == control::ControllerType::LinearQuadraticRegulator ||
-		    controller_type == control::ControllerType::LinearQuadraticTracker ||
-		    controller_type == control::ControllerType::LinearQuadraticIntegrator) {
+			controller_type == control::ControllerType::LinearQuadraticTracker ||
+			controller_type == control::ControllerType::LinearQuadraticIntegrator) {
 			if (!guidance_json.contains("v")) {
 				throw std::runtime_error(
-				    "json::validate_linear_quadratic_control_setpoint: linear_quadratic requires v");
+					"json::validate_linear_quadratic_control_setpoint: linear_quadratic requires v");
 			}
 			if (!guidance_json.contains("w")) {
 				throw std::runtime_error(
-				    "json::validate_linear_quadratic_control_setpoint: linear_quadratic requires w");
+					"json::validate_linear_quadratic_control_setpoint: linear_quadratic requires w");
 			}
 			if (!guidance_json.contains("eul")) {
 				throw std::runtime_error(
-				    "json::validate_linear_quadratic_control_setpoint: linear_quadratic requires eul");
+					"json::validate_linear_quadratic_control_setpoint: linear_quadratic requires eul");
 			}
 		}
 	}
 
 	void validate_nonlinear_control_setpoint(
-	    const nlohmann::json& guidance_json,
-	    const control::ControllerType& controller_type)
+		const nlohmann::json& guidance_json,
+		const control::ControllerType& controller_type)
 	{
 		if (controller_type == control::ControllerType::FeedbackLinearization ||
-		    controller_type == control::ControllerType::NonlinearDynamicInversion ||
-		    controller_type == control::ControllerType::IncrementalNonlinearDynamicInversion) {
+			controller_type == control::ControllerType::NonlinearDynamicInversion ||
+			controller_type == control::ControllerType::IncrementalNonlinearDynamicInversion) {
 			if (!guidance_json.contains("v")) {
 				throw std::runtime_error("json::validate_nonlinear_control_setpoint: nonlinear requires v");
 			}
@@ -94,7 +97,7 @@ namespace json {
 	}
 
 	void validate_guidance(
-	    const nlohmann::json& guidance_json)
+		const nlohmann::json& guidance_json)
 	{
 		bool attitude_flag = guidance_json.contains("attitude");
 		bool velocity_flag = guidance_json.contains("velocity");
@@ -103,7 +106,7 @@ namespace json {
 
 		if (attitude_flag && linear_quadratic_flag) {
 			throw std::runtime_error(
-			    "json::validate_guidance: attitude and linear_quadratic guidance cannot both be present");
+				"json::validate_guidance: attitude and linear_quadratic guidance cannot both be present");
 		}
 		if (attitude_flag && nonlinear_flag) {
 			throw std::runtime_error("json::validate_guidance: attitude and nonlinear guidance cannot both be present");
@@ -111,12 +114,12 @@ namespace json {
 
 		if (linear_quadratic_flag && nonlinear_flag) {
 			throw std::runtime_error(
-			    "json::validate_guidance: linear_quadratic and nonlinear guidance cannot both be present");
+				"json::validate_guidance: linear_quadratic and nonlinear guidance cannot both be present");
 		}
 
 		if (velocity_flag && linear_quadratic_flag) {
 			throw std::runtime_error(
-			    "json::validate_guidance: velocity and linear_quadratic guidance cannot both be present");
+				"json::validate_guidance: velocity and linear_quadratic guidance cannot both be present");
 		}
 		if (velocity_flag && nonlinear_flag) {
 			throw std::runtime_error("json::validate_guidance: velocity and nonlinear guidance cannot both be present");
@@ -124,12 +127,12 @@ namespace json {
 	}
 
 	void validate_trajectory_type(
-	    const guidance::TrajectoryComponents& traj_components,
-	    guidance::TrajectoryType traj_type)
+		const guidance::TrajectoryComponents& traj_components,
+		guidance::TrajectoryType traj_type)
 	{
 		if (traj_type == guidance::TrajectoryType::Regulation && traj_components.n_rows > 1) {
 			throw std::runtime_error(
-			    "json::validate_trajectory_type: regulation trajectory cannot have more than one row");
+				"json::validate_trajectory_type: regulation trajectory cannot have more than one row");
 		}
 		if (traj_type == guidance::TrajectoryType::Interpolated && traj_components.n_rows != 2) {
 			throw std::runtime_error("json::validate_trajectory_type: interpolated trajectory requires two rows");
@@ -137,7 +140,7 @@ namespace json {
 	}
 
 	void validate_trajectory_components(
-	    guidance::TrajectoryComponents& traj_components)
+		guidance::TrajectoryComponents& traj_components)
 	{
 		int n_cols = 3; // v, w, and eul are 3-column vectors
 		int n_rows = traj_components.n_rows;

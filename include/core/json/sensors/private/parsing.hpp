@@ -1,9 +1,11 @@
 #pragma once
-#include <string>
-#include <nlohmann/json.hpp>
 #include "simulation/sensors/public/manager.hpp"
 
-namespace json {
+#include <nlohmann/json.hpp>
+#include <string>
+
+namespace json
+{
 
 	template <typename SensorType> SensorType parse_sensor(const nlohmann::json& config, const std::string& key);
 

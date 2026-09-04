@@ -1,10 +1,13 @@
-#include <nlohmann/json.hpp>
-#include "core/json/allocator/private/parsing.hpp"
 #include "core/json/allocator/public/parser.hpp"
+
+#include "core/json/allocator/private/parsing.hpp"
 #include "core/json/public/files.hpp"
 #include "simulation/allocator/public/manager.hpp"
 
-namespace json {
+#include <nlohmann/json.hpp>
+
+namespace json
+{
 
 	allocator::AllocatorManager parse_allocator_config()
 	{

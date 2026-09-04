@@ -1,7 +1,8 @@
 #pragma once
 #include "simulation/dynamics/public/data/types.hpp"
 
-namespace dynamics {
+namespace dynamics
+{
 
 	template <typename T> StateVector_T<T> unpack_state_T(const State_T<T>& x);
 

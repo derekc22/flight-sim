@@ -1,10 +1,13 @@
-#include <nlohmann/json.hpp>
+#include "core/json/structural/public/parser.hpp"
+
 #include "core/json/public/files.hpp"
 #include "core/json/structural/private/parsing.hpp"
-#include "core/json/structural/public/parser.hpp"
 #include "simulation/structural/public/manager.hpp"
 
-namespace json {
+#include <nlohmann/json.hpp>
+
+namespace json
+{
 
 	structural::StructuralManager parse_structural_config()
 	{

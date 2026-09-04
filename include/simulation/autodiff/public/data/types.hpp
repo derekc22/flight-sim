@@ -5,7 +5,8 @@
 #include "simulation/propulsion/public/manager.hpp"
 #include "simulation/structural/public/data/types.hpp"
 
-namespace autodiff {
+namespace autodiff
+{
 
 	struct AutoDiffModel {
 		structural::StructuralState struc_t;

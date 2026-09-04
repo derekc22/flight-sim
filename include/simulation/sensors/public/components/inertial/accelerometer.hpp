@@ -2,7 +2,8 @@
 #include "simulation/sensors/public/components/base.hpp"
 #include "simulation/sensors/public/data/types.hpp"
 
-namespace sensors {
+namespace sensors
+{
 
 	struct Accelerometer : Sensor {
 		std::optional<Eigen::Vector3d> prev_fB_lag;

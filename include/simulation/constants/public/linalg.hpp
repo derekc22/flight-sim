@@ -1,11 +1,12 @@
 #pragma once
 #include <Eigen/Dense>
 
-namespace constants {
+namespace constants
+{
 
 	// Identity quantities
 	inline const Eigen::Matrix3d I3 = Eigen::Matrix3d::Identity();
-	inline const Eigen::Matrix4d HI = Eigen::Matrix4d::Identity();       // Identity homogeneous transformation matrix
+	inline const Eigen::Matrix4d HI = Eigen::Matrix4d::Identity();		 // Identity homogeneous transformation matrix
 	inline const Eigen::Quaterniond qI = Eigen::Quaterniond::Identity(); // Identity quaternion
 
 	// Zero quantities

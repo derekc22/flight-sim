@@ -1,10 +1,12 @@
 #pragma once
 
-#include <Eigen/Dense>
-#include <cppad/cppad.hpp>
 #include "simulation/constants/public/linalg.hpp"
 
-namespace util {
+#include <Eigen/Dense>
+#include <cppad/cppad.hpp>
+
+namespace util
+{
 
 	CppAD::AD<double> csc(CppAD::AD<double> x);
 	CppAD::AD<double> sec(CppAD::AD<double> x);

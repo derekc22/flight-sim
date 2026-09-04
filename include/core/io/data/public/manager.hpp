@@ -1,10 +1,12 @@
 #pragma once
-#include <optional>
-#include <string>
 #include "core/io/data/public/data/types.hpp"
 #include "simulation/runner/public/data/types.hpp"
 
-namespace io {
+#include <optional>
+#include <string>
+
+namespace io
+{
 
 	struct DataManager {
 		runner::JSONFlags json_flags;

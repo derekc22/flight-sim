@@ -1,12 +1,15 @@
-#include <Eigen/Dense>
-#include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/estimation/public/data/helpers.hpp"
 
-namespace estimation {
+#include "simulation/dynamics/public/data/types.hpp"
+
+#include <Eigen/Dense>
+
+namespace estimation
+{
 
 	dynamics::RigidBodyState make_kalman_state_estimate(
-	    const dynamics::RigidBodyState& Yt,
-	    const dynamics::StateVector_T<double>& zt)
+		const dynamics::RigidBodyState& Yt,
+		const dynamics::StateVector_T<double>& zt)
 	{
 		dynamics::RigidBodyState Zt = Yt;
 

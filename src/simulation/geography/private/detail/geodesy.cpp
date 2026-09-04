@@ -1,14 +1,17 @@
-#include <cmath>
-#include <Eigen/Dense>
-#include "simulation/constants/public/scalars.hpp"
 #include "simulation/geography/private/detail/geodesy.hpp"
+
+#include "simulation/constants/public/scalars.hpp"
 #include "simulation/util/public/math.hpp"
 #include "simulation/util/public/trig.hpp"
 
-namespace geography {
+#include <Eigen/Dense>
+#include <cmath>
+
+namespace geography
+{
 
 	GeographicState lat_lon_alt_from_pE(
-	    const dynamics::Position& pE)
+		const dynamics::Position& pE)
 	{
 		double x = pE.data(0);
 		double y = pE.data(1);

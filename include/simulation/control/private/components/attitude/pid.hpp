@@ -2,10 +2,15 @@
 #include "simulation/control/private/policies/pid/policy.hpp"
 #include "simulation/control/public/data/types.hpp"
 
-namespace control {
+namespace control
+{
 
 	struct AttitudePID {
-		enum AttitudeAxis { Longitudinal, Lateral, Vertical };
+		enum AttitudeAxis {
+			Longitudinal,
+			Lateral,
+			Vertical
+		};
 
 		PIDPolicy lateral_policy;
 		PIDPolicy longitudinal_policy;

@@ -1,7 +1,8 @@
 #pragma once
 #include "simulation/control/public/data/types.hpp"
 
-namespace devices {
+namespace devices
+{
 
 	inline constexpr double joystick_deadzone = 0.1;
 	inline constexpr double joystick_propulsor_rate = 0.5;

@@ -1,8 +1,10 @@
 #pragma once
-#include <vector>
 #include "simulation/aerodynamics/public/data/types.hpp"
 
-namespace aerodynamics {
+#include <vector>
+
+namespace aerodynamics
+{
 
 	struct AerodynamicsManager {
 		std::vector<Surface> surfaces;

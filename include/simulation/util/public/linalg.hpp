@@ -2,7 +2,8 @@
 
 #include <Eigen/Dense>
 
-namespace util {
+namespace util
+{
 
 	Eigen::Matrix3d hat(const Eigen::Vector3d& v);
 	Eigen::Vector3d vee(const Eigen::Matrix3d& S);

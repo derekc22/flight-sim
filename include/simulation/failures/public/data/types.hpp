@@ -1,7 +1,8 @@
 #pragma once
 #include "simulation/geography/public/data/types.hpp"
 
-namespace failures {
+namespace failures
+{
 
 	struct FailureManagerInput {
 		geography::HeightAGL height_agl;

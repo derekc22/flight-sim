@@ -1,11 +1,31 @@
 #pragma once
 
-namespace transforms {
+namespace transforms
+{
 
-	enum class EulerOrder { ZYX, ZXY, YZX, YXZ, XZY, XYZ, ZYZ, ZXZ, YZY, YXY, XZX, XYX };
+	enum class EulerOrder {
+		ZYX,
+		ZXY,
+		YZX,
+		YXZ,
+		XZY,
+		XYZ,
+		ZYZ,
+		ZXZ,
+		YZY,
+		YXY,
+		XZX,
+		XYX
+	};
 
-	enum class RotationType { Extrinsic, Intrinsic };
+	enum class RotationType {
+		Extrinsic,
+		Intrinsic
+	};
 
-	enum class TransformationOrder { RotateFirst, TranslateFirst };
+	enum class TransformationOrder {
+		RotateFirst,
+		TranslateFirst
+	};
 
 } // namespace transforms

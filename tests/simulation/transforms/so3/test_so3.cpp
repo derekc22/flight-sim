@@ -1,33 +1,33 @@
-#include <gtest/gtest.h>
-#include <Eigen/Dense>
-#include <string>
-#include <vector>
-#include <stdexcept>
-
+#include "simulation/constants/public/linalg.hpp"
+#include "simulation/constants/public/scalars.hpp"
+#include "simulation/transforms/helpers.hpp"
 #include "simulation/transforms/private/detail/so3.hpp"
 #include "simulation/transforms/public/detail/s3.hpp"
 #include "simulation/transforms/public/detail/so3.hpp"
-#include "simulation/constants/public/scalars.hpp"
-#include "simulation/constants/public/linalg.hpp"
-#include "simulation/transforms/helpers.hpp"
+
+#include <Eigen/Dense>
+#include <gtest/gtest.h>
+#include <stdexcept>
+#include <string>
+#include <vector>
 
 static void expect_matrix_near(
-    const Eigen::Matrix3d& A,
-    const Eigen::Matrix3d& B)
+	const Eigen::Matrix3d& A,
+	const Eigen::Matrix3d& B)
 {
 	EXPECT_TRUE(A.isApprox(B, constants::eps_strict));
 }
 
 static void expect_orthonormal_with_unit_determinant(
-    const Eigen::Matrix3d& R)
+	const Eigen::Matrix3d& R)
 {
 	EXPECT_TRUE((R.transpose() * R).isApprox(constants::I_T<double, 3>, constants::eps_strict));
 	EXPECT_NEAR(R.determinant(), 1.0, constants::eps_strict);
 }
 
 TEST(
-    transforms_so3,
-    EulerToRotToEulerToRotRoundTripExtrinsic)
+	transforms_so3,
+	EulerToRotToEulerToRotRoundTripExtrinsic)
 {
 	constexpr double a = 0.31;
 	constexpr double b = 0.47;
@@ -49,8 +49,8 @@ TEST(
 }
 
 TEST(
-    transforms_so3,
-    EulerToRotToEulerToRotRoundTripIntrinsic)
+	transforms_so3,
+	EulerToRotToEulerToRotRoundTripIntrinsic)
 {
 	constexpr double a = 0.31;
 	constexpr double b = 0.47;
@@ -72,8 +72,8 @@ TEST(
 }
 
 TEST(
-    transforms_so3,
-    CIsTransposeOfR)
+	transforms_so3,
+	CIsTransposeOfR)
 {
 	constexpr double a = 0.2;
 	constexpr double b = -0.4;
@@ -89,8 +89,8 @@ TEST(
 }
 
 TEST(
-    transforms_so3,
-    ChainRotPostAndPreComposeInExpectedOrder)
+	transforms_so3,
+	ChainRotPostAndPreComposeInExpectedOrder)
 {
 	const auto expect_chain_order = [](const Eigen::Matrix3d& rot1, const Eigen::Matrix3d& rot2) {
 		const std::vector<Eigen::Matrix3d> rot_list = {rot1, rot2};
@@ -99,20 +99,20 @@ TEST(
 	};
 
 	expect_chain_order(transforms::eul_to_R(0.2, -0.3, 0.4, transforms::EulerOrder::ZYX),
-	    transforms::eul_to_R(-0.1, 0.5, 0.2, transforms::EulerOrder::XYZ));
+		transforms::eul_to_R(-0.1, 0.5, 0.2, transforms::EulerOrder::XYZ));
 	expect_chain_order(transforms::eul_to_R_intr(0.2, -0.3, 0.4, transforms::EulerOrder::ZYX),
-	    transforms::eul_to_R_intr(-0.1, 0.5, 0.2, transforms::EulerOrder::XYZ));
+		transforms::eul_to_R_intr(-0.1, 0.5, 0.2, transforms::EulerOrder::XYZ));
 	expect_chain_order(
-	    transforms::eul_to_C(0.2, -0.3, 0.4, transforms::EulerOrder::ZYX, transforms::RotationType::Extrinsic),
-	    transforms::eul_to_C(-0.1, 0.5, 0.2, transforms::EulerOrder::XYZ, transforms::RotationType::Extrinsic));
+		transforms::eul_to_C(0.2, -0.3, 0.4, transforms::EulerOrder::ZYX, transforms::RotationType::Extrinsic),
+		transforms::eul_to_C(-0.1, 0.5, 0.2, transforms::EulerOrder::XYZ, transforms::RotationType::Extrinsic));
 	expect_chain_order(
-	    transforms::eul_to_C(0.2, -0.3, 0.4, transforms::EulerOrder::ZYX, transforms::RotationType::Intrinsic),
-	    transforms::eul_to_C(-0.1, 0.5, 0.2, transforms::EulerOrder::XYZ, transforms::RotationType::Intrinsic));
+		transforms::eul_to_C(0.2, -0.3, 0.4, transforms::EulerOrder::ZYX, transforms::RotationType::Intrinsic),
+		transforms::eul_to_C(-0.1, 0.5, 0.2, transforms::EulerOrder::XYZ, transforms::RotationType::Intrinsic));
 }
 
 TEST(
-    transforms_so3,
-    RotToQuatToRotRoundTrip)
+	transforms_so3,
+	RotToQuatToRotRoundTrip)
 {
 	const auto R = transforms::eul_to_R(0.3, -0.2, 0.5, transforms::EulerOrder::ZYX);
 	const auto q = transforms::rot_to_quat(R);
@@ -122,56 +122,56 @@ TEST(
 }
 
 TEST(
-    transforms_so3,
-    EulerToRAndEulerToCReturnOrthonormalMatricesWithUnitDeterminant)
+	transforms_so3,
+	EulerToRAndEulerToCReturnOrthonormalMatricesWithUnitDeterminant)
 {
 	expect_orthonormal_with_unit_determinant(transforms::eul_to_R(0.3, -0.2, 0.5, transforms::EulerOrder::ZYX));
 	expect_orthonormal_with_unit_determinant(transforms::eul_to_R_intr(0.3, -0.2, 0.5, transforms::EulerOrder::ZYX));
 	expect_orthonormal_with_unit_determinant(
-	    transforms::eul_to_C(0.3, -0.2, 0.5, transforms::EulerOrder::ZYX, transforms::RotationType::Extrinsic));
+		transforms::eul_to_C(0.3, -0.2, 0.5, transforms::EulerOrder::ZYX, transforms::RotationType::Extrinsic));
 	expect_orthonormal_with_unit_determinant(
-	    transforms::eul_to_C(0.3, -0.2, 0.5, transforms::EulerOrder::ZYX, transforms::RotationType::Intrinsic));
+		transforms::eul_to_C(0.3, -0.2, 0.5, transforms::EulerOrder::ZYX, transforms::RotationType::Intrinsic));
 }
 
 TEST(
-    transforms_so3,
-    IntrinsicAndExtrinsicWrappersDispatch)
+	transforms_so3,
+	IntrinsicAndExtrinsicWrappersDispatch)
 {
 	constexpr double a = 0.1;
 	constexpr double b = 0.2;
 	constexpr double c = -0.3;
 
 	expect_matrix_near(transforms::eul_to_R(a, b, c, transforms::EulerOrder::XYZ),
-	    transforms::eul_to_R_extr(a, b, c, transforms::EulerOrder::XYZ));
+		transforms::eul_to_R_extr(a, b, c, transforms::EulerOrder::XYZ));
 	expect_matrix_near(transforms::eul_to_C(a, b, c, transforms::EulerOrder::XYZ, transforms::RotationType::Extrinsic),
-	    transforms::eul_to_C_extr(a, b, c, transforms::EulerOrder::XYZ));
+		transforms::eul_to_C_extr(a, b, c, transforms::EulerOrder::XYZ));
 	expect_matrix_near(transforms::eul_to_C(a, b, c, transforms::EulerOrder::XYZ, transforms::RotationType::Intrinsic),
-	    transforms::eul_to_C_intr(a, b, c, transforms::EulerOrder::XYZ));
+		transforms::eul_to_C_intr(a, b, c, transforms::EulerOrder::XYZ));
 }
 
 TEST(
-    transforms_so3,
-    RejectsInvalidTypeArgument)
+	transforms_so3,
+	RejectsInvalidTypeArgument)
 {
 	EXPECT_THROW(
-	    transforms::eul_to_C(0.0, 0.0, 0.0, transforms::EulerOrder::ZYX, static_cast<transforms::RotationType>(-1)),
-	    std::invalid_argument);
+		transforms::eul_to_C(0.0, 0.0, 0.0, transforms::EulerOrder::ZYX, static_cast<transforms::RotationType>(-1)),
+		std::invalid_argument);
 	EXPECT_THROW(transforms::C_to_eul(
-	                 constants::I_T<double, 3>, transforms::EulerOrder::ZYX, static_cast<transforms::RotationType>(-1)),
-	    std::invalid_argument);
+					 constants::I_T<double, 3>, transforms::EulerOrder::ZYX, static_cast<transforms::RotationType>(-1)),
+		std::invalid_argument);
 }
 
 TEST(
-    transforms_so3,
-    RejectsInvalidEulerOrderArgument)
+	transforms_so3,
+	RejectsInvalidEulerOrderArgument)
 {
 	EXPECT_THROW(transforms::eul_to_R(0.0, 0.0, 0.0, static_cast<transforms::EulerOrder>(-1)), std::invalid_argument);
 	EXPECT_THROW(
-	    transforms::eul_to_R_intr(0.0, 0.0, 0.0, static_cast<transforms::EulerOrder>(-1)), std::invalid_argument);
+		transforms::eul_to_R_intr(0.0, 0.0, 0.0, static_cast<transforms::EulerOrder>(-1)), std::invalid_argument);
 	EXPECT_THROW(transforms::eul_to_C(
-	                 0.0, 0.0, 0.0, static_cast<transforms::EulerOrder>(-1), transforms::RotationType::Extrinsic),
-	    std::invalid_argument);
+					 0.0, 0.0, 0.0, static_cast<transforms::EulerOrder>(-1), transforms::RotationType::Extrinsic),
+		std::invalid_argument);
 	EXPECT_THROW(transforms::eul_to_C(
-	                 0.0, 0.0, 0.0, static_cast<transforms::EulerOrder>(-1), transforms::RotationType::Intrinsic),
-	    std::invalid_argument);
+					 0.0, 0.0, 0.0, static_cast<transforms::EulerOrder>(-1), transforms::RotationType::Intrinsic),
+		std::invalid_argument);
 }

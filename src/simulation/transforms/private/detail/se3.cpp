@@ -1,16 +1,19 @@
-#include <Eigen/Dense>
-#include <stdexcept>
-#include <algorithm>
-#include <vector>
-#include "simulation/constants/public/linalg.hpp"
 #include "simulation/transforms/private/detail/se3.hpp"
+
+#include "simulation/constants/public/linalg.hpp"
 #include "simulation/transforms/public/detail/se3.hpp"
 
-namespace transforms {
+#include <Eigen/Dense>
+#include <algorithm>
+#include <stdexcept>
+#include <vector>
+
+namespace transforms
+{
 
 	Eigen::Matrix4d make_HR_translate_first(
-	    const Eigen::Matrix3d& R,
-	    const Eigen::Vector3d& d)
+		const Eigen::Matrix3d& R,
+		const Eigen::Vector3d& d)
 	{
 		Eigen::Matrix4d H = Eigen::Matrix4d::Zero();
 		H.block<3, 3>(0, 0) = R;
@@ -20,8 +23,8 @@ namespace transforms {
 	};
 
 	Eigen::Matrix4d make_HR_rotate_first(
-	    const Eigen::Matrix3d& R,
-	    const Eigen::Vector3d& d)
+		const Eigen::Matrix3d& R,
+		const Eigen::Vector3d& d)
 	{
 		Eigen::Matrix4d H = Eigen::Matrix4d::Zero();
 		H.block<3, 3>(0, 0) = R;
@@ -31,8 +34,8 @@ namespace transforms {
 	};
 
 	Eigen::Matrix4d make_HC_translate_first(
-	    const Eigen::Matrix3d& C,
-	    const Eigen::Vector3d& d)
+		const Eigen::Matrix3d& C,
+		const Eigen::Vector3d& d)
 	{
 		Eigen::Matrix4d H = Eigen::Matrix4d::Zero();
 		H.block<3, 3>(0, 0) = C;
@@ -42,8 +45,8 @@ namespace transforms {
 	}
 
 	Eigen::Matrix4d make_HC_rotate_first(
-	    const Eigen::Matrix3d& C,
-	    const Eigen::Vector3d& d)
+		const Eigen::Matrix3d& C,
+		const Eigen::Vector3d& d)
 	{
 		Eigen::Matrix4d H = Eigen::Matrix4d::Zero();
 		H.block<3, 3>(0, 0) = C;
@@ -60,7 +63,7 @@ namespace transforms {
 	// That is, the concept of an "intrinsic" vector rotation is not defined
 	// Given the orientation (of the frame/vector) obtained via the nth transformation, how is the n+1 transformation applied
 	Eigen::Matrix4d chain_hom_post(
-	    const std::vector<Eigen::Matrix4d>& H_list)
+		const std::vector<Eigen::Matrix4d>& H_list)
 	{
 		Eigen::Matrix4d Htot = constants::HI;
 		for (const auto& H : H_list) {
@@ -71,7 +74,7 @@ namespace transforms {
 
 	// Given the orientation (of the frame/vector) obtained via the nth transformation, how is the n+1 transformation applied
 	Eigen::Matrix4d chain_hom_pre(
-	    const std::vector<Eigen::Matrix4d>& H_list)
+		const std::vector<Eigen::Matrix4d>& H_list)
 	{
 		Eigen::Matrix4d Htot = constants::HI;
 

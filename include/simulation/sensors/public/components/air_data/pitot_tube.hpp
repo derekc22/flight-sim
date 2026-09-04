@@ -2,7 +2,8 @@
 #include "simulation/sensors/public/components/base.hpp"
 #include "simulation/sensors/public/data/types.hpp"
 
-namespace sensors {
+namespace sensors
+{
 
 	struct PitotTube : Sensor {
 		std::optional<double> prev_P0_lag;

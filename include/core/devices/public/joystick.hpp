@@ -1,11 +1,12 @@
 #pragma once
 #include "core/devices/public/data/types.hpp"
-#include "simulation/actuators/public/manager.hpp"
 #include "simulation/actuators/public/data/helpers.hpp"
+#include "simulation/actuators/public/manager.hpp"
 
 struct SDL_Gamepad;
 
-namespace devices {
+namespace devices
+{
 
 	struct JoystickManager {
 		SDL_Gamepad* gamepad = nullptr;

@@ -1,7 +1,8 @@
 #pragma once
 #include "simulation/guidance/public/data/types.hpp"
 
-namespace guidance {
+namespace guidance
+{
 
 	struct TrackingGuidance {
 		Trajectory trajectory;

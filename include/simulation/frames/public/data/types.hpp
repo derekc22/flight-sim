@@ -1,10 +1,20 @@
 #pragma once
-#include <optional>
 #include "simulation/dynamics/public/data/types.hpp"
 
-namespace frames {
+#include <optional>
 
-	enum class FrameID { ECEFFrame, NEDFrameECEF, FRDFrameECEF, FRDFrameNED, CGFrameFRD, STABFrameFRD, WINDFrameSTAB };
+namespace frames
+{
+
+	enum class FrameID {
+		ECEFFrame,
+		NEDFrameECEF,
+		FRDFrameECEF,
+		FRDFrameNED,
+		CGFrameFRD,
+		STABFrameFRD,
+		WINDFrameSTAB
+	};
 
 	struct FrameView {
 		const dynamics::HomogeneousTransformationMatrix* H;

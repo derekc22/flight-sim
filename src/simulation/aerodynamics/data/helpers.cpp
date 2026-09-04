@@ -1,11 +1,14 @@
-#include <Eigen/Core>
 #include "simulation/aerodynamics/public/data/helpers.hpp"
+
 #include "simulation/util/public/trig.hpp"
 
-namespace aerodynamics {
+#include <Eigen/Core>
+
+namespace aerodynamics
+{
 
 	dynamics::OrientationMatrix CBS(
-	    const AngleOfAttack& alpha)
+		const AngleOfAttack& alpha)
 	{
 		Eigen::Matrix3d CBS;
 		double a = alpha.data;
@@ -14,7 +17,7 @@ namespace aerodynamics {
 	};
 
 	dynamics::OrientationMatrix CSW(
-	    const SideslipAngle& beta)
+		const SideslipAngle& beta)
 	{
 		Eigen::Matrix3d CSW;
 		double b = beta.data;

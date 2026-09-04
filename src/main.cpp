@@ -1,12 +1,13 @@
-#include <string>
-#include <spdlog/spdlog.h>
+#include "core/json/runner/public/parser.hpp"
 #include "simulation/runner/public/data/types.hpp"
 #include "simulation/runner/public/runner.hpp"
-#include "core/json/runner/public/parser.hpp"
+
+#include <spdlog/spdlog.h>
+#include <string>
 
 int main(
-    int argc,
-    char* argv[])
+	int argc,
+	char* argv[])
 {
 	int nargin = 8;
 	if (argc != nargin) {
@@ -27,11 +28,11 @@ int main(
 
 	// create cli options
 	runner::CLIOptions cli_options{
-	    .aircraft_id = aircraft_id,
-	    .flags = cli_flags,
-	    .log_dir_path = log_dir_path,
-	    .data_dir_path = data_dir_path,
-	    .report_dir_path = report_dir_path,
+		.aircraft_id = aircraft_id,
+		.flags = cli_flags,
+		.log_dir_path = log_dir_path,
+		.data_dir_path = data_dir_path,
+		.report_dir_path = report_dir_path,
 	};
 
 	// create json options

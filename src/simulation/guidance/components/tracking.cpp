@@ -1,8 +1,11 @@
-#include <spdlog/spdlog.h>
-#include "simulation/guidance/private/data/helpers.hpp"
 #include "simulation/guidance/public/components/tracking.hpp"
 
-namespace guidance {
+#include "simulation/guidance/private/data/helpers.hpp"
+
+#include <spdlog/spdlog.h>
+
+namespace guidance
+{
 
 	GuidanceSetpoint TrackingGuidance::step()
 	{

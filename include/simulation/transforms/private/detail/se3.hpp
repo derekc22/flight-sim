@@ -1,8 +1,9 @@
 #pragma once
-#include <vector>
 #include <Eigen/Dense>
+#include <vector>
 
-namespace transforms {
+namespace transforms
+{
 
 	Eigen::Matrix4d make_HR_translate_first(const Eigen::Matrix3d& R, const Eigen::Vector3d& d);
 	Eigen::Matrix4d make_HR_rotate_first(const Eigen::Matrix3d& R, const Eigen::Vector3d& d);

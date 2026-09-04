@@ -1,9 +1,11 @@
 #pragma once
-#include <vector>
-#include <Eigen/Dense>
 #include "simulation/transforms/public/data/types.hpp"
 
-namespace transforms {
+#include <Eigen/Dense>
+#include <vector>
+
+namespace transforms
+{
 
 	/** @deprecated */
 	// Eigen::Quaterniond quat_mul(const Eigen::Quaterniond& q1, const Eigen::Quaterniond& q2);

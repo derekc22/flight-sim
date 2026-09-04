@@ -1,11 +1,13 @@
 #pragma once
-#include <optional>
 #include "core/io/analysis/public/manager.hpp"
 #include "core/io/data/public/manager.hpp"
 #include "core/io/rerun/public/manager.hpp"
 #include "simulation/runner/public/data/types.hpp"
 
-namespace runner {
+#include <optional>
+
+namespace runner
+{
 
 	struct RecordingWrapper {
 		std::optional<io::DataManager> data_manager;

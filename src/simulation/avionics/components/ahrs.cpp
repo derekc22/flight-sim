@@ -1,16 +1,18 @@
-#include "simulation/constants/public/scalars.hpp"
 #include "simulation/avionics/public/components/ahrs.hpp"
+
+#include "simulation/constants/public/scalars.hpp"
 #include "simulation/geography/public/detail/gravity.hpp"
 #include "simulation/integrators/public/detail/euler.hpp"
 #include "simulation/util/public/math.hpp"
 
-namespace avionics {
+namespace avionics
+{
 
 	OrientationMeasurement AttitudeHeadingReferenceSystem::compute(
-	    const OrientationMeasurement& prev_qIB,
-	    const sensors::AngularVelocityMeasurement& wB_BI,
-	    const sensors::TranslationalAccelerationMeasurement& fB,
-	    double dt)
+		const OrientationMeasurement& prev_qIB,
+		const sensors::AngularVelocityMeasurement& wB_BI,
+		const sensors::TranslationalAccelerationMeasurement& fB,
+		double dt)
 	{
 		// Mahony filter
 		dynamics::OrientationQuaternion qIB_pred = integrators::quat_kin(prev_qIB, wB_BI, dt);

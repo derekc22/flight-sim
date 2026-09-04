@@ -1,14 +1,17 @@
-#include <cmath>
-#include <thread>
-#include "simulation/constants/public/scalars.hpp"
 #include "simulation/runner/public/scheduling/scheduler.hpp"
 
-namespace runner {
+#include "simulation/constants/public/scalars.hpp"
+
+#include <cmath>
+#include <thread>
+
+namespace runner
+{
 
 	Scheduler::Scheduler(
-	    const ModuleRates& module_rates,
-	    int tf)
-	    : module_rates(module_rates)
+		const ModuleRates& module_rates,
+		int tf)
+		: module_rates(module_rates)
 	{
 		// fraction of steps that will call guidance
 		double frac_guidance_steps = module_rates.guidance_hz / constants::hz;
@@ -17,7 +20,7 @@ namespace runner {
 	}
 
 	void Scheduler::step(
-	    const SchedulerInput& input)
+		const SchedulerInput& input)
 	{
 		sensor_tick += module_rates.sensor_hz;
 		++sensor_elapsed_ticks;
@@ -38,7 +41,7 @@ namespace runner {
 
 		// step timer by dt
 		next += std::chrono::duration_cast<std::chrono::steady_clock::duration>(
-		    std::chrono::duration<double>(constants::dt));
+			std::chrono::duration<double>(constants::dt));
 
 		// sleep to maintain frequency dictated by dt
 		if (!input.fast) {

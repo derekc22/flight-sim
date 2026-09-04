@@ -1,13 +1,15 @@
 #pragma once
-#include <Eigen/Dense>
-#include <string>
 #include "simulation/actuators/public/data/types.hpp"
 #include "simulation/atmospheric/public/data/types.hpp"
 #include "simulation/constants/public/linalg.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/structural/public/data/types.hpp"
 
-namespace aerodynamics {
+#include <Eigen/Dense>
+#include <string>
+
+namespace aerodynamics
+{
 
 	struct DynamicDerivatives {
 		double CL_qhat = 0.0;

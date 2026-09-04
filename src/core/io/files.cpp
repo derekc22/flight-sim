@@ -1,18 +1,20 @@
+#include "core/io/public/files.hpp"
+
+#include <Eigen/Dense>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <spdlog/spdlog.h>
 #include <stdexcept>
 #include <string>
-#include <Eigen/Dense>
-#include <spdlog/spdlog.h>
-#include "core/io/public/files.hpp"
 
-namespace io {
+namespace io
+{
 
 	void write_txt(
-	    const std::string& text,
-	    const std::string& dir_path,
-	    const std::string& fname)
+		const std::string& text,
+		const std::string& dir_path,
+		const std::string& fname)
 	{
 		const auto file_path = std::filesystem::path(dir_path) / (fname + ".txt");
 		std::ofstream file_txt(file_path);
@@ -28,9 +30,9 @@ namespace io {
 	}
 
 	void write_csv(
-	    const Eigen::MatrixXd& data,
-	    const std::string& dir_path,
-	    const std::string& fname)
+		const Eigen::MatrixXd& data,
+		const std::string& dir_path,
+		const std::string& fname)
 	{
 		const auto file_path = std::filesystem::path(dir_path) / (fname + ".csv");
 		std::ofstream file_csv(file_path);

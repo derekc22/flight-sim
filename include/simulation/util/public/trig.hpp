@@ -1,6 +1,7 @@
 #pragma once
 
-namespace util {
+namespace util
+{
 
 	double deg_to_rad(double deg);
 	double rad_to_deg(double rad);

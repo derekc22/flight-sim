@@ -1,10 +1,11 @@
 #pragma once
-#include "simulation/constants/public/linalg.hpp"
-#include "simulation/constants/public/dimensions.hpp"
 #include "simulation/allocator/public/data/types.hpp"
+#include "simulation/constants/public/dimensions.hpp"
+#include "simulation/constants/public/linalg.hpp"
 #include "simulation/qp/public/solver.hpp"
 
-namespace allocator {
+namespace allocator
+{
 
 	struct AllocatorManager {
 		constants::MatrixX_T<double, constants::virtual_input_dim, constants::virtual_input_dim> Q;

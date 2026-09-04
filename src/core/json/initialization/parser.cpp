@@ -1,14 +1,17 @@
-#include <nlohmann/json.hpp>
+#include "core/json/initialization/public/parser.hpp"
+
 #include "core/json/initialization/private/parsing.hpp"
 #include "core/json/initialization/private/validation.hpp"
-#include "core/json/initialization/public/parser.hpp"
 #include "core/json/public/files.hpp"
 #include "simulation/vehicles/public/data/types.hpp"
 
-namespace json {
+#include <nlohmann/json.hpp>
+
+namespace json
+{
 
 	vehicles::StepOptions parse_initialization_config(
-	    bool trim_flag)
+		bool trim_flag)
 	{
 		const auto config_path = resolve_run_config_entry_path("initialization_config");
 		const auto config = read_json_file(config_path);

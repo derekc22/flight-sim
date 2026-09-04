@@ -1,19 +1,22 @@
-#include <algorithm>
-#include <limits>
-#include <stdexcept>
-#include <spdlog/spdlog.h>
-#include "simulation/constants/public/linalg.hpp"
-#include "simulation/constants/public/dimensions.hpp"
-#include "simulation/actuators/public/data/helpers.hpp"
 #include "simulation/qp/public/solver.hpp"
+
+#include "simulation/actuators/public/data/helpers.hpp"
+#include "simulation/constants/public/dimensions.hpp"
+#include "simulation/constants/public/linalg.hpp"
 #include "simulation/trim/private/data/helpers.hpp"
 #include "simulation/trim/private/detail/residual.hpp"
 #include "simulation/trim/private/detail/solver.hpp"
 
-namespace trim {
+#include <algorithm>
+#include <limits>
+#include <spdlog/spdlog.h>
+#include <stdexcept>
+
+namespace trim
+{
 
 	void validate_trim_solve_options(
-	    const TrimSolveOptions& options)
+		const TrimSolveOptions& options)
 	{
 		if (options.residual_tolerance < 0.0)
 			throw std::invalid_argument("trim::validate_trim_solve_options: residual_tolerance must be non-negative");
@@ -38,22 +41,22 @@ namespace trim {
 	}
 
 	TrimSolution solve_trim(
-	    const TrimProblem& problem,
-	    const autodiff::AutoDiffModel& model,
-	    TrimSolveOptions options)
+		const TrimProblem& problem,
+		const autodiff::AutoDiffModel& model,
+		TrimSolveOptions options)
 	{
 		validate_trim_solve_options(options);
 
 		operating::StateInputVector_T<double> xu =
-		    operating::unpack_state_input_T<double>(problem.initial_guess.state, problem.initial_guess.input);
+			operating::unpack_state_input_T<double>(problem.initial_guess.state, problem.initial_guess.input);
 
 		const actuators::ActuatorLimitsVector actuator_limits =
-		    actuators::unpack_actuator_limits(model.actuator_limits);
+			actuators::unpack_actuator_limits(model.actuator_limits);
 		xu.tail<constants::input_dim>() =
-		    xu.tail<constants::input_dim>().cwiseMax(actuator_limits.col(0)).cwiseMin(actuator_limits.col(1));
+			xu.tail<constants::input_dim>().cwiseMax(actuator_limits.col(0)).cwiseMin(actuator_limits.col(1));
 
 		TrimResidualVector_T<double> residual =
-		    compute_trim_residual_vector_T<double>(xu, model, problem.target, problem.conditions);
+			compute_trim_residual_vector_T<double>(xu, model, problem.target, problem.conditions);
 
 		const TrimResidualVector_T<double> weights = fetch_trim_residual_weights(options);
 		TrimResidualVector_T<double> weighted_residual = weights.cwiseProduct(residual);
@@ -72,18 +75,18 @@ namespace trim {
 			}
 
 			const TrimResidualJacobian jac_raw =
-			    compute_trim_residual_jac(xu, model, problem.target, problem.conditions);
+				compute_trim_residual_jac(xu, model, problem.target, problem.conditions);
 			const TrimResidualJacobian jac = weights.asDiagonal() * jac_raw;
 
 			const constants::MatrixX_T<double, constants::state_input_dim, constants::state_input_dim> hess =
-			    jac.transpose() * jac + damping * constants::I_T<double, constants::state_input_dim>;
+				jac.transpose() * jac + damping * constants::I_T<double, constants::state_input_dim>;
 
 			const operating::StateInputVector_T<double> grad = jac.transpose() * weighted_residual;
 
 			Eigen::VectorXd lower =
-			    Eigen::VectorXd::Constant(constants::state_input_dim, -std::numeric_limits<double>::infinity());
+				Eigen::VectorXd::Constant(constants::state_input_dim, -std::numeric_limits<double>::infinity());
 			Eigen::VectorXd upper =
-			    Eigen::VectorXd::Constant(constants::state_input_dim, std::numeric_limits<double>::infinity());
+				Eigen::VectorXd::Constant(constants::state_input_dim, std::numeric_limits<double>::infinity());
 			lower.tail<constants::input_dim>() = actuator_limits.col(0) - xu.tail<constants::input_dim>();
 			upper.tail<constants::input_dim>() = actuator_limits.col(1) - xu.tail<constants::input_dim>();
 
@@ -93,7 +96,7 @@ namespace trim {
 
 			if (step_solution.status != qp::Status::Solved || !step_solution.x.allFinite()) {
 				spdlog::error(
-				    "trim::solve_trim QP solve failed with status {}", static_cast<int>(step_solution.status));
+					"trim::solve_trim QP solve failed with status {}", static_cast<int>(step_solution.status));
 				break;
 			}
 
@@ -101,12 +104,12 @@ namespace trim {
 
 			if (step.norm() <= options.step_tolerance) {
 				return build_trim_solution(xu,
-				    residual,
-				    weighted_residual,
-				    model,
-				    problem.conditions,
-				    weighted_residual_norm_inf <= options.residual_tolerance,
-				    iteration);
+					residual,
+					weighted_residual,
+					model,
+					problem.conditions,
+					weighted_residual_norm_inf <= options.residual_tolerance,
+					iteration);
 			}
 
 			bool accepted = false;
@@ -116,7 +119,7 @@ namespace trim {
 			while (step_scale >= options.min_step_scale) {
 				const operating::StateInputVector_T<double> xu_trial = xu + step_scale * step;
 				const TrimResidualVector_T<double> residual_trial =
-				    compute_trim_residual_vector_T<double>(xu_trial, model, problem.target, problem.conditions);
+					compute_trim_residual_vector_T<double>(xu_trial, model, problem.target, problem.conditions);
 				const double weighted_residual_trial_norm_2 = weights.cwiseProduct(residual_trial).norm();
 
 				if (weighted_residual_trial_norm_2 < weighted_residual_norm_2) {
@@ -136,7 +139,7 @@ namespace trim {
 		}
 
 		return build_trim_solution(
-		    xu, residual, weighted_residual, model, problem.conditions, false, iterations_completed);
+			xu, residual, weighted_residual, model, problem.conditions, false, iterations_completed);
 	}
 
 } // namespace trim

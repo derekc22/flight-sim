@@ -1,7 +1,9 @@
-#include "simulation/guidance/private/data/helpers.hpp"
 #include "simulation/guidance/public/components/regulation.hpp"
 
-namespace guidance {
+#include "simulation/guidance/private/data/helpers.hpp"
+
+namespace guidance
+{
 
 	GuidanceSetpoint RegulationGuidance::step()
 	{

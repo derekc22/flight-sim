@@ -1,27 +1,30 @@
-#include <tuple>
 #include "simulation/frames/private/detail/kinematics.hpp"
+
 #include "simulation/constants/public/linalg.hpp"
 #include "simulation/transforms/public/detail/se3.hpp"
 
-namespace frames {
+#include <tuple>
+
+namespace frames
+{
 
 	Eigen::Matrix3d CRF(
-	    const Frame& F,
-	    const Frame& R)
+		const Frame& F,
+		const Frame& R)
 	{
 		return transforms::C_from_H(HRF(F, R));
 	}
 
 	Eigen::Vector3d pRF(
-	    const Frame& F,
-	    const Frame& R)
+		const Frame& F,
+		const Frame& R)
 	{
 		return transforms::p_from_H(HRF(F, R));
 	}
 
 	Eigen::Matrix4d HRF(
-	    const Frame& F,
-	    const Frame& R)
+		const Frame& F,
+		const Frame& R)
 	{
 		Eigen::Matrix4d HEF = constants::HI;
 		const Frame* pF = &F;
@@ -41,7 +44,7 @@ namespace frames {
 	}
 
 	std::tuple<dynamics::TranslationalVelocity, dynamics::AngularVelocity> vel_from_E(
-	    const Frame& F)
+		const Frame& F)
 	{
 		const Frame* pF = &F;
 

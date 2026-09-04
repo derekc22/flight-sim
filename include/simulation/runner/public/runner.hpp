@@ -13,7 +13,8 @@
 #include "simulation/runner/public/wrappers/trim.hpp"
 #include "simulation/vehicles/public/aircraft.hpp"
 
-namespace runner {
+namespace runner
+{
 
 	struct Runner {
 		CLIOptions cli_options;

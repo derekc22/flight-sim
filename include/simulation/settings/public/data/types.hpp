@@ -2,7 +2,8 @@
 #include "simulation/actuators/public/data/types.hpp"
 #include "simulation/avionics/public/data/types.hpp"
 
-namespace settings {
+namespace settings
+{
 
 	struct Settings {
 

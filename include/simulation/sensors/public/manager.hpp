@@ -1,9 +1,11 @@
 #pragma once
-#include <optional>
 #include "simulation/sensors/public/components/collection.hpp"
 #include "simulation/sensors/public/data/types.hpp"
 
-namespace sensors {
+#include <optional>
+
+namespace sensors
+{
 
 	struct SensorManager {
 		Sensors sensors;

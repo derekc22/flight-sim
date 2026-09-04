@@ -1,12 +1,14 @@
 #pragma once
+#include "simulation/constants/public/dimensions.hpp"
+#include "simulation/constants/public/linalg.hpp"
+
 #include <Eigen/Dense>
 #include <optional>
 #include <string>
 #include <vector>
-#include "simulation/constants/public/linalg.hpp"
-#include "simulation/constants/public/dimensions.hpp"
 
-namespace actuators {
+namespace actuators
+{
 
 	template <typename T> using ActuatorInputsVector_T = constants::MatrixX_T<T, constants::input_dim, 1>;
 

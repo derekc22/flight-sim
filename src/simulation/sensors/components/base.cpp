@@ -1,26 +1,29 @@
-#include <optional>
-#include <random>
-#include "simulation/constants/public/scalars.hpp"
-#include "simulation/constants/public/linalg.hpp"
 #include "simulation/sensors/public/components/base.hpp"
+
+#include "simulation/constants/public/linalg.hpp"
+#include "simulation/constants/public/scalars.hpp"
 #include "simulation/util/public/filters.hpp"
 
-namespace sensors {
+#include <optional>
+#include <random>
+
+namespace sensors
+{
 
 	Sensor::Sensor(
-	    double mean,
-	    double stddev,
-	    double bias,
-	    const Eigen::Vector3d& bias3d,
-	    double tau)
-	    : mean(mean), stddev(stddev), bias(bias), bias_3d(bias3d), dist(mean, stddev), tau(tau)
+		double mean,
+		double stddev,
+		double bias,
+		const Eigen::Vector3d& bias3d,
+		double tau)
+		: mean(mean), stddev(stddev), bias(bias), bias_3d(bias3d), dist(mean, stddev), tau(tau)
 	{
 	}
 
 	double Sensor::step(
-	    double meas,
-	    std::optional<double>& lag_state,
-	    double dt)
+		double meas,
+		std::optional<double>& lag_state,
+		double dt)
 	{
 		double prev_meas = lag_state ? lag_state.value() : meas;
 		double meas_lagged = util::first_order_lag(meas, prev_meas, tau, dt); // apply EMA
@@ -32,9 +35,9 @@ namespace sensors {
 	}
 
 	Eigen::Vector3d Sensor::step(
-	    const Eigen::Vector3d& meas,
-	    std::optional<Eigen::Vector3d>& lag_state,
-	    double dt)
+		const Eigen::Vector3d& meas,
+		std::optional<Eigen::Vector3d>& lag_state,
+		double dt)
 	{
 		Eigen::Vector3d prev_meas = lag_state ? lag_state.value() : meas;
 		Eigen::Vector3d meas_lagged = util::first_order_lag(meas, prev_meas, tau, dt); // apply EMA
@@ -46,13 +49,13 @@ namespace sensors {
 	}
 
 	Eigen::Quaterniond Sensor::step(
-	    const Eigen::Quaterniond& meas,
-	    std::optional<Eigen::Quaterniond>& lag_state,
-	    double dt)
+		const Eigen::Quaterniond& meas,
+		std::optional<Eigen::Quaterniond>& lag_state,
+		double dt)
 	{
 		Eigen::Quaterniond prev_meas = lag_state ? lag_state.value() : meas;
 		Eigen::Quaterniond meas_lagged =
-		    util::first_order_lag(meas, prev_meas, tau, dt); // apply EMA via quaternion SLERP
+			util::first_order_lag(meas, prev_meas, tau, dt); // apply EMA via quaternion SLERP
 		lag_state = meas_lagged;
 
 		double bias_angle = bias_3d.norm();

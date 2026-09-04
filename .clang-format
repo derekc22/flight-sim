@@ -2,14 +2,13 @@ BasedOnStyle: LLVM
 
 IndentWidth: 4
 TabWidth: 4
-UseTab: ForIndentation
+UseTab: Always
 
 NamespaceIndentation: All
 PointerAlignment: Left
 ReferenceAlignment: Left
 
-BreakBeforeBraces: Custom
-BraceWrapping: {AfterFunction: true, AfterClass: false, AfterControlStatement: Never, AfterEnum: false, AfterNamespace: false, AfterStruct: false, AfterUnion: false, BeforeCatch: false, BeforeElse: false, BeforeLambdaBody: false, BeforeWhile: false}
+BreakBeforeBraces: Linux
 ColumnLimit: 120
 AlignAfterOpenBracket: DontAlign
 AllowAllParametersOfDeclarationOnNextLine: false
@@ -28,10 +27,28 @@ FixNamespaceComments: true
 IndentCaseLabels: true
 SpaceBeforeParens: ControlStatements
 Cpp11BracedListStyle: true
+BreakAfterOpenBracketBracedList: true
+BreakBeforeCloseBracketBracedList: true
 KeepEmptyLinesAtEOF: false
 AllowShortFunctionsOnASingleLine: Empty
+AllowShortEnumsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortLambdasOnASingleLine: Empty
+EmptyLineBeforeAccessModifier: LogicalBlock
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeCpp11BracedList: false
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+SpacesInAngles: false
+SpaceAfterCStyleCast: false
+AlwaysBreakAfterReturnType: None
+AlwaysBreakAfterDefinitionReturnType: None
+BreakTemplateDeclarations: MultiLine
+LambdaBodyIndentation: Signature
 BreakBeforeBinaryOperators: None
 AlignOperands: false
 
-IncludeBlocks: Preserve
-SortIncludes: false
+IncludeBlocks: Regroup
+SortIncludes: CaseSensitive

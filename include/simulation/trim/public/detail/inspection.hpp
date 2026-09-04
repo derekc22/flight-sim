@@ -3,11 +3,13 @@
 #include "simulation/autodiff/public/data/types.hpp"
 #include "simulation/trim/public/data/types.hpp"
 
-namespace vehicles {
+namespace vehicles
+{
 	struct Aircraft;
 } // namespace vehicles
 
-namespace trim {
+namespace trim
+{
 
 	TrimSolution
 	inspect_trim(vehicles::Aircraft& aircraft, const autodiff::AutoDiffModel& model, const atmospheric::Wind& wind);

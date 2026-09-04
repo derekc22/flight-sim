@@ -1,13 +1,15 @@
-#include <cmath>
 #include "simulation/util/public/filters.hpp"
 
-namespace util {
+#include <cmath>
+
+namespace util
+{
 
 	double first_order_lag(
-	    double val,
-	    double prev_val,
-	    double tau,
-	    double dt)
+		double val,
+		double prev_val,
+		double tau,
+		double dt)
 	{
 		if (tau <= 0.0) {
 			return val;
@@ -18,10 +20,10 @@ namespace util {
 	}
 
 	Eigen::Vector3d first_order_lag(
-	    const Eigen::Vector3d& val,
-	    const Eigen::Vector3d& prev_val,
-	    double tau,
-	    double dt)
+		const Eigen::Vector3d& val,
+		const Eigen::Vector3d& prev_val,
+		double tau,
+		double dt)
 	{
 		if (tau <= 0.0) {
 			return val;
@@ -32,10 +34,10 @@ namespace util {
 	}
 
 	Eigen::Quaterniond first_order_lag(
-	    const Eigen::Quaterniond& val,
-	    const Eigen::Quaterniond& prev_val,
-	    double tau,
-	    double dt)
+		const Eigen::Quaterniond& val,
+		const Eigen::Quaterniond& prev_val,
+		double tau,
+		double dt)
 	{
 		if (tau <= 0.0) {
 			return val;

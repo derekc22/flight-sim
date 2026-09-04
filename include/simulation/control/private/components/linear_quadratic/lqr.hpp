@@ -1,9 +1,11 @@
 #pragma once
-#include <Eigen/Dense>
 #include "simulation/control/private/policies/linear_quadratic/policy.hpp"
 #include "simulation/control/public/data/types.hpp"
 
-namespace control {
+#include <Eigen/Dense>
+
+namespace control
+{
 
 	struct LinearQuadraticRegulator {
 		LinearQuadraticPolicy policy;

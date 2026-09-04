@@ -1,8 +1,10 @@
 #pragma once
-#include <opencv2/core/mat.hpp>
 #include "core/io/data/public/data/types.hpp"
 
-namespace io {
+#include <opencv2/core/mat.hpp>
+
+namespace io
+{
 
 	struct RerunManagerInput {
 		int t;

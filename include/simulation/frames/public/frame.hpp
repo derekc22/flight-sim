@@ -1,9 +1,11 @@
 #pragma once
-#include <unordered_set>
 #include "simulation/constants/public/linalg.hpp"
 #include "simulation/frames/public/data/types.hpp"
 
-namespace frames {
+#include <unordered_set>
+
+namespace frames
+{
 
 	struct Frame {
 		FrameID id;

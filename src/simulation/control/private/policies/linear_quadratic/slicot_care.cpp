@@ -1,20 +1,23 @@
-#include <stdexcept>
-#include <string>
 #include "simulation/control/private/policies/linear_quadratic/slicot_care.hpp"
+
 #include "simulation/control/private/policies/linear_quadratic/slicot_care_wrapper.h"
 #include "simulation/util/public/validation.hpp"
 
-namespace control {
+#include <stdexcept>
+#include <string>
+
+namespace control
+{
 
 	Eigen::MatrixXd symmetrize(
-	    const Eigen::Ref<const Eigen::MatrixXd>& M)
+		const Eigen::Ref<const Eigen::MatrixXd>& M)
 	{
 		return 0.5 * (M + M.transpose());
 	}
 
 	Eigen::LDLT<Eigen::MatrixXd> factorize_symmetric(
-	    const Eigen::Ref<const Eigen::MatrixXd>& M,
-	    const char* name)
+		const Eigen::Ref<const Eigen::MatrixXd>& M,
+		const char* name)
 	{
 		Eigen::LDLT<Eigen::MatrixXd> ldlt(symmetrize(M));
 		if (ldlt.info() != Eigen::Success) {
@@ -24,18 +27,18 @@ namespace control {
 	}
 
 	Eigen::MatrixXd care_residual(
-	    const Eigen::Ref<const Eigen::MatrixXd>& A,
-	    const Eigen::Ref<const Eigen::MatrixXd>& G,
-	    const Eigen::Ref<const Eigen::MatrixXd>& Q,
-	    const Eigen::Ref<const Eigen::MatrixXd>& P)
+		const Eigen::Ref<const Eigen::MatrixXd>& A,
+		const Eigen::Ref<const Eigen::MatrixXd>& G,
+		const Eigen::Ref<const Eigen::MatrixXd>& Q,
+		const Eigen::Ref<const Eigen::MatrixXd>& P)
 	{
 		return A.transpose() * P + P * A - P * G * P + Q;
 	}
 
 	CareSolution solve_care_sb02md(
-	    const Eigen::Ref<const Eigen::MatrixXd>& A,
-	    const Eigen::Ref<const Eigen::MatrixXd>& G,
-	    const Eigen::Ref<const Eigen::MatrixXd>& Q)
+		const Eigen::Ref<const Eigen::MatrixXd>& A,
+		const Eigen::Ref<const Eigen::MatrixXd>& G,
+		const Eigen::Ref<const Eigen::MatrixXd>& Q)
 	{
 		util::validate_square(A, "control::solve_care_sb02md", "A");
 		util::validate_square(G, "control::solve_care_sb02md", "G");
@@ -60,10 +63,10 @@ namespace control {
 	}
 
 	CareSolution solve_care(
-	    const Eigen::Ref<const Eigen::MatrixXd>& A,
-	    const Eigen::Ref<const Eigen::MatrixXd>& B,
-	    const Eigen::Ref<const Eigen::MatrixXd>& Q,
-	    const Eigen::Ref<const Eigen::MatrixXd>& R)
+		const Eigen::Ref<const Eigen::MatrixXd>& A,
+		const Eigen::Ref<const Eigen::MatrixXd>& B,
+		const Eigen::Ref<const Eigen::MatrixXd>& Q,
+		const Eigen::Ref<const Eigen::MatrixXd>& R)
 	{
 		util::validate_square(A, "control::solve_care", "A");
 		util::validate_square(Q, "control::solve_care", "Q");
@@ -80,9 +83,9 @@ namespace control {
 	}
 
 	Eigen::MatrixXd lqr_gain(
-	    const Eigen::Ref<const Eigen::MatrixXd>& B,
-	    const Eigen::Ref<const Eigen::MatrixXd>& R,
-	    const Eigen::Ref<const Eigen::MatrixXd>& P)
+		const Eigen::Ref<const Eigen::MatrixXd>& B,
+		const Eigen::Ref<const Eigen::MatrixXd>& R,
+		const Eigen::Ref<const Eigen::MatrixXd>& P)
 	{
 		util::validate_square(R, "control::lqr_gain", "R");
 		util::validate_square(P, "control::lqr_gain", "P");

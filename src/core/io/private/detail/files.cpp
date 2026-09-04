@@ -1,21 +1,23 @@
+#include "core/io/private/detail/files.hpp"
+
 #include <ctime>
 #include <filesystem>
 #include <fstream>
 #include <string>
 #include <vector>
-#include "core/io/private/detail/files.hpp"
 
-namespace io {
+namespace io
+{
 
 	void create_dir(
-	    const std::string& dir_path)
+		const std::string& dir_path)
 	{
 		std::filesystem::create_directories(dir_path);
 	}
 
 	void save_vector_to_file(
-	    const std::vector<int>& data,
-	    const std::string& fname)
+		const std::vector<int>& data,
+		const std::string& fname)
 	{
 		std::string file_path = "results/data/" + fname + ".csv";
 		std::ofstream file_v(file_path);

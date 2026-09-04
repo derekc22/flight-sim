@@ -1,7 +1,8 @@
 #pragma once
 #include "simulation/propulsion/public/data/types.hpp"
 
-namespace propulsion {
+namespace propulsion
+{
 
 	struct PropulsionManager {
 		PropulsionState prev_state;

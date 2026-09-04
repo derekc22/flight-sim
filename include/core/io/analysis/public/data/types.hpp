@@ -1,12 +1,14 @@
 #pragma once
-#include <string>
 #include "analysis/eigenanalysis/public.hpp"
 #include "simulation/constants/public/dimensions.hpp"
 #include "simulation/linearization/public/data/types.hpp"
 #include "simulation/runner/public/data/types.hpp"
 #include "simulation/trim/public/data/types.hpp"
 
-namespace io {
+#include <string>
+
+namespace io
+{
 
 	struct MATLABContext {
 		std::string aircraft_id;
