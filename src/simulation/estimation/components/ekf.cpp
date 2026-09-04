@@ -1,4 +1,4 @@
-#include "simulation/estimation/public/components/extended_kalman.hpp"
+#include "simulation/estimation/public/components/ekf.hpp"
 
 #include "simulation/actuators/public/data/helpers.hpp"
 #include "simulation/autodiff/public/detail/evaluation.hpp"
@@ -15,14 +15,14 @@
 namespace estimation
 {
 
-	ExtendedKalmanEstimator::ExtendedKalmanEstimator(
+	ExtendedKalmanFilter::ExtendedKalmanFilter(
 		const ExtendedKalmanFilterParameters& params)
 		: params(params)
 	{
 	}
 
-	dynamics::RigidBodyState ExtendedKalmanEstimator::step(
-		const ExtendedKalmanEstimatorInput& input,
+	dynamics::RigidBodyState ExtendedKalmanFilter::step(
+		const ExtendedKalmanFilterInput& input,
 		double dt)
 	{
 		dynamics::StateVector_T<double> yt = dynamics::unpack_state(input.Yt);
@@ -42,8 +42,8 @@ namespace estimation
 		return Zt;
 	}
 
-	std::tuple<KalmanState, linearization::OutputJacobian> ExtendedKalmanEstimator::predict(
-		const ExtendedKalmanEstimatorInput& input,
+	std::tuple<KalmanState, linearization::OutputJacobian> ExtendedKalmanFilter::predict(
+		const ExtendedKalmanFilterInput& input,
 		const actuators::ActuatorInputsVector_T<double>& ut_1,
 		double dt)
 	{
@@ -68,20 +68,21 @@ namespace estimation
 		return {{.zt = zt_bar, .Pt = Pt_bar}, lin_sol.C};
 	}
 
-	KalmanState ExtendedKalmanEstimator::correct(
+	KalmanState ExtendedKalmanFilter::correct(
 		const dynamics::StateVector_T<double>& yt,
-		const linearization::OutputJacobian& output_jacobian)
+		const linearization::OutputJacobian& C)
 	{
 		KalmanState pred = state.value();
 
 		// C = I -> Ht = I
-		linearization::OutputJacobian Ht = output_jacobian;
+		linearization::OutputJacobian Ht = C;
 
-		Eigen::MatrixXd Kt =
-			pred.Pt * Ht.transpose() * (Ht * pred.Pt * Ht.transpose() + params.Q).inverse(); // Kalman gain
+		// Kalman gain
+		Eigen::MatrixXd Kt = pred.Pt * Ht.transpose() * (Ht * pred.Pt * Ht.transpose() + params.Q).inverse();
 
+		// Innovation
 		// C @ zt_bar = I @ zt_bar -> h(zt_bar) = zt_bar
-		dynamics::StateVector_T<double> Lt = yt - pred.zt; // Innovation
+		dynamics::StateVector_T<double> Lt = yt - pred.zt;
 
 		dynamics::StateVector_T<double> zt = pred.zt + Kt * Lt;
 

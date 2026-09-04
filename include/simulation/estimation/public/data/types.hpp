@@ -18,14 +18,14 @@ namespace estimation
 		ExtendedKalmanFilter
 	};
 
-	struct LinearKalmanEstimatorInput {
+	struct LinearKalmanFilterInput {
 		dynamics::RigidBodyState Yt;
 		operating::OperatingPoint_T<double> operating_point;
 		linearization::LocalLinearization lin_sol;
 		actuators::ActuatorInputs_T<double> u_actual_t_1;
 	};
 
-	struct ExtendedKalmanEstimatorInput {
+	struct ExtendedKalmanFilterInput {
 		dynamics::RigidBodyState Yt;
 		actuators::ActuatorInputs_T<double> u_actual_t_1;
 		const autodiff::AutoDiffModel& model;

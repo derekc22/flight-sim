@@ -1,7 +1,7 @@
 #pragma once
 #include "simulation/control/public/data/types.hpp"
-#include "simulation/estimation/public/components/extended_kalman.hpp"
-#include "simulation/estimation/public/components/linear_kalman.hpp"
+#include "simulation/estimation/public/components/ekf.hpp"
+#include "simulation/estimation/public/components/lkf.hpp"
 #include "simulation/estimation/public/data/types.hpp"
 
 #include <optional>
@@ -10,8 +10,8 @@ namespace estimation
 {
 
 	struct EstimationManager {
-		std::optional<LinearKalmanEstimator> linear_kalman_estimator;
-		std::optional<ExtendedKalmanEstimator> extended_kalman_estimator;
+		std::optional<LinearKalmanFilter> linear_kalman_filter;
+		std::optional<ExtendedKalmanFilter> extended_kalman_filter;
 
 		EstimationManagerOutput step(const EstimationManagerInput& input);
 	};

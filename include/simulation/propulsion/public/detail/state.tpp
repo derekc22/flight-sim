@@ -43,30 +43,30 @@ namespace propulsion
 
 	template <typename T>
 	PropellerOmegaStateSet_T<T> compute_propeller_omega_state_set_T(
-		const actuators::PropulsorActuators& propulsors,
-		const PropulsionState& prev_state,
+		const actuators::PropulsorActuators& propulsor_actuators,
+		const PropulsionState& propulsion_state_t_1,
 		const actuators::PropulsorActuatorInputs_T<T>& u,
 		const atmospheric::AirDensity& rho,
 		T dt,
 		bool steady_state)
 	{
 		return {
-			.front_propulsor = compute_propeller_omega_state_T<T>(propulsors.front_propulsor,
+			.front_propulsor = compute_propeller_omega_state_T<T>(propulsor_actuators.front_propulsor,
 				u.front_propulsor_cmd,
 				rho,
-				prev_state.front_propulsor_omega,
+				propulsion_state_t_1.front_propulsor_omega,
 				dt,
 				steady_state),
-			.left_propulsor = compute_propeller_omega_state_T<T>(propulsors.left_propulsor,
+			.left_propulsor = compute_propeller_omega_state_T<T>(propulsor_actuators.left_propulsor,
 				u.left_propulsor_cmd,
 				rho,
-				prev_state.left_propulsor_omega,
+				propulsion_state_t_1.left_propulsor_omega,
 				dt,
 				steady_state),
-			.right_propulsor = compute_propeller_omega_state_T<T>(propulsors.right_propulsor,
+			.right_propulsor = compute_propeller_omega_state_T<T>(propulsor_actuators.right_propulsor,
 				u.right_propulsor_cmd,
 				rho,
-				prev_state.right_propulsor_omega,
+				propulsion_state_t_1.right_propulsor_omega,
 				dt,
 				steady_state)
 		};

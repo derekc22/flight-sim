@@ -121,17 +121,16 @@ namespace runner
 		// step control allocator
 		if (input.current_mode == fsm::FiniteState::AutopilotTrim ||
 			input.current_mode == fsm::FiniteState::Autopilot) {
-			allocator::AllocatorManagerOutput allocator_output =
-				allocator_manager.step(allocator::build_allocator_input(mu_cmd,
-					active_mask,
-					actuator_mask,
-					input.context.Zt,
-					u_actual_t_1,
-					input.trim_sol.converged ? std::make_optional(input.trim_sol.operating_point.input) : std::nullopt,
-					input.context.transient_conditions,
-					input.context.autodiff_model));
-			u_cmd = allocator_output.u;
-			delta_mu_vec_t_1 = allocator_output.delta_mu_vec_t_1;
+			allocator::AllocatorManagerOutput ctrl_out = allocator_manager.step(allocator::build_allocator_input(mu_cmd,
+				active_mask,
+				actuator_mask,
+				input.context.Zt,
+				u_actual_t_1,
+				input.trim_sol.converged ? std::make_optional(input.trim_sol.operating_point.input) : std::nullopt,
+				input.context.transient_conditions,
+				input.context.autodiff_model));
+			u_cmd = ctrl_out.u;
+			delta_mu_vec_t_1 = ctrl_out.delta_mu_vec_t_1;
 		}
 
 		// apply fixed actuator inputs

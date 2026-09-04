@@ -29,9 +29,9 @@ namespace runner
 
 		  // create state machine
 		  fsm_manager(
-			  {.trim_enabled = json_options.flags.trim_flag,
-				  .control_enabled = json_options.flags.control_flag,
-				  .joystick_enabled = json_options.flags.joystick_flag}),
+			  {.trim_flag = json_options.flags.trim_flag,
+				  .control_flag = json_options.flags.control_flag,
+				  .joystick_flag = json_options.flags.joystick_flag}),
 
 		  // initialize scheduler
 		  scheduler(json_options.module_rates, json_options.tf),
@@ -83,7 +83,7 @@ namespace runner
 		JSONFlags& json_flags = json_options.flags;
 
 		FlightGearAdapterOutput flight_gear_output =
-			flight_gear_adapter.receive({.aircraft = aircraft, .wind_enabled = json_flags.wind_flag});
+			flight_gear_adapter.receive({.aircraft = aircraft, .wind_flag = json_flags.wind_flag});
 		atmospheric::Wind windI = flight_gear_output.windI;
 		atmospheric::Wind windB = flight_gear_output.windB;
 
@@ -209,7 +209,7 @@ namespace runner
 				.scheduler = scheduler,
 				.context = context,
 				.WB_net_t_1 = physics_wrapper.WB_net_t_1,
-				.enabled = json_options.flags.avionics_flag});
+				.avionics_flag = json_options.flags.avionics_flag});
 		context.Yt = output.Yt;
 	}
 
@@ -223,7 +223,7 @@ namespace runner
 				.trim_sol = trim_wrapper.trim_sol,
 				.lin_sol = linearization_wrapper.lin_sol,
 				.u_actual_t_1 = control_wrapper.u_actual_t_1,
-				.enabled = json_options.flags.estimation_flag});
+				.estimation_flag = json_options.flags.estimation_flag});
 		context.Zt = output.Zt;
 	}
 
@@ -289,10 +289,10 @@ namespace runner
 
 		// check for runtime failures
 		geography::HeightAGL height_agl{geo_t1.alt.data - flight_gear_adapter.cached_msg_out.ground_elevation.data};
-		failures::FailureManagerInput failure_input{.height_agl = height_agl};
-		failure_manager.step(failure_input);
+		failures::FailureManagerInput failure_inputs{.height_agl = height_agl};
+		failure_manager.step(failure_inputs);
 
-		flight_gear_adapter.send({.geographic_state = geo_t1, .attitude = aircraft.FRDFrameNED.eulNB});
+		flight_gear_adapter.send({.geo_t1 = geo_t1, .eulNB = aircraft.FRDFrameNED.eulNB});
 	}
 
 	void Runner::finish_step(
@@ -301,7 +301,7 @@ namespace runner
 		CLIFlags& cli_flags = cli_options.flags;
 
 		// step scheduler
-		scheduler.step({.current_mode = current_mode, .fast = cli_flags.fast_flag});
+		scheduler.step({.current_mode = current_mode, .fast_flag = cli_flags.fast_flag});
 	}
 
 } // namespace runner

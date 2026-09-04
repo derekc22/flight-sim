@@ -11,9 +11,9 @@ namespace fsm
 	};
 
 	struct Settings {
-		bool trim_enabled;
-		bool control_enabled;
-		bool joystick_enabled;
+		bool trim_flag;
+		bool control_flag;
+		bool joystick_flag;
 	};
 
 	struct FSMManagerInput {

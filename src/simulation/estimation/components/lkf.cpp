@@ -1,4 +1,4 @@
-#include "simulation/estimation/public/components/linear_kalman.hpp"
+#include "simulation/estimation/public/components/lkf.hpp"
 
 #include "simulation/actuators/public/data/helpers.hpp"
 #include "simulation/dynamics/public/data/helpers.hpp"
@@ -11,14 +11,14 @@
 namespace estimation
 {
 
-	LinearKalmanEstimator::LinearKalmanEstimator(
+	LinearKalmanFilter::LinearKalmanFilter(
 		const LinearKalmanFilterParameters& params)
 		: params(params)
 	{
 	}
 
-	dynamics::RigidBodyState LinearKalmanEstimator::step(
-		const LinearKalmanEstimatorInput& input,
+	dynamics::RigidBodyState LinearKalmanFilter::step(
+		const LinearKalmanFilterInput& input,
 		double dt)
 	{
 		dynamics::StateVector_T<double> yt_deviation =
@@ -46,7 +46,7 @@ namespace estimation
 		return Zt;
 	}
 
-	KalmanState LinearKalmanEstimator::predict(
+	KalmanState LinearKalmanFilter::predict(
 		const linearization::DiscretizedLocalLinearization& lin_sol_k,
 		const actuators::ActuatorInputsVector_T<double>& ut_1)
 	{
@@ -59,23 +59,23 @@ namespace estimation
 		return {.zt = zt_bar, .Pt = Pt_bar};
 	}
 
-	KalmanState LinearKalmanEstimator::correct(
-		const linearization::OutputJacobian& output_jacobian,
+	KalmanState LinearKalmanFilter::correct(
+		const linearization::OutputJacobian& C,
 		const dynamics::StateVector_T<double>& yt)
 	{
 		KalmanState pred = state.value();
 
-		Eigen::MatrixXd Kt = pred.Pt * output_jacobian.transpose() *
-			(output_jacobian * pred.Pt * output_jacobian.transpose() + params.Q).inverse(); // Kalman gain
+		// Kalman gain
+		Eigen::MatrixXd Kt = pred.Pt * C.transpose() * (C * pred.Pt * C.transpose() + params.Q).inverse();
 
-		dynamics::StateVector_T<double> Lt = yt - output_jacobian * pred.zt; // Innovation
+		// Innovation
+		dynamics::StateVector_T<double> Lt = yt - C * pred.zt;
 
 		dynamics::StateVector_T<double> zt = pred.zt + Kt * Lt;
 
 		Eigen::MatrixXd Inxn = Eigen::MatrixXd::Identity(pred.Pt.rows(), pred.Pt.cols());
 
-		Eigen::MatrixXd Pt = (Inxn - Kt * output_jacobian) * pred.Pt * (Inxn - Kt * output_jacobian).transpose() +
-			Kt * params.Q * Kt.transpose();
+		Eigen::MatrixXd Pt = (Inxn - Kt * C) * pred.Pt * (Inxn - Kt * C).transpose() + Kt * params.Q * Kt.transpose();
 
 		return {.zt = zt, .Pt = Pt};
 	}

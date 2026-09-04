@@ -52,22 +52,22 @@ namespace json
 		return {P0, Q, R};
 	}
 
-	estimation::LinearKalmanEstimator make_linear_kalman_estimator(
+	estimation::LinearKalmanFilter make_linear_kalman_filter(
 		estimation::EstimatorType estimator_type,
 		const nlohmann::json& estimator_json)
 	{
 		switch (estimator_type) {
 			case estimation::EstimatorType::LinearKalmanFilter: {
 				estimation::LinearKalmanFilterParameters params = parse_linear_kalman_filter_parameters(estimator_json);
-				return estimation::LinearKalmanEstimator(params);
+				return estimation::LinearKalmanFilter(params);
 			}
 
 			default:
-				throw std::runtime_error("json::make_linear_kalman_estimator unknown estimator type");
+				throw std::runtime_error("json::make_linear_kalman_filter unknown estimator type");
 		}
 	}
 
-	estimation::ExtendedKalmanEstimator make_extended_kalman_estimator(
+	estimation::ExtendedKalmanFilter make_extended_kalman_filter(
 		estimation::EstimatorType estimator_type,
 		const nlohmann::json& estimator_json)
 	{
@@ -75,11 +75,11 @@ namespace json
 			case estimation::EstimatorType::ExtendedKalmanFilter: {
 				estimation::ExtendedKalmanFilterParameters params =
 					parse_extended_kalman_filter_parameters(estimator_json);
-				return estimation::ExtendedKalmanEstimator(params);
+				return estimation::ExtendedKalmanFilter(params);
 			}
 
 			default:
-				throw std::runtime_error("json::make_extended_kalman_estimator unknown estimator type");
+				throw std::runtime_error("json::make_extended_kalman_filter unknown estimator type");
 		}
 	}
 
@@ -105,18 +105,18 @@ namespace json
 		return map_estimator_type(estimator_type_str);
 	}
 
-	void parse_linear_kalman_estimator(
+	void parse_linear_kalman_filter(
 		const nlohmann::json& estimator_json,
-		std::optional<estimation::LinearKalmanEstimator>& estimator)
+		std::optional<estimation::LinearKalmanFilter>& estimator)
 	{
-		estimator = make_linear_kalman_estimator(fetch_estimator_type(estimator_json), estimator_json);
+		estimator = make_linear_kalman_filter(fetch_estimator_type(estimator_json), estimator_json);
 	}
 
-	void parse_extended_kalman_estimator(
+	void parse_extended_kalman_filter(
 		const nlohmann::json& estimator_json,
-		std::optional<estimation::ExtendedKalmanEstimator>& estimator)
+		std::optional<estimation::ExtendedKalmanFilter>& estimator)
 	{
-		estimator = make_extended_kalman_estimator(fetch_estimator_type(estimator_json), estimator_json);
+		estimator = make_extended_kalman_filter(fetch_estimator_type(estimator_json), estimator_json);
 	}
 
 	estimation::EstimationManager parse_estimation_manager(
@@ -131,11 +131,11 @@ namespace json
 				break;
 
 			case estimation::EstimatorType::LinearKalmanFilter:
-				parse_linear_kalman_estimator(config, estimation_manager.linear_kalman_estimator);
+				parse_linear_kalman_filter(config, estimation_manager.linear_kalman_filter);
 				break;
 
 			case estimation::EstimatorType::ExtendedKalmanFilter:
-				parse_extended_kalman_estimator(config, estimation_manager.extended_kalman_estimator);
+				parse_extended_kalman_filter(config, estimation_manager.extended_kalman_filter);
 				break;
 
 			default:

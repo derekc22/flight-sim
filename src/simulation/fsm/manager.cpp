@@ -11,14 +11,14 @@ namespace fsm
 	FSMManager::FSMManager(
 		const Settings& settings)
 	{
-		if (settings.trim_enabled) {
+		if (settings.trim_flag) {
 			autopilot_mode = FiniteState::AutopilotTrim;
 		}
-		if (settings.control_enabled) {
+		if (settings.control_flag) {
 			autopilot_mode = FiniteState::Autopilot;
 		}
 
-		if (settings.joystick_enabled) {
+		if (settings.joystick_flag) {
 			current_mode = FiniteState::Manual;
 		} else {
 			current_mode = autopilot_mode;

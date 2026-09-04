@@ -18,15 +18,17 @@ namespace propulsion
 		bool steady_state);
 
 	template <typename T>
-	PropellerOmegaStateSet_T<T> compute_propeller_omega_state_set_T(const actuators::PropulsorActuators& propulsors,
-		const PropulsionState& prev_state,
+	PropellerOmegaStateSet_T<T> compute_propeller_omega_state_set_T(
+		const actuators::PropulsorActuators& propulsor_actuators,
+		const PropulsionState& propulsion_state_t_1,
 		const actuators::PropulsorActuatorInputs_T<T>& u,
 		const atmospheric::AirDensity& rho,
 		T dt,
 		bool steady_state);
 
-	PropellerOmegaStateSet_T<double> compute_propeller_omega_state_set(const actuators::PropulsorActuators& propulsors,
-		const PropulsionState& prev_state,
+	PropellerOmegaStateSet_T<double> compute_propeller_omega_state_set(
+		const actuators::PropulsorActuators& propulsor_actuators,
+		const PropulsionState& propulsion_state_t_1,
 		const actuators::PropulsorActuatorInputs_T<double>& u,
 		const atmospheric::AirDensity& rho,
 		double dt,

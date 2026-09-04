@@ -5,7 +5,7 @@ Components represent distinct functional responsibilities with their own behavio
 | Manager | Components | Boundary |
 |---|---|---|
 | `ActuatorManager` | `ElevatorActuator`<br>`AileronActuator`<br>`RudderActuator`<br>`FlapActuator`<br>`SpoilerActuator`<br>`FrontPropulsorActuator`<br>`LeftPropulsorActuator`<br>`RightPropulsorActuator` | Each actuator is independently configured and owns its own command limiting and lag state. |
-| `EstimationManager` | `LinearKalmanEstimator`<br>`ExtendedKalmanEstimator` | The estimators have distinct inputs, algorithms, and persistent filter state. |
+| `EstimationManager` | `LinearKalmanFilter`<br>`ExtendedKalmanFilter` | The filters have distinct inputs, algorithms, and persistent state. |
 | `ControlManager` | `AttitudeControl`<br>`VelocityControl`<br>`LinearQuadraticControl`<br>`NonlinearControl` (not implemented) | These are the major control responsibilities. Specific PID and linear-quadratic controllers are private implementations owned by the applicable component. |
 | `SensorManager` | `AngleOfAttackVane`<br>`Accelerometer`<br>`Gyroscope`<br>`PitotTube`<br>`StaticPort`<br>`TotalAirTemperatureProbe`<br>`GNSSReceiver`<br>`Magnetometer` | Each sensor independently owns its measurement behavior, noise, bias, and lag state. |
 | `AvionicsManager` | `AirDataComputer`<br>`AttitudeHeadingReferenceSystem`<br>`InertialNavigationSystem` | These are distinct avionics processors with separate responsibilities and state. |

@@ -16,7 +16,7 @@ namespace runner
 		// initialize estimated state to measurements
 		dynamics::RigidBodyState Zt = input.context.Yt;
 
-		if (input.enabled) {
+		if (input.estimation_flag) {
 			if (input.scheduler.estimation_tick >= constants::hz) {
 				double estimation_dt = input.scheduler.estimation_elapsed_ticks * constants::dt;
 

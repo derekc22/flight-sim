@@ -44,7 +44,7 @@ namespace runner
 			std::chrono::duration<double>(constants::dt));
 
 		// sleep to maintain frequency dictated by dt
-		if (!input.fast) {
+		if (!input.fast_flag) {
 			std::this_thread::sleep_until(next);
 		}
 	}

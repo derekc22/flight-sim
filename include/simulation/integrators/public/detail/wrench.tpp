@@ -25,7 +25,7 @@ namespace integrators
 			model.aerodynamic.surfaces, pB_GB, twist, atm, u.surface_inputs, windB);
 
 		const propulsion::PropulsionManagerInput_T<T> propulsion_input{
-			.propulsors = model.propulsor_actuators,
+			.propulsor_actuators = model.propulsor_actuators,
 			.pB_GB = pB_GB,
 			.twist = twist,
 			.atm = atm,
@@ -51,7 +51,7 @@ namespace integrators
 					.net =
 						{.F = WB_aerodynamic.F + WB_propulsive.F + T(model.struc_t.mass.data) * gB,
 							.M = WB_aerodynamic.M + WB_propulsive.M}},
-			.propulsion_state_t = propulsion_output.state_t
+			.propulsion_state_t = propulsion_output.propulsion_state_t
 		};
 	}
 

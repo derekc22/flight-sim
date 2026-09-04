@@ -28,9 +28,9 @@ namespace actuators
 		double cmd_clamped = util::clamp(cmd, limit_min, limit_max);
 		double init_lag_state = util::clamp(0.0, limit_min, limit_max);
 
-		double previous_cmd = prev_cmd ? prev_cmd.value() : init_lag_state;
-		double cmd_lagged = util::first_order_lag(cmd_clamped, previous_cmd, tau, dt);
-		prev_cmd = cmd_lagged;
+		double prev_cmd = lag_state ? lag_state.value() : init_lag_state;
+		double cmd_lagged = util::first_order_lag(cmd_clamped, prev_cmd, tau, dt);
+		lag_state = cmd_lagged;
 		return cmd_lagged;
 	}
 

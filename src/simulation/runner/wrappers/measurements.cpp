@@ -32,7 +32,7 @@ namespace runner
 		// use sensors and avionics
 		sensors::SensorMeasurements sensor_meas;
 
-		if (input.enabled) {
+		if (input.avionics_flag) {
 			if (input.scheduler.sensor_tick >= constants::hz) {
 				double sensor_dt = input.scheduler.sensor_elapsed_ticks * constants::dt;
 
@@ -46,7 +46,7 @@ namespace runner
 				sensor_meas = sensor_meas_t_1; // perform ZOH
 		}
 
-		if (input.enabled) {
+		if (input.avionics_flag) {
 			if (input.scheduler.avionics_tick >= constants::hz) {
 				double avionics_dt = input.scheduler.avionics_elapsed_ticks * constants::dt;
 

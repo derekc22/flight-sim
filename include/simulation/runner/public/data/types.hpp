@@ -92,7 +92,7 @@ namespace runner
 
 	struct SchedulerInput {
 		fsm::FiniteState current_mode;
-		bool fast;
+		bool fast_flag;
 	};
 
 	struct TrimWrapperInput {
@@ -121,7 +121,7 @@ namespace runner
 		Scheduler& scheduler;
 		const StepContext& context;
 		const dynamics::Wrench& WB_net_t_1;
-		bool enabled;
+		bool avionics_flag;
 	};
 
 	struct MeasurementsWrapperOutput {
@@ -135,7 +135,7 @@ namespace runner
 		const trim::TrimSolution& trim_sol;
 		const linearization::LocalLinearization& lin_sol;
 		const actuators::ActuatorInputs_T<double>& u_actual_t_1;
-		bool enabled;
+		bool estimation_flag;
 	};
 
 	struct EstimationWrapperOutput {
@@ -172,7 +172,7 @@ namespace runner
 
 	struct FlightGearAdapterInput {
 		vehicles::Aircraft& aircraft;
-		bool wind_enabled;
+		bool wind_flag;
 	};
 
 	struct FlightGearAdapterOutput {
@@ -181,8 +181,8 @@ namespace runner
 	};
 
 	struct FlightGearAdapterSendInput {
-		const geography::GeographicState& geographic_state;
-		const dynamics::EulerAngles& attitude;
+		const geography::GeographicState& geo_t1;
+		const dynamics::EulerAngles& eulNB;
 	};
 
 	struct RecordingWrapperInput {

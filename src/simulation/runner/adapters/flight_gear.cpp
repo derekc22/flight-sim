@@ -20,7 +20,7 @@ namespace runner
 		// apply wind
 		atmospheric::Wind windI{constants::Zero3};
 		atmospheric::Wind windB{constants::Zero3};
-		if (input.wind_enabled) {
+		if (input.wind_flag) {
 			windI.data = cached_msg_out.wind.data;
 			windB.data = frames::transform_vec(windI.data, input.aircraft.NEDFrameECEF, input.aircraft.FRDFrameNED);
 		}
@@ -32,7 +32,7 @@ namespace runner
 		const FlightGearAdapterSendInput& input)
 	{
 		// generate in_msg from the simulation state
-		messages::FlightGearMessageIn in_msg = messages::process_in_msg(input.geographic_state, input.attitude);
+		messages::FlightGearMessageIn in_msg = messages::process_in_msg(input.geo_t1, input.eulNB);
 
 		// send message
 		udp_in.send(in_msg);

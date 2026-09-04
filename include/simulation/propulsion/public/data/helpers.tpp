@@ -6,18 +6,18 @@ namespace propulsion
 
 	template <typename T>
 	PropulsionState_T<T> make_propulsion_state_T(
-		const actuators::PropulsorActuators& propulsors,
-		const PropellerOmegaStateSet_T<T>& propeller_state)
+		const actuators::PropulsorActuators& propulsor_actuators,
+		const PropellerOmegaStateSet_T<T>& propeller_omega_state_set)
 	{
 		return {
-			.front_propulsor_omega = propulsors.front_propulsor.propellers.has_value()
-				? std::optional<T>{propeller_state.front_propulsor.omega}
+			.front_propulsor_omega = propulsor_actuators.front_propulsor.propellers.has_value()
+				? std::optional<T>{propeller_omega_state_set.front_propulsor.omega}
 				: std::optional<T>{},
-			.left_propulsor_omega = propulsors.left_propulsor.propellers.has_value()
-				? std::optional<T>{propeller_state.left_propulsor.omega}
+			.left_propulsor_omega = propulsor_actuators.left_propulsor.propellers.has_value()
+				? std::optional<T>{propeller_omega_state_set.left_propulsor.omega}
 				: std::optional<T>{},
-			.right_propulsor_omega = propulsors.right_propulsor.propellers.has_value()
-				? std::optional<T>{propeller_state.right_propulsor.omega}
+			.right_propulsor_omega = propulsor_actuators.right_propulsor.propellers.has_value()
+				? std::optional<T>{propeller_omega_state_set.right_propulsor.omega}
 				: std::optional<T>{}
 		};
 	}
