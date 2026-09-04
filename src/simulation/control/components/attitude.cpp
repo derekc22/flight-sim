@@ -2,27 +2,23 @@
 
 #include "simulation/control/private/components/attitude/damper.hpp"
 #include "simulation/control/private/components/attitude/pid.hpp"
+#include "simulation/control/private/detail/stateful_controller.hpp"
 #include "simulation/util/public/math.hpp"
 
 namespace control
 {
 
-	// Creates a stateful lambda that owns a controller initialized with params
-	// Each call forwards input and dt to the stored controller's step() method and returns the result
-	// mutable is required because captured values are const by default, but step() may modify the stored controller
 	AttitudeControl::AttitudeControl(
 		const AttitudePIDParameters& params)
-		: implementation([controller = AttitudePID{params}](const AttitudeControlInput& input, double dt) mutable {
-			  return controller.step(input, dt);
-		  })
+		: implementation(
+			  make_stateful_controller<AttitudePID, AttitudeControlImplementation, AttitudeControlInput>(params))
 	{
 	}
 
 	AttitudeControl::AttitudeControl(
 		const DamperPIDParameters& params)
-		: implementation([controller = DamperPID{params}](const AttitudeControlInput& input, double dt) mutable {
-			  return controller.step(input, dt);
-		  })
+		: implementation(
+			  make_stateful_controller<DamperPID, AttitudeControlImplementation, AttitudeControlInput>(params))
 	{
 	}
 

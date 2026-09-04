@@ -2,8 +2,8 @@
 
 #include "simulation/constants/public/dimensions.hpp"
 #include "simulation/constants/public/scalars.hpp"
-#include "simulation/control/private/data/helpers.hpp"
 #include "simulation/control/private/components/linear_quadratic/lqr.hpp"
+#include "simulation/control/private/data/helpers.hpp"
 #include "simulation/dynamics/public/data/helpers.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/linearization/public/data/types.hpp"

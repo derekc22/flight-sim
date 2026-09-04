@@ -1,6 +1,7 @@
 #include "simulation/control/public/components/velocity.hpp"
 
 #include "simulation/control/private/components/velocity/pid.hpp"
+#include "simulation/control/private/detail/stateful_controller.hpp"
 #include "simulation/util/public/math.hpp"
 
 namespace control
@@ -8,9 +9,8 @@ namespace control
 
 	VelocityControl::VelocityControl(
 		const VelocityPIDParameters& params)
-		: implementation([controller = VelocityPID{params}](const VelocityControlInput& input, double dt) mutable {
-			  return controller.step(input, dt);
-		  })
+		: implementation(
+			  make_stateful_controller<VelocityPID, VelocityControlImplementation, VelocityControlInput>(params))
 	{
 	}
 

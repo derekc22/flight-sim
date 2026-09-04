@@ -2,6 +2,7 @@
 
 #include "simulation/control/private/components/linear_quadratic/lqi.hpp"
 #include "simulation/control/private/components/linear_quadratic/lqr.hpp"
+#include "simulation/control/private/detail/stateful_controller.hpp"
 #include "simulation/util/public/math.hpp"
 
 namespace control
@@ -9,19 +10,17 @@ namespace control
 
 	LinearQuadraticControl::LinearQuadraticControl(
 		const LinearQuadraticRegulatorParameters& params)
-		: implementation([controller = LinearQuadraticRegulator{params}](const LinearQuadraticControlInput& input,
-							 double dt) mutable {
-			  return controller.step(input, dt);
-		  })
+		: implementation(make_stateful_controller<LinearQuadraticRegulator,
+			  LinearQuadraticControlImplementation,
+			  LinearQuadraticControlInput>(params))
 	{
 	}
 
 	LinearQuadraticControl::LinearQuadraticControl(
 		const LinearQuadraticIntegratorParameters& params)
-		: implementation([controller = LinearQuadraticIntegrator{params}](const LinearQuadraticControlInput& input,
-							 double dt) mutable {
-			  return controller.step(input, dt);
-		  })
+		: implementation(make_stateful_controller<LinearQuadraticIntegrator,
+			  LinearQuadraticControlImplementation,
+			  LinearQuadraticControlInput>(params))
 	{
 	}
 

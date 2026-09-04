@@ -5,7 +5,8 @@ namespace aerodynamics
 {
 
 	template <typename T>
-	AerodynamicsManagerOutput_T<T> AerodynamicsManager::step(const AerodynamicsManagerInput_T<T>& input)
+	AerodynamicsManagerOutput_T<T> AerodynamicsManager::step(
+		const AerodynamicsManagerInput_T<T>& input)
 	{
 		return {
 			.WB_aerodynamic =

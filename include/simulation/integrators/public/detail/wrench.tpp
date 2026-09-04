@@ -19,11 +19,7 @@ namespace integrators
 	{
 		const constants::Vector3_T<T> pB_GB = model.struc_t.pB_GB.data.template cast<T>();
 		const aerodynamics::AerodynamicsManagerInput_T<T> aerodynamics_input{
-			.pB_GB = pB_GB,
-			.twist = twist,
-			.atm = atm,
-			.u = u.surface_inputs,
-			.windB = windB
+			.pB_GB = pB_GB, .twist = twist, .atm = atm, .u = u.surface_inputs, .windB = windB
 		};
 
 		const aerodynamics::AerodynamicsManagerOutput_T<T> aerodynamics_output =

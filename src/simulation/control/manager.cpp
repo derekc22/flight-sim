@@ -6,11 +6,8 @@ namespace control
 	ControlManagerOutput ControlManager::step(
 		const ControlManagerInput& input)
 	{
-		const ControlComponentInputs component_inputs = build_component_inputs(input.Zt,
-			input.trim_sol,
-			input.virtual_lin_sol,
-			input.setpoint,
-			input.delta_mu_vec_t_1);
+		const ControlComponentInputs component_inputs = build_component_inputs(
+			input.Zt, input.trim_sol, input.virtual_lin_sol, input.setpoint, input.delta_mu_vec_t_1);
 		return aggregate_components(component_inputs, input.dt);
 	}
 
