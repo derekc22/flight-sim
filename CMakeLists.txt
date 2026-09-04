@@ -61,7 +61,7 @@ find_package(OpenCV REQUIRED)
 # Collect all source files
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.cpp")
 file(GLOB_RECURSE IO_CV2_SOURCES CONFIGURE_DEPENDS "src/core/io/camera/*.cpp")
-list(FILTER SOURCES EXCLUDE REGEX "src/simulation/control/linear_quadratic/slicot_care\\.cpp$")
+list(FILTER SOURCES EXCLUDE REGEX "src/simulation/control/private/policies/linear_quadratic/slicot_care\\.cpp$")
 list(REMOVE_ITEM SOURCES ${IO_CV2_SOURCES})
 set(TESTED_SOURCES ${SOURCES})
 list(FILTER TESTED_SOURCES EXCLUDE REGEX "src/main\\.cpp$")
@@ -70,15 +70,15 @@ file(GLOB_RECURSE TEST_SOURCES CONFIGURE_DEPENDS "tests/*.cpp")
 set(SLICOT_CARE_WRAPPER_OBJ ${CMAKE_CURRENT_BINARY_DIR}/slicot_care_wrapper.o)
 add_custom_command(
     OUTPUT ${SLICOT_CARE_WRAPPER_OBJ}
-    COMMAND ${GFORTRAN_EXECUTABLE} -ffree-line-length-none -c ${CMAKE_SOURCE_DIR}/src/simulation/control/linear_quadratic/slicot_care_wrapper.f90 -o ${SLICOT_CARE_WRAPPER_OBJ}
-    DEPENDS ${CMAKE_SOURCE_DIR}/src/simulation/control/linear_quadratic/slicot_care_wrapper.f90
+    COMMAND ${GFORTRAN_EXECUTABLE} -ffree-line-length-none -c ${CMAKE_SOURCE_DIR}/src/simulation/control/private/policies/linear_quadratic/slicot_care_wrapper.f90 -o ${SLICOT_CARE_WRAPPER_OBJ}
+    DEPENDS ${CMAKE_SOURCE_DIR}/src/simulation/control/private/policies/linear_quadratic/slicot_care_wrapper.f90
     VERBATIM
 )
 set_source_files_properties(${SLICOT_CARE_WRAPPER_OBJ} PROPERTIES EXTERNAL_OBJECT TRUE GENERATED TRUE)
 
 # Standalone CARE library
 add_library(control_care STATIC
-    src/simulation/control/linear_quadratic/slicot_care.cpp
+    src/simulation/control/private/policies/linear_quadratic/slicot_care.cpp
     ${SLICOT_CARE_WRAPPER_OBJ}
 )
 target_include_directories(control_care PUBLIC ${CMAKE_SOURCE_DIR}/include)

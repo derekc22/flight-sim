@@ -1,0 +1,17 @@
+#pragma once
+#include "simulation/atmospheric/public/data/types.hpp"
+#include "simulation/autodiff/public/data/types.hpp"
+#include "simulation/trim/public/data/types.hpp"
+
+namespace vehicles
+{
+	struct Aircraft;
+} // namespace vehicles
+
+namespace trim
+{
+
+	TrimSolution
+	inspect_trim(vehicles::Aircraft& aircraft, const autodiff::AutoDiffModel& model, const atmospheric::Wind& wind);
+
+}
