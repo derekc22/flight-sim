@@ -25,8 +25,6 @@ namespace control
 		ControlComponentInputs build_component_inputs(const dynamics::RigidBodyState& Zt,
 			const trim::TrimSolution& trim_sol,
 			const linearization::VirtualLocalLinearization& virtual_lin_sol,
-			const actuators::SurfaceActuators& surface_actuators,
-			const actuators::PropulsorActuators& propulsor_actuators,
 			const guidance::GuidanceSetpoint& setpoint,
 			dynamics::WrenchVector_T<double> delta_mu_vec_t_1);
 	};

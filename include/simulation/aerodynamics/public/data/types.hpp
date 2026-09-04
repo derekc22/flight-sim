@@ -3,7 +3,6 @@
 #include "simulation/atmospheric/public/data/types.hpp"
 #include "simulation/constants/public/linalg.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
-#include "simulation/structural/public/data/types.hpp"
 
 #include <Eigen/Dense>
 #include <string>
@@ -95,17 +94,16 @@ namespace aerodynamics
 		T beta = T(0.0);
 	};
 
-	struct AerodynamicsManagerInput {
-		const structural::CenterOfGravity& pB_GB;
-		const dynamics::RigidBodyState& X;
+	template <typename T> struct AerodynamicsManagerInput_T {
+		const constants::Vector3_T<T>& pB_GB;
+		const dynamics::Twist_T<T>& twist;
 		const atmospheric::StaticAtmosphericState& atm;
-		const actuators::SurfaceActuatorInputs_T<double>& u;
+		const actuators::SurfaceActuatorInputs_T<T>& u;
 		const atmospheric::Wind& windB;
 	};
 
-	struct AerodynamicsManagerOutput {
-		AerodynamicState aero_t;
-		dynamics::Wrench WB_aerodynamic;
+	template <typename T> struct AerodynamicsManagerOutput_T {
+		dynamics::Wrench_T<T> WB_aerodynamic;
 	};
 
 } // namespace aerodynamics

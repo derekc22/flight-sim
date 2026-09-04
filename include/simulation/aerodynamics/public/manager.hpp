@@ -11,7 +11,9 @@ namespace aerodynamics
 
 		AerodynamicsManager(std::vector<Surface> s);
 		void compute_surface_geometry();
-		AerodynamicsManagerOutput step(const AerodynamicsManagerInput& input);
+		template <typename T> AerodynamicsManagerOutput_T<T> step(const AerodynamicsManagerInput_T<T>& input);
 	};
 
 } // namespace aerodynamics
+
+#include "simulation/aerodynamics/public/manager.tpp"

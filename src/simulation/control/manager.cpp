@@ -9,8 +9,6 @@ namespace control
 		const ControlComponentInputs component_inputs = build_component_inputs(input.Zt,
 			input.trim_sol,
 			input.virtual_lin_sol,
-			input.surface_actuators,
-			input.propulsor_actuators,
 			input.setpoint,
 			input.delta_mu_vec_t_1);
 		return aggregate_components(component_inputs, input.dt);
@@ -68,8 +66,6 @@ namespace control
 		const dynamics::RigidBodyState& Zt,
 		const trim::TrimSolution& trim_sol,
 		const linearization::VirtualLocalLinearization& virtual_lin_sol,
-		const actuators::SurfaceActuators& surface_actuators,
-		const actuators::PropulsorActuators& propulsor_actuators,
 		const guidance::GuidanceSetpoint& setpoint,
 		const dynamics::WrenchVector_T<double> delta_mu_vec_t_1)
 	{
@@ -90,9 +86,7 @@ namespace control
 				.Zt = Zt,
 				.virtual_linearization = virtual_lin_sol,
 				.Z_sol_trim = trim_sol.operating_point.state,
-				.surface_actuators = surface_actuators,
-				.propulsor_actuators = propulsor_actuators,
-				.setpoint = setpoint,
+				.setpoint = guidance::LinearQuadraticSetpoint{setpoint},
 				.delta_mu_vec_t_1 = delta_mu_vec_t_1
 			});
 		}

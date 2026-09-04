@@ -39,13 +39,9 @@ namespace propulsion
 		bool steady_state;
 	};
 
-	using PropulsionManagerInput = PropulsionManagerInput_T<double>;
-
 	template <typename T> struct PropulsionManagerOutput_T {
 		dynamics::Wrench_T<T> WB_propulsive;
 		PropulsionState_T<T> propulsion_state_t;
 	};
-
-	using PropulsionManagerOutput = PropulsionManagerOutput_T<double>;
 
 } // namespace propulsion

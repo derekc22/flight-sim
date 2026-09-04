@@ -5,6 +5,6 @@
 namespace control
 {
 
-	dynamics::StateVector_T<double> unpack_state(const guidance::GuidanceSetpoint& setpoint);
+	dynamics::StateVector_T<double> unpack_state(const guidance::LinearQuadraticSetpoint& setpoint);
 
 }

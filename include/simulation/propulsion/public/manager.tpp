@@ -8,7 +8,7 @@ namespace propulsion
 {
 
 	template <typename T>
-	PropulsionManagerOutput_T<T> PropulsionManager::step_T(
+	PropulsionManagerOutput_T<T> PropulsionManager::step(
 		const PropulsionManagerInput_T<T>& input)
 	{
 		const PropellerOmegaStateSet_T<T> propeller_omega_state_set = compute_propeller_omega_state_set_T<T>(

@@ -1,10 +1,7 @@
 #pragma once
-#include "simulation/aerodynamics/public/detail/loads.hpp"
 #include "simulation/constants/public/linalg.hpp"
 #include "simulation/integrators/public/detail/wrench.hpp"
 #include "simulation/propulsion/public/manager.hpp"
-
-#include <type_traits>
 
 namespace integrators
 {
@@ -21,8 +18,18 @@ namespace integrators
 		bool steady_state)
 	{
 		const constants::Vector3_T<T> pB_GB = model.struc_t.pB_GB.data.template cast<T>();
-		const dynamics::Wrench_T<T> WB_aerodynamic = aerodynamics::step_aero_forces_moments_T<T>(
-			model.aerodynamic.surfaces, pB_GB, twist, atm, u.surface_inputs, windB);
+		const aerodynamics::AerodynamicsManagerInput_T<T> aerodynamics_input{
+			.pB_GB = pB_GB,
+			.twist = twist,
+			.atm = atm,
+			.u = u.surface_inputs,
+			.windB = windB
+		};
+
+		const aerodynamics::AerodynamicsManagerOutput_T<T> aerodynamics_output =
+			model.aerodynamic.step(aerodynamics_input);
+
+		const dynamics::Wrench_T<T>& WB_aerodynamic = aerodynamics_output.WB_aerodynamic;
 
 		const propulsion::PropulsionManagerInput_T<T> propulsion_input{
 			.propulsor_actuators = model.propulsor_actuators,
@@ -34,13 +41,7 @@ namespace integrators
 			.steady_state = steady_state
 		};
 
-		const propulsion::PropulsionManagerOutput_T<T> propulsion_output = [&]() {
-			if constexpr (std::is_same_v<T, double>) {
-				return model.propulsion.step(propulsion_input);
-			} else {
-				return model.propulsion.template step_T<T>(propulsion_input);
-			}
-		}();
+		const propulsion::PropulsionManagerOutput_T<T> propulsion_output = model.propulsion.step(propulsion_input);
 
 		const dynamics::Wrench_T<T>& WB_propulsive = propulsion_output.WB_propulsive;
 

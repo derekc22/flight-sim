@@ -1,5 +1,4 @@
 #pragma once
-#include "simulation/actuators/public/components/collection.hpp"
 #include "simulation/actuators/public/data/types.hpp"
 #include "simulation/constants/public/dimensions.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
@@ -91,9 +90,7 @@ namespace control
 		const dynamics::RigidBodyState& Zt;
 		const linearization::VirtualLocalLinearization& virtual_linearization;
 		const dynamics::State_T<double>& Z_sol_trim;
-		const actuators::SurfaceActuators& surface_actuators;
-		const actuators::PropulsorActuators& propulsor_actuators;
-		guidance::GuidanceSetpoint setpoint;
+		guidance::LinearQuadraticSetpoint setpoint;
 		dynamics::WrenchVector_T<double> delta_mu_vec_t_1;
 	};
 
@@ -122,8 +119,6 @@ namespace control
 		const dynamics::RigidBodyState& Zt;
 		const trim::TrimSolution& trim_sol;
 		const linearization::VirtualLocalLinearization& virtual_lin_sol;
-		const actuators::SurfaceActuators& surface_actuators;
-		const actuators::PropulsorActuators& propulsor_actuators;
 		const guidance::GuidanceSetpoint& setpoint;
 		dynamics::WrenchVector_T<double> delta_mu_vec_t_1;
 		double dt;

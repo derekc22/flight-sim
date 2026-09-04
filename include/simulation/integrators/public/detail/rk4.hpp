@@ -1,5 +1,5 @@
 #pragma once
-#include "simulation/actuators/public/data/helpers.hpp"
+#include "simulation/actuators/public/data/types.hpp"
 #include "simulation/integrators/public/data/types.hpp"
 #include "simulation/operating/public/data/types.hpp"
 

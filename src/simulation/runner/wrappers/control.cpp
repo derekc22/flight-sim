@@ -53,8 +53,6 @@ namespace runner
 		actuators::ActuatorManager& actuator_manager = input.aircraft.actuator_manager;
 		guidance::GuidanceManager& guidance_manager = input.aircraft.guidance_manager;
 		allocator::AllocatorManager& allocator_manager = input.aircraft.allocator_manager;
-		actuators::SurfaceActuators& surface_actuators = actuator_manager.surface_actuators;
-		actuators::PropulsorActuators& propulsor_actuators = actuator_manager.propulsor_actuators;
 
 		// initialize active mask
 		std::array<bool, constants::virtual_input_dim> active_mask;
@@ -96,8 +94,6 @@ namespace runner
 					{.Zt = input.context.Zt,
 						.trim_sol = input.trim_sol,
 						.virtual_lin_sol = input.virtual_lin_sol,
-						.surface_actuators = surface_actuators,
-						.propulsor_actuators = propulsor_actuators,
 						.setpoint = setpoint,
 						.delta_mu_vec_t_1 = delta_mu_vec_t_1,
 						.dt = control_dt});
