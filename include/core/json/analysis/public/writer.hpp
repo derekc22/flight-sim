@@ -6,6 +6,6 @@
 namespace json
 {
 
-	void write_analysis_variables_to_json(const io::MATLABContext& context, const std::string& data_dir_path);
+	void write_analysis_variables_to_json(const io::AnalysisExportContext& context, const std::string& data_dir_path);
 
 }

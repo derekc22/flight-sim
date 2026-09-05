@@ -7,8 +7,8 @@ CONDA_BASE_PATH=$(conda info --base)
 source "$CONDA_BASE_PATH/etc/profile.d/conda.sh"
 conda activate ame532
 
-PLOT_2D_PATH="$PROJ_PATH/scripts/lib/plot/plot_2d.py"
-PLOT_3D_PATH="$PROJ_PATH/scripts/lib/plot/plot_3d.py"
+PLOT_2D_PATH="$PROJ_PATH/plot/plot_2d.py"
+PLOT_3D_PATH="$PROJ_PATH/plot/plot_3d.py"
 
 if [ -z "$1" ]; then
 	echo "Usage: $0 <OUT_DIR>"

@@ -12,6 +12,4 @@ figures/
 __pycache__
 CLAUDE.md
 .cache/
-*.asv
-*.mat
 *tar.gz

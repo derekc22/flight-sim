@@ -10,7 +10,7 @@
 namespace io
 {
 
-	struct MATLABContext {
+	struct AnalysisExportContext {
 		std::string aircraft_id;
 		runner::ModuleRates module_rates;
 		int state_dim = constants::state_dim;

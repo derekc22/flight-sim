@@ -18,8 +18,8 @@ namespace io
 		const runner::ModuleRates& module_rates)
 		: json_flags(json_flags)
 	{
-		matlab_context.aircraft_id = aircraft_id;
-		matlab_context.module_rates = module_rates;
+		export_context.aircraft_id = aircraft_id;
+		export_context.module_rates = module_rates;
 	}
 
 	void AnalysisRecorder::save(
@@ -44,13 +44,13 @@ namespace io
 
 				write_txt(analysis::print_eigen_analysis(context.eig_sol), report_dir_path, "eig_sol");
 
-				matlab_context.A_csv = A_fname + ".csv";
-				matlab_context.B_csv = B_fname + ".csv";
-				matlab_context.C_csv = C_fname + ".csv";
-				matlab_context.D_csv = D_fname + ".csv";
+				export_context.A_csv = A_fname + ".csv";
+				export_context.B_csv = B_fname + ".csv";
+				export_context.C_csv = C_fname + ".csv";
+				export_context.D_csv = D_fname + ".csv";
 			}
 		}
 
-		json::write_analysis_variables_to_json(matlab_context, data_dir_path);
+		json::write_analysis_variables_to_json(export_context, data_dir_path);
 	}
 } // namespace io
