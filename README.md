@@ -44,6 +44,11 @@ https://www.mathworks.com/products/compiler/matlab-runtime.html
 
 ## Setup
 
+Enable the repository-managed pre-commit hook to format C++ files automatically:
+```bash
+git config core.hooksPath .githooks
+```
+
 Update the following environment variables in `.env` with the corresponding paths on your machine:
 - `PROJ_PATH`: Project root
 - `FG_PATH`: FlightGear executable
