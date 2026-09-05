@@ -37,7 +37,7 @@ namespace integrators
 
 		const dynamics::RigidBodyState Xt1 = add_rk4_weighted_rigid_body_state_dot(Xt, k1, k2, k3, k4, dt);
 
-		model.propulsion.commit(evaluation_1.propulsion_state_t);
+		model.propulsion_manager.commit(evaluation_1.propulsion_state_t);
 
 		return {.Xt1 = Xt1, .WB_set = wrench_1};
 	}

@@ -7,7 +7,7 @@
 #include "simulation/autodiff/public/data/helpers.hpp"
 #include "simulation/dynamics/public/detail/state.hpp"
 #include "simulation/geography/public/detail/geodesy.hpp"
-#include "simulation/runner/private/data/helpers.hpp"
+#include "simulation/runner/private/detail/loading.hpp"
 #include "simulation/trim/public/data/helpers.hpp"
 #include "simulation/trim/public/detail/application.hpp"
 

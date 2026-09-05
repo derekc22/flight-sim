@@ -10,9 +10,9 @@ namespace integrators
 
 	struct RK4Model {
 		const structural::StructuralState& struc_t;
-		aerodynamics::AerodynamicsManager& aerodynamic;
+		aerodynamics::AerodynamicsManager& aerodynamics_manager;
 		actuators::PropulsorActuators& propulsor_actuators;
-		propulsion::PropulsionManager& propulsion;
+		propulsion::PropulsionManager& propulsion_manager;
 	};
 
 	struct RK4Output {

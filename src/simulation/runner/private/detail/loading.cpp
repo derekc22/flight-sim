@@ -1,4 +1,4 @@
-#include "simulation/actuators/public/data/helpers.hpp"
+#include "simulation/runner/private/detail/loading.hpp"
 
 #include "core/json/actuators/public/parser.hpp"
 #include "core/json/aerodynamics/public/parser.hpp"
@@ -11,7 +11,7 @@
 #include "core/json/sensors/public/parser.hpp"
 #include "core/json/settings/public/parser.hpp"
 #include "core/json/structural/public/parser.hpp"
-#include "simulation/runner/private/data/helpers.hpp"
+#include "simulation/actuators/public/data/helpers.hpp"
 #include "simulation/settings/public/detail/application.hpp"
 
 namespace runner

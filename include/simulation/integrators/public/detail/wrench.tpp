@@ -23,7 +23,7 @@ namespace integrators
 		};
 
 		const aerodynamics::AerodynamicsManagerOutput_T<T> aerodynamics_output =
-			model.aerodynamic.step(aerodynamics_input);
+			model.aerodynamics_manager.step(aerodynamics_input);
 
 		const dynamics::Wrench_T<T>& WB_aerodynamic = aerodynamics_output.WB_aerodynamic;
 
@@ -37,7 +37,8 @@ namespace integrators
 			.steady_state = steady_state
 		};
 
-		const propulsion::PropulsionManagerOutput_T<T> propulsion_output = model.propulsion.step(propulsion_input);
+		const propulsion::PropulsionManagerOutput_T<T> propulsion_output =
+			model.propulsion_manager.step(propulsion_input);
 
 		const dynamics::Wrench_T<T>& WB_propulsive = propulsion_output.WB_propulsive;
 

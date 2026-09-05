@@ -15,9 +15,9 @@ namespace runner
 
 		integrators::RK4Model rk4_model{
 			.struc_t = input.context.struc_t,
-			.aerodynamic = aerodynamics_manager,
+			.aerodynamics_manager = aerodynamics_manager,
 			.propulsor_actuators = propulsor_actuators,
-			.propulsion = input.aircraft.propulsion_manager
+			.propulsion_manager = input.aircraft.propulsion_manager
 		};
 
 		operating::OperatingConditions rk4_conditions{

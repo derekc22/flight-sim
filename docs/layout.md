@@ -33,6 +33,9 @@ include/simulation/<module>/
     components/
       <owner>/
         <implementation>.hpp
+    detail/
+      <implementation>.hpp
+      <implementation>.tpp  # optional
     policies/
       <policy>/
         <implementation>.hpp
@@ -43,6 +46,7 @@ src/simulation/<module>/
   manager.cpp
   private/
     data/
+    detail/
     components/
     policies/
 ```
@@ -59,7 +63,7 @@ include/simulation/<module>/
       helpers.hpp        # optional
       helpers.tpp        # optional
     detail/
-      <calculation>.hpp
+      <implementation>.hpp
       <calculation>.tpp  # optional
     manager.hpp          # only when orchestration or persistent state exists
     manager.tpp          # optional
@@ -99,6 +103,9 @@ include/simulation/<orchestrator>/
   private/
     data/
       helpers.hpp        # optional
+    detail/
+      <implementation>.hpp
+      <implementation>.tpp  # optional
 
 src/simulation/<orchestrator>/
   adapters/
@@ -110,6 +117,8 @@ src/simulation/<orchestrator>/
   private/
     data/
       helpers.cpp        # optional
+    detail/
+      <implementation>.cpp
   <orchestrator>.cpp
 ```
 
@@ -163,9 +172,9 @@ Contains operations that assemble, pack, unpack, format, or otherwise construct 
 
 ### `detail`
 
-Contains module calculations. Detail files contain calculation functions, not shared type declarations. A module's detail calculations must consume data directly and must not depend on that module's manager.
+Contains module calculations and implementation support that does not belong to data, components, policies, managers, adapters, scheduling, or wrappers. Detail files contain functions, not shared type declarations. A module's detail calculations must consume data directly and must not depend on that module's manager.
 
-Public detail functions are calculations required by other modules or public template definitions. Private detail functions are required only by the owning module's implementation.
+Public detail functions are calculations required by other modules or public template definitions. Private detail functions may also provide internal validation, translation, construction, streaming, filesystem, or other implementation support required only by the owning module.
 
 ### `components`
 
