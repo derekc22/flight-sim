@@ -10,7 +10,7 @@ namespace io
 		runner::JSONFlags json_flags;
 
 		AnalysisContext context;
-		MATLABContext matlab_context;
+		AnalysisExportContext export_context;
 
 		AnalysisRecorder(const std::string& aircraft_id,
 			const runner::JSONFlags& json_flags,
