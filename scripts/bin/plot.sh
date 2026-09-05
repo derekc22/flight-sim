@@ -17,7 +17,7 @@ fi
 
 OUT_DIR="$1"
 DATA_DIR_PATH="$PROJ_PATH/results/$OUT_DIR/data"
-PLOT_DIR_PATH="$PROJ_PATH/results/$OUT_DIR/figures"
+PLOT_DIR_PATH="$PROJ_PATH/results/$OUT_DIR/figures/run"
 
 python "$PLOT_2D_PATH" -d "$DATA_DIR_PATH/p.csv" -s "$PLOT_DIR_PATH" \
 -l "x(t) [m]" "y(t) [m]" "z(t) [m]" \
