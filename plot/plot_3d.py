@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from datetime import datetime
-from plot_util import init_plot
+from init import init_plot
 import logging
 logging.basicConfig(
     level=logging.INFO,
