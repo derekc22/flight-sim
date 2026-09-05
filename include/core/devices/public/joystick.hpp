@@ -1,26 +1,25 @@
 #pragma once
 #include "core/devices/public/data/types.hpp"
-#include "simulation/actuators/public/data/helpers.hpp"
-#include "simulation/actuators/public/manager.hpp"
+#include "simulation/actuators/public/data/types.hpp"
 
 struct SDL_Gamepad;
 
 namespace devices
 {
 
-	struct JoystickManager {
+	struct Joystick {
 		SDL_Gamepad* gamepad = nullptr;
 		bool prev_touchpad_down = false;
 		bool mode_toggled = false;
 		actuators::ActuatorLimits actuator_limits;
 
-		JoystickManager(const actuators::ActuatorLimits& actuator_limits);
-		~JoystickManager();
-		JoystickManager(const JoystickManager&) = delete;
-		JoystickManager& operator=(const JoystickManager&) = delete;
+		Joystick(const actuators::ActuatorLimits& actuator_limits);
+		~Joystick();
+		Joystick(const Joystick&) = delete;
+		Joystick& operator=(const Joystick&) = delete;
 
 		JoystickOutputRaw poll();
-		JoystickManagerOutput step(const JoystickManagerInput& input);
+		JoystickOutput step(const JoystickInput& input);
 	};
 
 } // namespace devices

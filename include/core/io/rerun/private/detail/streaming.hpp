@@ -1,8 +1,8 @@
 #pragma once
-#include "core/io/rerun/public/manager.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 
 #include <Eigen/Dense>
+#include <cstddef>
 #include <opencv2/core/mat.hpp>
 #include <rerun.hpp>
 #include <string>
@@ -10,13 +10,6 @@
 
 namespace io
 {
-
-	extern const std::vector<std::string> xyz_labels;
-	extern const std::vector<std::string> eul_labels;
-	extern const std::vector<std::string> angular_rate_labels;
-	extern const std::vector<std::string> velocity_labels;
-	extern const std::vector<std::string> surface_labels;
-	extern const std::vector<std::string> propulsor_labels;
 
 	void stream_scalar(rerun::RecordingStream& rec, const std::string& path, double value);
 	void stream_vector(rerun::RecordingStream& rec,

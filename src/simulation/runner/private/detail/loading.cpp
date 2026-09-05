@@ -12,7 +12,7 @@
 #include "core/json/settings/public/parser.hpp"
 #include "core/json/structural/public/parser.hpp"
 #include "simulation/actuators/public/data/helpers.hpp"
-#include "simulation/settings/public/detail/application.hpp"
+#include "simulation/settings/public/application.hpp"
 
 namespace runner
 {

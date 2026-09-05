@@ -1,5 +1,6 @@
 #include "simulation/trim/private/detail/residual.hpp"
 
+#include "simulation/autodiff/public/data/helpers.hpp"
 #include "simulation/autodiff/public/detail/cppad.hpp"
 #include "simulation/constants/public/dimensions.hpp"
 

@@ -148,7 +148,7 @@ namespace runner
 		const StepContext& context;
 		const trim::TrimSolution& trim_sol;
 		const linearization::VirtualLocalLinearization& virtual_lin_sol;
-		const devices::JoystickManagerOutput& joystick_output;
+		const devices::JoystickOutput& joystick_output;
 		fsm::FiniteState current_mode;
 	};
 

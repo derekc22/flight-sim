@@ -1,6 +1,7 @@
 #include "simulation/allocator/private/detail/effectiveness.hpp"
 
 #include "simulation/actuators/public/data/helpers.hpp"
+#include "simulation/autodiff/public/data/helpers.hpp"
 #include "simulation/autodiff/public/detail/cppad.hpp"
 #include "simulation/autodiff/public/detail/evaluation.hpp"
 #include "simulation/constants/public/dimensions.hpp"

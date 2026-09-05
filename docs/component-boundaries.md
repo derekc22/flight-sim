@@ -17,7 +17,7 @@ Components represent distinct functional responsibilities with their own behavio
 
 ## Runner Wrappers
 
-`Runner` is the top-level simulation orchestrator, not a subsystem manager. Its `TrimWrapper`, `LinearizationWrapper`, `MeasurementsWrapper`, `EstimationWrapper`, `ControlWrapper`, `PhysicsWrapper`, and `RecordingWrapper` coordinate the subsystem managers and exchange per-step data through explicit payloads and `StepContext`. `Scheduler` owns runner timing, while `FlightGearAdapter` handles the external FlightGear integration. `Runner` owns and steps `FSMManager` directly, then supplies the selected mode to the wrappers that consume it.
+`Runner` is the module's primary public object and acts as the top-level simulation orchestrator, not a subsystem manager. Its `TrimWrapper`, `LinearizationWrapper`, `MeasurementsWrapper`, `EstimationWrapper`, `ControlWrapper`, `PhysicsWrapper`, and `RecordingWrapper` coordinate the subsystem managers and exchange per-step data through explicit payloads and `StepContext`. `Scheduler` owns runner timing, while `FlightGearAdapter` handles the external FlightGear integration. `Runner` owns and steps `FSMManager` directly, then supplies the selected mode to the wrappers that consume it.
 
 ## Granularity Rules
 
