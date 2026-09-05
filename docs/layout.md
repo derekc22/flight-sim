@@ -6,6 +6,9 @@ These rules define the final layout contract for C++ modules under `include/simu
 
 - `public/` contains declarations that code outside the module may use.
 - `private/` contains algorithms, implementation types, and policies used only by the owning module.
+- Under `src/`, `public/` contains definitions declared by public headers and `private/` contains definitions declared by private headers.
+- Source visibility names classify the declarations being implemented; source files themselves are never included as interfaces.
+- A source file's placement follows the declarations it defines, not its dependencies; a public implementation may use private headers from its own module.
 - Public headers and public template definitions must never include private headers.
 - Production code must not include another module's private headers.
 - Tests may include private headers for deliberate white-box testing.
@@ -21,7 +24,8 @@ include/<area>/<module>/
     <object>.tpp  # when the object has template definitions
 
 src/<area>/<module>/
-  <object>.cpp    # when the object has out-of-line definitions
+  public/
+    <object>.cpp  # when the object has out-of-line definitions
 ```
 
 `<area>` is `simulation` or `core`. A primary public object is the entity, service, or application object that callers construct, hold, and operate. It owns meaningful state or behavior and is not merely a shared data representation, free implementation function, subordinate component, or subsystem manager.
@@ -43,7 +47,8 @@ include/<area>/<module>/
     <operation>.tpp  # when the operation has template definitions
 
 src/<area>/<module>/
-  <operation>.cpp    # when the operation has out-of-line definitions
+  public/
+    <operation>.cpp  # when the operation has out-of-line definitions
 ```
 
 Public operation interfaces are first-class module capabilities, not internal implementation detail. They are not data helpers unless their purpose is representation assembly, and they are not `detail` unless they are domain calculations. Current examples include `settings/public/application.hpp`, `trim/public/application.hpp`, `trim/public/inspection.hpp`, and `io/camera/public/capture.hpp`. Core parsers, writers, and file interfaces are specialized public operations with conventional names.
@@ -87,9 +92,10 @@ include/simulation/<module>/
         <implementation>.hpp
 
 src/simulation/<module>/
-  data/
-  components/
-  manager.cpp
+  public/
+    data/
+    components/
+    manager.cpp
   private/
     data/
     detail/
@@ -122,9 +128,10 @@ include/simulation/<module>/
       <implementation>.hpp
 
 src/simulation/<module>/
-  data/
-  detail/
-  manager.cpp            # only when a manager exists
+  public/
+    data/
+    detail/
+    manager.cpp          # only when a manager exists
   private/
     data/
     detail/
@@ -154,13 +161,14 @@ include/simulation/runner/
       <implementation>.tpp  # optional
 
 src/simulation/runner/
-  runner.cpp
-  adapters/
-    <adapter>.cpp
-  scheduling/
-    scheduler.cpp
-  wrappers/
-    <wrapper>.cpp
+  public/
+    runner.cpp
+    adapters/
+      <adapter>.cpp
+    scheduling/
+      scheduler.cpp
+    wrappers/
+      <wrapper>.cpp
   private/
     data/
       helpers.cpp        # optional
@@ -195,13 +203,14 @@ include/simulation/util/
     validation.tpp
 
 src/simulation/util/
-  math.cpp
-  cppad.cpp
-  filters.cpp
-  linalg.cpp
-  print.cpp
-  trig.cpp
-  units.cpp
+  public/
+    math.cpp
+    cppad.cpp
+    filters.cpp
+    linalg.cpp
+    print.cpp
+    trig.cpp
+    units.cpp
 ```
 
 ## File Roles
@@ -266,23 +275,23 @@ Source directories mirror the semantic category and visibility of their declarat
 
 ```text
 include/<area>/<module>/public/data/helpers.hpp
-  -> src/<area>/<module>/data/helpers.cpp
+  -> src/<area>/<module>/public/data/helpers.cpp
 include/<area>/<module>/public/data/types.hpp
-  -> src/<area>/<module>/data/types.cpp
+  -> src/<area>/<module>/public/data/types.cpp
 include/<area>/<module>/public/components/foo.hpp
-  -> src/<area>/<module>/components/foo.cpp
+  -> src/<area>/<module>/public/components/foo.cpp
 include/<area>/<module>/public/adapters/foo.hpp
-  -> src/<area>/<module>/adapters/foo.cpp
+  -> src/<area>/<module>/public/adapters/foo.cpp
 include/<area>/<module>/public/scheduling/foo.hpp
-  -> src/<area>/<module>/scheduling/foo.cpp
+  -> src/<area>/<module>/public/scheduling/foo.cpp
 include/<area>/<module>/public/wrappers/foo.hpp
-  -> src/<area>/<module>/wrappers/foo.cpp
+  -> src/<area>/<module>/public/wrappers/foo.cpp
 include/<area>/<module>/public/detail/foo.hpp
-  -> src/<area>/<module>/detail/foo.cpp
+  -> src/<area>/<module>/public/detail/foo.cpp
 include/<area>/<module>/public/manager.hpp
-  -> src/<area>/<module>/manager.cpp
+  -> src/<area>/<module>/public/manager.cpp
 include/<area>/<module>/public/<semantic>.hpp
-  -> src/<area>/<module>/<semantic>.cpp
+  -> src/<area>/<module>/public/<semantic>.cpp
 include/<area>/<module>/private/data/foo.hpp
   -> src/<area>/<module>/private/data/foo.cpp
 include/<area>/<module>/private/components/<owner>/foo.hpp
@@ -310,7 +319,7 @@ Core modules follow the same `public/` and `private/` visibility rules without f
 - A JSON domain's `public/parser.hpp` contains its public configuration-to-domain entry points. `private/parsing.hpp` contains subordinate JSON-to-domain construction, and `private/validation.hpp` contains checks of the external JSON representation. These private files exist only when their roles are present.
 - A JSON `public/writer.hpp` contains public domain-to-JSON output operations. Shared JSON representation assembly belongs in `json/public/data/helpers.hpp`.
 - A module's `public/files.hpp` contains file and path operations exposed to other modules. Its `private/detail/files.hpp` contains subordinate file implementation used only by that module.
-- Core source paths mirror these semantic roles: `public/parser.hpp` maps to `parser.cpp`, `private/parsing.hpp` to `private/parsing.cpp`, `private/validation.hpp` to `private/validation.cpp`, `public/writer.hpp` to `writer.cpp`, and `public/files.hpp` to `files.cpp`.
+- Core source paths mirror visibility and semantic roles: `public/parser.hpp` maps to `public/parser.cpp`, `private/parsing.hpp` to `private/parsing.cpp`, `private/validation.hpp` to `private/validation.cpp`, `public/writer.hpp` to `public/writer.cpp`, and `public/files.hpp` to `public/files.cpp`.
 
 ## Required Checks
 
