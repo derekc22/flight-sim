@@ -3,7 +3,9 @@
 #include <Eigen/Dense>
 #include <filesystem>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
+#include <limits>
 #include <spdlog/spdlog.h>
 #include <stdexcept>
 #include <string>
@@ -39,6 +41,7 @@ namespace io
 		if (!file_csv.is_open()) {
 			throw std::runtime_error("Failed to open file: " + file_path.string());
 		}
+		file_csv << std::setprecision(std::numeric_limits<double>::max_digits10);
 
 		for (Eigen::Index i = 0; i < data.rows(); ++i) {
 			for (Eigen::Index j = 0; j < data.cols(); ++j) {

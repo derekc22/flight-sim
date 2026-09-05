@@ -3,7 +3,7 @@
 C++ flight simulator with FlightGear integration
 
 ## Installation
-Download FlightGear: 
+Download FlightGear:
 ```
 https://www.flightgear.org/download/
 ```
@@ -50,7 +50,7 @@ git config core.hooksPath .githooks
 Update the following environment variables in `.env` with the corresponding paths on your machine:
 - `PROJ_PATH`: Project root
 - `FG_PATH`: FlightGear executable
-  
+
 Customize the following JSON configuration file paths in `config/run.json`:
 - `initialization_config`: Initial conditions
 - `structural_config`: Structural properties
@@ -65,19 +65,19 @@ Customize the following JSON configuration file paths in `config/run.json`:
 - `runner_config`: Runner options
 
 Customize the JSON configuration file paths in `config/analyze.json`
-  
+
 ## Run
 
 To run the simulation:
   ```bash
   ./scripts/bin/run.sh -a <AIRCRAFT> [-d DATA] [-p PLOT] [-m ANALYSIS] -o <OUT_DIR>
   ```
-- `-a AIRCRAFT`: Aircraft to simulate (e.g. ASW28, c172p)
+- `-a AIRCRAFT`: Aircraft to visualize (e.g. ASW28, c172p)
 - `-d DATA`: Enable data saving
 - `-p PLOT`: Enable plotting
-- `-m ANALYSIS`: Enable post-run analysis 
+- `-m ANALYSIS`: Enable post-run analysis
 - `-o OUT_DIR`: Output directory name
-  
+
 ## Example
 Run a simulation of the C172 with logs, data, plots, and reports saved under `results/c172`:
 ```bash

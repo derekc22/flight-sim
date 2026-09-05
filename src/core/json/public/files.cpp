@@ -58,14 +58,16 @@ namespace json
 	{
 		const auto run_path = std::filesystem::path("config") / "run.json";
 		const auto run_config = read_json_file(run_path);
-		write_json(run_config, dir_path, "run");
+		const auto run_dir_path = std::filesystem::path(dir_path) / "run";
+		std::filesystem::create_directories(run_dir_path);
+		write_json(run_config, run_dir_path.string(), "run");
 
 		for (const auto& [key, value] : run_config.items()) {
 			if (!value.is_string()) {
 				throw std::runtime_error(std::format("json::dump_run_configs: expected string path for key '{}'", key));
 			}
 			const auto config_path = resolve_config_path(run_path, value.get<std::string>());
-			write_json(read_json_file(config_path), dir_path, key);
+			write_json(read_json_file(config_path), run_dir_path.string(), key);
 		}
 	}
 
@@ -74,11 +76,17 @@ namespace json
 	{
 		const auto analyze_path = std::filesystem::path("config") / "analyze.json";
 		const auto analyze_config = read_json_file(analyze_path);
-		write_json(analyze_config, dir_path, "analyze");
+		const auto analysis_dir_path = std::filesystem::path(dir_path) / "analysis";
+		std::filesystem::create_directories(analysis_dir_path);
+		write_json(analyze_config, analysis_dir_path.string(), "analyze");
 
-		const std::array<nlohmann::json, 2> cfgs{analyze_config.at("linear"), analyze_config.at("nonlinear")};
+		const std::array<std::string, 2> groups{"linear", "nonlinear"};
 
-		for (const auto& cfg : cfgs) {
+		for (const auto& group : groups) {
+			const auto group_dir_path = analysis_dir_path / group;
+			std::filesystem::create_directories(group_dir_path);
+			const auto& cfg = analyze_config.at(group);
+
 			for (const auto& [key, value] : cfg.items()) {
 				if (value.is_null()) {
 					continue;
@@ -88,7 +96,7 @@ namespace json
 						std::format("json::dump_analyze_configs: expected string path for key '{}'", key));
 				}
 				const auto config_path = resolve_config_path(analyze_path, value.get<std::string>());
-				write_json(read_json_file(config_path), dir_path, key);
+				write_json(read_json_file(config_path), group_dir_path.string(), key);
 			}
 		}
 	}

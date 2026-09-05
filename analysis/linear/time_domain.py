@@ -1,7 +1,3 @@
-import matplotlib
-
-matplotlib.use("Agg")
-
 import control as ct
 import matplotlib.pyplot as plt
 import numpy as np
@@ -11,10 +7,10 @@ from analysis.plotting import save_figure
 
 
 CONFIG_FIELDS = (
-    "time_sec", 
-    "step", 
-    "impulse", 
-    "ramp", 
+    "time_sec",
+    "step",
+    "impulse",
+    "ramp",
     "sine",
 )
 
@@ -77,7 +73,8 @@ def make_input_signal(file_prefix, time, dt):
         return signal
     if file_prefix == "ramp_response":
         return time
-    return np.sin(time)
+    if file_prefix == "sine_response":
+        return np.sin(time)
 
 
 def simulate_response(sys, time, inputs):

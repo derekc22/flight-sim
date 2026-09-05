@@ -1,6 +1,5 @@
 #pragma once
 #include "analysis/eigenanalysis/public.hpp"
-#include "simulation/constants/public/dimensions.hpp"
 #include "simulation/linearization/public/data/types.hpp"
 #include "simulation/runner/public/data/types.hpp"
 #include "simulation/trim/public/data/types.hpp"
@@ -13,8 +12,6 @@ namespace io
 	struct AnalysisExportContext {
 		std::string aircraft_id;
 		runner::ModuleRates module_rates;
-		int state_dim = constants::state_dim;
-		int input_dim = constants::input_dim;
 		std::string A_csv;
 		std::string B_csv;
 		std::string C_csv;
