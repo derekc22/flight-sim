@@ -61,7 +61,7 @@ namespace devices
 		return std::clamp(previous + delta, limit_min, limit_max);
 	}
 
-	JoystickManager::JoystickManager(
+	Joystick::Joystick(
 		const actuators::ActuatorLimits& actuator_limits)
 		: actuator_limits(actuator_limits)
 	{
@@ -69,7 +69,7 @@ namespace devices
 		SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "1");
 		if (!SDL_Init(SDL_INIT_GAMEPAD)) {
 			throw std::runtime_error(
-				std::string("devices::JoystickManager: Failed to initialize SDL gamepad support: ") + SDL_GetError());
+				std::string("devices::Joystick: Failed to initialize SDL gamepad support: ") + SDL_GetError());
 		}
 
 		int count = 0;
@@ -89,8 +89,8 @@ namespace devices
 
 		if (!gamepad) {
 			std::string message = dualshock_found
-				? std::string("devices::JoystickManager: Failed to open DualShock 4: ") + SDL_GetError()
-				: "devices::JoystickManager: DualShock 4 not found";
+				? std::string("devices::Joystick: Failed to open DualShock 4: ") + SDL_GetError()
+				: "devices::Joystick: DualShock 4 not found";
 			SDL_QuitSubSystem(SDL_INIT_GAMEPAD);
 			throw std::runtime_error(message);
 		}
@@ -99,7 +99,7 @@ namespace devices
 		prev_touchpad_down = SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_TOUCHPAD);
 	}
 
-	JoystickManager::~JoystickManager()
+	Joystick::~Joystick()
 	{
 		if (gamepad) {
 			SDL_CloseGamepad(gamepad);
@@ -107,12 +107,12 @@ namespace devices
 		SDL_QuitSubSystem(SDL_INIT_GAMEPAD);
 	}
 
-	JoystickOutputRaw JoystickManager::poll()
+	JoystickOutputRaw Joystick::poll()
 	{
 		SDL_PumpEvents();
 		SDL_UpdateGamepads();
 		if (!SDL_GamepadConnected(gamepad)) {
-			throw std::runtime_error("devices::JoystickManager: DualShock 4 disconnected");
+			throw std::runtime_error("devices::Joystick: DualShock 4 disconnected");
 		}
 
 		bool touchpad_down = SDL_GetGamepadButton(gamepad, SDL_GAMEPAD_BUTTON_TOUCHPAD);
@@ -133,8 +133,8 @@ namespace devices
 		return raw_output;
 	}
 
-	JoystickManagerOutput JoystickManager::step(
-		const JoystickManagerInput& input)
+	JoystickOutput Joystick::step(
+		const JoystickInput& input)
 	{
 		JoystickOutputRaw raw_output = poll();
 		const actuators::ActuatorInputs_T<double>& limit_min = actuator_limits.limit_min;
@@ -163,7 +163,7 @@ namespace devices
 				limit_min.propulsor_inputs.right_propulsor_cmd,
 				limit_max.propulsor_inputs.right_propulsor_cmd);
 
-		JoystickManagerOutput joystick_output{.u_cmd = u_cmd, .mode_toggled = mode_toggled};
+		JoystickOutput joystick_output{.u_cmd = u_cmd, .mode_toggled = mode_toggled};
 		mode_toggled = false;
 
 		return joystick_output;

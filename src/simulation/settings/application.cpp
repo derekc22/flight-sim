@@ -1,4 +1,4 @@
-#include "simulation/settings/public/detail/application.hpp"
+#include "simulation/settings/public/application.hpp"
 
 #include "simulation/vehicles/public/aircraft.hpp"
 

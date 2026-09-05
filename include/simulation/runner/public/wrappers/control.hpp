@@ -10,7 +10,7 @@ namespace runner
 {
 
 	struct ControlWrapper {
-		std::optional<devices::JoystickManager> joystick_manager;
+		std::optional<devices::Joystick> joystick;
 
 		guidance::GuidanceSetpoint setpoint_t_1;
 		control::VirtualControlOutput mu_cmd_t_1;
@@ -25,7 +25,7 @@ namespace runner
 		ControlWrapper(const JSONFlags& flags,
 			const actuators::SurfaceActuators& surface_actuators,
 			const actuators::PropulsorActuators& propulsor_actuators);
-		devices::JoystickManagerOutput poll_joystick();
+		devices::JoystickOutput poll_joystick();
 		ControlWrapperOutput step(const ControlWrapperInput& input);
 	};
 

@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "simulation/control/private/components/attitude/pid.hpp"

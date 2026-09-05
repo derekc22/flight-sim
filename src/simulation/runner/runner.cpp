@@ -1,15 +1,14 @@
 #include "simulation/runner/public/runner.hpp"
 
 #include "simulation/actuators/public/data/helpers.hpp"
-#include "simulation/aerodynamics/public/data/helpers.hpp"
 #include "simulation/aerodynamics/public/detail/state.hpp"
 #include "simulation/atmospheric/public/detail/state.hpp"
 #include "simulation/autodiff/public/data/helpers.hpp"
 #include "simulation/dynamics/public/detail/state.hpp"
 #include "simulation/geography/public/detail/geodesy.hpp"
 #include "simulation/runner/private/detail/loading.hpp"
+#include "simulation/trim/public/application.hpp"
 #include "simulation/trim/public/data/helpers.hpp"
-#include "simulation/trim/public/detail/application.hpp"
 
 #include <array>
 #include <chrono>
@@ -230,7 +229,7 @@ namespace runner
 	void Runner::step_control(
 		StepContext& context)
 	{
-		devices::JoystickManagerOutput joystick_output = control_wrapper.poll_joystick();
+		devices::JoystickOutput joystick_output = control_wrapper.poll_joystick();
 
 		// step state machine
 		context.current_mode = fsm_manager.step({.mode_toggled = joystick_output.mode_toggled}).current_mode;

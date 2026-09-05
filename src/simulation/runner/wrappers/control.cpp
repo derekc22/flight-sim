@@ -25,22 +25,22 @@ namespace runner
 		// set u_actual_t_1 to match actuators' neutral initialization
 		u_actual_t_1 = actuators::get_neutral_actuator_inputs(surface_actuators, propulsor_actuators);
 
-		// create joystick manager
+		// create joystick
 		if (flags.joystick_flag) {
 			actuators::ActuatorLimits actuator_limits =
 				actuators::pack_actuator_limits(surface_actuators, propulsor_actuators);
-			joystick_manager.emplace(actuator_limits);
+			joystick.emplace(actuator_limits);
 		}
 	}
 
-	devices::JoystickManagerOutput ControlWrapper::poll_joystick()
+	devices::JoystickOutput ControlWrapper::poll_joystick()
 	{
 		// declare for state machine
-		devices::JoystickManagerOutput joystick_output{};
+		devices::JoystickOutput joystick_output{};
 
 		// fetch from joystick
-		if (joystick_manager) {
-			joystick_output = joystick_manager->step({.u_cmd_t_1 = u_cmd_t_1});
+		if (joystick) {
+			joystick_output = joystick->step({.u_cmd_t_1 = u_cmd_t_1});
 		}
 
 		return joystick_output;

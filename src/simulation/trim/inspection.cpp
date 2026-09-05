@@ -1,4 +1,4 @@
-#include "simulation/trim/public/detail/inspection.hpp"
+#include "simulation/trim/public/inspection.hpp"
 
 #include "simulation/aerodynamics/public/detail/state.hpp"
 #include "simulation/atmospheric/public/detail/state.hpp"

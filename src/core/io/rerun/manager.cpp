@@ -1,6 +1,7 @@
 #include "core/io/rerun/public/manager.hpp"
 
 #include "core/io/camera/public/capture.hpp"
+#include "core/io/rerun/private/data/types.hpp"
 #include "core/io/rerun/private/detail/streaming.hpp"
 #include "simulation/actuators/public/data/helpers.hpp"
 #include "simulation/constants/public/scalars.hpp"

@@ -1,4 +1,4 @@
-#include "simulation/aerodynamics/public/data/helpers.hpp"
+#include "simulation/aerodynamics/public/detail/axes.hpp"
 
 #include "simulation/util/public/trig.hpp"
 

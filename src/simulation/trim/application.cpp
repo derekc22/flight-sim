@@ -1,4 +1,4 @@
-#include "simulation/trim/public/detail/application.hpp"
+#include "simulation/trim/public/application.hpp"
 
 #include <Eigen/Dense>
 

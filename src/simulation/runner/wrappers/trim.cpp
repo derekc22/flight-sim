@@ -1,6 +1,6 @@
 #include "simulation/runner/public/wrappers/trim.hpp"
 
-#include "simulation/trim/public/detail/inspection.hpp"
+#include "simulation/trim/public/inspection.hpp"
 
 namespace runner
 {
