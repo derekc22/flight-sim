@@ -1,7 +1,7 @@
 #include "simulation/control/public/components/attitude.hpp"
 
-#include "simulation/control/private/components/attitude/damper.hpp"
-#include "simulation/control/private/components/attitude/pid.hpp"
+#include "simulation/control/private/components/controllers/attitude/damper.hpp"
+#include "simulation/control/private/components/controllers/attitude/pid.hpp"
 #include "simulation/control/private/detail/stateful_controller.hpp"
 #include "simulation/util/public/math.hpp"
 

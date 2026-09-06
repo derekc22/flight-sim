@@ -7,6 +7,7 @@
 #include <format>
 #include <fstream>
 #include <nlohmann/json.hpp>
+#include <spdlog/spdlog.h>
 #include <stdexcept>
 #include <string>
 
@@ -32,6 +33,24 @@ namespace json
 		const auto run_path = std::filesystem::path("config") / "run.json";
 		const auto run_config = read_json_file(run_path);
 		return resolve_config_path(run_path, run_config.at(key).get<std::string>());
+	}
+
+	void write_json(
+		const nlohmann::json& config,
+		const std::string& dir_path,
+		const std::string& fname)
+	{
+		const auto file_path = std::filesystem::path(dir_path) / (fname + ".json");
+		std::ofstream file_json(file_path);
+		if (!file_json.is_open()) {
+			throw std::runtime_error("Failed to open file: " + file_path.string());
+		}
+
+		file_json << config.dump(4) << "\n";
+		file_json.close();
+
+		std::string log_str = "File saved successfully to " + file_path.string();
+		spdlog::info(log_str);
 	}
 
 	void dump_run_configs(

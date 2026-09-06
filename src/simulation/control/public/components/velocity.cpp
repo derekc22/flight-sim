@@ -1,6 +1,6 @@
 #include "simulation/control/public/components/velocity.hpp"
 
-#include "simulation/control/private/components/velocity/pid.hpp"
+#include "simulation/control/private/components/controllers/velocity/pid.hpp"
 #include "simulation/control/private/detail/stateful_controller.hpp"
 #include "simulation/util/public/math.hpp"
 

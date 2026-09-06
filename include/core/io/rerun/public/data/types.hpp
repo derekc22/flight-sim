@@ -6,7 +6,7 @@
 namespace io
 {
 
-	struct RerunManagerInput {
+	struct RerunRecorderInput {
 		int t;
 		const DataContext& data_context;
 	};

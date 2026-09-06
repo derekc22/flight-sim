@@ -1,6 +1,6 @@
 #include "core/messages/public/data/helpers.hpp"
 
-#include "simulation/atmospheric/public/detail/wind.hpp"
+#include "simulation/atmospheric/public/data/helpers.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/geography/public/data/types.hpp"
 #include "simulation/util/public/trig.hpp"

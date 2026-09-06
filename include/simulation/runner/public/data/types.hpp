@@ -192,11 +192,11 @@ namespace runner
 		const JSONFlags& flags;
 	};
 
-	struct RunnerInput {
+	struct RunManagerInput {
 		int t;
 	};
 
-	struct RunnerOutput {
+	struct RunManagerOutput {
 		StepContext context;
 	};
 
