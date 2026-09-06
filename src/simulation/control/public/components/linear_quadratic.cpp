@@ -1,7 +1,7 @@
 #include "simulation/control/public/components/linear_quadratic.hpp"
 
-#include "simulation/control/private/components/linear_quadratic/lqi.hpp"
-#include "simulation/control/private/components/linear_quadratic/lqr.hpp"
+#include "simulation/control/private/components/controllers/linear_quadratic/lqi.hpp"
+#include "simulation/control/private/components/controllers/linear_quadratic/lqr.hpp"
 #include "simulation/control/private/detail/stateful_controller.hpp"
 #include "simulation/util/public/math.hpp"
 

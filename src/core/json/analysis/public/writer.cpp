@@ -1,6 +1,6 @@
 #include "core/json/analysis/public/writer.hpp"
 
-#include "core/json/private/detail/files.hpp"
+#include "core/json/public/files.hpp"
 #include "simulation/constants/public/scalars.hpp"
 
 #include <nlohmann/json.hpp>

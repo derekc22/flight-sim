@@ -33,7 +33,7 @@ namespace io
 		atmospheric::Wind windB;
 	};
 
-	struct DataManagerInput {
+	struct DataRecorderInput {
 		int t;
 		const DataContext& context;
 	};

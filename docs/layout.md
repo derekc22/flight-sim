@@ -5,7 +5,7 @@ These rules define the final layout contract for C++ modules under `include/simu
 ## Visibility
 
 - `public/` contains declarations that code outside the module may use.
-- `private/` contains algorithms, implementation types, and policies used only by the owning module.
+- `private/` contains algorithms and implementation types used only by the owning module.
 - Under `src/`, `public/` contains definitions declared by public headers and `private/` contains definitions declared by private headers.
 - Source visibility names classify the declarations being implemented; source files themselves are never included as interfaces.
 - A source file's placement follows the declarations it defines, not its dependencies; a public implementation may use private headers from its own module.
@@ -13,9 +13,9 @@ These rules define the final layout contract for C++ modules under `include/simu
 - Production code must not include another module's private headers.
 - Tests may include private headers for deliberate white-box testing.
 
-## Primary Public Objects
+## Standalone Public Objects
 
-A module whose main interface is a named object places that object directly under `public/` using its semantic name.
+A public behavior-bearing type that is neither shared data, a component, nor a manager is a standalone public object. It is placed directly under `public/` using its semantic name.
 
 ```text
 include/<area>/<module>/
@@ -28,13 +28,13 @@ src/<area>/<module>/
     <object>.cpp  # when the object has out-of-line definitions
 ```
 
-`<area>` is `simulation` or `core`. A primary public object is the entity, service, or application object that callers construct, hold, and operate. It owns meaningful state or behavior and is not merely a shared data representation, free implementation function, subordinate component, or subsystem manager.
+`<area>` is `simulation` or `core`. A standalone public object represents the thing callers use, such as a vehicle, frame, solver, device, connection, or recorder. Its methods implement that object's own behavior. Internal state, resources, threads, queues, and helper functions are implementation and do not make the object a manager. A standalone object may aggregate subsystem managers when those subsystems are part of the object it represents, as `Aircraft` does.
 
-Use the object's semantic name. If `XManager` would mean a separate object that manages instances of `X`, then `X` itself is a primary public object and belongs in `public/x.hpp`. A semantic header may contain a cohesive object family, such as the `Frame` hierarchy or the `UDPIn` and `UDPOut` pair; unrelated primary objects use separate semantic headers.
+Use the object's semantic name. If `XManager` would mean a separate object that manages instances of `X`, then `X` itself is a standalone public object and belongs in `public/x.hpp`. A semantic header may contain a cohesive object family, such as the `Frame` hierarchy or the `UDPIn` and `UDPOut` pair; unrelated standalone objects use separate semantic headers.
 
-`frames/public/frame.hpp`, `vehicles/public/aircraft.hpp`, `qp/public/solver.hpp`, and `runner/public/runner.hpp` are the current simulation examples. Core examples include `connection/public/udp.hpp` and `devices/public/joystick.hpp`.
+`frames/public/frame.hpp`, `vehicles/public/aircraft.hpp`, and `qp/public/solver.hpp` are the current simulation examples. Core examples include `connection/public/udp.hpp`, `devices/public/joystick.hpp`, `io/analysis/public/analysis_recorder.hpp`, `io/data/public/data_recorder.hpp`, and `io/rerun/public/rerun_recorder.hpp`.
 
-A primary public object may coexist with the module's applicable public operations, `data/`, `detail/`, component, policy, adapter, scheduling, or wrapper directories.
+A standalone public object may coexist with the module's applicable public operations, `data/`, `detail/`, or a distinct subsystem manager.
 
 ## Public Operation Interfaces
 
@@ -51,21 +51,25 @@ src/<area>/<module>/
     <operation>.cpp  # when the operation has out-of-line definitions
 ```
 
-Public operation interfaces are first-class module capabilities, not internal implementation detail. They are not data helpers unless their purpose is representation assembly, and they are not `detail` unless they are domain calculations. Current examples include `settings/public/application.hpp`, `trim/public/application.hpp`, `trim/public/inspection.hpp`, and `io/camera/public/capture.hpp`. Core parsers, writers, and file interfaces are specialized public operations with conventional names.
+Public operation interfaces are first-class module capabilities, not subordinate implementation functions. They are not data helpers unless their purpose is representation assembly, and subordinate module behavior belongs in `detail`. Current examples include `settings/public/application.hpp`, `trim/public/application.hpp`, `trim/public/inspection.hpp`, and `io/camera/public/capture.hpp`. Core parsers, writers, and file interfaces are specialized public operations with conventional names.
 
-A module may expose both primary public objects and public operations when both roles exist.
+A module may expose both standalone public objects and public operations when both roles exist.
 
 ## Reading Layout Trees
 
 The trees below enumerate permitted role locations, not mandatory scaffolding. Create a directory or file only when the module contains code with that role; do not create empty categories to reproduce the full tree. A `.cpp` exists only when its header has out-of-line definitions, and a `.tpp` exists only when its header has template definitions.
 
-A module with components necessarily has at least one public component and a manager that owns or selects its components. All other displayed roles are conditional. A module without components has no component hierarchy; its data, detail, manager, and primary-object roles are present only when applicable.
+A module with components necessarily has at least one component and a manager that directly or transitively owns or selects its component hierarchy. All other displayed roles are conditional. A module without components has no component hierarchy; its data, detail, manager, standalone-object, and public-operation roles are present only when applicable.
 
 ## Modules With Components
 
 ```text
 include/simulation/<module>/
   public/
+    <object>.hpp         # when a standalone public object exists
+    <object>.tpp         # optional
+    <operation>.hpp      # when a public operation exists
+    <operation>.tpp      # optional
     data/
       types.hpp
       helpers.hpp        # optional
@@ -87,12 +91,11 @@ include/simulation/<module>/
     detail/
       <implementation>.hpp
       <implementation>.tpp  # optional
-    policies/
-      <policy>/
-        <implementation>.hpp
 
 src/simulation/<module>/
   public/
+    <object>.cpp         # when the object has out-of-line definitions
+    <operation>.cpp      # when the operation has out-of-line definitions
     data/
     components/
     manager.cpp
@@ -100,24 +103,43 @@ src/simulation/<module>/
     data/
     detail/
     components/
-    policies/
 ```
 
 Components may use short semantic subdirectories when genuine categories exist, such as `surface/`, `propulsor/`, `air_data/`, or `navigation/`. Do not add a directory layer that would contain only a redundant repetition of the component name.
+
+Control divides its private components into two genuine categories:
+
+```text
+private/components/
+  controllers/
+    <control-domain>/
+      <implementation>.hpp
+  policies/
+    <policy-family>/
+      <implementation>.hpp
+```
+
+`controllers/` contains implementations of Control's public attitude, velocity, and linear-quadratic components. `policies/` contains behavior-bearing control-law components used by those controllers and their implementation support. The `ControlManager` owns both categories transitively through its component hierarchy. These are Control-specific component categories, not repository-wide roles.
+
+Runner groups `ControlWrapper`, `EstimationWrapper`, `LinearizationWrapper`, `MeasurementsWrapper`, `PhysicsWrapper`, `RecordingWrapper`, and `TrimWrapper` under `public/components/wrappers/`. `Scheduler` and `FlightGearAdapter` remain directly under `public/components/` because they are individual components that do not form a second shared category. `wrappers/` is a Runner-specific component category, not a repository-wide role.
 
 ## Modules Without Components
 
 ```text
 include/simulation/<module>/
   public/
+    <object>.hpp         # when a standalone public object exists
+    <object>.tpp         # optional
+    <operation>.hpp      # when a public operation exists
+    <operation>.tpp      # optional
     data/
       types.hpp
       helpers.hpp        # optional
       helpers.tpp        # optional
     detail/
-      <calculation>.hpp
-      <calculation>.tpp  # optional
-    manager.hpp          # when the module manages one subsystem
+      <function>.hpp
+      <function>.tpp  # optional
+    manager.hpp          # when a manager exists
     manager.tpp          # optional
   private/
     data/
@@ -129,6 +151,8 @@ include/simulation/<module>/
 
 src/simulation/<module>/
   public/
+    <object>.cpp         # when the object has out-of-line definitions
+    <operation>.cpp      # when the operation has out-of-line definitions
     data/
     detail/
     manager.cpp          # only when a manager exists
@@ -136,47 +160,6 @@ src/simulation/<module>/
     data/
     detail/
 ```
-
-## Runner Support Roles
-
-`Runner` is a primary public object whose behavior is top-level application orchestration. Wrappers isolate orchestration responsibilities and runner-level persistent state without representing independent subsystems. Scheduling and external-system adapters remain separate from subsystem wrappers. These support roles do not create a separate placement or naming category for `Runner` itself.
-
-```text
-include/simulation/runner/
-  public/
-    runner.hpp
-    adapters/
-      <adapter>.hpp
-    data/
-      types.hpp
-    scheduling/
-      scheduler.hpp
-    wrappers/
-      <wrapper>.hpp
-  private/
-    data/
-      helpers.hpp        # optional
-    detail/
-      <implementation>.hpp
-      <implementation>.tpp  # optional
-
-src/simulation/runner/
-  public/
-    runner.cpp
-    adapters/
-      <adapter>.cpp
-    scheduling/
-      scheduler.cpp
-    wrappers/
-      <wrapper>.cpp
-  private/
-    data/
-      helpers.cpp        # optional
-    detail/
-      <implementation>.cpp
-```
-
-Runner wrappers coordinate subsystem managers and exchange per-step data through explicit payloads and `StepContext`.
 
 ## Shared Support Modules
 
@@ -219,7 +202,7 @@ src/simulation/util/
 
 Contains domain-owned shared value types, state structures, payloads, parameters, enums, constants, and aliases.
 
-Intrinsic value-object behavior may remain on its owning type. Examples include representation accessors and conversions such as the methods on dynamics orientation types. Module orchestration and calculations involving independent domain objects do not belong here.
+Intrinsic value-object behavior may remain on its owning type. Behavior is intrinsic when it queries or modifies that type's own representation, enforces its invariants, or validates an instance of that type without coordinating module responsibilities or calculating relationships between independent domain objects. Examples include orientation accessors and conversions, `DataMatrix::insert`, and `StepOptions::validate`.
 
 Constants owned by one domain remain in that domain's data. Constants with no domain owner that are used throughout the codebase belong in the shared `constants` module.
 
@@ -229,45 +212,29 @@ Contains cohesive free-function capabilities exposed as part of a module's publi
 
 ### `data/helpers`
 
-Contains operations that assemble, pack, unpack, format, or otherwise construct data representations. This includes `make_*` functions whose purpose is to assemble an output structure.
+Contains operations whose primary purpose is to assemble, decompose, pack, unpack, format, or convert shared data representations. This includes selecting or calculating field values needed to construct a state, payload, result, or report representation. A function whose primary result is a domain calculation rather than an assembled data representation belongs in `detail`. Its name may use `make_*`, `build_*`, or another semantic verb; the name alone does not determine its role. `atmospheric::build_wind` is a data helper because it assembles a `Wind` representation from external wind inputs.
 
 ### `detail`
 
-Contains module calculations and implementation support that does not belong to data, components, policies, managers, adapters, scheduling, or wrappers. Detail files contain functions; they do not define shared types. Forward declarations of types owned elsewhere may appear when required by function declarations. A module's detail calculations must consume data directly and must not depend on that module's manager.
+Contains subordinate module behavior implemented as functions. It does not contain standalone objects, managers, components, shared type declarations, or representation helpers. Domain calculations and decisions, validation beyond one value type's own invariants, streaming, filesystem support, and similar behavior may all belong in `detail` when they are subordinate to the module's public interfaces. A detail function may construct or extract a mathematical value as part of its calculation; that does not make it a data helper. The SE(3) functions in `transforms/public/detail/se3.hpp` are transform calculations even when they construct or extract matrices. Forward declarations of types owned elsewhere may appear when required by function declarations.
 
-Public detail functions are domain-owned calculations required by other modules or public template definitions. A generally reusable calculation with no domain owner belongs in `util`, not in a domain module's detail directory.
+This definition is identical for `public/detail` and `private/detail`; visibility is the only distinction. Public detail functions are required outside the module or by public template definitions. Private detail functions are required only by the owning module. Detail calculations must consume data directly and must not depend on their module's manager.
 
-Private detail functions may also provide internal validation, translation, construction, streaming, filesystem, or other implementation support required only by the owning module. A helper shared by multiple components belongs in private detail unless it is a selectable implementation strategy. Detail files use names that identify their operation; the generic `helpers.hpp` and `helpers.tpp` names are reserved for data helpers.
+A generally reusable function with no domain owner belongs in `util`, not in a domain module's detail directory. A function shared by multiple components belongs in detail. Detail files use names that identify their operation; the generic `helpers.hpp` and `helpers.tpp` names are reserved for data helpers.
 
 ### `components`
 
-Contains one file per distinct functional responsibility owned or selected by a subsystem manager. A component may own its own state and behavior. Individual formulas, repeated data entries, and intermediate stages of one calculation are not components. `base.hpp` exists only when components share behavior. `collection.hpp` exists only when a named aggregate of components is useful.
+Contains one file per distinct functional responsibility directly or transitively owned or selected within a manager's component hierarchy. A component may own its own state, behavior, and subordinate components. Subcomponent describes an ownership relationship, not a separate layout category. Individual formulas, repeated data entries, and intermediate stages of one calculation are not components. `base.hpp` exists only when components share behavior. `collection.hpp` exists only when a named aggregate of components is useful.
 
-An algorithm used by only one component belongs under `private/components/<owner>/`.
-
-### `policies`
-
-Contains selectable or replaceable implementation strategies that satisfy a defined behavioral role. A policy may be shared by multiple components. Code does not become a policy merely because multiple components call it; shared support without strategy selection belongs in `private/detail`.
+An algorithm used by only one component belongs under `private/components/<owner>/`. Component subdirectories may distinguish genuine categories of components; they do not establish new repository-wide file roles.
 
 ### `manager`
 
-Represents management of one subsystem. It owns that subsystem's orchestration and, when applicable, persistent state, component selection, input-payload distribution, and output-payload aggregation. It is declared in `public/manager.hpp` and named for the subsystem it manages, such as `ControlManager` or `SensorManager`. Calculation detail should remain in components or `detail/`.
+Represents the management layer for a simulation subsystem or application execution. A manager coordinates that responsibility through its component hierarchy, subordinate managers, or cohesive subsystem step. It owns the managed responsibility's persistent state and, when applicable, component selection, input-payload distribution, and output-payload aggregation. Managers may form a hierarchy: subsystem managers own subsystem responsibilities, while a top-level manager may coordinate those managers as part of application execution. Internal resources and helper functions are implementation, not managed responsibilities. A manager is declared in `public/manager.hpp` and named for the responsibility it manages, such as `ControlManager`, `SensorManager`, or `RunManager`. Subordinate behavior should remain in components or `detail/`.
 
 `step(input) -> output` is the standard per-tick entry point, not the manager's only permitted method. Managers may use named member methods for coherent orchestration phases; simple managers may orchestrate directly in `step()` without artificial helpers. A member method's visibility under the project's struct convention is not a reason to inline it.
 
-An object does not become a manager merely because it coordinates other objects or owns persistent state. A named domain entity, tool, or application service is a primary public object; a class whose public role is managing subordinate objects, modes, or calculations belonging to one subsystem is a manager. A cohesive subsystem manager may have no components when splitting its behavior would create artificial responsibilities; `StructuralManager` is the current example.
-
-### `adapters`
-
-Contains boundaries between the application and an external system or protocol. Adapters translate application data and lifecycle operations without owning an independent simulation subsystem.
-
-### `scheduling`
-
-Contains application timing and decisions about when work executes. Scheduling does not implement the subsystem work being scheduled.
-
-### `wrappers`
-
-Contains runner-level coordination for one application phase involving subsystem managers, scheduling, and shared `StepContext` data. A wrapper is not an independent subsystem and does not replace the managers it coordinates.
+An object does not become a manager merely because it organizes its own behavior or owns persistent state or implementation resources. A public type representing the entity, tool, connection, or recorder being used is a standalone public object. A type whose public role is the management layer for a simulation subsystem or application execution is a manager. A cohesive subsystem manager may have no components when splitting its behavior would create artificial responsibilities; `StructuralManager` is the current example.
 
 ## Source Mirroring
 
@@ -280,12 +247,8 @@ include/<area>/<module>/public/data/types.hpp
   -> src/<area>/<module>/public/data/types.cpp
 include/<area>/<module>/public/components/foo.hpp
   -> src/<area>/<module>/public/components/foo.cpp
-include/<area>/<module>/public/adapters/foo.hpp
-  -> src/<area>/<module>/public/adapters/foo.cpp
-include/<area>/<module>/public/scheduling/foo.hpp
-  -> src/<area>/<module>/public/scheduling/foo.cpp
-include/<area>/<module>/public/wrappers/foo.hpp
-  -> src/<area>/<module>/public/wrappers/foo.cpp
+include/<area>/<module>/public/components/<category>/foo.hpp
+  -> src/<area>/<module>/public/components/<category>/foo.cpp
 include/<area>/<module>/public/detail/foo.hpp
   -> src/<area>/<module>/public/detail/foo.cpp
 include/<area>/<module>/public/manager.hpp
@@ -296,10 +259,10 @@ include/<area>/<module>/private/data/foo.hpp
   -> src/<area>/<module>/private/data/foo.cpp
 include/<area>/<module>/private/components/<owner>/foo.hpp
   -> src/<area>/<module>/private/components/<owner>/foo.cpp
+include/<area>/<module>/private/components/<category>/<owner>/foo.hpp
+  -> src/<area>/<module>/private/components/<category>/<owner>/foo.cpp
 include/<area>/<module>/private/detail/foo.hpp
   -> src/<area>/<module>/private/detail/foo.cpp
-include/<area>/<module>/private/policies/<policy>/foo.hpp
-  -> src/<area>/<module>/private/policies/<policy>/foo.cpp
 ```
 
 Template definitions remain in the corresponding `.tpp`. Every `.hpp` and `.tpp` uses `#pragma once`.
@@ -312,9 +275,9 @@ Template definitions remain in the corresponding `.tpp`. Every `.hpp` and `.tpp`
 
 Core modules follow the same `public/` and `private/` visibility rules without forcing simulation-specific manager or component roles onto infrastructure code.
 
-- Primary public infrastructure objects follow the primary-object rule, such as `connection/public/udp.hpp` and `devices/public/joystick.hpp`.
+- Standalone public infrastructure objects follow the standalone-object rule, such as `connection/public/udp.hpp`, `devices/public/joystick.hpp`, `io/analysis/public/analysis_recorder.hpp`, `io/data/public/data_recorder.hpp`, and `io/rerun/public/rerun_recorder.hpp`.
 - Shared value types and representation helpers use `public/data/types.hpp` and `public/data/helpers.hpp`.
-- IO subsystems with persistent orchestration use `public/data/types.hpp` and `public/manager.hpp`.
+- IO types follow the same standalone-object and manager rules; persistent state, threads, queues, files, or streams do not by themselves establish a manager role.
 - Public operation interfaces follow the general semantic naming rule, such as `io/camera/public/capture.hpp`.
 - A JSON domain's `public/parser.hpp` contains its public configuration-to-domain entry points. `private/parsing.hpp` contains subordinate JSON-to-domain construction, and `private/validation.hpp` contains checks of the external JSON representation. These private files exist only when their roles are present.
 - A JSON `public/writer.hpp` contains public domain-to-JSON output operations. Shared JSON representation assembly belongs in `json/public/data/helpers.hpp`.
@@ -330,9 +293,9 @@ Core modules follow the same `public/` and `private/` visibility rules without f
 - Domain-owned calculations remain with their domain; ownerless general-purpose operations belong in shared support.
 - No public header or template definition includes `private/`.
 - No production module includes another module's `private/` tree.
-- No detail calculation depends on its own manager.
-- Primary public objects and public operations use semantic root-level headers. Objects that manage one subsystem use `public/manager.hpp` and the `<Subsystem>Manager` name.
-- Component-specific implementations remain with their owner; selectable shared strategies use `private/policies`; other shared private support uses `private/detail`.
+- No detail function depends on its own manager.
+- Standalone public objects and public operations use semantic root-level headers. A type whose public role is the management layer for a simulation subsystem or application execution uses `public/manager.hpp` and the `<Responsibility>Manager` name.
+- Component-specific implementations remain with their owner; genuine component categories may use semantic subdirectories. Shared supporting functions use `detail`.
 - Source paths mirror declaration visibility and semantic role.
 - Core parser, parsing, validation, writer, and file interfaces use their defined semantic paths.
 - No obsolete flat `public.hpp`, `private.hpp`, or legacy submodule directories remain after a module is refactored.

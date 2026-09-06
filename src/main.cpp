@@ -1,6 +1,6 @@
 #include "core/json/runner/public/parser.hpp"
 #include "simulation/runner/public/data/types.hpp"
-#include "simulation/runner/public/runner.hpp"
+#include "simulation/runner/public/manager.hpp"
 
 #include <spdlog/spdlog.h>
 #include <string>
@@ -39,7 +39,7 @@ int main(
 	runner::JSONOptions json_options = json::parse_runner_config();
 
 	// build runner
-	runner::Runner runner{cli_options, json_options};
+	runner::RunManager runner{cli_options, json_options};
 
 	// run simulation
 	runner.run();
