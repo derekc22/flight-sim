@@ -15,15 +15,21 @@
             "CM0": -0.05,
             "CMa": 0.0,
             "dynamic_derivatives": {
-                "CL_qhat": 0.0,
-                "CD_qhat": 0.0,
-                "CM_qhat": -8.0,
-                "CL_phat": -0.12,
-                "CL_rhat": 0.02,
-                "CD_phat": 0.01,
-                "CD_rhat": 0.01,
-                "CM_phat": 0.0,
-                "CM_rhat": 0.0
+                "p_hat": {
+                    "dCL": -0.12,
+                    "dCD": 0.01,
+                    "dCM": 0.0
+                },
+                "q_hat": {
+                    "dCL": 0.0,
+                    "dCD": 0.0,
+                    "dCM": -8.0
+                },
+                "r_hat": {
+                    "dCL": 0.02,
+                    "dCD": 0.01,
+                    "dCM": 0.0
+                }
             },
             "effectors": [
                 {
@@ -61,15 +67,21 @@
             "CM0": -0.05,
             "CMa": 0.0,
             "dynamic_derivatives": {
-                "CL_qhat": 0.0,
-                "CD_qhat": 0.0,
-                "CM_qhat": -8.0,
-                "CL_phat": -0.12,
-                "CL_rhat": -0.02,
-                "CD_phat": 0.01,
-                "CD_rhat": 0.01,
-                "CM_phat": 0.0,
-                "CM_rhat": 0.0
+                "p_hat": {
+                    "dCL": -0.12,
+                    "dCD": 0.01,
+                    "dCM": 0.0
+                },
+                "q_hat": {
+                    "dCL": 0.0,
+                    "dCD": 0.0,
+                    "dCM": -8.0
+                },
+                "r_hat": {
+                    "dCL": -0.02,
+                    "dCD": 0.01,
+                    "dCM": 0.0
+                }
             },
             "effectors": [
                 {
@@ -107,15 +119,21 @@
             "CM0": 0.0,
             "CMa": 0.0,
             "dynamic_derivatives": {
-                "CL_qhat": -18.0,
-                "CD_qhat": 0.10,
-                "CM_qhat": -180.0,
-                "CL_phat": 0.0,
-                "CL_rhat": 0.0,
-                "CD_phat": 0.0,
-                "CD_rhat": 0.0,
-                "CM_phat": 0.0,
-                "CM_rhat": 0.0
+                "p_hat": {
+                    "dCL": 0.0,
+                    "dCD": 0.0,
+                    "dCM": 0.0
+                },
+                "q_hat": {
+                    "dCL": -18.0,
+                    "dCD": 0.10,
+                    "dCM": -180.0
+                },
+                "r_hat": {
+                    "dCL": 0.0,
+                    "dCD": 0.0,
+                    "dCM": 0.0
+                }
             },
             "effectors": [
                 {
@@ -141,15 +159,21 @@
             "CM0": 0.0,
             "CMa": 0.0,
             "dynamic_derivatives": {
-                "CL_qhat": 0.0,
-                "CD_qhat": 0.0,
-                "CM_qhat": 0.0,
-                "CL_phat": 0.0,
-                "CL_rhat": -1.8,
-                "CD_phat": 0.0,
-                "CD_rhat": 0.02,
-                "CM_phat": 0.0,
-                "CM_rhat": -3.5
+                "p_hat": {
+                    "dCL": 0.0,
+                    "dCD": 0.0,
+                    "dCM": 0.0
+                },
+                "q_hat": {
+                    "dCL": 0.0,
+                    "dCD": 0.0,
+                    "dCM": 0.0
+                },
+                "r_hat": {
+                    "dCL": -1.8,
+                    "dCD": 0.02,
+                    "dCM": -3.5
+                }
             },
             "effectors": [
                 {

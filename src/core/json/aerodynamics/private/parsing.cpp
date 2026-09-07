@@ -15,19 +15,26 @@
 namespace json
 {
 
-	aerodynamics::DynamicDerivatives parse_dynamic_derivatives(
-		const nlohmann::json& dyn_json)
+	aerodynamics::DynamicDerivative parse_dynamic_derivative(
+		const nlohmann::json& derivative_json)
 	{
 		return {
-			.CL_qhat = dyn_json.value("CL_qhat", 0.0),
-			.CD_qhat = dyn_json.value("CD_qhat", 0.0),
-			.CM_qhat = dyn_json.value("CM_qhat", 0.0),
-			.CL_phat = dyn_json.value("CL_phat", 0.0),
-			.CD_phat = dyn_json.value("CD_phat", 0.0),
-			.CM_phat = dyn_json.value("CM_phat", 0.0),
-			.CL_rhat = dyn_json.value("CL_rhat", 0.0),
-			.CD_rhat = dyn_json.value("CD_rhat", 0.0),
-			.CM_rhat = dyn_json.value("CM_rhat", 0.0),
+			.dCL = derivative_json.value("dCL", 0.0),
+			.dCD = derivative_json.value("dCD", 0.0),
+			.dCM = derivative_json.value("dCM", 0.0),
+		};
+	}
+
+	aerodynamics::DynamicDerivatives parse_dynamic_derivatives(
+		const nlohmann::json& derivatives_json)
+	{
+		return {
+			.p_hat = derivatives_json.contains("p_hat") ? parse_dynamic_derivative(derivatives_json.at("p_hat"))
+														: aerodynamics::DynamicDerivative{},
+			.q_hat = derivatives_json.contains("q_hat") ? parse_dynamic_derivative(derivatives_json.at("q_hat"))
+														: aerodynamics::DynamicDerivative{},
+			.r_hat = derivatives_json.contains("r_hat") ? parse_dynamic_derivative(derivatives_json.at("r_hat"))
+														: aerodynamics::DynamicDerivative{},
 		};
 	}
 

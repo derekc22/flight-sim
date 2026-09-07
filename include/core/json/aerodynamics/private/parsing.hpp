@@ -9,7 +9,8 @@
 namespace json
 {
 
-	aerodynamics::DynamicDerivatives parse_dynamic_derivatives(const nlohmann::json& dyn_json);
+	aerodynamics::DynamicDerivative parse_dynamic_derivative(const nlohmann::json& derivative_json);
+	aerodynamics::DynamicDerivatives parse_dynamic_derivatives(const nlohmann::json& derivatives_json);
 	actuators::SurfaceActuatorID parse_surface_actuator_id(const std::string& actuator_id);
 	aerodynamics::SurfaceEffector parse_surface_effector(const nlohmann::json& effector_json);
 	std::vector<aerodynamics::SurfaceEffector> parse_surface_effectors(const nlohmann::json& effectors_json);

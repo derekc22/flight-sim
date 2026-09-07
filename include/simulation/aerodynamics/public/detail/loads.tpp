@@ -52,9 +52,9 @@ namespace aerodynamics
 		out.CL = T(s.CL0) + T(CLalpha) * sk.alpha;
 		out.CM = T(s.CM0) + T(s.CMa) * sk.alpha;
 
-		out.CL += T(dyn.CL_phat) * sk.p_hat + T(dyn.CL_qhat) * sk.q_hat + T(dyn.CL_rhat) * sk.r_hat;
-		out.CM += T(dyn.CM_phat) * sk.p_hat + T(dyn.CM_qhat) * sk.q_hat + T(dyn.CM_rhat) * sk.r_hat;
-		out.CD += T(dyn.CD_phat) * sk.p_hat + T(dyn.CD_qhat) * sk.q_hat + T(dyn.CD_rhat) * sk.r_hat;
+		out.CL += T(dyn.p_hat.dCL) * sk.p_hat + T(dyn.q_hat.dCL) * sk.q_hat + T(dyn.r_hat.dCL) * sk.r_hat;
+		out.CM += T(dyn.p_hat.dCM) * sk.p_hat + T(dyn.q_hat.dCM) * sk.q_hat + T(dyn.r_hat.dCM) * sk.r_hat;
+		out.CD += T(dyn.p_hat.dCD) * sk.p_hat + T(dyn.q_hat.dCD) * sk.q_hat + T(dyn.r_hat.dCD) * sk.r_hat;
 
 		for (const SurfaceEffector& effector : s.effectors) {
 			const T actuator_input = actuators::get_surface_actuator_input_T<T>(effector.actuator_id, u);

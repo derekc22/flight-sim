@@ -11,16 +11,16 @@
 namespace aerodynamics
 {
 
+	struct DynamicDerivative {
+		double dCL = 0.0;
+		double dCD = 0.0;
+		double dCM = 0.0;
+	};
+
 	struct DynamicDerivatives {
-		double CL_qhat = 0.0;
-		double CD_qhat = 0.0;
-		double CM_qhat = 0.0;
-		double CL_phat = 0.0;
-		double CD_phat = 0.0;
-		double CM_phat = 0.0;
-		double CL_rhat = 0.0;
-		double CD_rhat = 0.0;
-		double CM_rhat = 0.0;
+		DynamicDerivative p_hat;
+		DynamicDerivative q_hat;
+		DynamicDerivative r_hat;
 	};
 
 	struct SurfaceEffector {
