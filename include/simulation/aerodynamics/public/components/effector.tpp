@@ -1,6 +1,7 @@
 #pragma once
 #include "simulation/actuators/public/data/helpers.hpp"
 #include "simulation/aerodynamics/public/components/effector.hpp"
+#include "simulation/util/public/cppad.hpp"
 #include "simulation/util/public/math.hpp"
 
 namespace aerodynamics

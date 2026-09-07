@@ -15,7 +15,7 @@ namespace aerodynamics
 	{
 		SurfaceKinematics_T<T> out;
 		const constants::Vector3_T<T> pG_acG = pB_acB.cast<T>() - input.pB_GB;
-		out.vB_rel = (input.twist.v - input.windB.data.cast<T>()) + input.twist.w.cross(pG_acG);
+		out.vB_rel = (input.twist.v - input.windB.data.template cast<T>()) + input.twist.w.cross(pG_acG);
 		out.V = out.vB_rel.norm();
 
 		if (out.V < T(constants::eps)) {
