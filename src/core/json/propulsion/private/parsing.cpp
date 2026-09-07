@@ -30,10 +30,10 @@ namespace json
 		double spin_inertia = 0.0;
 
 		for (const std::string& geometry_id : geometry_ids) {
-			const structural::Geometry& geom = structural_manager.get_geometry(geometry_id);
+			structural::Geometry& geom = structural_manager.get_geometry(geometry_id);
 			y_min = std::min(y_min, geom.pB_geomB(1) - 0.5 * geom.y_size);
 			y_max = std::max(y_max, geom.pB_geomB(1) + 0.5 * geom.y_size);
-			spin_inertia += structural_manager.compute_spin_inertia(geom, n_prop);
+			spin_inertia += geom.compute_spin_inertia(n_prop);
 		}
 
 		const double diameter = y_max - y_min;

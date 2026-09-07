@@ -234,7 +234,7 @@ Represents the management layer for a simulation subsystem or application execut
 
 `step(input) -> output` is the standard per-tick entry point, not the manager's only permitted method. Managers may use named member methods for coherent orchestration phases; simple managers may orchestrate directly in `step()` without artificial helpers. A member method's visibility under the project's struct convention is not a reason to inline it.
 
-An object does not become a manager merely because it organizes its own behavior or owns persistent state or implementation resources. A public type representing the entity, tool, connection, or recorder being used is a standalone public object. A type whose public role is the management layer for a simulation subsystem or application execution is a manager. A cohesive subsystem manager may have no components when splitting its behavior would create artificial responsibilities; `StructuralManager` is the current example.
+An object does not become a manager merely because it organizes its own behavior or owns persistent state or implementation resources. A public type representing the entity, tool, connection, or recorder being used is a standalone public object. A type whose public role is the management layer for a simulation subsystem or application execution is a manager. A cohesive subsystem manager may have no components when splitting its behavior would create artificial responsibilities; `AllocatorManager` is the current example.
 
 ## Source Mirroring
 

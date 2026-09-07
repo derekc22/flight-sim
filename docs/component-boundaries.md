@@ -12,7 +12,7 @@ Components represent distinct functional responsibilities with their own behavio
 | `GuidanceManager` | `RegulationGuidance`<br>`TrackingGuidance`<br>`InterpolatedGuidance` | Regulation, tracking, and interpolation are semantically distinct guidance modes and therefore distinct components. |
 | `AerodynamicsManager` | `Surface`<br>`SurfaceEffector` (nested under `Surface`) | Each surface owns its geometry, aerodynamic coefficient and load behavior, and surface-effector subcomponents. Each surface effector owns its actuator mapping and coefficient contribution behavior. The manager evaluates the surfaces and aggregates their loads. Aerodynamic state remains a stateless detail calculation used independently by the runner. |
 | `AllocatorManager` | None | Effectiveness evaluation and constrained or unconstrained solving are implementation stages of one cohesive allocation responsibility, so they remain private detail calculations. |
-| `StructuralManager` | None | Deriving mass properties from structural geometry is one cohesive responsibility. Components could become appropriate if independently behaving structural subsystems are added later, such as fuel mass, releasable payload, moving landing gear, structural damage, or other time-varying mass sources. |
+| `StructuralManager` | `Geometry` | Each geometry owns its mass, dimensions, position, and geometry-local inertia behavior. The manager indexes the geometries and aggregates their mass, center of gravity, and aircraft inertia tensor. |
 | `PropulsionManager` | `PropulsorEffector` | Each propulsor effector owns its installation and propeller configuration, previous propeller omega, and per-propulsor state and load behavior. The manager evaluates the effectors, aggregates their outputs, and commits their state. |
 | `RunManager` | `TrimWrapper`<br>`LinearizationWrapper`<br>`MeasurementsWrapper`<br>`EstimationWrapper`<br>`ControlWrapper`<br>`PhysicsWrapper`<br>`RecordingWrapper`<br>`Scheduler`<br>`FlightGearAdapter` | The manager performs top-level simulation orchestration. Its components coordinate subsystem managers, exchange per-step data through explicit payloads and `StepContext`, schedule execution, and handle the external FlightGear connection. |
 
@@ -21,7 +21,7 @@ Within the RunManager component set, the wrappers are grouped under `public/comp
 ## Granularity Rules
 
 - Components are not individual formulas, repeated data entries, or intermediate stages of one calculation.
-- Individual geometries are data, not structural components.
+- Local and spin inertia are behaviors of each `Geometry` component; aggregate mass properties remain manager behavior.
 - Aerodynamic kinematics, coefficients, and loads remain calculation stages within each `Surface` component.
 - PID and linear-quadratic algorithms remain implementations inside their owning control component.
 - Constrained and unconstrained allocation remain solver paths rather than separate components.
