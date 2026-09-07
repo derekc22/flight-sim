@@ -8,48 +8,78 @@
 
 #include <Eigen/Dense>
 #include <nlohmann/json.hpp>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
 namespace json
 {
 
-	aerodynamics::DynamicDerivatives parse_dynamic_derivatives(
-		const nlohmann::json& dyn_json)
+	aerodynamics::DynamicDerivative parse_dynamic_derivative(
+		const nlohmann::json& derivative_json)
 	{
 		return {
-			.CL_qhat = dyn_json.value("CL_qhat", 0.0),
-			.CD_qhat = dyn_json.value("CD_qhat", 0.0),
-			.CM_qhat = dyn_json.value("CM_qhat", 0.0),
-			.CL_phat = dyn_json.value("CL_phat", 0.0),
-			.CD_phat = dyn_json.value("CD_phat", 0.0),
-			.CM_phat = dyn_json.value("CM_phat", 0.0),
-			.CL_rhat = dyn_json.value("CL_rhat", 0.0),
-			.CD_rhat = dyn_json.value("CD_rhat", 0.0),
-			.CM_rhat = dyn_json.value("CM_rhat", 0.0),
+			.dCL = derivative_json.value("dCL", 0.0),
+			.dCD = derivative_json.value("dCD", 0.0),
+			.dCM = derivative_json.value("dCM", 0.0),
 		};
 	}
 
-	aerodynamics::ControlDerivatives parse_control_derivatives(
-		const nlohmann::json& ctrl_json)
+	aerodynamics::DynamicDerivatives parse_dynamic_derivatives(
+		const nlohmann::json& derivatives_json)
 	{
 		return {
-			.dCL_de = ctrl_json.value("dCL_de", 0.0),
-			.dCM_de = ctrl_json.value("dCM_de", 0.0),
-			.dCD_de = ctrl_json.value("dCD_de", 0.0),
-			.dCL_da = ctrl_json.value("dCL_da", 0.0),
-			.dCM_da = ctrl_json.value("dCM_da", 0.0),
-			.dCD_da = ctrl_json.value("dCD_da", 0.0),
-			.dCL_dr = ctrl_json.value("dCL_dr", 0.0),
-			.dCM_dr = ctrl_json.value("dCM_dr", 0.0),
-			.dCD_dr = ctrl_json.value("dCD_dr", 0.0),
-			.dCL_df = ctrl_json.value("dCL_df", 0.0),
-			.dCM_df = ctrl_json.value("dCM_df", 0.0),
-			.dCD_df = ctrl_json.value("dCD_df", 0.0),
-			.dCL_ds = ctrl_json.value("dCL_ds", 0.0),
-			.dCM_ds = ctrl_json.value("dCM_ds", 0.0),
-			.dCD_ds = ctrl_json.value("dCD_ds", 0.0),
+			.p_hat = derivatives_json.contains("p_hat") ? parse_dynamic_derivative(derivatives_json.at("p_hat"))
+														: aerodynamics::DynamicDerivative{},
+			.q_hat = derivatives_json.contains("q_hat") ? parse_dynamic_derivative(derivatives_json.at("q_hat"))
+														: aerodynamics::DynamicDerivative{},
+			.r_hat = derivatives_json.contains("r_hat") ? parse_dynamic_derivative(derivatives_json.at("r_hat"))
+														: aerodynamics::DynamicDerivative{},
 		};
+	}
+
+	actuators::SurfaceActuatorID parse_surface_actuator_id(
+		const std::string& actuator_id)
+	{
+		if (actuator_id == "elevator") {
+			return actuators::SurfaceActuatorID::Elevator;
+		}
+		if (actuator_id == "aileron") {
+			return actuators::SurfaceActuatorID::Aileron;
+		}
+		if (actuator_id == "rudder") {
+			return actuators::SurfaceActuatorID::Rudder;
+		}
+		if (actuator_id == "flap") {
+			return actuators::SurfaceActuatorID::Flap;
+		}
+		if (actuator_id == "spoiler") {
+			return actuators::SurfaceActuatorID::Spoiler;
+		}
+		throw std::runtime_error("json::parse_surface_actuator_id: unknown actuator_id '" + actuator_id + "'");
+	}
+
+	aerodynamics::SurfaceEffector parse_surface_effector(
+		const nlohmann::json& effector_json)
+	{
+		return {
+			.actuator_id = parse_surface_actuator_id(effector_json.at("actuator_id").get<std::string>()),
+			.dCL = effector_json.at("dCL").get<double>(),
+			.dCD = effector_json.at("dCD").get<double>(),
+			.dCM = effector_json.at("dCM").get<double>()
+		};
+	}
+
+	std::vector<aerodynamics::SurfaceEffector> parse_surface_effectors(
+		const nlohmann::json& effectors_json)
+	{
+		validate_surface_effectors_json(effectors_json);
+		std::vector<aerodynamics::SurfaceEffector> effectors;
+		effectors.reserve(effectors_json.size());
+		for (const auto& effector_json : effectors_json) {
+			effectors.push_back(parse_surface_effector(effector_json));
+		}
+		return effectors;
 	}
 
 	aerodynamics::AerodynamicsManager parse_aerodynamics_manager(
@@ -83,9 +113,8 @@ namespace json
 				.dyn = surface_json.contains("dynamic_derivatives")
 					? parse_dynamic_derivatives(surface_json.at("dynamic_derivatives"))
 					: aerodynamics::DynamicDerivatives{},
-				.ctrl = surface_json.contains("control_derivatives")
-					? parse_control_derivatives(surface_json.at("control_derivatives"))
-					: aerodynamics::ControlDerivatives{},
+				.effectors = surface_json.contains("effectors") ? parse_surface_effectors(surface_json.at("effectors"))
+																: std::vector<aerodynamics::SurfaceEffector>{},
 			});
 		}
 		return {surfaces};

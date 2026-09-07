@@ -28,13 +28,7 @@ namespace integrators
 		const dynamics::Wrench_T<T>& WB_aerodynamic = aerodynamics_output.WB_aerodynamic;
 
 		const propulsion::PropulsionManagerInput_T<T> propulsion_input{
-			.propulsor_actuators = model.propulsor_actuators,
-			.pB_GB = pB_GB,
-			.twist = twist,
-			.atm = atm,
-			.u = u.propulsor_inputs,
-			.dt = dt,
-			.steady_state = steady_state
+			.pB_GB = pB_GB, .twist = twist, .atm = atm, .u = u.propulsor_inputs, .dt = dt, .steady_state = steady_state
 		};
 
 		const propulsion::PropulsionManagerOutput_T<T> propulsion_output =

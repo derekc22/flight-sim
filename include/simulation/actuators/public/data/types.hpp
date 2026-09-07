@@ -3,12 +3,16 @@
 #include "simulation/constants/public/linalg.hpp"
 
 #include <Eigen/Dense>
-#include <optional>
-#include <string>
-#include <vector>
 
 namespace actuators
 {
+	enum class SurfaceActuatorID {
+		Elevator,
+		Aileron,
+		Rudder,
+		Flap,
+		Spoiler
+	};
 
 	template <typename T> using ActuatorInputsVector_T = constants::MatrixX_T<T, constants::input_dim, 1>;
 
@@ -55,15 +59,6 @@ namespace actuators
 	struct ActuatorManagerOutput {
 		ActuatorInputs_T<double> u_cmd;
 		ActuatorInputs_T<double> u_actual;
-	};
-
-	struct PropellerAssembly {
-		std::vector<std::string> geometry_ids;
-		double spin_sign;
-		double thrust_coeff;
-		double torque_coeff;
-		double diameter;
-		double spin_inertia;
 	};
 
 	using SurfaceActuatorInputsVector = constants::MatrixX_T<double, constants::full_surface_input_dim, 1>;

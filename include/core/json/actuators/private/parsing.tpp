@@ -2,7 +2,6 @@
 #include "core/json/actuators/private/validation.hpp"
 #include "simulation/actuators/public/data/helpers.hpp"
 #include "simulation/actuators/public/manager.hpp"
-#include "simulation/structural/public/manager.hpp"
 
 #include <nlohmann/json.hpp>
 #include <string>
@@ -30,8 +29,7 @@ namespace json
 	template <typename PropulsorActuatorType>
 	PropulsorActuatorType parse_propulsor_actuator(
 		const nlohmann::json& config,
-		const std::string& key,
-		structural::StructuralManager& structural_manager)
+		const std::string& key)
 	{
 		if (config.at(key).is_null()) {
 			return PropulsorActuatorType{};
@@ -40,22 +38,8 @@ namespace json
 		const auto& propulsor_actuator_json = config.at(key);
 		validate_propulsor_actuator_json(propulsor_actuator_json);
 
-		std::string geometry_id = propulsor_actuator_json.at("geometry_id").get<std::string>();
-		const structural::Geometry& geom = structural_manager.get_geometry(geometry_id);
-		validate_propulsor_actuator_placement(geom.pB_geomB, key);
-
-		PropulsorActuatorType propulsor(propulsor_actuator_json.at("limit_max").get<double>(),
+		return PropulsorActuatorType(propulsor_actuator_json.at("limit_max").get<double>(),
 			propulsor_actuator_json.at("limit_min").get<double>(),
-			propulsor_actuator_json.at("tau").get<double>(),
-			propulsor_actuator_json.at("inclination_angle").get<double>(),
-			propulsor_actuator_json.at("toe_angle").get<double>(),
-			geom.pB_geomB);
-
-		if (propulsor_actuator_json.contains("propellers")) {
-			propulsor.propellers =
-				parse_propellers(propulsor_actuator_json.at("propellers"), structural_manager, propulsor.n_prop);
-		}
-
-		return propulsor;
+			propulsor_actuator_json.at("tau").get<double>());
 	}
 } // namespace json

@@ -1,5 +1,4 @@
 #pragma once
-#include "simulation/actuators/public/components/collection.hpp"
 #include "simulation/aerodynamics/public/manager.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/propulsion/public/manager.hpp"
@@ -11,7 +10,6 @@ namespace integrators
 	struct RK4Model {
 		const structural::StructuralState& struc_t;
 		aerodynamics::AerodynamicsManager& aerodynamics_manager;
-		actuators::PropulsorActuators& propulsor_actuators;
 		propulsion::PropulsionManager& propulsion_manager;
 	};
 
