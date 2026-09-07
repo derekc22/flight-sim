@@ -3,7 +3,6 @@
 #include "simulation/constants/public/linalg.hpp"
 #include "simulation/constants/public/scalars.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
-#include "simulation/util/public/linalg.hpp"
 
 #include <Eigen/Dense>
 #include <cmath>
@@ -61,9 +60,9 @@ namespace structural
 	{
 		Eigen::Matrix3d j = constants::Zero3x3;
 
-		for (const Geometry& geom : geometries) {
+		for (Geometry& geom : geometries) {
 			double m = geom.mass;
-			Eigen::Matrix3d j_local = compute_local_JB(geom);
+			Eigen::Matrix3d j_local = geom.compute_local_JB();
 
 			// Distance from geometry CG to system CG
 			double dx = geom.pB_geomB(0) - pB_GB.data(0);
@@ -92,33 +91,6 @@ namespace structural
 		}
 
 		return j;
-	}
-
-	Eigen::Matrix3d StructuralManager::compute_local_JB(
-		const Geometry& geom)
-	{
-		double m = geom.mass;
-		double lx = geom.x_size;
-		double ly = geom.y_size;
-		double lz = geom.z_size;
-
-		// Moments of inertia of rectangular prism about its own center
-		Eigen::Matrix3d j = constants::Zero3x3;
-		j(0, 0) = (1.0 / 12.0) * m * (ly * ly + lz * lz); // Jxx
-		j(1, 1) = (1.0 / 12.0) * m * (lx * lx + lz * lz); // Jyy
-		j(2, 2) = (1.0 / 12.0) * m * (lx * lx + ly * ly); // Jzz
-		return j;
-	}
-
-	double StructuralManager::compute_spin_inertia(
-		const Geometry& geom,
-		const Eigen::Vector3d& axis)
-	{
-		Eigen::Vector3d axis_hat = util::norm(axis);
-		if (axis_hat.norm() < constants::eps) {
-			throw std::runtime_error("structural::StructuralManager::compute_spin_inertia: spin axis cannot be zero");
-		}
-		return axis_hat.dot(compute_local_JB(geom) * axis_hat);
 	}
 
 	std::unordered_map<std::string, std::size_t> StructuralManager::build_geometry_id_map()
