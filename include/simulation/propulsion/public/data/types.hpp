@@ -4,15 +4,11 @@
 #include "simulation/constants/public/linalg.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 
-#include <Eigen/Dense>
 #include <optional>
-#include <string>
-#include <vector>
 
 namespace propulsion
 {
 	struct PropellerAssembly {
-		std::vector<std::string> geometry_ids;
 		double spin_sign;
 		double thrust_coeff;
 		double torque_coeff;
@@ -20,29 +16,18 @@ namespace propulsion
 		double spin_inertia;
 	};
 
-	struct PropulsorEffector {
-		double inclination_angle = 0.0;
-		double toe_angle = 0.0;
-		Eigen::Vector3d pB_propB = constants::Zero3;
-		Eigen::Vector3d n_prop = constants::ei;
-		std::optional<PropellerAssembly> propellers;
+	template <typename T> struct PropulsorEffectorInput_T {
+		const constants::Vector3_T<T>& pB_GB;
+		const constants::Vector3_T<T>& wB_BI;
+		const atmospheric::AirDensity& rho;
+		const T& thrust;
+		T dt;
+		bool steady_state;
 	};
 
-	struct PropulsorEffectors {
-		PropulsorEffector front_propulsor;
-		PropulsorEffector left_propulsor;
-		PropulsorEffector right_propulsor;
-	};
-
-	template <typename T> struct PropellerOmegaState_T {
-		T omega = T(0.0);
-		T omega_dot = T(0.0);
-	};
-
-	template <typename T> struct PropellerOmegaStateSet_T {
-		PropellerOmegaState_T<T> front_propulsor{};
-		PropellerOmegaState_T<T> left_propulsor{};
-		PropellerOmegaState_T<T> right_propulsor{};
+	template <typename T> struct PropulsorEffectorOutput_T {
+		dynamics::Wrench_T<T> WB_propulsive;
+		std::optional<T> propeller_omega;
 	};
 
 	template <typename T> struct PropulsionState_T {

@@ -1,7 +1,5 @@
 #pragma once
 #include "simulation/propulsion/public/data/helpers.hpp"
-#include "simulation/propulsion/public/detail/loads.hpp"
-#include "simulation/propulsion/public/detail/state.hpp"
 #include "simulation/propulsion/public/manager.hpp"
 
 namespace propulsion
@@ -11,13 +9,24 @@ namespace propulsion
 	PropulsionManagerOutput_T<T> PropulsionManager::step(
 		const PropulsionManagerInput_T<T>& input)
 	{
-		const PropellerOmegaStateSet_T<T> propeller_omega_state_set = compute_propeller_omega_state_set_T<T>(
-			propulsor_effectors, propulsion_state_t_1, input.u, input.atm.rho, input.dt, input.steady_state);
+		const PropulsorEffectorOutput_T<T> front_output = propulsor_effectors.front_propulsor.step<T>(
+			make_propulsor_effector_input_T<T>(input, input.u.front_propulsor_cmd));
+		const PropulsorEffectorOutput_T<T> left_output = propulsor_effectors.left_propulsor.step<T>(
+			make_propulsor_effector_input_T<T>(input, input.u.left_propulsor_cmd));
+		const PropulsorEffectorOutput_T<T> right_output = propulsor_effectors.right_propulsor.step<T>(
+			make_propulsor_effector_input_T<T>(input, input.u.right_propulsor_cmd));
+
+		dynamics::Wrench_T<T> WB_propulsive;
+		WB_propulsive.F = front_output.WB_propulsive.F + left_output.WB_propulsive.F + right_output.WB_propulsive.F;
+		WB_propulsive.M = front_output.WB_propulsive.M + left_output.WB_propulsive.M + right_output.WB_propulsive.M;
 
 		return {
-			.WB_propulsive = compute_propulsive_loads_T<T>(
-				propulsor_effectors, input.pB_GB, input.twist, input.atm, input.u, propeller_omega_state_set),
-			.propulsion_state_t = make_propulsion_state_T<T>(propulsor_effectors, propeller_omega_state_set)
+			.WB_propulsive = WB_propulsive,
+			.propulsion_state_t = {
+				.front_propulsor_omega = front_output.propeller_omega,
+				.left_propulsor_omega = left_output.propeller_omega,
+				.right_propulsor_omega = right_output.propeller_omega
+			}
 		};
 	}
 

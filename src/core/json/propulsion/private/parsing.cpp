@@ -45,7 +45,6 @@ namespace json
 		}
 
 		return {
-			.geometry_ids = geometry_ids,
 			.spin_sign = propellers_json.at("spin_sign").get<double>(),
 			.thrust_coeff = propellers_json.at("thrust_coeff").get<double>(),
 			.torque_coeff = propellers_json.at("torque_coeff").get<double>(),
@@ -75,12 +74,7 @@ namespace json
 		const Eigen::Matrix3d RBP =
 			transforms::eul_to_R(toe_angle, inclination_angle, 0.0, transforms::EulerOrder::ZYX);
 
-		propulsion::PropulsorEffector propulsor_effector{
-			.inclination_angle = inclination_angle,
-			.toe_angle = toe_angle,
-			.pB_propB = geom.pB_geomB,
-			.n_prop = RBP * constants::ei
-		};
+		propulsion::PropulsorEffector propulsor_effector{.pB_propB = geom.pB_geomB, .n_prop = RBP * constants::ei};
 
 		if (propulsor_effector_json.contains("propellers")) {
 			propulsor_effector.propellers = parse_propellers(

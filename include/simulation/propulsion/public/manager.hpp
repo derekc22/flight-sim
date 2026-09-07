@@ -1,4 +1,5 @@
 #pragma once
+#include "simulation/propulsion/public/components/collection.hpp"
 #include "simulation/propulsion/public/data/types.hpp"
 
 namespace propulsion
@@ -6,7 +7,6 @@ namespace propulsion
 
 	struct PropulsionManager {
 		PropulsorEffectors propulsor_effectors;
-		PropulsionState propulsion_state_t_1;
 
 		template <typename T> PropulsionManagerOutput_T<T> step(const PropulsionManagerInput_T<T>& input);
 		void commit(const PropulsionState& propulsion_state_t);

@@ -5,11 +5,8 @@ namespace propulsion
 {
 
 	template <typename T>
-	PropulsionState_T<T> make_propulsion_state_T(const PropulsorEffectors& propulsor_effectors,
-		const PropellerOmegaStateSet_T<T>& propeller_omega_state_set);
-
-	PropulsionState make_propulsion_state(const PropulsorEffectors& propulsor_effectors,
-		const PropellerOmegaStateSet_T<double>& propeller_omega_state_set);
+	PropulsorEffectorInput_T<T> make_propulsor_effector_input_T(const PropulsionManagerInput_T<T>& input,
+		const T& thrust);
 
 } // namespace propulsion
 
