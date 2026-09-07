@@ -1,4 +1,5 @@
 #pragma once
+#include "simulation/actuators/public/data/helpers.hpp"
 #include "simulation/atmospheric/public/data/types.hpp"
 #include "simulation/constants/public/linalg.hpp"
 #include "simulation/constants/public/scalars.hpp"
@@ -10,26 +11,6 @@
 
 namespace aerodynamics
 {
-	template <typename T>
-	T get_surface_actuator_input_T(
-		actuators::SurfaceActuatorID actuator_id,
-		const actuators::SurfaceActuatorInputs_T<T>& u)
-	{
-		switch (actuator_id) {
-			case actuators::SurfaceActuatorID::Elevator:
-				return u.elevator_cmd;
-			case actuators::SurfaceActuatorID::Aileron:
-				return u.aileron_cmd;
-			case actuators::SurfaceActuatorID::Rudder:
-				return u.rudder_cmd;
-			case actuators::SurfaceActuatorID::Flap:
-				return u.flap_cmd;
-			case actuators::SurfaceActuatorID::Spoiler:
-				return u.spoiler_cmd;
-		}
-		return T(0.0);
-	}
-
 	template <typename T>
 	SurfaceKinematics_T<T> compute_surface_kinematics_T(
 		const Surface& s,
@@ -76,7 +57,7 @@ namespace aerodynamics
 		out.CD += T(dyn.CD_phat) * sk.p_hat + T(dyn.CD_qhat) * sk.q_hat + T(dyn.CD_rhat) * sk.r_hat;
 
 		for (const SurfaceEffector& effector : s.effectors) {
-			const T actuator_input = get_surface_actuator_input_T<T>(effector.actuator_id, u);
+			const T actuator_input = actuators::get_surface_actuator_input_T<T>(effector.actuator_id, u);
 			out.CL += T(effector.dCL) * actuator_input;
 			out.CD += T(effector.dCD) * util::smooth_abs(actuator_input);
 			out.CM += T(effector.dCM) * actuator_input;

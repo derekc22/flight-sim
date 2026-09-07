@@ -51,4 +51,24 @@ namespace actuators
 		return unpack_actuator_inputs_T(pack_actuator_inputs_T(u_surface, u_propulsor));
 	}
 
+	template <typename T>
+	T get_surface_actuator_input_T(
+		SurfaceActuatorID actuator_id,
+		const SurfaceActuatorInputs_T<T>& u)
+	{
+		switch (actuator_id) {
+			case SurfaceActuatorID::Elevator:
+				return u.elevator_cmd;
+			case SurfaceActuatorID::Aileron:
+				return u.aileron_cmd;
+			case SurfaceActuatorID::Rudder:
+				return u.rudder_cmd;
+			case SurfaceActuatorID::Flap:
+				return u.flap_cmd;
+			case SurfaceActuatorID::Spoiler:
+				return u.spoiler_cmd;
+		}
+		return T(0.0);
+	}
+
 } // namespace actuators

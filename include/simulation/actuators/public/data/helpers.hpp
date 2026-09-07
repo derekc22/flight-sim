@@ -35,6 +35,9 @@ namespace actuators
 	PropulsorActuatorInputsVector unpack_propulsor_actuator_inputs(
 		const PropulsorActuatorInputs_T<double>& u_propulsor);
 
+	template <typename T>
+	T get_surface_actuator_input_T(SurfaceActuatorID actuator_id, const SurfaceActuatorInputs_T<T>& u);
+
 } // namespace actuators
 
 #include "simulation/actuators/public/data/helpers.tpp"
