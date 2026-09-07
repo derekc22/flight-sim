@@ -6,6 +6,13 @@
 
 namespace actuators
 {
+	enum class SurfaceActuatorID {
+		Elevator,
+		Aileron,
+		Rudder,
+		Flap,
+		Spoiler
+	};
 
 	template <typename T> using ActuatorInputsVector_T = constants::MatrixX_T<T, constants::input_dim, 1>;
 

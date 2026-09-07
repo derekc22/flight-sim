@@ -25,17 +25,26 @@
                 "CM_phat": 0.0,
                 "CM_rhat": 0.0
             },
-            "control_derivatives": {
-                "dCL_da": -0.35,
-                "dCD_da": 0.020,
-                "dCM_da": 0.0,
-                "dCL_df": 0.90,
-                "dCD_df": 0.080,
-                "dCM_df": -0.120,
-                "dCL_ds": -0.60,
-                "dCD_ds": 0.180,
-                "dCM_ds": 0.0
-            }
+            "effectors": [
+                {
+                    "actuator_id": "aileron",
+                    "dCL": -0.35,
+                    "dCD": 0.020,
+                    "dCM": 0.0
+                },
+                {
+                    "actuator_id": "flap",
+                    "dCL": 0.90,
+                    "dCD": 0.080,
+                    "dCM": -0.120
+                },
+                {
+                    "actuator_id": "spoiler",
+                    "dCL": -0.60,
+                    "dCD": 0.180,
+                    "dCM": 0.0
+                }
+            ]
         },
         {
             "id": "left_wing",
@@ -62,17 +71,26 @@
                 "CM_phat": 0.0,
                 "CM_rhat": 0.0
             },
-            "control_derivatives": {
-                "dCL_da": 0.35,
-                "dCD_da": 0.020,
-                "dCM_da": 0.0,
-                "dCL_df": 0.90,
-                "dCD_df": 0.080,
-                "dCM_df": -0.120,
-                "dCL_ds": -0.60,
-                "dCD_ds": 0.180,
-                "dCM_ds": 0.0
-            }
+            "effectors": [
+                {
+                    "actuator_id": "aileron",
+                    "dCL": 0.35,
+                    "dCD": 0.020,
+                    "dCM": 0.0
+                },
+                {
+                    "actuator_id": "flap",
+                    "dCL": 0.90,
+                    "dCD": 0.080,
+                    "dCM": -0.120
+                },
+                {
+                    "actuator_id": "spoiler",
+                    "dCL": -0.60,
+                    "dCD": 0.180,
+                    "dCM": 0.0
+                }
+            ]
         },
         {
             "id": "horizontal_stabilizer",
@@ -99,11 +117,14 @@
                 "CM_phat": 0.0,
                 "CM_rhat": 0.0
             },
-            "control_derivatives": {
-                "dCL_de": -1.60,
-                "dCD_de": 0.040,
-                "dCM_de": 0.120
-            }
+            "effectors": [
+                {
+                    "actuator_id": "elevator",
+                    "dCL": -1.60,
+                    "dCD": 0.040,
+                    "dCM": 0.120
+                }
+            ]
         },
         {
             "id": "vertical_stabilizer",
@@ -130,11 +151,14 @@
                 "CM_phat": 0.0,
                 "CM_rhat": -3.5
             },
-            "control_derivatives": {
-                "dCL_dr": -0.95,
-                "dCD_dr": 0.025,
-                "dCM_dr": 0.040
-            }
+            "effectors": [
+                {
+                    "actuator_id": "rudder",
+                    "dCL": -0.95,
+                    "dCD": 0.025,
+                    "dCM": 0.040
+                }
+            ]
         }
     ]
 }

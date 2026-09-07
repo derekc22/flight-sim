@@ -9,6 +9,9 @@
 
 namespace aerodynamics
 {
+	template <typename T>
+	T get_surface_actuator_input_T(actuators::SurfaceActuatorID actuator_id,
+		const actuators::SurfaceActuatorInputs_T<T>& u);
 
 	template <typename T>
 	SurfaceKinematics_T<T> compute_surface_kinematics_T(const Surface& s,

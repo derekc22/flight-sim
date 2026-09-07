@@ -6,6 +6,7 @@
 
 #include <Eigen/Dense>
 #include <string>
+#include <vector>
 
 namespace aerodynamics
 {
@@ -22,22 +23,11 @@ namespace aerodynamics
 		double CM_rhat = 0.0;
 	};
 
-	struct ControlDerivatives {
-		double dCL_de = 0.0;
-		double dCM_de = 0.0;
-		double dCD_de = 0.0;
-		double dCL_da = 0.0;
-		double dCM_da = 0.0;
-		double dCD_da = 0.0;
-		double dCL_dr = 0.0;
-		double dCM_dr = 0.0;
-		double dCD_dr = 0.0;
-		double dCL_df = 0.0;
-		double dCM_df = 0.0;
-		double dCD_df = 0.0;
-		double dCL_ds = 0.0;
-		double dCM_ds = 0.0;
-		double dCD_ds = 0.0;
+	struct SurfaceEffector {
+		actuators::SurfaceActuatorID actuator_id;
+		double dCL;
+		double dCD;
+		double dCM;
 	};
 
 	struct Surface {
@@ -51,7 +41,7 @@ namespace aerodynamics
 		Eigen::Vector3d n;
 		double CL0, e, i, CD0, CDa, a0, CM0, CMa;
 		DynamicDerivatives dyn;
-		ControlDerivatives ctrl;
+		std::vector<SurfaceEffector> effectors;
 	};
 
 	template <typename T> struct SurfaceKinematics_T {

@@ -14,4 +14,12 @@ namespace json
 		}
 	}
 
+	void validate_surface_effectors_json(
+		const nlohmann::json& effectors_json)
+	{
+		if (!effectors_json.is_array()) {
+			throw std::runtime_error("json::parse_aerodynamics_manager expected 'effectors' to be an array");
+		}
+	}
+
 } // namespace json
