@@ -19,7 +19,6 @@ namespace autodiff
 		return {
 			.struc_t = struc_t,
 			.aerodynamics_manager = aircraft.aerodynamics_manager,
-			.propulsor_actuators = propulsor_actuators,
 			.propulsion_manager = aircraft.propulsion_manager,
 			.actuator_limits = actuator_limits,
 			.fixed_actuator_inputs = aircraft.actuator_manager.settings.fixed_actuator_inputs

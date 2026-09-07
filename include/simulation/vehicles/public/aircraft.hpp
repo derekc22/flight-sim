@@ -45,6 +45,7 @@ namespace vehicles
 			const structural::StructuralManager& structural_manager,
 			const aerodynamics::AerodynamicsManager& aerodynamics_manager,
 			const actuators::ActuatorManager& actuator_manager,
+			const propulsion::PropulsionManager& propulsion_manager,
 			const control::ControlManager& control_manager,
 			const sensors::SensorManager& sensor_manager,
 			const avionics::AvionicsManager& avionics_manager,

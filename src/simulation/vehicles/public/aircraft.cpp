@@ -493,18 +493,24 @@ namespace vehicles
 	void Aircraft::step_dependent(
 		frames::Frame& F)
 	{
-		if (F.id == frames::FrameID::NEDFrameECEF)
+		if (F.id == frames::FrameID::NEDFrameECEF) {
 			return step(static_cast<frames::NEDFrameECEF&>(F), {});
-		if (F.id == frames::FrameID::FRDFrameECEF)
+		}
+		if (F.id == frames::FrameID::FRDFrameECEF) {
 			return step(static_cast<frames::FRDFrameECEF&>(F), {});
-		if (F.id == frames::FrameID::FRDFrameNED)
+		}
+		if (F.id == frames::FrameID::FRDFrameNED) {
 			return step(static_cast<frames::FRDFrameNED&>(F), {});
-		if (F.id == frames::FrameID::CGFrameFRD)
+		}
+		if (F.id == frames::FrameID::CGFrameFRD) {
 			return step(static_cast<frames::CGFrameFRD&>(F), {});
-		if (F.id == frames::FrameID::STABFrameFRD)
+		}
+		if (F.id == frames::FrameID::STABFrameFRD) {
 			return step(static_cast<frames::STABFrameFRD&>(F), {});
-		if (F.id == frames::FrameID::WINDFrameSTAB)
+		}
+		if (F.id == frames::FrameID::WINDFrameSTAB) {
 			return step(static_cast<frames::WINDFrameSTAB&>(F), {});
+		}
 
 		std::string err_msg =
 			"vehicles::Aircraft::step_dependent: Attempting to recursively step an unknown frame type";
@@ -575,6 +581,7 @@ namespace vehicles
 		const structural::StructuralManager& structural_manager,
 		const aerodynamics::AerodynamicsManager& aerodynamics_manager,
 		const actuators::ActuatorManager& actuator_manager,
+		const propulsion::PropulsionManager& propulsion_manager,
 		const control::ControlManager& control_manager,
 		const sensors::SensorManager& sensor_manager,
 		const avionics::AvionicsManager& avionics_manager,
@@ -594,7 +601,7 @@ namespace vehicles
 		  structural_manager(structural_manager),
 		  aerodynamics_manager(aerodynamics_manager),
 		  actuator_manager(actuator_manager),
-		  propulsion_manager{},
+		  propulsion_manager(propulsion_manager),
 		  control_manager(control_manager),
 		  sensor_manager(sensor_manager),
 		  avionics_manager(avionics_manager),

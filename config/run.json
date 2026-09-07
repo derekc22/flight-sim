@@ -8,6 +8,7 @@
     "avionics_config": "simulation/avionics/c172p/default.json",
     "sensors_config": "simulation/sensors/c172p/default.json",
     "actuator_config": "simulation/actuators/c172p/default.json",
+    "propulsion_config": "simulation/propulsion/c172p/default.json",
     "settings_config": "simulation/settings/c172p/default.json",
     "runner_config": "simulation/runner/c172p/default.json",
     "allocator_config": "simulation/allocator/c172p/default.json"

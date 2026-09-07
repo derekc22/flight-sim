@@ -9,14 +9,14 @@ namespace propulsion
 
 	template <typename T>
 	T compute_propeller_omega_T(
-		const actuators::PropulsorActuator& propulsor,
+		const PropulsorEffector& propulsor_effector,
 		const T& thrust,
 		const atmospheric::AirDensity& rho)
 	{
-		if (!propulsor.propellers) {
+		if (!propulsor_effector.propellers) {
 			return T(0.0);
 		}
-		const actuators::PropellerAssembly& propellers = propulsor.propellers.value();
+		const PropellerAssembly& propellers = propulsor_effector.propellers.value();
 		const double denom = propellers.thrust_coeff * rho.data * propellers.diameter * propellers.diameter *
 			propellers.diameter * propellers.diameter;
 		const T n = util::sqrt((thrust + T(constants::eps)) / T(denom));
@@ -25,25 +25,25 @@ namespace propulsion
 
 	template <typename T>
 	PropellerOmegaState_T<T> compute_propeller_omega_state_T(
-		const actuators::PropulsorActuator& propulsor,
+		const PropulsorEffector& propulsor_effector,
 		T thrust,
 		const atmospheric::AirDensity& rho,
 		const std::optional<double>& prev_omega,
 		T dt,
 		bool steady_state)
 	{
-		if (!propulsor.propellers.has_value()) {
+		if (!propulsor_effector.propellers.has_value()) {
 			return {};
 		}
 
-		T omega = compute_propeller_omega_T<T>(propulsor, thrust, rho);
+		T omega = compute_propeller_omega_T<T>(propulsor_effector, thrust, rho);
 		T omega_dot = !steady_state && prev_omega.has_value() ? (omega - T(prev_omega.value())) / dt : T(0.0);
 		return {.omega = omega, .omega_dot = omega_dot};
 	}
 
 	template <typename T>
 	PropellerOmegaStateSet_T<T> compute_propeller_omega_state_set_T(
-		const actuators::PropulsorActuators& propulsor_actuators,
+		const PropulsorEffectors& propulsor_effectors,
 		const PropulsionState& propulsion_state_t_1,
 		const actuators::PropulsorActuatorInputs_T<T>& u,
 		const atmospheric::AirDensity& rho,
@@ -51,19 +51,19 @@ namespace propulsion
 		bool steady_state)
 	{
 		return {
-			.front_propulsor = compute_propeller_omega_state_T<T>(propulsor_actuators.front_propulsor,
+			.front_propulsor = compute_propeller_omega_state_T<T>(propulsor_effectors.front_propulsor,
 				u.front_propulsor_cmd,
 				rho,
 				propulsion_state_t_1.front_propulsor_omega,
 				dt,
 				steady_state),
-			.left_propulsor = compute_propeller_omega_state_T<T>(propulsor_actuators.left_propulsor,
+			.left_propulsor = compute_propeller_omega_state_T<T>(propulsor_effectors.left_propulsor,
 				u.left_propulsor_cmd,
 				rho,
 				propulsion_state_t_1.left_propulsor_omega,
 				dt,
 				steady_state),
-			.right_propulsor = compute_propeller_omega_state_T<T>(propulsor_actuators.right_propulsor,
+			.right_propulsor = compute_propeller_omega_state_T<T>(propulsor_effectors.right_propulsor,
 				u.right_propulsor_cmd,
 				rho,
 				propulsion_state_t_1.right_propulsor_omega,

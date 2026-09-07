@@ -1,14 +1,38 @@
 #pragma once
-#include "simulation/actuators/public/components/collection.hpp"
 #include "simulation/actuators/public/data/types.hpp"
 #include "simulation/atmospheric/public/data/types.hpp"
 #include "simulation/constants/public/linalg.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 
+#include <Eigen/Dense>
 #include <optional>
+#include <string>
+#include <vector>
 
 namespace propulsion
 {
+	struct PropellerAssembly {
+		std::vector<std::string> geometry_ids;
+		double spin_sign;
+		double thrust_coeff;
+		double torque_coeff;
+		double diameter;
+		double spin_inertia;
+	};
+
+	struct PropulsorEffector {
+		double inclination_angle = 0.0;
+		double toe_angle = 0.0;
+		Eigen::Vector3d pB_propB = constants::Zero3;
+		Eigen::Vector3d n_prop = constants::ei;
+		std::optional<PropellerAssembly> propellers;
+	};
+
+	struct PropulsorEffectors {
+		PropulsorEffector front_propulsor;
+		PropulsorEffector left_propulsor;
+		PropulsorEffector right_propulsor;
+	};
 
 	template <typename T> struct PropellerOmegaState_T {
 		T omega = T(0.0);
@@ -30,7 +54,6 @@ namespace propulsion
 	using PropulsionState = PropulsionState_T<double>;
 
 	template <typename T> struct PropulsionManagerInput_T {
-		const actuators::PropulsorActuators& propulsor_actuators;
 		const constants::Vector3_T<T>& pB_GB;
 		const dynamics::Twist_T<T>& twist;
 		const atmospheric::StaticAtmosphericState& atm;

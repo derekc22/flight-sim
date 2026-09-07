@@ -11,12 +11,10 @@ namespace runner
 		const PhysicsWrapperInput& input)
 	{
 		aerodynamics::AerodynamicsManager& aerodynamics_manager = input.aircraft.aerodynamics_manager;
-		actuators::PropulsorActuators& propulsor_actuators = input.aircraft.actuator_manager.propulsor_actuators;
 
 		integrators::RK4Model rk4_model{
 			.struc_t = input.context.struc_t,
 			.aerodynamics_manager = aerodynamics_manager,
-			.propulsor_actuators = propulsor_actuators,
 			.propulsion_manager = input.aircraft.propulsion_manager
 		};
 

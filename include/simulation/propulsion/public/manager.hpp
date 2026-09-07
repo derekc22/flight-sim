@@ -5,6 +5,7 @@ namespace propulsion
 {
 
 	struct PropulsionManager {
+		PropulsorEffectors propulsor_effectors;
 		PropulsionState propulsion_state_t_1;
 
 		template <typename T> PropulsionManagerOutput_T<T> step(const PropulsionManagerInput_T<T>& input);

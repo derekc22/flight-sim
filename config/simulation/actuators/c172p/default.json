@@ -24,20 +24,9 @@
 	},
 	"propulsors": {
 		"front_propulsor": {
-			"geometry_id": "propeller",
 			"limit_max": 2250.0,
 			"limit_min": 290.0,
-			"tau": 1.0,
-			"inclination_angle": 0.0,
-			"toe_angle": 0.0,
-			"propellers": {
-				"geometry_ids": [
-					"propeller"
-				],
-				"spin_sign": 1,
-				"thrust_coeff": 0.1,
-				"torque_coeff": 0.01
-			}
+			"tau": 1.0
 		},
 		"left_propulsor": null,
 		"right_propulsor": null

@@ -5,12 +5,12 @@ namespace propulsion
 {
 
 	template <typename T>
-	T compute_propeller_omega_T(const actuators::PropulsorActuator& propulsor,
+	T compute_propeller_omega_T(const PropulsorEffector& propulsor_effector,
 		const T& thrust,
 		const atmospheric::AirDensity& rho);
 
 	template <typename T>
-	PropellerOmegaState_T<T> compute_propeller_omega_state_T(const actuators::PropulsorActuator& propulsor,
+	PropellerOmegaState_T<T> compute_propeller_omega_state_T(const PropulsorEffector& propulsor_effector,
 		T thrust,
 		const atmospheric::AirDensity& rho,
 		const std::optional<double>& prev_omega,
@@ -18,16 +18,14 @@ namespace propulsion
 		bool steady_state);
 
 	template <typename T>
-	PropellerOmegaStateSet_T<T> compute_propeller_omega_state_set_T(
-		const actuators::PropulsorActuators& propulsor_actuators,
+	PropellerOmegaStateSet_T<T> compute_propeller_omega_state_set_T(const PropulsorEffectors& propulsor_effectors,
 		const PropulsionState& propulsion_state_t_1,
 		const actuators::PropulsorActuatorInputs_T<T>& u,
 		const atmospheric::AirDensity& rho,
 		T dt,
 		bool steady_state);
 
-	PropellerOmegaStateSet_T<double> compute_propeller_omega_state_set(
-		const actuators::PropulsorActuators& propulsor_actuators,
+	PropellerOmegaStateSet_T<double> compute_propeller_omega_state_set(const PropulsorEffectors& propulsor_effectors,
 		const PropulsionState& propulsion_state_t_1,
 		const actuators::PropulsorActuatorInputs_T<double>& u,
 		const atmospheric::AirDensity& rho,

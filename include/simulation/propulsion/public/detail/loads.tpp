@@ -8,14 +8,14 @@ namespace propulsion
 
 	template <typename T>
 	T compute_propeller_torque_T(
-		const actuators::PropulsorActuator& propulsor,
+		const PropulsorEffector& propulsor_effector,
 		const T& omega,
 		const atmospheric::AirDensity& rho)
 	{
-		if (!propulsor.propellers) {
+		if (!propulsor_effector.propellers) {
 			return T(0.0);
 		}
-		const actuators::PropellerAssembly& propellers = propulsor.propellers.value();
+		const PropellerAssembly& propellers = propulsor_effector.propellers.value();
 		const T n = omega / T(2.0 * constants::pi);
 		return T(propellers.torque_coeff * rho.data * propellers.diameter * propellers.diameter * propellers.diameter *
 				   propellers.diameter * propellers.diameter) *
@@ -24,7 +24,7 @@ namespace propulsion
 
 	template <typename T>
 	dynamics::Wrench_T<T> compute_propulsor_loads_T(
-		const actuators::PropulsorActuator& propulsor,
+		const PropulsorEffector& propulsor_effector,
 		const constants::Vector3_T<T>& pB_GB,
 		const dynamics::Twist_T<T>& twist,
 		const atmospheric::StaticAtmosphericState& atm,
@@ -35,16 +35,16 @@ namespace propulsion
 
 		const constants::Vector3_T<T>& wB_BI = twist.w;
 
-		const constants::Vector3_T<T> n_prop = propulsor.n_prop.cast<T>();
-		const constants::Vector3_T<T> pG_propG = propulsor.pB_propB.cast<T>() - pB_GB;
+		const constants::Vector3_T<T> n_prop = propulsor_effector.n_prop.cast<T>();
+		const constants::Vector3_T<T> pG_propG = propulsor_effector.pB_propB.cast<T>() - pB_GB;
 		const atmospheric::AirDensity& rho = atm.rho;
 
 		out.F = n_prop * thrust;
 		out.M = pG_propG.cross(out.F);
 
-		if (propulsor.propellers.has_value()) {
-			const actuators::PropellerAssembly& propellers = propulsor.propellers.value();
-			const T q_prop = compute_propeller_torque_T<T>(propulsor, propeller_omega_state.omega, rho);
+		if (propulsor_effector.propellers.has_value()) {
+			const PropellerAssembly& propellers = propulsor_effector.propellers.value();
+			const T q_prop = compute_propeller_torque_T<T>(propulsor_effector, propeller_omega_state.omega, rho);
 			const constants::Vector3_T<T> H_prop =
 				n_prop * (T(propellers.spin_inertia * propellers.spin_sign) * propeller_omega_state.omega);
 
@@ -58,7 +58,7 @@ namespace propulsion
 
 	template <typename T>
 	dynamics::Wrench_T<T> compute_propulsive_loads_T(
-		const actuators::PropulsorActuators& propulsor_actuators,
+		const PropulsorEffectors& propulsor_effectors,
 		const constants::Vector3_T<T>& pB_GB,
 		const dynamics::Twist_T<T>& twist,
 		const atmospheric::StaticAtmosphericState& atm,
@@ -67,19 +67,19 @@ namespace propulsion
 	{
 		dynamics::Wrench_T<T> total;
 
-		const dynamics::Wrench_T<T> front = compute_propulsor_loads_T<T>(propulsor_actuators.front_propulsor,
+		const dynamics::Wrench_T<T> front = compute_propulsor_loads_T<T>(propulsor_effectors.front_propulsor,
 			pB_GB,
 			twist,
 			atm,
 			u.front_propulsor_cmd,
 			propeller_omega_state_set.front_propulsor);
-		const dynamics::Wrench_T<T> left = compute_propulsor_loads_T<T>(propulsor_actuators.left_propulsor,
+		const dynamics::Wrench_T<T> left = compute_propulsor_loads_T<T>(propulsor_effectors.left_propulsor,
 			pB_GB,
 			twist,
 			atm,
 			u.left_propulsor_cmd,
 			propeller_omega_state_set.left_propulsor);
-		const dynamics::Wrench_T<T> right = compute_propulsor_loads_T<T>(propulsor_actuators.right_propulsor,
+		const dynamics::Wrench_T<T> right = compute_propulsor_loads_T<T>(propulsor_effectors.right_propulsor,
 			pB_GB,
 			twist,
 			atm,

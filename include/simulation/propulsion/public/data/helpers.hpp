@@ -5,10 +5,10 @@ namespace propulsion
 {
 
 	template <typename T>
-	PropulsionState_T<T> make_propulsion_state_T(const actuators::PropulsorActuators& propulsor_actuators,
+	PropulsionState_T<T> make_propulsion_state_T(const PropulsorEffectors& propulsor_effectors,
 		const PropellerOmegaStateSet_T<T>& propeller_omega_state_set);
 
-	PropulsionState make_propulsion_state(const actuators::PropulsorActuators& propulsor_actuators,
+	PropulsionState make_propulsion_state(const PropulsorEffectors& propulsor_effectors,
 		const PropellerOmegaStateSet_T<double>& propeller_omega_state_set);
 
 } // namespace propulsion

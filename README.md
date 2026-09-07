@@ -61,6 +61,7 @@ Customize the following JSON configuration file paths in `config/run.json`:
 - `avionics_config`: Avionics properties
 - `sensors_config`: Sensor properties
 - `actuator_config`: Actuator properties
+- `propulsion_config`: Propulsion properties
 - `control_config`: Control properties
 - `estimation_config`: Estimation properties
 - `guidance_config`: Guidance properties

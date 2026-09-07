@@ -1,0 +1,19 @@
+{
+	"propulsors": {
+		"front_propulsor": {
+			"geometry_id": "propeller",
+			"inclination_angle": 0.0,
+			"toe_angle": 0.0,
+			"propellers": {
+				"geometry_ids": [
+					"propeller"
+				],
+				"spin_sign": 1,
+				"thrust_coeff": 0.1,
+				"torque_coeff": 0.01
+			}
+		},
+		"left_propulsor": null,
+		"right_propulsor": null
+	}
+}
