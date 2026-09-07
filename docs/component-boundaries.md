@@ -10,7 +10,7 @@ Components represent distinct functional responsibilities with their own behavio
 | `SensorManager` | `AngleOfAttackVane`<br>`Accelerometer`<br>`Gyroscope`<br>`PitotTube`<br>`StaticPort`<br>`TotalAirTemperatureProbe`<br>`GNSSReceiver`<br>`Magnetometer` | Each sensor independently owns its measurement behavior, noise, bias, and lag state. |
 | `AvionicsManager` | `AirDataComputer`<br>`AttitudeHeadingReferenceSystem`<br>`InertialNavigationSystem` | These are distinct avionics processors with separate responsibilities and state. |
 | `GuidanceManager` | `RegulationGuidance`<br>`TrackingGuidance`<br>`InterpolatedGuidance` | Regulation, tracking, and interpolation are semantically distinct guidance modes and therefore distinct components. |
-| `AerodynamicsManager` | None | The manager owns surface definitions and their surface effectors and orchestrates stateless aerodynamic load calculations in `detail/`. Aerodynamic state remains a stateless detail calculation used independently by the runner. |
+| `AerodynamicsManager` | `Surface`<br>`SurfaceEffector` (nested under `Surface`) | Each surface owns its geometry, aerodynamic coefficient and load behavior, and surface-effector subcomponents. Each surface effector owns its actuator mapping and coefficient contribution behavior. The manager evaluates the surfaces and aggregates their loads. Aerodynamic state remains a stateless detail calculation used independently by the runner. |
 | `AllocatorManager` | None | Effectiveness evaluation and constrained or unconstrained solving are implementation stages of one cohesive allocation responsibility, so they remain private detail calculations. |
 | `StructuralManager` | None | Deriving mass properties from structural geometry is one cohesive responsibility. Components could become appropriate if independently behaving structural subsystems are added later, such as fuel mass, releasable payload, moving landing gear, structural damage, or other time-varying mass sources. |
 | `PropulsionManager` | `PropulsorEffector` | Each propulsor effector owns its installation and propeller configuration, previous propeller omega, and per-propulsor state and load behavior. The manager evaluates the effectors, aggregates their outputs, and commits their state. |
@@ -22,6 +22,6 @@ Within the RunManager component set, the wrappers are grouped under `public/comp
 
 - Components are not individual formulas, repeated data entries, or intermediate stages of one calculation.
 - Individual geometries are data, not structural components.
-- Aerodynamic kinematics, coefficients, and loads remain calculation stages rather than components.
+- Aerodynamic kinematics, coefficients, and loads remain calculation stages within each `Surface` component.
 - PID and linear-quadratic algorithms remain implementations inside their owning control component.
 - Constrained and unconstrained allocation remain solver paths rather than separate components.

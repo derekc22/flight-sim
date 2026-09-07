@@ -4,10 +4,6 @@
 #include "simulation/constants/public/linalg.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 
-#include <Eigen/Dense>
-#include <string>
-#include <vector>
-
 namespace aerodynamics
 {
 
@@ -23,25 +19,12 @@ namespace aerodynamics
 		DynamicDerivative r_hat;
 	};
 
-	struct SurfaceEffector {
-		actuators::SurfaceActuatorID actuator_id;
-		double dCL;
-		double dCD;
-		double dCM;
-	};
-
-	struct Surface {
-		std::string id;
-		double chord;
-		double span;
-		double area;
-		double AR;
-		// For a thin airfoil in incompressible subsonic flow, the aerodynamic center is approximately at the quarter chord
-		Eigen::Vector3d pB_acB;
-		Eigen::Vector3d n;
-		double CL0, e, i, CD0, CDa, a0, CM0, CMa;
-		DynamicDerivatives dyn;
-		std::vector<SurfaceEffector> effectors;
+	template <typename T> struct SurfaceInput_T {
+		const constants::Vector3_T<T>& pB_GB;
+		const dynamics::Twist_T<T>& twist;
+		const atmospheric::StaticAtmosphericState& atm;
+		const actuators::SurfaceActuatorInputs_T<T>& u;
+		const atmospheric::Wind& windB;
 	};
 
 	template <typename T> struct SurfaceKinematics_T {
