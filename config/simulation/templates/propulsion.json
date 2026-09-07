@@ -1,5 +1,5 @@
 {
-    "propulsors": {
+    "effectors": {
         "front_propulsor": {
             "inclination_angle": 0,
             "toe_angle": 0

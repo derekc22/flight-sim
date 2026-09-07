@@ -1,5 +1,5 @@
 {
-	"propulsors": {
+	"effectors": {
 		"front_propulsor": {
 			"geometry_id": "propeller",
 			"inclination_angle": 0.0,

@@ -94,13 +94,13 @@ namespace json
 		const nlohmann::json& config,
 		structural::StructuralManager& structural_manager)
 	{
-		const auto& propulsor_json = config.at("propulsors");
+		const auto& effectors_json = config.at("effectors");
 
 		return {
 			.propulsor_effectors = {
-				.front_propulsor = parse_propulsor_effector(propulsor_json, "front_propulsor", structural_manager),
-				.left_propulsor = parse_propulsor_effector(propulsor_json, "left_propulsor", structural_manager),
-				.right_propulsor = parse_propulsor_effector(propulsor_json, "right_propulsor", structural_manager),
+				.front_propulsor = parse_propulsor_effector(effectors_json, "front_propulsor", structural_manager),
+				.left_propulsor = parse_propulsor_effector(effectors_json, "left_propulsor", structural_manager),
+				.right_propulsor = parse_propulsor_effector(effectors_json, "right_propulsor", structural_manager),
 			}
 		};
 	}
