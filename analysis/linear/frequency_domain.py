@@ -44,6 +44,7 @@ def run(context, config_path):
     omega = np.logspace(
         config["w_min_order"], config["w_max_order"], config["num_points"]
     )
+    nyquist_omega = np.concatenate(([0.0], omega))
 
     if config["bode"]:
         plot_siso_responses(
@@ -64,7 +65,7 @@ def run(context, config_path):
     if config["nyquist"]:
         plot_siso_responses(
             sys,
-            omega,
+            nyquist_omega,
             context.plot_dir_path,
             "nyquist_response",
             lambda response, frequencies, title: ct.nyquist_plot(
