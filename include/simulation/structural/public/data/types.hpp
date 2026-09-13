@@ -14,7 +14,7 @@ namespace structural
 	struct StructuralState {
 		dynamics::Mass mass;
 		CenterOfGravity pB_GB;
-		dynamics::InertiaTensor JB;
+		dynamics::InertiaTensor JB_G;
 	};
 
 	struct StructuralManagerInput {};
@@ -26,7 +26,7 @@ namespace structural
 	template <typename T> struct StructuralState_T {
 		T mass = T(0.0);
 		constants::Vector3_T<T> pB_GB = constants::Zero3_T<T>;
-		constants::Matrix3_T<T> JB = constants::Zero3x3_T<T>;
+		constants::Matrix3_T<T> JB_G = constants::Zero3x3_T<T>;
 	};
 
 } // namespace structural

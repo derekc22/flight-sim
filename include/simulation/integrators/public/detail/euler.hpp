@@ -18,7 +18,7 @@ namespace integrators
 
 	dynamics::RigidBodyState step_rigid_body(const dynamics::RigidBodyState& Xt,
 		const dynamics::Mass& mass,
-		const dynamics::InertiaTensor& JB,
+		const dynamics::InertiaTensor& JB_G,
 		const dynamics::Wrench& WB_net_t,
 		double dt);
 

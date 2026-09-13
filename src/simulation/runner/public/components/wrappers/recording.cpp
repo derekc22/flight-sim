@@ -12,7 +12,7 @@ namespace runner
 		const CLIOptions& cli_options,
 		const JSONOptions& json_options)
 	{
-		// create data manager
+		// create data recorder
 		if (cli_options.flags.data_flag) {
 			data_recorder.emplace(json_options.tf, json_options.flags);
 		}
@@ -20,7 +20,7 @@ namespace runner
 			rerun_recorder.emplace(json_options.flags, json_options.module_rates.log_hz);
 		}
 
-		// create analysis manager
+		// create analysis recorder
 		if (cli_options.flags.analysis_flag) {
 			// initialize analysis context
 			analysis_recorder.emplace(cli_options.aircraft_id, json_options.flags, json_options.module_rates);
@@ -46,7 +46,7 @@ namespace runner
 			.windB = input.context.windB
 		};
 
-		// step data manager
+		// step data recorder
 		if (data_recorder) {
 			data_recorder->step({.t = input.t, .context = data_context});
 		}

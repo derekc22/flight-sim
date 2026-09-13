@@ -22,7 +22,7 @@ namespace runner
 		// initialize prior-step delta mu
 		dynamics::WrenchVector_T<double> delta_mu_vec_t_1{};
 
-		ControlWrapper(const JSONFlags& flags,
+		ControlWrapper(bool joystick_flag,
 			const actuators::SurfaceActuators& surface_actuators,
 			const actuators::PropulsorActuators& propulsor_actuators);
 		devices::JoystickOutput poll_joystick();

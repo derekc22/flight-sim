@@ -17,7 +17,7 @@ namespace integrators
 		double dt);
 
 	dynamics::AngularVelocity rot_dyn(const dynamics::AngularVelocity& wB_BI_t,
-		const dynamics::InertiaTensor& JB,
+		const dynamics::InertiaTensor& JB_G,
 		const dynamics::Moment& MB_net_t,
 		double dt);
 

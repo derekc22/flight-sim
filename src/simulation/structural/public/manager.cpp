@@ -55,7 +55,7 @@ namespace structural
 		return pB_GB;
 	}
 
-	Eigen::Matrix3d StructuralManager::compute_JB(
+	Eigen::Matrix3d StructuralManager::compute_JB_G(
 		const CenterOfGravity& pB_GB)
 	{
 		Eigen::Matrix3d j = constants::Zero3x3;
@@ -87,7 +87,7 @@ namespace structural
 
 		double detj = j.determinant();
 		if (std::abs(detj) < constants::eps) {
-			throw std::runtime_error("structural::StructuralManager::compute_JB: Inertia tensor is singular");
+			throw std::runtime_error("structural::StructuralManager::compute_JB_G: Inertia tensor is singular");
 		}
 
 		return j;
@@ -107,8 +107,8 @@ namespace structural
 	{
 		dynamics::Mass mass = dynamics::Mass{compute_mass()};
 		CenterOfGravity pB_GB = CenterOfGravity{compute_CG(mass)};
-		dynamics::InertiaTensor JB = dynamics::InertiaTensor{compute_JB(pB_GB)};
-		return {.struc_t = {mass, pB_GB, JB}};
+		dynamics::InertiaTensor JB_G = dynamics::InertiaTensor{compute_JB_G(pB_GB)};
+		return {.struc_t = {mass, pB_GB, JB_G}};
 	}
 
 } // namespace structural

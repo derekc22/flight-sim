@@ -24,13 +24,13 @@ namespace dynamics
 	template <typename T>
 	constants::Vector3_T<T> ddtB_wB_BI_T(
 		const constants::Vector3_T<T>& wB_BI,
-		const Eigen::Matrix3d& J,
+		const Eigen::Matrix3d& JB_G,
 		const constants::Vector3_T<T>& MB_net)
 	{
-		const constants::Matrix3_T<T> J_T = J.cast<T>();
-		const constants::Matrix3_T<T> J_inv_T = J.inverse().cast<T>();
-		const constants::Vector3_T<T> rhs = MB_net - wB_BI.cross(J_T * wB_BI);
-		return J_inv_T * rhs;
+		const constants::Matrix3_T<T> JB_G_T = JB_G.cast<T>();
+		const constants::Matrix3_T<T> JB_G_inv_T = JB_G.inverse().cast<T>();
+		const constants::Vector3_T<T> rhs = MB_net - wB_BI.cross(JB_G_T * wB_BI);
+		return JB_G_inv_T * rhs;
 	}
 
 	template <typename T>

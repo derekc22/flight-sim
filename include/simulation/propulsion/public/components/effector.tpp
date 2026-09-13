@@ -20,7 +20,15 @@ namespace propulsion
 		if (!propellers.has_value()) {
 			return {.WB_propulsive = WB_propulsive, .propeller_omega = {}};
 		}
+		return compute_propeller_effects<T>(input, WB_propulsive, n_prop_t);
+	}
 
+	template <typename T>
+	PropulsorEffectorOutput_T<T> PropulsorEffector::compute_propeller_effects(
+		const PropulsorEffectorInput_T<T>& input,
+		dynamics::Wrench_T<T> WB_propulsive,
+		const constants::Vector3_T<T>& n_prop_t)
+	{
 		const PropellerAssembly& propeller_assembly = propellers.value();
 		const double omega_denominator = propeller_assembly.thrust_coeff * input.rho.data *
 			propeller_assembly.diameter * propeller_assembly.diameter * propeller_assembly.diameter *

@@ -58,11 +58,11 @@ namespace integrators
 
 	dynamics::AngularVelocity rot_dyn(
 		const dynamics::AngularVelocity& wB_BI_t,
-		const dynamics::InertiaTensor& JB,
+		const dynamics::InertiaTensor& JB_G,
 		const dynamics::Moment& MB_net_t,
 		double dt)
 	{
-		const Eigen::Vector3d wB_BI_dot_t = ddtB_wB_BI(wB_BI_t, JB, MB_net_t);
+		const Eigen::Vector3d wB_BI_dot_t = ddtB_wB_BI(wB_BI_t, JB_G, MB_net_t);
 
 		const Eigen::Vector3d wB_BI_t1 = wB_BI_t.data + wB_BI_dot_t * dt;
 		return {wB_BI_t1};

@@ -19,7 +19,7 @@ namespace dynamics
 	/**
     * @brief Returns the body derivative of body-expressed angular velocity
     */
-	Eigen::Vector3d ddtB_wB_BI(const AngularVelocity& wB_BI, const InertiaTensor& JB, const Moment& MB_net);
+	Eigen::Vector3d ddtB_wB_BI(const AngularVelocity& wB_BI, const InertiaTensor& JB_G, const Moment& MB_net);
 
 	/**
     * @brief Converts a body derivative to an inertial derivative
@@ -40,8 +40,9 @@ namespace dynamics
 		const constants::Vector3_T<T>& FB_net);
 
 	template <typename T>
-	constants::Vector3_T<T>
-	ddtB_wB_BI_T(const constants::Vector3_T<T>& wB_BI, const Eigen::Matrix3d& J, const constants::Vector3_T<T>& MB_net);
+	constants::Vector3_T<T> ddtB_wB_BI_T(const constants::Vector3_T<T>& wB_BI,
+		const Eigen::Matrix3d& JB_G,
+		const constants::Vector3_T<T>& MB_net);
 
 	template <typename T>
 	constants::Vector3_T<T> wB_BI_to_eul_dot_T(const constants::Vector3_T<T>& wB_BI, const T& theta, const T& phi);

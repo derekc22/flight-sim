@@ -58,7 +58,7 @@ namespace integrators
 	dynamics::RigidBodyState step_rigid_body(
 		const dynamics::RigidBodyState& Xt,
 		const dynamics::Mass& mass,
-		const dynamics::InertiaTensor& JB,
+		const dynamics::InertiaTensor& JB_G,
 		const dynamics::Wrench& WB_net_t,
 		double dt)
 	{
@@ -83,7 +83,7 @@ namespace integrators
 		}; // since pI_BI_t1 and vI_BI_t are inertial, aB_BI_t needs to be an inertial derivative
 
 		// Rotational dynamics in body coordinates
-		const dynamics::AngularVelocity wB_BI_t1 = rot_dyn(Xt.w, JB, MB_net_t, dt);
+		const dynamics::AngularVelocity wB_BI_t1 = rot_dyn(Xt.w, JB_G, MB_net_t, dt);
 
 		// Quaternion rotational kinematics
 		const dynamics::OrientationQuaternion qIB_t1 = quat_kin(Xt.q, Xt.w, dt);

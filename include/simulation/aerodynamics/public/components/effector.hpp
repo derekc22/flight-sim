@@ -6,6 +6,7 @@ namespace aerodynamics
 
 	struct SurfaceEffector {
 		actuators::SurfaceActuatorID actuator_id;
+		// Control derivatives
 		double dCL;
 		double dCD;
 		double dCM;

@@ -21,7 +21,7 @@ namespace structural
 
 		double compute_mass();
 		Eigen::Vector3d compute_CG(const dynamics::Mass& mass);
-		Eigen::Matrix3d compute_JB(const CenterOfGravity& pB_GB);
+		Eigen::Matrix3d compute_JB_G(const CenterOfGravity& pB_GB);
 
 		StructuralManagerOutput step(const StructuralManagerInput& input);
 	};

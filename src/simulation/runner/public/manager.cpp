@@ -35,7 +35,7 @@ namespace runner
 		  // initialize scheduler
 		  scheduler(json_options.module_rates, json_options.tf),
 
-		  control_wrapper(json_options.flags,
+		  control_wrapper(json_options.flags.joystick_flag,
 			  aircraft.actuator_manager.surface_actuators,
 			  aircraft.actuator_manager.propulsor_actuators),
 

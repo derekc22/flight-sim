@@ -35,10 +35,10 @@ namespace dynamics
 
 	Eigen::Vector3d ddtB_wB_BI(
 		const AngularVelocity& wB_BI,
-		const InertiaTensor& JB,
+		const InertiaTensor& JB_G,
 		const Moment& MB_net)
 	{
-		return ddtB_wB_BI_T<double>(wB_BI.data, JB.data, MB_net.data);
+		return ddtB_wB_BI_T<double>(wB_BI.data, JB_G.data, MB_net.data);
 	}
 
 	AngularVelocity CIB_dot_to_wB_BI(

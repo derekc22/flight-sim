@@ -6,7 +6,7 @@ namespace integrators
 
 	dynamics::RigidBodyStateDot compute_rigid_body_state_dot(const dynamics::RigidBodyState& Xt,
 		const dynamics::Mass& mass,
-		const dynamics::InertiaTensor& JB,
+		const dynamics::InertiaTensor& JB_G,
 		const dynamics::Wrench& WB_net_t);
 
 	dynamics::RigidBodyState add_scaled_rigid_body_state_dot(const dynamics::RigidBodyState& X,

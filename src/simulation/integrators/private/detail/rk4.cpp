@@ -11,7 +11,7 @@ namespace integrators
 	dynamics::RigidBodyStateDot compute_rigid_body_state_dot(
 		const dynamics::RigidBodyState& Xt,
 		const dynamics::Mass& mass,
-		const dynamics::InertiaTensor& JB,
+		const dynamics::InertiaTensor& JB_G,
 		const dynamics::Wrench& WB_net_t)
 	{
 		const dynamics::Force FB_net_t = WB_net_t.F;
@@ -20,7 +20,7 @@ namespace integrators
 		return {
 			.p_dot = dynamics::TranslationalVelocity{Xt.q.data.conjugate() * Xt.v.data},
 			.v_dot = dynamics::ddtB_vB_BI(Xt.v, Xt.w, mass, FB_net_t),
-			.w_dot = dynamics::AngularAcceleration{dynamics::ddtB_wB_BI(Xt.w, JB, MB_net_t)}
+			.w_dot = dynamics::AngularAcceleration{dynamics::ddtB_wB_BI(Xt.w, JB_G, MB_net_t)}
 		};
 	}
 

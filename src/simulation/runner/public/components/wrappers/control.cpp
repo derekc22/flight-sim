@@ -18,7 +18,7 @@ namespace runner
 {
 
 	ControlWrapper::ControlWrapper(
-		const JSONFlags& flags,
+		bool joystick_flag,
 		const actuators::SurfaceActuators& surface_actuators,
 		const actuators::PropulsorActuators& propulsor_actuators)
 	{
@@ -26,7 +26,7 @@ namespace runner
 		u_actual_t_1 = actuators::get_neutral_actuator_inputs(surface_actuators, propulsor_actuators);
 
 		// create joystick
-		if (flags.joystick_flag) {
+		if (joystick_flag) {
 			actuators::ActuatorLimits actuator_limits =
 				actuators::pack_actuator_limits(surface_actuators, propulsor_actuators);
 			joystick.emplace(actuator_limits);

@@ -76,7 +76,7 @@ namespace autodiff
 		const dynamics::Twist_T<T> twist = dynamics::build_twist_from_state_T(x);
 		const constants::Vector3_T<T> v_dot =
 			dynamics::ddtB_vB_BI_T<T>(twist.v, twist.w, model.struc_t.mass.data, net_wrench.F);
-		const constants::Vector3_T<T> w_dot = dynamics::ddtB_wB_BI_T<T>(twist.w, model.struc_t.JB.data, net_wrench.M);
+		const constants::Vector3_T<T> w_dot = dynamics::ddtB_wB_BI_T<T>(twist.w, model.struc_t.JB_G.data, net_wrench.M);
 		const constants::Vector3_T<T> eul_dot = dynamics::wB_BI_to_eul_dot_T<T>(twist.w, x.theta, x.phi);
 
 		return {
