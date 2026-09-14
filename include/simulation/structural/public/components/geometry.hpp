@@ -13,8 +13,9 @@ namespace structural
 		double y_size;
 		double z_size;
 		Eigen::Vector3d pB_geomB;
+		Eigen::Matrix3d CBL;
 
-		Eigen::Matrix3d compute_local_JB();
+		Eigen::Matrix3d compute_local_J();
 		double compute_spin_inertia(const Eigen::Vector3d& axis);
 	};
 

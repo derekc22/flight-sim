@@ -11,6 +11,7 @@ namespace json
 
 	propulsion::PropellerAssembly parse_propellers(const nlohmann::json& propellers_json,
 		structural::StructuralManager& structural_manager,
+		const Eigen::Vector3d& pB_propB,
 		const Eigen::Vector3d& n_prop);
 
 	propulsion::PropulsorEffector parse_propulsor_effector(const nlohmann::json& config,

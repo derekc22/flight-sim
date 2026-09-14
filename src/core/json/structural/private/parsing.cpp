@@ -2,6 +2,7 @@
 
 #include "core/json/public/data/helpers.hpp"
 #include "simulation/structural/public/manager.hpp"
+#include "simulation/util/public/validation.hpp"
 
 #include <nlohmann/json.hpp>
 #include <stdexcept>
@@ -22,6 +23,8 @@ namespace json
 		std::vector<structural::Geometry> geometries;
 		geometries.reserve(geometries_json.size());
 		for (const auto& geom_json : geometries_json) {
+			Eigen::Matrix3d CBL = parse_Matrix3d(geom_json.at("CBL"));
+			util::validate_orthonormal(CBL, "json::parse_structural_manager", "geometry CBL");
 			geometries.push_back(structural::Geometry{
 				.id = geom_json.at("id").get<std::string>(),
 				.mass = geom_json.at("mass").get<double>(),
@@ -29,6 +32,7 @@ namespace json
 				.y_size = geom_json.at("y_size").get<double>(),
 				.z_size = geom_json.at("z_size").get<double>(),
 				.pB_geomB = parse_Vector3d(geom_json.at("pB_geomB")),
+				.CBL = CBL
 			});
 		}
 

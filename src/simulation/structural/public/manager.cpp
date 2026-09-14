@@ -58,39 +58,26 @@ namespace structural
 	Eigen::Matrix3d StructuralManager::compute_JB_G(
 		const CenterOfGravity& pB_GB)
 	{
-		Eigen::Matrix3d j = constants::Zero3x3;
+		Eigen::Matrix3d J = constants::Zero3x3;
 
 		for (Geometry& geom : geometries) {
-			double m = geom.mass;
-			Eigen::Matrix3d j_local = geom.compute_local_JB();
+			Eigen::Matrix3d j_localL = geom.compute_local_J();
+
+			// Express geometry-local inertia tensor in body frame
+			Eigen::Matrix3d j_localB = geom.CBL.transpose() * j_localL * geom.CBL;
 
 			// Distance from geometry CG to system CG
-			double dx = geom.pB_geomB(0) - pB_GB.data(0);
-			double dy = geom.pB_geomB(1) - pB_GB.data(1);
-			double dz = geom.pB_geomB(2) - pB_GB.data(2);
+			Eigen::Vector3d d = geom.pB_geomB - pB_GB.data;
 
 			// Parallel axis theorem
-			j(0, 0) += j_local(0, 0) + m * (dy * dy + dz * dz); // Jxx
-			j(1, 1) += j_local(1, 1) + m * (dx * dx + dz * dz); // Jyy
-			j(2, 2) += j_local(2, 2) + m * (dx * dx + dy * dy); // Jzz
-
-			// Off-diagonal terms (products of inertia)
-			j(0, 1) += -m * dx * dy;
-			j(0, 2) += -m * dx * dz;
-			j(1, 2) += -m * dy * dz;
+			J += j_localB + geom.mass * (d.squaredNorm() * Eigen::Matrix3d::Identity() - d * d.transpose());
 		}
 
-		// Symmetric
-		j(1, 0) = j(0, 1);
-		j(2, 0) = j(0, 2);
-		j(2, 1) = j(1, 2);
-
-		double detj = j.determinant();
-		if (std::abs(detj) < constants::eps) {
+		if (std::abs(J.determinant()) < constants::eps) {
 			throw std::runtime_error("structural::StructuralManager::compute_JB_G: Inertia tensor is singular");
 		}
 
-		return j;
+		return J;
 	}
 
 	std::unordered_map<std::string, std::size_t> StructuralManager::build_geometry_id_map()

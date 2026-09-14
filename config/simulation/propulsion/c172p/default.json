@@ -2,8 +2,6 @@
 	"effectors": {
 		"front_propulsor": {
 			"geometry_id": "propeller",
-			"inclination_angle": 0.0,
-			"toe_angle": 0.0,
 			"propellers": {
 				"geometry_ids": [
 					"propeller"
