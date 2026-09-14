@@ -17,12 +17,6 @@ namespace json
 		if (!propulsor_effector_json.contains("geometry_id")) {
 			throw std::runtime_error("json::validate_propulsor_effector_json: propulsor geometry_id not present");
 		}
-		if (!propulsor_effector_json.contains("inclination_angle")) {
-			throw std::runtime_error("json::validate_propulsor_effector_json: propulsor inclination_angle not present");
-		}
-		if (!propulsor_effector_json.contains("toe_angle")) {
-			throw std::runtime_error("json::validate_propulsor_effector_json: propulsor toe_angle not present");
-		}
 	}
 
 	void validate_propulsor_effector_placement(

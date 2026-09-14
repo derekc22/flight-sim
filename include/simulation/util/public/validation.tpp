@@ -51,6 +51,19 @@ namespace util
 	}
 
 	template <typename T>
+	void validate_orthonormal(
+		const Eigen::MatrixBase<T>& M,
+		const std::string& context,
+		const std::string& name)
+	{
+		validate_square(M, context, name);
+		if (!M.isUnitary(constants::eps) || std::abs(M.determinant() - 1.0) > constants::eps) {
+			throw std::invalid_argument(
+				"util::validate_orthonormal: " + context + ": " + name + " must be orthonormal with determinant +1");
+		}
+	}
+
+	template <typename T>
 	void validate_value(
 		T a,
 		T b,

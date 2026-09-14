@@ -1,16 +1,7 @@
 {
     "effectors": {
-        "front_propulsor": {
-            "inclination_angle": 0,
-            "toe_angle": 0
-        },
-        "left_propulsor": {
-            "inclination_angle": 0,
-            "toe_angle": 0
-        },
-        "right_propulsor": {
-            "inclination_angle": 0,
-            "toe_angle": 0
-        }
+        "front_propulsor": {},
+        "left_propulsor": {},
+        "right_propulsor": {}
     }
 }
