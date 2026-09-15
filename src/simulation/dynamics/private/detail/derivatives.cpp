@@ -48,6 +48,30 @@ namespace dynamics
 		return {qIB_dot}; // do NOT canonicalize qIB_dot
 	}
 
+	OrientationQuaternionRate quat_kin_vel_Q(
+		const OrientationQuaternion& qIB,
+		const AngularVelocity& wB_BI)
+	{
+		Eigen::Matrix<double, 4, 3> Q;
+		Q << qIB.data.x(), qIB.data.y(), qIB.data.z(), -qIB.data.w(), -qIB.data.z(), qIB.data.y(), qIB.data.z(),
+			-qIB.data.w(), -qIB.data.x(), -qIB.data.y(), qIB.data.x(), -qIB.data.w();
+		Eigen::Vector4d qIB_dot = 0.5 * Q * wB_BI.data;
+		return {Eigen::Quaterniond{qIB_dot[0], qIB_dot[1], qIB_dot[2], qIB_dot[3]}};
+	}
+
+	OrientationQuaternionRate quat_kin_vel_W(
+		const OrientationQuaternion& qIB,
+		const AngularVelocity& wB_BI)
+	{
+		Eigen::Matrix4d W;
+		W << 0.0, wB_BI.data.x(), wB_BI.data.y(), wB_BI.data.z(), -wB_BI.data.x(), 0.0, wB_BI.data.z(), -wB_BI.data.y(),
+			-wB_BI.data.y(), -wB_BI.data.z(), 0.0, wB_BI.data.x(), -wB_BI.data.z(), wB_BI.data.y(), -wB_BI.data.x(),
+			0.0;
+		Eigen::Vector4d qIB_data{qIB.data.w(), qIB.data.x(), qIB.data.y(), qIB.data.z()};
+		Eigen::Vector4d qIB_dot = 0.5 * W * qIB_data;
+		return {Eigen::Quaterniond{qIB_dot[0], qIB_dot[1], qIB_dot[2], qIB_dot[3]}};
+	}
+
 	OrientationQuaternionRate quat_kin_vel(
 		const OrientationQuaternion& qIB,
 		const AngularVelocityQuaternion& wq_BI)

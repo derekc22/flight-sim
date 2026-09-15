@@ -10,6 +10,10 @@ namespace dynamics
 
 	OrientationQuaternionRate quat_kin_vel(const OrientationQuaternion& qIB, const AngularVelocity& wB_BI);
 
+	OrientationQuaternionRate quat_kin_vel_Q(const OrientationQuaternion& qIB, const AngularVelocity& wB_BI);
+
+	OrientationQuaternionRate quat_kin_vel_W(const OrientationQuaternion& qIB, const AngularVelocity& wB_BI);
+
 	OrientationQuaternionRate quat_kin_vel(const OrientationQuaternion& qIB, const AngularVelocityQuaternion& wq_BI);
 
 	OrientationQuaternionRate CIB_dot_to_qIB_dot(const OrientationMatrixRate& CIB_dot,
