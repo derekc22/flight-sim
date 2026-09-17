@@ -58,14 +58,15 @@ namespace runner
 					input.context.geo_t);
 
 				// step avionics
-				// sensor_hist will always be populated by the time AvionicsManager::step is called, but std::optional is kept here for consistency
+				// sensor_hist is empty until a previous sensor measurement is available
 				avionics::AvionicsMeasurements avionics_meas = avionics_manager
 																   .step(
 																	   {.sensor_meas = sensor_meas,
-																		   .sensor_hist = sensor_manager.hist,
+																		   .sensor_hist = sensor_manager.prev_hist,
 																		   .sensor_gt = sensor_gt,
 																		   .avionics_gt = avionics_gt,
-																		   .dt = avionics_dt})
+																		   .dt = avionics_dt,
+																		   .sensor_dt = sensor_manager.sensor_dt})
 																   .avionics_meas;
 
 				// overwrite local measurement state with sensor measurements

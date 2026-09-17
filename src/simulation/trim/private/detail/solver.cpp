@@ -34,6 +34,8 @@ namespace trim
 			throw std::invalid_argument("trim::validate_trim_solve_options: angle_rate_scale must be positive");
 		if (options.angle_err_scale <= 0.0)
 			throw std::invalid_argument("trim::validate_trim_solve_options: angle_err_scale must be positive");
+		if (options.vel_err_scale <= 0.0)
+			throw std::invalid_argument("trim::validate_trim_solve_options: vel_err_scale must be positive");
 		if (options.backtrack_scale <= 0.0 || options.backtrack_scale >= 1.0)
 			throw std::invalid_argument("trim::validate_trim_solve_options: backtrack_scale must be in (0, 1)");
 		if (options.min_step_scale <= 0.0 || options.min_step_scale > 1.0)

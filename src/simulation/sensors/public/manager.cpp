@@ -18,7 +18,9 @@ namespace sensors
 			.heading_BE = sensors.magnetometer.measure(input.sensor_gt.heading, input.dt)
 		};
 
+		prev_hist = hist;
 		hist = sensor_meas;
+		sensor_dt = input.dt;
 
 		return {.sensor_meas = sensor_meas};
 	}

@@ -185,6 +185,14 @@ namespace vehicles
 		std::optional<STABFrameFRDStepOptions> STABFrameFRDStepOpts;
 		std::optional<WINDFrameSTABStepOptions> WINDFrameSTABStepOpts;
 
+		/**
+		 * @brief Validates an aircraft frame-step request.
+		 *
+		 * Earth-relative and NED-relative FRD frame updates are mutually exclusive
+		 * within one request.
+		 *
+		 * @param[in] opts Aircraft frame-step options to validate.
+		 */
 		static void validate(const StepOptions& opts);
 	};
 
@@ -203,7 +211,26 @@ namespace vehicles
 		std::optional<geography::GeographicState> geo;
 		std::optional<aerodynamics::AerodynamicState> aero;
 
+		/**
+		 * @brief Validates unified frame-step options.
+		 *
+		 * Latitude, longitude, and altitude must be supplied together. Position,
+		 * orientation, and attitude-rate representations are mutually exclusive
+		 * within their respective groups, and a homogeneous transform cannot be
+		 * combined with another position or orientation representation. A rigid-body
+		 * state cannot be combined with homogeneous-transform, position, orientation,
+		 * attitude-rate, translational-velocity, or geographic fields. An aerodynamic
+		 * state cannot be combined with individual angle of attack or sideslip fields.
+		 *
+		 * @param[in] opts Unified frame-step options to validate.
+		 */
 		static void validate(const _StepOptions& opts);
+
+		/**
+		 * @brief Reports whether any unified frame-step field is populated.
+		 *
+		 * @return `true` when at least one field contains a value; otherwise `false`.
+		 */
 		explicit operator bool() const;
 	};
 

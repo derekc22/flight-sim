@@ -14,8 +14,7 @@ namespace geography
 		return {Eigen::Vector3d(0.0, 0.0, constants::g_earth)};
 	};
 
-	dynamics::Gravity gB(
-		const dynamics::Position& pE,
+	dynamics::Gravity gB_from_E(
 		const dynamics::HomogeneousTransformationMatrix& HEB)
 	{
 		return {HEB.C().data * gE(HEB.p()).data};
@@ -49,7 +48,7 @@ namespace geography
 		};
 	};
 
-	dynamics::Gravity gB(
+	dynamics::Gravity gB_from_N(
 		const dynamics::HomogeneousTransformationMatrix& HNB)
 	{
 		return {HNB.C().data * gN().data};

@@ -15,6 +15,7 @@ namespace avionics
 		const sensors::SensorGroundTruth& sensor_gt = input.sensor_gt;
 		const AvionicsGroundTruth& avionics_gt = input.avionics_gt;
 		double dt = input.dt;
+		double sensor_dt = input.sensor_dt;
 
 		MachNumberMeasurement mach_meas{atmospheric::compute_mach(sensor_meas.P0, sensor_meas.P)};
 		StaticAirTemperatureMeasurement T_meas{atmospheric::T_from_T0(sensor_meas.T0, mach_meas)};
@@ -32,7 +33,7 @@ namespace avionics
 						: OrientationMeasurement{avionics_gt.qIB},
 			.Vinf = avionics.ADC.compute(mach_meas, T_meas),
 			.pressure_alt_BE = avionics.ADC.compute(sensor_meas.P),
-			.alt_BE_dot = sensor_hist ? avionics.ADC.compute(sensor_meas.P, sensor_hist->P, T_meas, dt)
+			.alt_BE_dot = sensor_hist ? avionics.ADC.compute(sensor_meas.P, sensor_hist->P, T_meas, sensor_dt)
 									  : VerticalSpeedMeasurement{avionics_gt.alt_BE_dot},
 			.rho = avionics.ADC.compute(sensor_meas.P, T_meas)
 		};

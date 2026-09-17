@@ -19,9 +19,36 @@ namespace control
 		std::optional<VelocityControl> velocity_control;
 		std::optional<LinearQuadraticControl> linear_quadratic_control;
 
+		/**
+		 * @brief Advances the configured control components and combines their outputs.
+		 *
+		 * @param[in] input Current simulation, trim, linearization, guidance, allocation, and timing data.
+		 * @return Combined virtual wrench and active-channel masks.
+		 */
 		ControlManagerOutput step(const ControlManagerInput& input);
+
+		/**
+		 * @brief Advances available control components and aggregates their commands and masks.
+		 *
+		 * Component force and moment commands are summed, while their active-channel
+		 * and actuator masks are combined with a logical OR.
+		 *
+		 * @param[in] inputs Optional input for each configured control component.
+		 * @param[in] dt Controller step [s].
+		 * @return Aggregated virtual wrench and active-channel masks.
+		 */
 		ControlManagerOutput aggregate_components(const ControlComponentInputs& inputs, double dt);
 
+		/**
+		 * @brief Builds inputs for each configured control component.
+		 *
+		 * @param[in] Zt Current rigid-body state.
+		 * @param[in] trim_sol Trim solution supplying the linear-quadratic reference state.
+		 * @param[in] virtual_lin_sol Current virtual-system linearization.
+		 * @param[in] setpoint Current guidance setpoint.
+		 * @param[in] delta_mu_vec_t_1 Previous-step virtual-control allocation residual.
+		 * @return Optional component inputs populated for the configured controllers.
+		 */
 		ControlComponentInputs build_component_inputs(const dynamics::RigidBodyState& Zt,
 			const trim::TrimSolution& trim_sol,
 			const linearization::VirtualLocalLinearization& virtual_lin_sol,

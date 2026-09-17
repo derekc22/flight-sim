@@ -20,68 +20,252 @@ namespace dynamics
 
 	struct OrientationMatrix {
 		Eigen::Matrix3d data; // e.g. CIB [-]
+
+		/**
+		 * @brief Sets the orientation matrix from an orientation quaternion.
+		 *
+		 * @param[in] q Orientation quaternion [-].
+		 */
 		void set(const OrientationQuaternion& q);
+
+		/**
+		 * @brief Sets the orientation matrix from intrinsic ZYX Euler angles.
+		 *
+		 * @param[in] eul Euler angles [rad].
+		 */
 		void set(const EulerAngles& eul);
 	};
 
 	struct HomogeneousTransformationMatrix {
 		Eigen::Matrix4d data; // e.g. HIB
+
+		/**
+		 * @brief Extracts the orientation matrix from the homogeneous transformation.
+		 *
+		 * @return Orientation matrix in the upper-left block [-].
+		 */
 		OrientationMatrix C() const;
+
+		/**
+		 * @brief Extracts the frame-position vector from the homogeneous transformation.
+		 *
+		 * @return Frame-position vector [m].
+		 */
 		Position p() const;
+
+		/**
+		 * @brief Sets the orientation and position represented by the homogeneous transformation.
+		 *
+		 * @param[in] C Orientation matrix [-].
+		 * @param[in] p Frame-position vector [m].
+		 */
 		void set(const OrientationMatrix& C, const Position& p);
+
+		/**
+		 * @brief Sets the orientation matrix while preserving the current position.
+		 *
+		 * @param[in] C Orientation matrix [-].
+		 */
 		void set(const OrientationMatrix& C);
+
+		/**
+		 * @brief Sets the position while preserving the current orientation.
+		 *
+		 * @param[in] p Frame-position vector [m].
+		 */
 		void set(const Position& p);
+
+		/**
+		 * @brief Sets the orientation from a quaternion while preserving the current position.
+		 *
+		 * @param[in] q Orientation quaternion [-].
+		 */
 		void set(const OrientationQuaternion& q);
+
+		/**
+		 * @brief Sets the orientation from intrinsic ZYX Euler angles while preserving the current position.
+		 *
+		 * @param[in] eul Euler angles [rad].
+		 */
 		void set(const EulerAngles& eul);
 	};
 
 	struct OrientationQuaternion {
 		Eigen::Quaterniond data; // e.g. qIB [-]
+
+		/**
+		 * @brief Sets the orientation quaternion from an orientation matrix.
+		 *
+		 * @param[in] C Orientation matrix [-].
+		 */
 		void set(const OrientationMatrix& C);
+
+		/**
+		 * @brief Sets the orientation quaternion from intrinsic ZYX Euler angles.
+		 *
+		 * @param[in] eul Euler angles [rad].
+		 */
 		void set(const EulerAngles& eul);
 	};
 
 	struct EulerAngles {
 		// "ZYX", intrinsic. Stored as [yaw, pitch, roll]
 		Eigen::Vector3d data; // e.g. eulIB [rad]
-		double psi() const;	  // yaw
+
+		/**
+		 * @brief Returns the yaw angle.
+		 *
+		 * @return Yaw angle [rad].
+		 */
+		double psi() const; // yaw
+
+		/**
+		 * @brief Returns the pitch angle.
+		 *
+		 * @return Pitch angle [rad].
+		 */
 		double theta() const; // pitch
-		double phi() const;	  // roll
+
+		/**
+		 * @brief Returns the roll angle.
+		 *
+		 * @return Roll angle [rad].
+		 */
+		double phi() const; // roll
+
+		/**
+		 * @brief Sets intrinsic ZYX Euler angles from an orientation matrix.
+		 *
+		 * @param[in] C Orientation matrix [-].
+		 */
 		void set(const OrientationMatrix& C);
+
+		/**
+		 * @brief Sets intrinsic ZYX Euler angles from an orientation quaternion.
+		 *
+		 * @param[in] q Orientation quaternion [-].
+		 */
 		void set(const OrientationQuaternion& q);
 	};
 
 	struct AngularVelocity {
 		Eigen::Vector3d data; // e.g. wB_BI [rad/s]
+
+		/**
+		 * @brief Returns the angular-velocity component about the body x-axis.
+		 *
+		 * @return Roll-rate component [rad/s].
+		 */
 		double p() const;
+
+		/**
+		 * @brief Returns the angular-velocity component about the body y-axis.
+		 *
+		 * @return Pitch-rate component [rad/s].
+		 */
 		double q() const;
+
+		/**
+		 * @brief Returns the angular-velocity component about the body z-axis.
+		 *
+		 * @return Yaw-rate component [rad/s].
+		 */
 		double r() const;
 	};
 
 	struct OrientationMatrixRate {
 		Eigen::Matrix3d data; // e.g. CIB_dot [s^-1]
+
+		/**
+		 * @brief Sets the orientation-matrix rate from quaternion orientation and rate.
+		 *
+		 * @param[in] q_dot Orientation-quaternion rate [1/s].
+		 * @param[in] q Orientation quaternion [-].
+		 * @param[in] C Orientation matrix [-].
+		 */
 		void set(const OrientationQuaternionRate& q_dot, const OrientationQuaternion& q, const OrientationMatrix& C);
+
+		/**
+		 * @brief Sets the orientation-matrix rate from orientation and angular velocity.
+		 *
+		 * @param[in] C Orientation matrix [-].
+		 * @param[in] w Angular velocity [rad/s].
+		 */
 		void set(const OrientationMatrix& C, const AngularVelocity& w);
 	};
 
 	struct OrientationQuaternionRate {
 		Eigen::Quaterniond data; // e.g. qIB_dot [s^-1]
+
+		/**
+		 * @brief Sets the orientation-quaternion rate from matrix orientation and rate.
+		 *
+		 * @param[in] C_dot Orientation-matrix rate [1/s].
+		 * @param[in] C Orientation matrix [-].
+		 * @param[in] q Orientation quaternion [-].
+		 */
 		void set(const OrientationMatrixRate& C_dot, const OrientationMatrix& C, const OrientationQuaternion& q);
+
+		/**
+		 * @brief Sets the orientation-quaternion rate from orientation and angular velocity.
+		 *
+		 * @param[in] q Orientation quaternion [-].
+		 * @param[in] w Angular velocity [rad/s].
+		 */
 		void set(const OrientationQuaternion& q, const AngularVelocity& w);
 	};
 
 	struct EulerAngleRates {
 		// "ZYX", intrinsic. Stored as [phi_dot, theta_dot, psi_dot]
 		Eigen::Vector3d data; // e.g. eulIB_dot [rad/s]
+
+		/**
+		 * @brief Returns the roll-angle rate.
+		 *
+		 * @return Roll-angle rate [rad/s].
+		 */
 		double phi_dot() const;
+
+		/**
+		 * @brief Returns the pitch-angle rate.
+		 *
+		 * @return Pitch-angle rate [rad/s].
+		 */
 		double theta_dot() const;
+
+		/**
+		 * @brief Returns the yaw-angle rate.
+		 *
+		 * @return Yaw-angle rate [rad/s].
+		 */
 		double psi_dot() const;
+
+		/**
+		 * @brief Sets intrinsic ZYX Euler-angle rates from angular velocity and orientation.
+		 *
+		 * @param[in] w Angular velocity [rad/s].
+		 * @param[in] eul Intrinsic ZYX Euler angles [rad].
+		 */
 		void set(const AngularVelocity& w, const EulerAngles& eul);
 	};
 
 	struct AngularVelocityQuaternion {
-		Eigen::Quaterniond data; // e.g. wq_BI = [ 0; -wB_BI ]. minus for qIB convention
+		Eigen::Quaterniond data; // e.g. wq_BI = [ 0; wB_BI ]
+
+		/**
+		 * @brief Extracts angular velocity from the quaternion vector part.
+		 *
+		 * @return Angular velocity [rad/s].
+		 */
 		AngularVelocity w() const;
+
+		/**
+		 * @brief Sets a pure quaternion from angular velocity.
+		 *
+		 * Sets the scalar coefficient to zero and the vector coefficients to @p w.
+		 *
+		 * @param[in] w Angular velocity [rad/s].
+		 */
 		void set(const AngularVelocity& w);
 	};
 

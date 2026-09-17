@@ -47,7 +47,7 @@ namespace connection
 			in_msg.pitch_deg,
 			in_msg.heading_deg);
 
-		if (n <= 0)
+		if (n <= 0 || static_cast<size_t>(n) >= sizeof(buffer))
 			return false;
 
 		const ssize_t sent =

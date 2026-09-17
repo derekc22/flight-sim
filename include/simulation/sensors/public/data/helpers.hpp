@@ -4,6 +4,21 @@
 namespace sensors
 {
 
+	/**
+	 * @brief Builds the ground-truth quantities measured by the sensor suite.
+	 *
+	 * Computes stagnation properties from airspeed and the static atmosphere,
+	 * specific force from net force minus gravity, and heading from yaw. Remaining
+	 * measured quantities are copied from the supplied state and aerodynamic data.
+	 *
+	 * @param[in] Xt Rigid-body state supplying measured position, velocity, orientation, and angular velocity.
+	 * @param[in] XEt Earth-referenced rigid-body state used to compute body-expressed gravity.
+	 * @param[in] aero_t Current aerodynamic state supplying angle of attack.
+	 * @param[in] atm_t Current static atmospheric state.
+	 * @param[in] mass Aircraft mass [kg].
+	 * @param[in] WB_net Net body-frame wrench supplying the force used for specific acceleration [N].
+	 * @return Ground-truth input for every modeled sensor.
+	 */
 	SensorGroundTruth build_sensor_gt(const dynamics::RigidBodyState& Xt,
 		const dynamics::RigidBodyState& XEt,
 		const aerodynamics::AerodynamicState& aero_t,
@@ -11,4 +26,4 @@ namespace sensors
 		const dynamics::Mass& mass,
 		const dynamics::Wrench& WB_net);
 
-}
+} // namespace sensors

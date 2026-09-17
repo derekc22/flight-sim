@@ -58,6 +58,7 @@ namespace avionics
 		const sensors::SensorGroundTruth& sensor_gt;
 		const AvionicsGroundTruth& avionics_gt;
 		double dt;
+		double sensor_dt;
 	};
 
 	struct AvionicsManagerOutput {

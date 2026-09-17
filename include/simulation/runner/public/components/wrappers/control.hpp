@@ -25,7 +25,24 @@ namespace runner
 		ControlWrapper(bool joystick_flag,
 			const actuators::SurfaceActuators& surface_actuators,
 			const actuators::PropulsorActuators& propulsor_actuators);
+
+		/**
+		 * @brief Polls the configured joystick.
+		 *
+		 * @return Current joystick output, or a default output when no joystick is configured.
+		 */
 		devices::JoystickOutput poll_joystick();
+
+		/**
+		 * @brief Runs control selection, allocation, and actuator dynamics for one step.
+		 *
+		 * Manual mode uses the joystick command. Autopilot modes allocate virtual
+		 * control commands, with scheduled guidance and control outputs held between
+		 * updates. Actuator dynamics are advanced in every mode.
+		 *
+		 * @param[in,out] input Aircraft, scheduler, state, and mode data for the step.
+		 * @return Guidance setpoint, commanded controls, and actual actuator inputs.
+		 */
 		ControlWrapperOutput step(const ControlWrapperInput& input);
 	};
 

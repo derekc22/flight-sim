@@ -11,8 +11,25 @@ namespace control
 		LinearQuadraticPolicy policy;
 
 		LinearQuadraticRegulator(const LinearQuadraticRegulatorParameters& params);
+
+		/**
+		 * @brief Computes the virtual-control deviation from the current state error.
+		 *
+		 * @param[in] input Current state, setpoint, trim state, and virtual linearization.
+		 * @param[in] dt Controller step duration, which is unused by the regulator [s].
+		 * @return Virtual-control deviation with force components [N] and moment components [N m].
+		 */
 		VirtualControlOutput_T<double> step(const LinearQuadraticControlInput& input, double);
 
+		/**
+		 * @brief Builds the regulator policy input from the state deviation and virtual linearization.
+		 *
+		 * The state deviation is measured from the requested velocity, angular
+		 * velocity, roll, and pitch setpoint.
+		 *
+		 * @param[in] input Current state, setpoint, and virtual linearization.
+		 * @return Linear-quadratic policy input for the regulator.
+		 */
 		LinearQuadraticPolicyInput make_linear_quadratic_policy_input(const LinearQuadraticControlInput& input);
 	};
 } // namespace control

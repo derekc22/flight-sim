@@ -9,6 +9,20 @@ namespace avionics
 {
 
 	struct AttitudeHeadingReferenceSystem {
+		/**
+		 * @brief Advances the orientation estimate using a Mahony-style attitude filter.
+		 *
+		 * Propagates the inertial-to-body quaternion with gyroscope data. When the
+		 * measured specific-force magnitude is within the configured tolerance of
+		 * gravity, an accelerometer-derived proportional-integral correction is added.
+		 * Otherwise, the uncorrected gyroscope prediction is returned.
+		 *
+		 * @param[in] prev_qIB Previous inertial-to-body orientation estimate [-].
+		 * @param[in] wB_BI Measured body angular velocity [rad/s].
+		 * @param[in] fB Measured body-expressed specific force [m/s^2].
+		 * @param[in] dt Estimation interval [s].
+		 * @return Normalized and canonicalized inertial-to-body orientation estimate [-].
+		 */
 		OrientationMeasurement compute(const OrientationMeasurement& prev_qIB,
 			const sensors::AngularVelocityMeasurement& wB_BI,
 			const sensors::TranslationalAccelerationMeasurement& fB,

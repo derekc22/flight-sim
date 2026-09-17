@@ -41,19 +41,97 @@ namespace runner
 		RecordingWrapper recording_wrapper;
 
 		RunManager(const CLIOptions& cli_options, const JSONOptions& json_options);
+
 		~RunManager();
 
+		/**
+		 * @brief Saves recorded run outputs and configuration snapshots.
+		 */
 		void cleanup();
+
+		/**
+		 * @brief Executes the configured simulation run and saves its outputs.
+		 */
 		void run();
+
+		/**
+		 * @brief Executes one complete simulation step.
+		 *
+		 * The step prepares current conditions, initializes trim when required, runs
+		 * measurements, estimation, control, and physics, publishes the result, and
+		 * advances the scheduler.
+		 *
+		 * @param[in] input Current simulation-step index.
+		 * @return Context containing the inputs, intermediate values, and outputs for the step.
+		 */
 		RunManagerOutput step(const RunManagerInput& input);
 
+		/**
+		 * @brief Builds the current simulation-step context.
+		 *
+		 * FlightGear wind, aircraft states, structural and aerodynamic state,
+		 * geography, atmosphere, and model data are collected from the current
+		 * aircraft state.
+		 *
+		 * @return Initialized context for the current step.
+		 */
 		StepContext prepare_step();
+
+		/**
+		 * @brief Performs one-time trim and linearization initialization when enabled.
+		 *
+		 * A converged trim solution is applied to the aircraft and internal wrapper
+		 * state before physical and virtual linearizations are computed.
+		 *
+		 * @param[in,out] context Step context updated with the applied trim state.
+		 */
 		void initialize_trim(StepContext& context);
+
+		/**
+		 * @brief Updates the measured state in a step context.
+		 *
+		 * @param[in,out] context Step context whose measured state is updated.
+		 */
 		void step_measurements(StepContext& context);
+
+		/**
+		 * @brief Updates the estimated state in a step context.
+		 *
+		 * @param[in,out] context Step context whose estimated state is updated.
+		 */
 		void step_estimation(StepContext& context);
+
+		/**
+		 * @brief Updates the flight mode, guidance setpoint, and actuator inputs.
+		 *
+		 * @param[in,out] context Step context updated with control-stage outputs.
+		 */
 		void step_control(StepContext& context);
+
+		/**
+		 * @brief Integrates the aircraft dynamics and updates step-result wrenches.
+		 *
+		 * @param[in,out] context Step context updated with the next state and wrenches.
+		 */
 		void step_physics(StepContext& context);
+
+		/**
+		 * @brief Records the step and publishes its next aircraft state.
+		 *
+		 * The next state is applied to the aircraft frames, runtime failures are
+		 * checked, and the resulting geographic state and attitude are sent to
+		 * FlightGear.
+		 *
+		 * @param[in] t Simulation-step index [-].
+		 * @param[in] context Completed context for the current step.
+		 */
 		void publish_step(int t, StepContext& context);
+
+		/**
+		 * @brief Advances scheduler state and applies real-time pacing.
+		 *
+		 * @param[in] current_mode Flight mode completed during the current step.
+		 */
 		void finish_step(fsm::FiniteState current_mode);
 	};
 

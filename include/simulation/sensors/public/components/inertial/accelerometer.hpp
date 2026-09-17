@@ -7,6 +7,14 @@ namespace sensors
 
 	struct Accelerometer : Sensor {
 		std::optional<Eigen::Vector3d> prev_fB_lag;
+
+		/**
+		 * @brief Measures body-expressed specific force through the configured sensor model.
+		 *
+		 * @param[in] fB Ground-truth body-expressed specific force [m/s^2].
+		 * @param[in] dt Measurement interval [s].
+		 * @return Lagged, biased, and noised specific-force measurement [m/s^2].
+		 */
 		TranslationalAccelerationMeasurement measure(const dynamics::TranslationalAcceleration& fB, double dt);
 		// Note: fB = aB_BI - gB
 		//          = FB_net/m - gB
