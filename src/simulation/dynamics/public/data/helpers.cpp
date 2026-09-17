@@ -9,7 +9,10 @@ namespace dynamics
 		const Wrench& wrench)
 	{
 		WrenchVector_T<double> out;
-		out << wrench.F.data, wrench.M.data;
+		// clang-format off
+		out <<   wrench.F.data,
+		         wrench.M.data;
+		// clang-format on
 		return out;
 	}
 

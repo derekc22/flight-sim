@@ -24,8 +24,14 @@ namespace trim
 		const TrimResidual_T<double>& weighted_residual = trim_sol.weighted_residual;
 
 		dynamics::Twist_T<double> trim_sol_twist;
-		trim_sol_twist.v << state.vx, state.vy, state.vz;
-		trim_sol_twist.w << state.p, state.q, state.r;
+		// clang-format off
+		trim_sol_twist.v <<   state.vx,
+		                      state.vy,
+		                      state.vz;
+		trim_sol_twist.w <<   state.p,
+		                      state.q,
+		                      state.r;
+		// clang-format on
 
 		const aerodynamics::AerodynamicState_T<double> trim_sol_aero =
 			aerodynamics::compute_aerodynamic_state_T<double>(trim_sol_twist, trim_sol.conditions.windB);
@@ -50,16 +56,35 @@ namespace trim
 		out << "trim_sol.weighted_residual_norm_inf: " << trim_sol.weighted_residual_norm_inf << "\n\n";
 
 		out << "trim_sol.operating_point.state:\n" << section_rule << "\n";
-		out << "vB_BN: [" << state.vx << ", " << state.vy << ", " << state.vz << "]\n";
-		out << "wB_BN: [" << state.p << ", " << state.q << ", " << state.r << "]\n";
-		out << "eulNB: [n/a, " << state.theta << ", " << state.phi << "]\n";
-		out << "eulNB_dot: [" << trim_eul_dot.phi_dot() << ", " << trim_eul_dot.theta_dot() << ", "
-			<< trim_eul_dot.psi_dot() << "]\n\n";
+		// clang-format off
+		out << "vB_BN: ["
+		    << state.vx << ", "
+		    << state.vy << ", "
+		    << state.vz << "]\n";
+		out << "wB_BN: ["
+		    << state.p << ", "
+		    << state.q << ", "
+		    << state.r << "]\n";
+		out << "eulNB: ["
+		    << "n/a, "
+		    << state.theta << ", "
+		    << state.phi << "]\n";
+		out << "eulNB_dot: ["
+		    << trim_eul_dot.phi_dot() << ", "
+		    << trim_eul_dot.theta_dot() << ", "
+		    << trim_eul_dot.psi_dot() << "]\n\n";
+		// clang-format on
 
-		out << "eulNB_deg: [n/a, " << util::rad_to_deg(state.theta) << ", " << util::rad_to_deg(state.phi) << "]\n";
-		out << "eulNB_dot_deg_s: [" << util::rad_to_deg(trim_eul_dot.phi_dot()) << ", "
-			<< util::rad_to_deg(trim_eul_dot.theta_dot()) << ", " << util::rad_to_deg(trim_eul_dot.psi_dot())
-			<< "]\n\n";
+		// clang-format off
+		out << "eulNB_deg: ["
+		    << "n/a, "
+		    << util::rad_to_deg(state.theta) << ", "
+		    << util::rad_to_deg(state.phi) << "]\n";
+		out << "eulNB_dot_deg_s: ["
+		    << util::rad_to_deg(trim_eul_dot.phi_dot()) << ", "
+		    << util::rad_to_deg(trim_eul_dot.theta_dot()) << ", "
+		    << util::rad_to_deg(trim_eul_dot.psi_dot()) << "]\n\n";
+		// clang-format on
 
 		out << "trim_sol.aero:\n"
 			<< section_rule << "\n"
@@ -76,8 +101,16 @@ namespace trim
 		out << "right_propulsor_cmd: " << propulsor_inputs.right_propulsor_cmd << "\n\n";
 
 		out << "trim_sol.wrench:\n" << section_rule << "\n";
-		out << "F: [" << F.x() << ", " << F.y() << ", " << F.z() << "]\n";
-		out << "M: [" << M.x() << ", " << M.y() << ", " << M.z() << "]\n\n";
+		// clang-format off
+		out << "F: ["
+		    << F.x() << ", "
+		    << F.y() << ", "
+		    << F.z() << "]\n";
+		out << "M: ["
+		    << M.x() << ", "
+		    << M.y() << ", "
+		    << M.z() << "]\n\n";
+		// clang-format on
 
 		out << "trim_sol.residual:\n"
 			<< section_rule << "\n"

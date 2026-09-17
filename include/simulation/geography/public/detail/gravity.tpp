@@ -14,8 +14,11 @@ namespace geography
 		const T& theta)
 	{
 		constants::Vector3_T<T> gB;
-		gB << -T(constants::g_earth) * util::sin(theta), T(constants::g_earth) * util::sin(phi) * util::cos(theta),
-			T(constants::g_earth) * util::cos(phi) * util::cos(theta);
+		// clang-format off
+		gB <<   -T(constants::g_earth) * util::sin(theta),
+		        T(constants::g_earth) * util::sin(phi) * util::cos(theta),
+		        T(constants::g_earth) * util::cos(phi) * util::cos(theta);
+		// clang-format on
 		return gB;
 	}
 

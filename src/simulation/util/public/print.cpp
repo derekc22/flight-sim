@@ -21,8 +21,14 @@ namespace util
 		std::ostringstream ss;
 		ss << std::fixed << std::setprecision(3);
 
-		ss << std::left << std::setw(8) << name << "[ " << std::right << std::setw(10) << x.x() << ", " << std::right
-		   << std::setw(10) << x.y() << ", " << std::right << std::setw(10) << x.z() << " ] " << unit << '\n';
+		// clang-format off
+		ss << std::left << std::setw(8) << name
+		   << "[ "
+		   << std::right << std::setw(10) << x.x() << ", "
+		   << std::right << std::setw(10) << x.y() << ", "
+		   << std::right << std::setw(10) << x.z()
+		   << " ] " << unit << '\n';
+		// clang-format on
 
 		return ss.str();
 	}
@@ -54,17 +60,25 @@ namespace util
 
 		ss << print_vec("p", p, "[m]");
 
+		// clang-format off
 		ss << std::left << std::setw(8) << "eul"
-		   << "[ " << std::right << std::setw(10) << util::rad_to_deg(eul.psi()) << ", " << std::right << std::setw(10)
-		   << util::rad_to_deg(eul.theta()) << ", " << std::right << std::setw(10) << util::rad_to_deg(eul.phi())
+		   << "[ "
+		   << std::right << std::setw(10) << util::rad_to_deg(eul.psi()) << ", "
+		   << std::right << std::setw(10) << util::rad_to_deg(eul.theta()) << ", "
+		   << std::right << std::setw(10) << util::rad_to_deg(eul.phi())
 		   << " ] [deg]\n";
+		// clang-format on
 
 		ss << print_vec("v", v, "[m/s]");
 
+		// clang-format off
 		ss << std::left << std::setw(8) << "w"
-		   << "[ " << std::right << std::setw(10) << util::rad_to_deg(w.x()) << ", " << std::right << std::setw(10)
-		   << util::rad_to_deg(w.y()) << ", " << std::right << std::setw(10) << util::rad_to_deg(w.z())
+		   << "[ "
+		   << std::right << std::setw(10) << util::rad_to_deg(w.x()) << ", "
+		   << std::right << std::setw(10) << util::rad_to_deg(w.y()) << ", "
+		   << std::right << std::setw(10) << util::rad_to_deg(w.z())
 		   << " ] [deg/s]\n";
+		// clang-format on
 
 		ss << print_vec("g", g, "[m/s^2]");
 		ss << print_vec("wind", wind, "[m/s]");

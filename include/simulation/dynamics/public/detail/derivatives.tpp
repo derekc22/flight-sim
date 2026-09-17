@@ -39,8 +39,11 @@ namespace dynamics
 		const T& phi)
 	{
 		constants::Matrix3_T<T> T_mat;
-		T_mat << T(1.0), util::sin(phi) * util::tan(theta), util::cos(phi) * util::tan(theta), T(0.0), util::cos(phi),
-			-util::sin(phi), T(0.0), util::sin(phi) * util::sec(theta), util::cos(phi) * util::sec(theta);
+		// clang-format off
+		T_mat <<   T(1.0),  util::sin(phi) * util::tan(theta),  util::cos(phi) * util::tan(theta),
+		           T(0.0),                     util::cos(phi),                    -util::sin(phi),
+		           T(0.0),  util::sin(phi) * util::sec(theta),  util::cos(phi) * util::sec(theta);
+		// clang-format on
 		return T_mat;
 	}
 

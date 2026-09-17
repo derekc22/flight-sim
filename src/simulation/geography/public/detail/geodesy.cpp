@@ -30,8 +30,11 @@ namespace geography
 		Eigen::Matrix3d CEN;
 		double lat = latitude.data;
 		double lon = longitude.data;
-		CEN << -util::sin(lat) * util::cos(lon), -util::sin(lat) * util::sin(lon), util::cos(lat), -util::sin(lon),
-			util::cos(lon), 0, -util::cos(lat) * util::cos(lon), -util::cos(lat) * util::sin(lon), -util::sin(lat);
+		// clang-format off
+		CEN <<   -util::sin(lat) * util::cos(lon),  -util::sin(lat) * util::sin(lon),   util::cos(lat),
+		                          -util::sin(lon),                    util::cos(lon),                0,
+		         -util::cos(lat) * util::cos(lon),  -util::cos(lat) * util::sin(lon),  -util::sin(lat);
+		// clang-format on
 		return {CEN};
 	};
 

@@ -30,9 +30,22 @@ namespace trim
 		const constants::Vector3_T<T> eul_dot = dynamics::wB_BI_to_eul_dot_T<T>(twist.w, x.theta, x.phi);
 
 		TrimResidualVector_T<T> residual;
-		residual << x_dot.vx_dot, x_dot.vy_dot, x_dot.vz_dot, x_dot.p_dot, x_dot.q_dot, x_dot.r_dot, x_dot.phi_dot,
-			x_dot.theta_dot, aero.beta - T(target.beta), x.phi - T(target.phi), x.theta - T(target.theta),
-			x.vx - T(target.vx), x.vz - T(target.vz), eul_dot.z() - T(target.psi_dot);
+		// clang-format off
+		residual <<   x_dot.vx_dot,
+		              x_dot.vy_dot,
+		              x_dot.vz_dot,
+		              x_dot.p_dot,
+		              x_dot.q_dot,
+		              x_dot.r_dot,
+		              x_dot.phi_dot,
+		              x_dot.theta_dot,
+		              aero.beta - T(target.beta),
+		              x.phi - T(target.phi),
+		              x.theta - T(target.theta),
+		              x.vx - T(target.vx),
+		              x.vz - T(target.vz),
+		              eul_dot.z() - T(target.psi_dot);
+		// clang-format on
 		return residual;
 	}
 } // namespace trim

@@ -38,10 +38,18 @@ namespace control
 		double dt)
 	{
 		IntegratedStateVector zt_integrated; // grab phi, theta, r
-		zt_integrated << zt(6), zt(7), zt(5);
+		// clang-format off
+		zt_integrated <<   zt(6),
+		                   zt(7),
+		                   zt(5);
+		// clang-format on
 
 		IntegratedStateVector zt_des_integrated;
-		zt_des_integrated << zt_des(6), zt_des(7), zt_des(5);
+		// clang-format off
+		zt_des_integrated <<   zt_des(6),
+		                       zt_des(7),
+		                       zt_des(5);
+		// clang-format on
 
 		return integral + (zt_des_integrated - zt_integrated) * dt; // integrate
 	}
@@ -71,10 +79,16 @@ namespace control
 		dynamics::StateVector_T<double> zt_trim = dynamics::unpack_state_T(input.Z_sol_trim);
 
 		AugmentedStateVector zt_aug;
-		zt_aug << zt, integral_new;
+		// clang-format off
+		zt_aug <<   zt,
+		            integral_new;
+		// clang-format on
 
 		AugmentedStateVector zt_trim_aug;
-		zt_trim_aug << zt_trim, IntegratedStateVector::Zero();
+		// clang-format off
+		zt_trim_aug <<   zt_trim,
+		                 IntegratedStateVector::Zero();
+		// clang-format on
 
 		AugmentedStateVector zt_aug_deviation = zt_aug - zt_trim_aug;
 
