@@ -21,8 +21,6 @@ namespace integrators
 	/**
 	 * @brief Advances an inertial-to-body quaternion using constant body angular velocity.
 	 *
-	 * Applies the qIB sign convention, then normalizes and canonicalizes the result.
-	 *
 	 * @param[in] qIB_t Inertial-to-body orientation quaternion at the current time [-].
 	 * @param[in] wB_BI_t Body angular velocity relative to the inertial frame [rad/s].
 	 * @param[in] dt Time step [s].
@@ -45,9 +43,6 @@ namespace integrators
 
 	/**
 	 * @brief Advances a rigid-body state by one integration step.
-	 *
-	 * Integrates body-expressed translational and angular dynamics, quaternion attitude, and inertial-expressed
-	 * position using the wrench at the current time.
 	 *
 	 * @param[in] Xt Rigid-body state at the current time.
 	 * @param[in] mass Vehicle mass [kg].

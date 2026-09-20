@@ -49,7 +49,6 @@ namespace util
 	/**
 	 * @brief Validates that a matrix is a proper orthonormal matrix.
 	 *
-	 * Requires a square unitary matrix whose determinant is within
 	 * @c constants::eps of positive one.
 	 *
 	 * @tparam T Eigen matrix-expression type.

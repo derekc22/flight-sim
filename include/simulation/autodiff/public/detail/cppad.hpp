@@ -33,8 +33,6 @@ namespace autodiff
 	/**
 	 * @brief Computes the dense Jacobian of a recorded vector function.
 	 *
-	 * Rows correspond to dependent variables and columns correspond to independent variables.
-	 *
 	 * @tparam output_rows Number of dependent variables.
 	 * @tparam input_rows Number of independent variables.
 	 * @param[in,out] f Recorded CppAD function whose Jacobian is evaluated.

@@ -7,8 +7,6 @@ namespace dynamics
 	/**
 	 * @brief Unpacks a structured state into vector form.
 	 *
-	 * The vector order is vx, vy, vz, p, q, r, roll, and pitch.
-	 *
 	 * @tparam T Scalar type stored by the state.
 	 * @param[in] x Structured state.
 	 * @return State vector with velocity [m/s], angular velocity [rad/s], and attitude [rad] components.
@@ -18,8 +16,6 @@ namespace dynamics
 	/**
 	 * @brief Packs a state vector into structured form.
 	 *
-	 * The vector order is vx, vy, vz, p, q, r, roll, and pitch.
-	 *
 	 * @tparam T Scalar type stored by the state.
 	 * @param[in] x State vector with velocity [m/s], angular velocity [rad/s], and attitude [rad] components.
 	 * @return Structured state.
@@ -28,8 +24,6 @@ namespace dynamics
 
 	/**
 	 * @brief Unpacks a structured state derivative into vector form.
-	 *
-	 * The vector order is vx_dot, vy_dot, vz_dot, p_dot, q_dot, r_dot, roll rate, and pitch rate.
 	 *
 	 * @tparam T Scalar type stored by the state derivative.
 	 * @param[in] x_dot Structured state derivative.
@@ -41,8 +35,6 @@ namespace dynamics
 	/**
 	 * @brief Unpacks a structured wrench into vector form.
 	 *
-	 * The vector order is Fx, Fy, Fz, Mx, My, and Mz.
-	 *
 	 * @tparam T Scalar type stored by the wrench.
 	 * @param[in] wrench Structured force [N] and moment [N m].
 	 * @return Wrench vector with force followed by moment components.
@@ -51,8 +43,6 @@ namespace dynamics
 
 	/**
 	 * @brief Packs a wrench vector into structured form.
-	 *
-	 * The vector order is Fx, Fy, Fz, Mx, My, and Mz.
 	 *
 	 * @tparam T Scalar type stored by the wrench.
 	 * @param[in] wrench Wrench vector with force [N] followed by moment [N m] components.
@@ -63,8 +53,6 @@ namespace dynamics
 	/**
 	 * @brief Unpacks a wrench into vector form.
 	 *
-	 * The vector order is Fx, Fy, Fz, Mx, My, and Mz.
-	 *
 	 * @param[in] wrench Structured force [N] and moment [N m].
 	 * @return Wrench vector with force followed by moment components.
 	 */
@@ -72,8 +60,6 @@ namespace dynamics
 
 	/**
 	 * @brief Packs a wrench vector into a wrench.
-	 *
-	 * The vector order is Fx, Fy, Fz, Mx, My, and Mz.
 	 *
 	 * @param[in] wrench Wrench vector with force [N] followed by moment [N m] components.
 	 * @return Structured force and moment.
@@ -100,9 +86,6 @@ namespace dynamics
 	/**
 	 * @brief Packs a rigid-body state into the reduced structured state.
 	 *
-	 * Converts the orientation quaternion to intrinsic ZYX Euler angles and retains roll and pitch; position and yaw
-	 * are not included.
-	 *
 	 * @param[in] Xt Rigid-body state.
 	 * @return Structured velocity, angular velocity, roll, and pitch state.
 	 */
@@ -110,8 +93,6 @@ namespace dynamics
 
 	/**
 	 * @brief Unpacks a rigid-body state into the reduced state vector.
-	 *
-	 * The vector order is vx, vy, vz, p, q, r, roll, and pitch; position and yaw are not included.
 	 *
 	 * @param[in] Xt Rigid-body state.
 	 * @return Reduced state vector with velocity [m/s], angular velocity [rad/s], and attitude [rad] components.

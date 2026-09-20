@@ -15,9 +15,6 @@ namespace actuators
 		/**
 		 * @brief Advances the actuator response for one time step.
 		 *
-		 * Clamps @p cmd to the actuator limits, applies the configured first-order lag, stores the resulting lag state,
-		 * and returns it. An uninitialized lag state starts from zero clamped to the actuator limits.
-		 *
 		 * @param[in] cmd Requested actuator command in actuator command units.
 		 * @param[in] dt Time step [s].
 		 * @return Lagged actuator command in actuator command units.

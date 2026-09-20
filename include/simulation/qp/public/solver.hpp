@@ -16,8 +16,6 @@ namespace qp
 		/**
 		 * @brief Solves a bound-constrained quadratic program.
 		 *
-		 * Solves an objective of the form `0.5 * x^T H x + g^T x` subject to componentwise lower and upper bounds.
-		 *
 		 * @param[in] problem Hessian, gradient, and decision-variable bounds.
 		 * @return Decision vector and mapped solver status.
 		 */

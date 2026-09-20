@@ -15,13 +15,6 @@ namespace allocator
 		/**
 		 * @brief Allocates a virtual-wrench command to bounded actuator inputs.
 		 *
-		 * Linearizes the net wrench with respect to actuator inputs, masks inactive
-		 * wrench components, and solves a weighted quadratic program. An optional
-		 * preferred input supplies the target for inactive actuators and adds a trim
-		 * tracking penalty. The returned allocation residual is the effectiveness
-		 * matrix multiplied by the constrained-minus-unconstrained actuator input
-		 * when an active actuator limit binds; otherwise, it is zero.
-		 *
 		 * @param[in] input Command, masks, operating point, conditions, and aircraft model.
 		 * @return Allocated actuator command and virtual-wrench allocation residual.
 		 */

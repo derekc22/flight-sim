@@ -21,9 +21,6 @@ namespace control
 		/**
 		 * @brief Computes the virtual-control deviation and conditionally updates the integral state.
 		 *
-		 * The integral candidate is committed only when the previous-step allocation
-		 * residual is negligible.
-		 *
 		 * @param[in] input Current state, setpoint, trim state, virtual linearization, and allocation residual.
 		 * @param[in] dt Integration step [s].
 		 * @return Virtual-control deviation with force components [N] and moment components [N m].
@@ -32,9 +29,6 @@ namespace control
 
 		/**
 		 * @brief Builds the augmented linear-quadratic policy input.
-		 *
-		 * The augmented state contains the deviation from the trim state followed by
-		 * the supplied roll, pitch, and yaw-rate integral candidate.
 		 *
 		 * @param[in] input Current state, trim state, and virtual linearization.
 		 * @param[in] integral_candidate Candidate integral state.

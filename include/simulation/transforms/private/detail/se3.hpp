@@ -8,8 +8,6 @@ namespace transforms
 	/**
 	 * @brief Constructs an active homogeneous transformation that translates before rotating.
 	 *
-	 * The returned matrix has rotation block R and translation block R d.
-	 *
 	 * @param[in] R Active rotation matrix [-].
 	 * @param[in] d Translation vector, in the same length units as transformed points.
 	 * @return Homogeneous transformation that applies @p d before @p R.
@@ -18,8 +16,6 @@ namespace transforms
 
 	/**
 	 * @brief Constructs an active homogeneous transformation that rotates before translating.
-	 *
-	 * The returned matrix has rotation block R and translation block d.
 	 *
 	 * @param[in] R Active rotation matrix [-].
 	 * @param[in] d Translation vector, in the same length units as transformed points.
@@ -30,8 +26,6 @@ namespace transforms
 	/**
 	 * @brief Constructs a passive homogeneous transformation that translates before rotating.
 	 *
-	 * The returned matrix has coordinate-transformation block C and translation block -C d.
-	 *
 	 * @param[in] C Coordinate-transformation matrix [-].
 	 * @param[in] d Translation vector, in the same length units as transformed points.
 	 * @return Homogeneous transformation with upper blocks C and -C d.
@@ -40,8 +34,6 @@ namespace transforms
 
 	/**
 	 * @brief Constructs a passive homogeneous transformation that rotates before translating.
-	 *
-	 * The returned matrix has coordinate-transformation block C and translation block -d.
 	 *
 	 * @param[in] C Coordinate-transformation matrix [-].
 	 * @param[in] d Translation vector, in the same length units as transformed points.
@@ -52,9 +44,6 @@ namespace transforms
 	/**
 	 * @brief Multiplies homogeneous transformations in list order.
 	 *
-	 * For a list containing H1, H2, and H3, the result is H1 H2 H3. An empty list returns the identity
-	 * transformation.
-	 *
 	 * @param[in] H_list Homogeneous transformations to multiply.
 	 * @return Product of the transformations in list order.
 	 */
@@ -62,9 +51,6 @@ namespace transforms
 
 	/**
 	 * @brief Multiplies homogeneous transformations in reverse list order.
-	 *
-	 * For a list containing H1, H2, and H3, the result is H3 H2 H1. An empty list returns the identity
-	 * transformation.
 	 *
 	 * @param[in] H_list Homogeneous transformations to multiply.
 	 * @return Product of the transformations in reverse list order.

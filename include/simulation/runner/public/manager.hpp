@@ -57,10 +57,6 @@ namespace runner
 		/**
 		 * @brief Executes one complete simulation step.
 		 *
-		 * The step prepares current conditions, initializes trim when required, runs
-		 * measurements, estimation, control, and physics, publishes the result, and
-		 * advances the scheduler.
-		 *
 		 * @param[in] input Current simulation-step index.
 		 * @return Context containing the inputs, intermediate values, and outputs for the step.
 		 */
@@ -69,19 +65,12 @@ namespace runner
 		/**
 		 * @brief Builds the current simulation-step context.
 		 *
-		 * FlightGear wind, aircraft states, structural and aerodynamic state,
-		 * geography, atmosphere, and model data are collected from the current
-		 * aircraft state.
-		 *
 		 * @return Initialized context for the current step.
 		 */
 		StepContext prepare_step();
 
 		/**
 		 * @brief Performs one-time trim and linearization initialization when enabled.
-		 *
-		 * A converged trim solution is applied to the aircraft and internal wrapper
-		 * state before physical and virtual linearizations are computed.
 		 *
 		 * @param[in,out] context Step context updated with the applied trim state.
 		 */
@@ -117,10 +106,6 @@ namespace runner
 
 		/**
 		 * @brief Records the step and publishes its next aircraft state.
-		 *
-		 * The next state is applied to the aircraft frames, runtime failures are
-		 * checked, and the resulting geographic state and attitude are sent to
-		 * FlightGear.
 		 *
 		 * @param[in] t Simulation-step index [-].
 		 * @param[in] context Completed context for the current step.

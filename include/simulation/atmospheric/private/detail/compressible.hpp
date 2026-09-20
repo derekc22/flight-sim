@@ -34,8 +34,6 @@ namespace atmospheric
 	/**
 	 * @brief Converts a stagnation atmospheric state to a static atmospheric state.
 	 *
-	 * Converts temperature and pressure using @p M while copying density and dynamic viscosity unchanged.
-	 *
 	 * @param[in] atm0 Stagnation atmospheric state.
 	 * @param[in] M Mach number [-].
 	 * @return Static atmospheric state.

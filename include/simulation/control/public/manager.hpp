@@ -30,9 +30,6 @@ namespace control
 		/**
 		 * @brief Advances available control components and aggregates their commands and masks.
 		 *
-		 * Component force and moment commands are summed, while their active-channel
-		 * and actuator masks are combined with a logical OR.
-		 *
 		 * @param[in] inputs Optional input for each configured control component.
 		 * @param[in] dt Controller step [s].
 		 * @return Aggregated virtual wrench and active-channel masks.

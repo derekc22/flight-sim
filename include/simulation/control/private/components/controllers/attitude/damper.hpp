@@ -11,9 +11,6 @@ namespace control
 		/**
 		 * @brief Builds the PID-policy input for a body-axis angular-rate damper.
 		 *
-		 * The selected axis maps to roll, pitch, or yaw rate and its corresponding
-		 * previous-step moment-allocation residual.
-		 *
 		 * @param[in] input Current state, angular-rate setpoint, and allocation residual.
 		 * @param[in] axis Attitude axis to map into a scalar policy input.
 		 * @return PID-policy input for the selected body axis.

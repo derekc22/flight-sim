@@ -33,8 +33,6 @@ namespace util
 	/**
 	 * @brief Computes a differentiable approximation of absolute value.
 	 *
-	 * Evaluates sqrt(x^2 + eps^2) - eps using @c constants::eps.
-	 *
 	 * @param[in] x Input value.
 	 * @return Smooth approximation of the absolute value of @p x.
 	 */

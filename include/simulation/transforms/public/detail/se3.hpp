@@ -33,8 +33,6 @@ namespace transforms
 	/**
 	 * @brief Extracts the frame-position vector from a passive homogeneous transformation.
 	 *
-	 * For a transformation with rotation block C and translation block -C p, this function returns p.
-	 *
 	 * @param[in] H Passive homogeneous transformation matrix.
 	 * @return Frame-position vector, in the transformation's length units.
 	 */

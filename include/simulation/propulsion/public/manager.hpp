@@ -11,8 +11,6 @@ namespace propulsion
 		/**
 		 * @brief Computes the total propulsive wrench for one simulation step.
 		 *
-		 * Evaluates the front, left, and right propulsors and sums their body-expressed wrenches.
-		 *
 		 * @tparam T Scalar type used for the propulsion calculation.
 		 * @param[in] input State, atmosphere, propulsor thrust commands, and timing data.
 		 * @return Total propulsive force [N], moment [N m], and optional propeller angular velocities [rad/s].

@@ -25,8 +25,6 @@ namespace dynamics
 	/**
 	 * @brief Computes orientation-quaternion rate using quaternion multiplication.
 	 *
-	 * Applies one half of the product `[0; -wB_BI] * qIB`, including the minus sign required by the qIB convention.
-	 *
 	 * @param[in] qIB Inertial-to-body orientation quaternion [-].
 	 * @param[in] wB_BI Body angular velocity relative to the inertial frame [rad/s].
 	 * @return Inertial-to-body orientation-quaternion rate [1/s].
@@ -36,8 +34,6 @@ namespace dynamics
 	/**
 	 * @brief Computes orientation-quaternion rate using the Q(qIB) angular-velocity mapping.
 	 *
-	 * The Q matrix includes the one-half factor and the signs required by the qIB convention.
-	 *
 	 * @param[in] qIB Inertial-to-body orientation quaternion [-].
 	 * @param[in] wB_BI Body angular velocity relative to the inertial frame [rad/s].
 	 * @return Inertial-to-body orientation-quaternion rate [1/s].
@@ -46,8 +42,6 @@ namespace dynamics
 
 	/**
 	 * @brief Computes orientation-quaternion rate using the W(wB_BI) quaternion mapping.
-	 *
-	 * The W matrix includes the one-half factor and the signs required by the qIB convention.
 	 *
 	 * @param[in] qIB Inertial-to-body orientation quaternion [-].
 	 * @param[in] wB_BI Body angular velocity relative to the inertial frame [rad/s].

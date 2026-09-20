@@ -30,9 +30,6 @@ namespace runner
 		/**
 		 * @brief Advances module tick accumulators and wall-clock timing by one step.
 		 *
-		 * Guidance and control ticks advance only in autopilot mode. Real-time pacing
-		 * is skipped when fast execution is enabled.
-		 *
 		 * @param[in] input Current flight mode and timing options.
 		 */
 		void step(const SchedulerInput& input);

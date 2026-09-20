@@ -19,9 +19,6 @@ namespace runner
 		/**
 		 * @brief Records and logs the current simulation context.
 		 *
-		 * Data recording runs every step. Rerun recording and verbose state output
-		 * follow the configured logging schedule.
-		 *
 		 * @param[in,out] input Step index, simulation data, scheduler, and logging flags.
 		 */
 		void step(const RecordingWrapperInput& input);

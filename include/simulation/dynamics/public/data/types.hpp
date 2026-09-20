@@ -262,8 +262,6 @@ namespace dynamics
 		/**
 		 * @brief Sets a pure quaternion from angular velocity.
 		 *
-		 * Sets the scalar coefficient to zero and the vector coefficients to @p w.
-		 *
 		 * @param[in] w Angular velocity [rad/s].
 		 */
 		void set(const AngularVelocity& w);

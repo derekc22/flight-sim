@@ -9,8 +9,6 @@ namespace integrators
 	/**
 	 * @brief Computes concrete aerodynamic, propulsive, and net wrenches for an RK4 stage.
 	 *
-	 * Converts inertial wind and NED gravity to body axes before evaluating the templated wrench model.
-	 *
 	 * @param[in] Xt Rigid-body state at the stage.
 	 * @param[in,out] model Structural state and aerodynamic and propulsion managers used during evaluation.
 	 * @param[in] conditions Atmospheric, inertial-wind, and steady-state conditions.

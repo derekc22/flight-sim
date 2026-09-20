@@ -10,8 +10,6 @@ namespace frames
 	/**
 	 * @brief Re-expresses a vector from one frame in another frame.
 	 *
-	 * This operation applies rotation only and does not apply frame translation.
-	 *
 	 * @param[in] vA Vector expressed in frame @p A.
 	 * @param[in] A Source frame in which @p vA is expressed.
 	 * @param[in] B Destination frame in which the result is expressed.
@@ -21,8 +19,6 @@ namespace frames
 
 	/**
 	 * @brief Re-expresses a point from one frame in another frame.
-	 *
-	 * This operation applies both frame rotation and translation.
 	 *
 	 * @param[in] pA Point coordinates expressed in frame @p A.
 	 * @param[in] A Source frame in which @p pA is expressed.

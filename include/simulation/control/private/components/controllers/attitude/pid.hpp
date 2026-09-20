@@ -30,9 +30,6 @@ namespace control
 		/**
 		 * @brief Builds the PI-D policy input for one attitude axis.
 		 *
-		 * The selected axis maps to roll, pitch, or yaw angle, its measured body
-		 * angular rate, and its corresponding previous-step moment-allocation residual.
-		 *
 		 * @param[in] input Current state, attitude setpoint, and allocation residual.
 		 * @param[in] axis Attitude axis to map into a scalar policy input.
 		 * @return PI-D policy input for the selected attitude axis.

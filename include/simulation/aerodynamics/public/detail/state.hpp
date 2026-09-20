@@ -24,9 +24,6 @@ namespace aerodynamics
 	/**
 	 * @brief Computes aerodynamic state from a body-expressed twist and wind velocity.
 	 *
-	 * Angle of attack and sideslip angle remain zero when the relative airspeed is no greater than the numerical
-	 * tolerance.
-	 *
 	 * @tparam T Scalar type used for the computation.
 	 * @param[in] twist Body-expressed translational velocity [m/s] and angular velocity [rad/s].
 	 * @param[in] windB Wind velocity expressed in body axes [m/s].

@@ -9,8 +9,6 @@ namespace trim
 	/**
 	 * @brief Applies a trimmed reduced state to a rigid-body state.
 	 *
-	 * Preserves position and yaw while replacing translational velocity, angular velocity, roll, and pitch.
-	 *
 	 * @param[in] Xt Existing rigid-body state.
 	 * @param[in] trim_state Trimmed velocity [m/s], angular velocity [rad/s], roll [rad], and pitch [rad].
 	 * @return Updated rigid-body state.
@@ -20,8 +18,6 @@ namespace trim
 
 	/**
 	 * @brief Initializes actuator lag states from a trim solution.
-	 *
-	 * Updates all surface and propulsor actuator lag states to their trimmed commands.
 	 *
 	 * @param[in,out] surface_actuators Surface actuators whose lag states are updated.
 	 * @param[in,out] propulsor_actuators Propulsor actuators whose lag states are updated.

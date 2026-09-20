@@ -7,9 +7,6 @@ namespace estimation
 	/**
 	 * @brief Builds a rigid-body estimate from a measured state and reduced Kalman state.
 	 *
-	 * Replaces translational velocity, angular velocity, roll, and pitch with the
-	 * values in @p zt while preserving measured position and yaw from @p Yt.
-	 *
 	 * @param[in] Yt Measured rigid-body state supplying position and yaw.
 	 * @param[in] zt Estimated reduced state vector.
 	 * @return Rigid-body state containing the combined measured and estimated quantities.

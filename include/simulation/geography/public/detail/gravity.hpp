@@ -15,8 +15,6 @@ namespace geography
 	/**
 	 * @brief Computes gravity expressed in body axes from an ECEF-to-body transformation.
 	 *
-	 * Uses the position and orientation contained in @p HEB.
-	 *
 	 * @param[in] HEB ECEF-to-body homogeneous transformation.
 	 * @return Gravity vector expressed in body axes [m/s^2].
 	 */

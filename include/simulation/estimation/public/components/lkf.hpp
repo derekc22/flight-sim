@@ -15,10 +15,6 @@ namespace estimation
 		/**
 		 * @brief Advances the linear Kalman filter and returns a rigid-body state estimate.
 		 *
-		 * The filter estimates deviations from the supplied operating point using an
-		 * exact zero-order-hold discretization. The first call initializes the state
-		 * from the measured deviation and uses @c P0 as its covariance.
-		 *
 		 * @param[in] input Measurement, operating point, local linearization, and previous actuator input.
 		 * @param[in] dt Estimation interval [s].
 		 * @return Rigid-body estimate with operating-point offsets restored and measured position and yaw preserved.
@@ -37,8 +33,6 @@ namespace estimation
 
 		/**
 		 * @brief Corrects the predicted deviation state with a measurement.
-		 *
-		 * Uses the Joseph form to update the error covariance.
 		 *
 		 * @param[in] C Output Jacobian mapping the state estimate to the measurement.
 		 * @param[in] yt Measured state deviation from the operating point.

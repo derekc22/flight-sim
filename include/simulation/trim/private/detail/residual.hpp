@@ -8,9 +8,6 @@ namespace trim
 	/**
 	 * @brief Computes the trim-residual vector for a state-input candidate.
 	 *
-	 * The vector contains three linear accelerations, three angular accelerations, roll and pitch rates, sideslip
-	 * error, roll error, pitch error, longitudinal-velocity error, vertical-velocity error, and yaw-rate error.
-	 *
 	 * @tparam T Scalar type used for the residual evaluation.
 	 * @param[in] xu Candidate state-input vector.
 	 * @param[in] model Automatic-differentiation model used to evaluate state derivatives.

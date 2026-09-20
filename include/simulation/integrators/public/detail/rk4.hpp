@@ -9,9 +9,6 @@ namespace integrators
 	/**
 	 * @brief Advances a rigid-body state using a fourth-order Runge-Kutta step.
 	 *
-	 * Re-evaluates aerodynamic, propulsive, and gravity loads at each RK4 stage. The returned wrench and committed
-	 * propeller state come from the first stage.
-	 *
 	 * @param[in] Xt Rigid-body state at the current time.
 	 * @param[in,out] model Structural state and aerodynamic and propulsion managers used during evaluation.
 	 * @param[in] conditions Atmospheric, wind, and steady-state conditions.

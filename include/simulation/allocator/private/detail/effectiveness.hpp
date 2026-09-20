@@ -10,10 +10,6 @@ namespace allocator
 	/**
 	 * @brief Computes the local actuator-effectiveness matrix and net wrench.
 	 *
-	 * The effectiveness matrix is the Jacobian of the body-frame net-wrench
-	 * vector with respect to the actuator-input vector, evaluated at the supplied
-	 * operating point.
-	 *
 	 * @param[in] model Differentiable aircraft model and actuator configuration.
 	 * @param[in] operating_point State and actuator input at which to evaluate the model.
 	 * @param[in] conditions Atmospheric and wind conditions used by the model.

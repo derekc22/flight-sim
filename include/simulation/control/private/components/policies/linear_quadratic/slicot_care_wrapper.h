@@ -7,10 +7,6 @@ extern "C" {
 /**
  * @brief Solves a continuous-time algebraic Riccati equation through SLICOT SB02MD.
  *
- * The matrices use column-major storage and have dimensions @p n by @p n.
- * The solver symmetrizes G and Q, then computes X for
- * A^T X + X A - X G X + Q = 0. On failure, X is set to zero.
- *
  * @param[in] n Order of the equation matrices.
  * @param[in] a State-matrix data.
  * @param[in] g Riccati quadratic-term matrix data.

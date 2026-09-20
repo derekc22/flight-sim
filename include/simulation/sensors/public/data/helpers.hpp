@@ -7,10 +7,6 @@ namespace sensors
 	/**
 	 * @brief Builds the ground-truth quantities measured by the sensor suite.
 	 *
-	 * Computes stagnation properties from airspeed and the static atmosphere,
-	 * specific force from net force minus gravity, and heading from yaw. Remaining
-	 * measured quantities are copied from the supplied state and aerodynamic data.
-	 *
 	 * @param[in] Xt Rigid-body state supplying measured position, velocity, orientation, and angular velocity.
 	 * @param[in] XEt Earth-referenced rigid-body state used to compute body-expressed gravity.
 	 * @param[in] aero_t Current aerodynamic state supplying angle of attack.

@@ -9,9 +9,6 @@ namespace autodiff
 	/**
 	 * @brief Computes the net body-frame wrench at an operating point.
 	 *
-	 * Applies the model's fixed flap and spoiler inputs, computes body gravity from roll and pitch, and combines
-	 * aerodynamic, propulsive, and gravitational loads.
-	 *
 	 * @tparam T Scalar type used for the evaluation.
 	 * @param[in] operating_point Reduced state and actuator inputs.
 	 * @param[in] model Structural, aerodynamic, propulsion, and actuator model data.
@@ -27,9 +24,6 @@ namespace autodiff
 
 	/**
 	 * @brief Computes the reduced state derivative at an operating point.
-	 *
-	 * Evaluates the net wrench and then computes translational acceleration, angular acceleration, roll rate, and
-	 * pitch rate.
 	 *
 	 * @tparam T Scalar type used for the evaluation.
 	 * @param[in] operating_point Reduced state and actuator inputs.
@@ -58,9 +52,6 @@ namespace autodiff
 
 	/**
 	 * @brief Computes the reduced state derivative from a supplied net wrench.
-	 *
-	 * The result is ordered as linear acceleration, angular acceleration, roll rate, and pitch rate. The Euler-rate
-	 * calculation is singular when pitch has zero cosine.
 	 *
 	 * @tparam T Scalar type used for the evaluation.
 	 * @param[in] x Reduced state.

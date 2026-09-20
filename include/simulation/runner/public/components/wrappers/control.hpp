@@ -36,10 +36,6 @@ namespace runner
 		/**
 		 * @brief Runs control selection, allocation, and actuator dynamics for one step.
 		 *
-		 * Manual mode uses the joystick command. Autopilot modes allocate virtual
-		 * control commands, with scheduled guidance and control outputs held between
-		 * updates. Actuator dynamics are advanced in every mode.
-		 *
 		 * @param[in,out] input Aircraft, scheduler, state, and mode data for the step.
 		 * @return Guidance setpoint, commanded controls, and actual actuator inputs.
 		 */

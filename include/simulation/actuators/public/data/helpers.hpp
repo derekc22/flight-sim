@@ -8,9 +8,6 @@ namespace actuators
 	/**
 	 * @brief Packs an actuator-input vector into grouped surface and propulsor inputs.
 	 *
-	 * The vector order is elevator, aileron, rudder, front propulsor, left propulsor, and right propulsor. Flap and
-	 * spoiler commands retain their default values.
-	 *
 	 * @tparam T Scalar type stored by the actuator inputs.
 	 * @param[in] u Actuator-input vector in actuator command units.
 	 * @return Grouped surface and propulsor actuator inputs.
@@ -19,9 +16,6 @@ namespace actuators
 
 	/**
 	 * @brief Unpacks grouped actuator inputs into an actuator-input vector.
-	 *
-	 * The vector order is elevator, aileron, rudder, front propulsor, left propulsor, and right propulsor. Flap and
-	 * spoiler commands are not included.
 	 *
 	 * @tparam T Scalar type stored by the actuator inputs.
 	 * @param[in] u Grouped surface and propulsor actuator inputs.
@@ -32,9 +26,6 @@ namespace actuators
 	/**
 	 * @brief Packs an actuator-limit matrix into grouped minimum and maximum limits.
 	 *
-	 * Column zero contains minimum limits and column one contains maximum limits. Rows use the actuator-input vector
-	 * ordering.
-	 *
 	 * @param[in] limits Actuator-limit matrix in actuator command units.
 	 * @return Grouped minimum and maximum actuator limits.
 	 */
@@ -42,9 +33,6 @@ namespace actuators
 
 	/**
 	 * @brief Unpacks grouped actuator limits into an actuator-limit matrix.
-	 *
-	 * Column zero contains minimum limits and column one contains maximum limits. Rows use the actuator-input vector
-	 * ordering.
 	 *
 	 * @param[in] limits Grouped minimum and maximum actuator limits.
 	 * @return Actuator-limit matrix in actuator command units.
@@ -66,9 +54,6 @@ namespace actuators
 	/**
 	 * @brief Unpacks separate surface and propulsor inputs into an actuator-input vector.
 	 *
-	 * The vector order is elevator, aileron, rudder, front propulsor, left propulsor, and right propulsor. Flap and
-	 * spoiler commands are not included.
-	 *
 	 * @tparam T Scalar type stored by the actuator inputs.
 	 * @param[in] u_surface Surface-actuator inputs.
 	 * @param[in] u_propulsor Propulsor-actuator inputs.
@@ -81,8 +66,6 @@ namespace actuators
 	/**
 	 * @brief Collects minimum and maximum limits from surface and propulsor actuators.
 	 *
-	 * Flap and spoiler limits retain their default values.
-	 *
 	 * @param[in] surface_actuators Surface actuators containing their configured limits.
 	 * @param[in] propulsor_actuators Propulsor actuators containing their configured limits.
 	 * @return Grouped minimum and maximum actuator limits.
@@ -92,9 +75,6 @@ namespace actuators
 
 	/**
 	 * @brief Collects actuator limits into an actuator-limit matrix.
-	 *
-	 * Column zero contains minimum limits and column one contains maximum limits. Rows are ordered as elevator,
-	 * aileron, rudder, front propulsor, left propulsor, and right propulsor. Flap and spoiler limits are not included.
 	 *
 	 * @param[in] surface_actuators Surface actuators containing their configured limits.
 	 * @param[in] propulsor_actuators Propulsor actuators containing their configured limits.
@@ -106,9 +86,6 @@ namespace actuators
 	/**
 	 * @brief Computes neutral actuator inputs from the configured limits.
 	 *
-	 * Each included actuator uses zero when zero lies within its limits and otherwise uses the nearest limit. Flap and
-	 * spoiler commands retain their default values.
-	 *
 	 * @param[in] surface_actuators Surface actuators containing their configured limits.
 	 * @param[in] propulsor_actuators Propulsor actuators containing their configured limits.
 	 * @return Grouped neutral actuator inputs.
@@ -119,8 +96,6 @@ namespace actuators
 	/**
 	 * @brief Unpacks surface-actuator inputs into a vector.
 	 *
-	 * The vector order is elevator, aileron, rudder, flap, and spoiler.
-	 *
 	 * @param[in] u_surface Surface-actuator inputs.
 	 * @return Surface-actuator input vector in actuator command units.
 	 */
@@ -128,8 +103,6 @@ namespace actuators
 
 	/**
 	 * @brief Unpacks propulsor-actuator inputs into a vector.
-	 *
-	 * The vector order is front, left, and right propulsor.
 	 *
 	 * @param[in] u_propulsor Propulsor-actuator inputs.
 	 * @return Propulsor-actuator input vector in actuator command units.
@@ -139,8 +112,6 @@ namespace actuators
 
 	/**
 	 * @brief Returns the command for a selected surface actuator.
-	 *
-	 * Returns zero when @p actuator_id does not identify a supported surface actuator.
 	 *
 	 * @tparam T Scalar type stored by the surface-actuator inputs.
 	 * @param[in] actuator_id Surface actuator to select.

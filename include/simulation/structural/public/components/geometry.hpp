@@ -18,8 +18,6 @@ namespace structural
 		/**
 		 * @brief Computes the geometry's inertia tensor about its center in local axes.
 		 *
-		 * Models the geometry as a rectangular prism aligned with its local axes.
-		 *
 		 * @return Local inertia tensor about the geometry center [kg m^2].
 		 */
 		Eigen::Matrix3d compute_local_J();

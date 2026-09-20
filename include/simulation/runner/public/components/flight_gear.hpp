@@ -18,9 +18,6 @@ namespace runner
 		/**
 		 * @brief Receives FlightGear data and returns the current wind vectors.
 		 *
-		 * The most recent successfully received message remains cached. When wind is
-		 * disabled, both returned wind vectors are zero.
-		 *
 		 * @param[in] input Aircraft frame data and wind-enable flag.
 		 * @return Wind expressed in the inertial and body frames.
 		 */

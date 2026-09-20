@@ -117,10 +117,6 @@ namespace transforms
 	/**
 	 * @brief Multiplies quaternions in list order.
 	 *
-	 * For a list containing q1, q2, and q3, the result is q1 q2 q3. Each quaternion is normalized and
-	 * canonicalized before multiplication, and the result is canonicalized. An empty list returns the identity
-	 * quaternion.
-	 *
 	 * @param[in] q_list Quaternions to multiply [-].
 	 * @return Product of the quaternions in list order [-].
 	 */
@@ -128,10 +124,6 @@ namespace transforms
 
 	/**
 	 * @brief Multiplies quaternions in reverse list order.
-	 *
-	 * For a list containing q1, q2, and q3, the result is q3 q2 q1. Each quaternion is normalized and
-	 * canonicalized before multiplication, and the result is canonicalized. An empty list returns the identity
-	 * quaternion.
 	 *
 	 * @param[in] q_list Quaternions to multiply [-].
 	 * @return Product of the quaternions in reverse list order [-].

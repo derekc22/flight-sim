@@ -9,9 +9,6 @@ namespace trim
 	/**
 	 * @brief Packs a trim-residual vector into named fields.
 	 *
-	 * The vector order is linear acceleration, angular acceleration, roll and pitch rates, sideslip error, roll error,
-	 * pitch error, longitudinal-velocity error, vertical-velocity error, and yaw-rate error.
-	 *
 	 * @tparam T Scalar type stored by the residual.
 	 * @param[in] residual Trim-residual vector.
 	 * @return Trim residual with named fields.
@@ -28,9 +25,6 @@ namespace trim
 
 	/**
 	 * @brief Builds a complete trim solution from the current solver state.
-	 *
-	 * Packs state and actuator inputs, applies fixed flap and spoiler inputs, evaluates the net wrench, stores raw and
-	 * weighted residuals, and computes weighted residual norms.
 	 *
 	 * @param[in] xu Current combined state-input vector.
 	 * @param[in] residual Raw trim-residual vector.

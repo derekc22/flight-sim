@@ -8,9 +8,6 @@ namespace control
 	/**
 	 * @brief Packs a linear-quadratic setpoint into the reduced state vector.
 	 *
-	 * The returned vector is ordered as body translational velocity, body angular
-	 * velocity, roll, and pitch. Yaw is excluded from the modeled state.
-	 *
 	 * @param[in] setpoint Guidance setpoint to pack.
 	 * @return Reduced desired-state vector.
 	 */

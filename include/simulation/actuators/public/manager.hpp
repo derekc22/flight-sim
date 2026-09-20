@@ -13,9 +13,6 @@ namespace actuators
 		/**
 		 * @brief Advances all actuators for one simulation step.
 		 *
-		 * Replaces the requested flap and spoiler commands with the configured fixed inputs before stepping the surface
-		 * and propulsor actuators.
-		 *
 		 * @param[in] input Requested actuator commands and time step.
 		 * @return Applied commands and lagged actuator outputs.
 		 */

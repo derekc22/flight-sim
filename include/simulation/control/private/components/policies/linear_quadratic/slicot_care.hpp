@@ -26,8 +26,6 @@ namespace control
 	/**
 	 * @brief Evaluates a continuous-time algebraic Riccati equation residual.
 	 *
-	 * Computes A^T P + P A - P G P + Q.
-	 *
 	 * @param[in] A State matrix.
 	 * @param[in] G Riccati quadratic-term matrix.
 	 * @param[in] Q State-weighting matrix.
@@ -42,8 +40,6 @@ namespace control
 	/**
 	 * @brief Solves a continuous-time algebraic Riccati equation with SLICOT SB02MD.
 	 *
-	 * Solves A^T P + P A - P G P + Q = 0 after symmetrizing @p G and @p Q.
-	 *
 	 * @param[in] A Square state matrix.
 	 * @param[in] G Square Riccati quadratic-term matrix with the same order as @p A.
 	 * @param[in] Q Square state-weighting matrix with the same order as @p A.
@@ -55,9 +51,6 @@ namespace control
 
 	/**
 	 * @brief Solves the continuous-time algebraic Riccati equation for an input matrix.
-	 *
-	 * Forms G = B R^-1 B^T and solves
-	 * A^T P + P A - P B R^-1 B^T P + Q = 0.
 	 *
 	 * @param[in] A Square state matrix.
 	 * @param[in] B Input matrix.
@@ -72,8 +65,6 @@ namespace control
 
 	/**
 	 * @brief Computes a continuous-time linear-quadratic feedback gain.
-	 *
-	 * Computes K = R^-1 B^T P.
 	 *
 	 * @param[in] B Input matrix.
 	 * @param[in] R Square input-weighting matrix.

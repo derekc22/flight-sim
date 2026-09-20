@@ -51,8 +51,6 @@ namespace transforms
 	/**
 	 * @brief Converts a rotation representation from quaternion form to matrix form.
 	 *
-	 * The input quaternion is normalized and canonicalized before conversion.
-	 *
 	 * @param[in] q Quaternion representing a rotation or coordinate transformation [-].
 	 * @return Equivalent rotation or coordinate-transformation matrix [-].
 	 */

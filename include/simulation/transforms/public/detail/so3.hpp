@@ -67,8 +67,6 @@ namespace transforms
 	/**
 	 * @brief Converts a rotation representation from matrix form to quaternion form.
 	 *
-	 * The returned quaternion is normalized and canonicalized to have a nonnegative scalar coefficient.
-	 *
 	 * @param[in] rot Rotation or coordinate-transformation matrix [-].
 	 * @return Equivalent unit quaternion with a nonnegative scalar coefficient [-].
 	 */

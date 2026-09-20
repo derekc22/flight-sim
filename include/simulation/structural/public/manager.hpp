@@ -19,8 +19,6 @@ namespace structural
 		/**
 		 * @brief Builds a map from geometry identifiers to vector indices.
 		 *
-		 * If identifiers are duplicated, the last matching geometry determines the stored index.
-		 *
 		 * @return Map from each geometry identifier to its index in `geometries`.
 		 */
 		std::unordered_map<std::string, size_t> build_geometry_id_map();
@@ -50,8 +48,6 @@ namespace structural
 
 		/**
 		 * @brief Computes the combined inertia tensor about the center of gravity.
-		 *
-		 * Rotates each local inertia tensor into body axes and applies the parallel-axis theorem.
 		 *
 		 * @param[in] pB_GB Combined center-of-gravity position expressed in body axes [m].
 		 * @return Combined inertia tensor about the center of gravity, expressed in body axes [kg m^2].

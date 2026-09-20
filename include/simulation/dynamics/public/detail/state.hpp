@@ -20,9 +20,6 @@ namespace dynamics
 	/**
 	 * @brief Computes the rigid-body state of a frame relative to a reference frame.
 	 *
-	 * The result contains the position and orientation from @p R to @p F and the translational and angular velocity
-	 * of @p F relative to @p R expressed in @p F.
-	 *
 	 * @param[in] F Frame whose relative state is computed.
 	 * @param[in] R Reference frame.
 	 * @return Rigid-body state of @p F relative to @p R.

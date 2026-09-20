@@ -23,8 +23,6 @@ namespace sensors
 		/**
 		 * @brief Applies first-order lag, scalar bias, and Gaussian noise to a measurement.
 		 *
-		 * An empty lag state is initialized from @p meas before filtering.
-		 *
 		 * @param[in] meas Ground-truth scalar measurement in its native units.
 		 * @param[in,out] lag_state Previous lagged value, updated with the current lagged value.
 		 * @param[in] dt Measurement interval [s].
@@ -35,8 +33,6 @@ namespace sensors
 		/**
 		 * @brief Applies first-order lag, vector bias, and independent Gaussian noise to a vector measurement.
 		 *
-		 * An empty lag state is initialized from @p meas before filtering.
-		 *
 		 * @param[in] meas Ground-truth vector measurement in its native units.
 		 * @param[in,out] lag_state Previous lagged vector, updated with the current lagged vector.
 		 * @param[in] dt Measurement interval [s].
@@ -46,10 +42,6 @@ namespace sensors
 
 		/**
 		 * @brief Applies first-order lag, rotational bias, and rotational Gaussian noise to a quaternion.
-		 *
-		 * Lag is applied with shortest-path spherical interpolation. Bias and noise
-		 * rotations are post-multiplied onto the lagged quaternion, and the result is
-		 * normalized. An empty lag state is initialized from @p meas.
 		 *
 		 * @param[in] meas Ground-truth orientation quaternion [-].
 		 * @param[in,out] lag_state Previous lagged quaternion, updated before bias and noise are applied.

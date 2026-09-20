@@ -17,9 +17,6 @@ namespace qp
 	/**
 	 * @brief Validates a quadratic problem against the solver dimension.
 	 *
-	 * Requires a square symmetric Hessian, matching gradient and bound sizes, finite objective coefficients, non-NaN
-	 * bounds, and lower bounds no greater than upper bounds. Infinite bounds are permitted.
-	 *
 	 * @param[in] problem Quadratic problem to validate.
 	 * @param[in] dimension Expected number of decision variables.
 	 */

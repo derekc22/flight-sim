@@ -10,9 +10,6 @@ namespace integrators
 	/**
 	 * @brief Evaluates aerodynamic, propulsive, and net body-frame wrenches.
 	 *
-	 * The net force includes aerodynamic force, propulsive force, and weight. The net moment includes aerodynamic and
-	 * propulsive moments.
-	 *
 	 * @tparam T Scalar type used for the evaluation.
 	 * @tparam Model Model type providing structural state and aerodynamic and propulsion managers.
 	 * @param[in] model Structural state and aerodynamic and propulsion models.

@@ -8,10 +8,6 @@ namespace avionics
 		/**
 		 * @brief Advances inertial position using body velocity and specific force.
 		 *
-		 * Rotates the previous body-expressed velocity and the gravity-restored
-		 * acceleration into the inertial frame, then applies constant-acceleration
-		 * translational kinematics.
-		 *
 		 * @param[in] prev_pI_BI Previous inertial-expressed position [m].
 		 * @param[in] prev_vB_BI Previous body-expressed translational velocity [m/s].
 		 * @param[in] fB Measured body-expressed specific force [m/s^2].
@@ -29,9 +25,6 @@ namespace avionics
 
 		/**
 		 * @brief Advances body-expressed translational velocity using inertial measurements.
-		 *
-		 * Restores gravity to the measured specific force and includes the rotating-body
-		 * transport term before applying a forward-Euler update.
 		 *
 		 * @param[in] prev_vB_BI Previous body-expressed translational velocity [m/s].
 		 * @param[in] fB Measured body-expressed specific force [m/s^2].

@@ -18,8 +18,6 @@ namespace avionics
 		/**
 		 * @brief Computes pressure altitude from static air pressure.
 		 *
-		 * Uses the standard tropospheric pressure-altitude relation.
-		 *
 		 * @param[in] P Measured static air pressure [Pa].
 		 * @return Pressure altitude [m].
 		 */
@@ -41,8 +39,6 @@ namespace avionics
 
 		/**
 		 * @brief Computes air density from static pressure and temperature.
-		 *
-		 * Applies the ideal-gas relation for air.
 		 *
 		 * @param[in] P Measured static air pressure [Pa].
 		 * @param[in] T Measured static air temperature [K].

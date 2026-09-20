@@ -46,8 +46,6 @@ namespace transforms
 	/**
 	 * @brief Constructs the matrix counterpart to an intrinsic Euler-angle sequence.
 	 *
-	 * The result is the transpose of the extrinsic rotation constructed from the negated angles.
-	 *
 	 * @param[in] roll First Euler angle in @p order [rad].
 	 * @param[in] pitch Second Euler angle in @p order [rad].
 	 * @param[in] yaw Third Euler angle in @p order [rad].
@@ -117,8 +115,6 @@ namespace transforms
 	/**
 	 * @brief Multiplies rotation matrices in list order.
 	 *
-	 * For a list containing R1, R2, and R3, the result is R1 R2 R3. An empty list returns the identity matrix.
-	 *
 	 * @param[in] rot_list Rotation matrices to multiply [-].
 	 * @return Product of the rotation matrices in list order [-].
 	 */
@@ -126,8 +122,6 @@ namespace transforms
 
 	/**
 	 * @brief Multiplies rotation matrices in reverse list order.
-	 *
-	 * For a list containing R1, R2, and R3, the result is R3 R2 R1. An empty list returns the identity matrix.
 	 *
 	 * @param[in] rot_list Rotation matrices to multiply [-].
 	 * @return Product of the rotation matrices in reverse list order [-].

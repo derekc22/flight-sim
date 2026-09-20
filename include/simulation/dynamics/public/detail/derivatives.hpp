@@ -13,8 +13,6 @@ namespace dynamics
 	/**
 	 * @brief Computes the body derivative of body-expressed translational velocity.
 	 *
-	 * Uses the non-rotating-Earth translational equation of motion.
-	 *
 	 * @param[in] vB Body-expressed translational velocity [m/s].
 	 * @param[in] wB_BI Body angular velocity relative to an inertial frame, expressed in body axes [rad/s].
 	 * @param[in] mass Vehicle mass [kg].
@@ -37,8 +35,6 @@ namespace dynamics
 	/**
 	 * @brief Converts a derivative taken in body axes to an inertial derivative.
 	 *
-	 * All vector arguments must be expressed in the same coordinate frame.
-	 *
 	 * @param[in] ddtB_vB Body derivative of a vector [m/s^2].
 	 * @param[in] vB Vector whose derivative is converted [m/s].
 	 * @param[in] wB_BI Body angular velocity relative to an inertial frame [rad/s].
@@ -49,8 +45,6 @@ namespace dynamics
 
 	/**
 	 * @brief Converts an inertial derivative to a derivative taken in body axes.
-	 *
-	 * All vector arguments must be expressed in the same coordinate frame.
 	 *
 	 * @param[in] ddtI_vI Inertial derivative of a vector [m/s^2].
 	 * @param[in] vI Vector whose derivative is converted [m/s].
@@ -93,8 +87,6 @@ namespace dynamics
 	/**
 	 * @brief Converts body angular velocity to intrinsic ZYX Euler-angle rates.
 	 *
-	 * The conversion is singular when the pitch angle has zero cosine.
-	 *
 	 * @tparam T Scalar type used for the calculation.
 	 * @param[in] wB_BI Body angular velocity relative to an inertial frame [rad/s].
 	 * @param[in] theta Pitch angle [rad].
@@ -106,8 +98,6 @@ namespace dynamics
 
 	/**
 	 * @brief Constructs the intrinsic ZYX mapping from body angular velocity to Euler-angle rates.
-	 *
-	 * The matrix is singular when the pitch angle has zero cosine.
 	 *
 	 * @tparam T Scalar type used for the calculation.
 	 * @param[in] theta Pitch angle [rad].
@@ -136,8 +126,6 @@ namespace dynamics
 
 	/**
 	 * @brief Converts body angular velocity to intrinsic ZYX Euler-angle rates.
-	 *
-	 * The conversion is singular when the pitch angle has zero cosine.
 	 *
 	 * @param[in] wB_BI Body angular velocity relative to the inertial frame [rad/s].
 	 * @param[in] eul Intrinsic ZYX Euler angles [rad].

@@ -16,9 +16,6 @@ namespace estimation
 		/**
 		 * @brief Advances the configured estimator and returns its state estimate.
 		 *
-		 * With no configured filter, the measurement is returned unchanged. If both
-		 * filters are present, the extended Kalman filter result takes precedence.
-		 *
 		 * @param[in] input Measurement, trim, linearization, model, actuator, condition, and timing data.
 		 * @return Estimated rigid-body state.
 		 */

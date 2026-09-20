@@ -9,9 +9,6 @@ namespace operating
 	/**
 	 * @brief Unpacks a state and actuator inputs into a combined vector.
 	 *
-	 * The vector order is vx, vy, vz, p, q, r, roll, pitch, elevator, aileron, rudder, front propulsor, left
-	 * propulsor, and right propulsor. Flap and spoiler inputs are not included.
-	 *
 	 * @tparam T Scalar type stored by the state and inputs.
 	 * @param[in] x Structured state.
 	 * @param[in] u Structured actuator inputs.
@@ -22,8 +19,6 @@ namespace operating
 
 	/**
 	 * @brief Unpacks a state and virtual wrench input into a combined vector.
-	 *
-	 * The vector order is vx, vy, vz, p, q, r, roll, pitch, Fx, Fy, Fz, Mx, My, and Mz.
 	 *
 	 * @tparam T Scalar type stored by the state and wrench.
 	 * @param[in] x Structured state.
@@ -48,8 +43,6 @@ namespace operating
 	/**
 	 * @brief Packs the state portion of a combined state-input vector.
 	 *
-	 * Reads vx, vy, vz, p, q, r, roll, and pitch from the first eight elements.
-	 *
 	 * @tparam T Scalar type stored by the vector.
 	 * @param[in] xu Combined state-input vector.
 	 * @return Structured state.
@@ -58,9 +51,6 @@ namespace operating
 
 	/**
 	 * @brief Packs the actuator portion of a combined state-input vector.
-	 *
-	 * Reads elevator, aileron, rudder, front propulsor, left propulsor, and right propulsor from elements 8 through
-	 * 13. Flap and spoiler commands retain their default values.
 	 *
 	 * @tparam T Scalar type stored by the vector.
 	 * @param[in] xu Combined state-input vector.
@@ -71,8 +61,6 @@ namespace operating
 	/**
 	 * @brief Packs the virtual wrench portion of a combined virtual state-input vector.
 	 *
-	 * Reads Fx, Fy, Fz, Mx, My, and Mz from elements 8 through 13.
-	 *
 	 * @tparam T Scalar type stored by the vector.
 	 * @param[in] xu Combined virtual state-input vector.
 	 * @return Structured virtual force [N] and moment [N m].
@@ -81,8 +69,6 @@ namespace operating
 
 	/**
 	 * @brief Packs actuator inputs and applies configured fixed controls.
-	 *
-	 * Reads the six variable actuator inputs from @p xu, then assigns the configured flap and spoiler inputs.
 	 *
 	 * @tparam T Scalar type stored by the actuator inputs.
 	 * @param[in] xu Combined state-input vector.
@@ -95,8 +81,6 @@ namespace operating
 
 	/**
 	 * @brief Packs a combined state-input vector into an operating point.
-	 *
-	 * Flap and spoiler inputs retain their default values.
 	 *
 	 * @tparam T Scalar type stored by the operating point.
 	 * @param[in] xu Combined state-input vector.

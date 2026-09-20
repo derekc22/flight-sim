@@ -8,9 +8,6 @@ namespace allocator
 	/**
 	 * @brief Builds an allocator input from simulation and control data.
 	 *
-	 * Packs @p Zt and @p u_actual_t_1 into the allocator operating point and
-	 * converts the commanded wrench into force-then-moment vector form.
-	 *
 	 * @param[in] mu_cmd Commanded body-frame force [N] and moment [N m].
 	 * @param[in] active_mask Mask identifying commanded virtual-wrench components.
 	 * @param[in] actuator_mask Mask identifying actuators available to the allocator.

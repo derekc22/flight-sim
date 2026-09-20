@@ -24,9 +24,6 @@ namespace control
 		/**
 		 * @brief Builds the regulator policy input from the state deviation and virtual linearization.
 		 *
-		 * The state deviation is measured from the requested velocity, angular
-		 * velocity, roll, and pitch setpoint.
-		 *
 		 * @param[in] input Current state, setpoint, and virtual linearization.
 		 * @return Linear-quadratic policy input for the regulator.
 		 */

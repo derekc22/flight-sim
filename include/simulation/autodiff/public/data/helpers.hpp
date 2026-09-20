@@ -50,9 +50,6 @@ namespace autodiff
 	/**
 	 * @brief Builds the model used for automatic-differentiation evaluations.
 	 *
-	 * Copies structural state, actuator limits, and fixed controls while retaining references to the aircraft's
-	 * aerodynamic and propulsion managers. The aircraft must outlive the returned model.
-	 *
 	 * @param[in] aircraft Aircraft providing managers, actuator limits, and fixed controls.
 	 * @param[in] struc_t Structural state copied into the model.
 	 * @return Automatic-differentiation model referencing the aircraft managers.

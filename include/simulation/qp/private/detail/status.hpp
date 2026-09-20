@@ -9,8 +9,6 @@ namespace qp
 	/**
 	 * @brief Maps a ProxQP solver status to the repository's QP status type.
 	 *
-	 * Unrecognized values map to `Status::NotRun`.
-	 *
 	 * @param[in] status ProxQP solver output status.
 	 * @return Corresponding repository QP status.
 	 */

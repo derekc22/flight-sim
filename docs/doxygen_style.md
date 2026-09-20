@@ -39,8 +39,6 @@ A documentation pass must review every declaration eligible under the scope rule
 /**
  * @brief Returns a rotation matrix about the x-axis.
  *
- * The matrix represents a rotation of the coordinate frame by @p angle.
- *
  * @param[in] angle Rotation angle [rad].
  * @return Rotation matrix representing the x-axis rotation [-].
  */
@@ -52,7 +50,9 @@ Use `/** ... */` blocks with one leading `*` on each interior line. End complete
 ## Required Content
 
 - Begin with `@brief` followed by one concise sentence describing the function's result or effect.
-- Add a normal paragraph after `@brief` only when the function needs more explanation. Do not add `@details`; Doxygen treats subsequent paragraphs as detailed documentation.
+- Do not add `@details` or free-form explanatory paragraphs after `@brief`.
+- Do not narrate implementation steps. Keep documentation limited to the concise API contract expressed by `@brief`
+  and the structured tags below.
 - Document parameters in signature order with `@param[in]`, `@param[out]`, or `@param[in,out]`.
 - Add `@return` for non-`void` functions. Do not add it to constructors or `void` functions.
 - Add `@tparam` for each template parameter.
@@ -97,6 +97,9 @@ Document conventions that affect how a caller interprets the result, including:
 - normalization or canonicalization;
 - multiplication or application order;
 - singularities and selected solution ranges.
+
+State essential conventions concisely in `@brief`, `@param`, `@return`, `@note`, or `@warning`; do not add a
+free-form explanatory paragraph.
 
 Do not infer a convention, unit, or behavior from the function name alone. Confirm it from the implementation and existing call sites. If the contract remains ambiguous, ask for clarification before writing the documentation.
 

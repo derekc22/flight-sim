@@ -22,9 +22,6 @@ namespace integrators
 	/**
 	 * @brief Adds a scaled rigid-body state derivative to a state.
 	 *
-	 * Advances position, translational velocity, and angular velocity linearly and advances orientation using the
-	 * resulting angular velocity.
-	 *
 	 * @param[in] X Base rigid-body state.
 	 * @param[in] X_dot Rigid-body state derivative.
 	 * @param[in] scale Derivative scale [s].
@@ -36,9 +33,6 @@ namespace integrators
 
 	/**
 	 * @brief Applies the RK4 weighted state derivative to a rigid-body state.
-	 *
-	 * Uses weights one, two, two, and one for the four stages and integrates attitude with the corresponding weighted
-	 * angular velocity.
 	 *
 	 * @param[in] X Rigid-body state at the beginning of the step.
 	 * @param[in] k1 First RK4 state derivative.

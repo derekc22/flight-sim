@@ -13,11 +13,6 @@ namespace allocator
 	/**
 	 * @brief Solves the actuator-increment quadratic program subject to actuator limits.
 	 *
-	 * The decision vector is the increment from @p u_0. Active actuators use their
-	 * configured bounds, while inactive actuators are fixed at @p actuator_target.
-	 * If the solver does not report a solution, the failure is logged and @p u_0
-	 * is returned.
-	 *
 	 * @param[in,out] solver Bound-constrained quadratic-program solver.
 	 * @param[in] hessian Quadratic objective Hessian.
 	 * @param[in] gradient Linear objective gradient.
@@ -37,10 +32,6 @@ namespace allocator
 
 	/**
 	 * @brief Solves the actuator-increment quadratic objective without active-actuator bounds.
-	 *
-	 * Active actuators with nonzero ranges are free in the least-squares solve.
-	 * Fixed actuators remain at their configured fixed value, and inactive actuators
-	 * are fixed at @p actuator_target.
 	 *
 	 * @param[in] hessian Quadratic objective Hessian.
 	 * @param[in] gradient Linear objective gradient.

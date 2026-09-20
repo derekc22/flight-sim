@@ -37,8 +37,6 @@ namespace frames
 		/**
 		 * @brief Sets the frame orientation quaternion and synchronizes its equivalent representations.
 		 *
-		 * The quaternion is normalized and canonicalized before storage.
-		 *
 		 * @param[in] q Orientation quaternion [-].
 		 */
 		void _set(const dynamics::OrientationQuaternion& q);
@@ -117,9 +115,6 @@ namespace frames
 
 		/**
 		 * @brief Applies the populated frame fields in a set of options.
-		 *
-		 * Options are applied in field order. When multiple equivalent representations are populated, later fields can
-		 * overwrite values synchronized from earlier fields.
 		 *
 		 * @param[in] opts Optional frame fields to apply.
 		 */

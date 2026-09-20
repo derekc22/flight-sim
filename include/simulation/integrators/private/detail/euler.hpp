@@ -18,8 +18,6 @@ namespace integrators
 	/**
 	 * @brief Advances an inertial-to-body orientation matrix using constant angular velocity.
 	 *
-	 * Uses the strapdown rotation exponential with the sign required by the CIB convention.
-	 *
 	 * @param[in] CIB_t Inertial-to-body orientation matrix at the current time [-].
 	 * @param[in] wB_BI_t Body angular velocity relative to the inertial frame [rad/s].
 	 * @param[in] dt Time step [s].

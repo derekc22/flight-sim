@@ -9,9 +9,6 @@ namespace trim
 	/**
 	 * @brief Formats a trim solution as a human-readable report.
 	 *
-	 * The report includes convergence metrics, state, aerodynamic quantities, actuator inputs, wrench, and raw and
-	 * weighted residuals.
-	 *
 	 * @param[in] trim_sol Trim solution to format.
 	 * @return Multi-section textual report.
 	 */

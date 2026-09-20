@@ -29,8 +29,6 @@ namespace util
 	/**
 	 * @brief Applies an exact discrete first-order lag between two quaternions.
 	 *
-	 * Uses shortest-path spherical interpolation from @p prev_val toward @p val.
-	 *
 	 * @param[in] val Current input quaternion [-].
 	 * @param[in] prev_val Previous filtered quaternion [-].
 	 * @param[in] tau Lag time constant; zero bypasses the filter and negative values throw [s].

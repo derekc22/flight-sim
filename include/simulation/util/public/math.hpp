@@ -53,8 +53,6 @@ namespace util
 	/**
 	 * @brief Wraps an angle to the principal remainder about zero.
 	 *
-	 * Uses a period of 2 pi and the standard remainder operation.
-	 *
 	 * @param[in] x Angle to wrap [rad].
 	 * @return Equivalent principal angle [rad].
 	 */
@@ -66,8 +64,6 @@ namespace util
 
 	/**
 	 * @brief Computes a differentiable approximation of absolute value.
-	 *
-	 * Evaluates sqrt(x^2 + eps^2) - eps using @c constants::eps.
 	 *
 	 * @param[in] x Input value.
 	 * @return Smooth approximation of the absolute value of @p x.
@@ -86,8 +82,6 @@ namespace util
 
 	/**
 	 * @brief Checks whether two vectors have equal sizes and approximately equal values.
-	 *
-	 * Uses Eigen's approximate comparison with @c constants::eps_strict.
 	 *
 	 * @param[in] a First vector.
 	 * @param[in] b Second vector.
