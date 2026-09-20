@@ -22,12 +22,12 @@ namespace io
 		if (input.cols() > 1) {
 			throw std::runtime_error("DataMatrix::insert Eigen::Matrix passed for 'input', expected Eigen::Vector");
 		}
-		if (input.rows() > n_cols - 1) {
+		if (input.rows() != n_cols - 1) {
 			throw std::runtime_error(
-				"DataMatrix::insert Number of rows in 'input' exceeds number of columns in DataMatrix");
+				"DataMatrix::insert Number of rows in 'input' does not match number of data columns in DataMatrix");
 		}
-		if (t > n_rows - 1) {
-			throw std::runtime_error("DataMatrix::insert Input index 't' exceeds number of rows in DataMatrix");
+		if (t < 0 || t >= n_rows) {
+			throw std::runtime_error("DataMatrix::insert Input index 't' is outside the row range of DataMatrix");
 		}
 
 		data(t, 0) = t * constants::dt;

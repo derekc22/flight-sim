@@ -53,7 +53,7 @@ namespace util
 	CppAD::AD<double> acos(
 		const CppAD::AD<double>& x)
 	{
-		return CppAD::asin(x);
+		return CppAD::acos(x);
 	}
 
 	CppAD::AD<double> atan2(

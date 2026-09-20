@@ -14,6 +14,12 @@ namespace guidance
 		std::optional<TrackingGuidance> tracking;
 		std::optional<InterpolatedGuidance> interpolated;
 
+		/**
+		 * @brief Advances the configured guidance component and returns its setpoint.
+		 *
+		 * @param[in] input Guidance horizon data used by interpolated guidance.
+		 * @return Setpoint produced by the selected guidance component.
+		 */
 		GuidanceManagerOutput step(const GuidanceManagerInput& input);
 	};
 

@@ -11,6 +11,13 @@ namespace aerodynamics
 		double dCD;
 		double dCM;
 
+		/**
+		 * @brief Computes the aerodynamic-coefficient contribution from this control effector.
+		 *
+		 * @tparam T Scalar type used for the computation.
+		 * @param[in] u Surface-actuator inputs.
+		 * @return Lift, drag, and pitching-moment coefficient contributions [-].
+		 */
 		template <typename T> SurfaceCoefficients_T<T> step(const actuators::SurfaceActuatorInputs_T<T>& u);
 	};
 

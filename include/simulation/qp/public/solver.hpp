@@ -12,6 +12,13 @@ namespace qp
 		proxsuite::proxqp::dense::QP<double> solver;
 
 		Solver(std::size_t dimension);
+
+		/**
+		 * @brief Solves a bound-constrained quadratic program.
+		 *
+		 * @param[in] problem Hessian, gradient, and decision-variable bounds.
+		 * @return Decision vector and mapped solver status.
+		 */
 		Solution solve(const Problem& problem);
 	};
 

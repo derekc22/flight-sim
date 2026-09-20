@@ -16,7 +16,16 @@ namespace dynamics
 		const State_T<T>& x)
 	{
 		StateVector_T<T> out;
-		out << x.vx, x.vy, x.vz, x.p, x.q, x.r, x.phi, x.theta;
+		// clang-format off
+		out <<   x.vx,
+		         x.vy,
+		         x.vz,
+		         x.p,
+		         x.q,
+		         x.r,
+		         x.phi,
+		         x.theta;
+		// clang-format on
 		return out;
 	}
 
@@ -25,8 +34,16 @@ namespace dynamics
 		const StateDot_T<T>& x_dot)
 	{
 		StateDotVector_T<T> out;
-		out << x_dot.vx_dot, x_dot.vy_dot, x_dot.vz_dot, x_dot.p_dot, x_dot.q_dot, x_dot.r_dot, x_dot.phi_dot,
-			x_dot.theta_dot;
+		// clang-format off
+		out <<   x_dot.vx_dot,
+		         x_dot.vy_dot,
+		         x_dot.vz_dot,
+		         x_dot.p_dot,
+		         x_dot.q_dot,
+		         x_dot.r_dot,
+		         x_dot.phi_dot,
+		         x_dot.theta_dot;
+		// clang-format on
 		return out;
 	}
 
@@ -35,7 +52,14 @@ namespace dynamics
 		const Wrench_T<T>& wrench)
 	{
 		WrenchVector_T<T> out;
-		out << wrench.F.x(), wrench.F.y(), wrench.F.z(), wrench.M.x(), wrench.M.y(), wrench.M.z();
+		// clang-format off
+		out <<   wrench.F.x(),
+		         wrench.F.y(),
+		         wrench.F.z(),
+		         wrench.M.x(),
+		         wrench.M.y(),
+		         wrench.M.z();
+		// clang-format on
 		return out;
 	}
 
@@ -54,8 +78,14 @@ namespace dynamics
 		const State_T<T>& x)
 	{
 		Twist_T<T> twist;
-		twist.v << x.vx, x.vy, x.vz;
-		twist.w << x.p, x.q, x.r;
+		// clang-format off
+		twist.v <<   x.vx,
+		             x.vy,
+		             x.vz;
+		twist.w <<   x.p,
+		             x.q,
+		             x.r;
+		// clang-format on
 		return twist;
 	}
 

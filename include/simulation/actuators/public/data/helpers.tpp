@@ -29,9 +29,14 @@ namespace actuators
 		const SurfaceActuatorInputs_T<T>& surface_inputs = u.surface_inputs;
 		const PropulsorActuatorInputs_T<T>& propulsor_inputs = u.propulsor_inputs;
 		ActuatorInputsVector_T<T> out;
-		out << surface_inputs.elevator_cmd, surface_inputs.aileron_cmd, surface_inputs.rudder_cmd,
-			propulsor_inputs.front_propulsor_cmd, propulsor_inputs.left_propulsor_cmd,
-			propulsor_inputs.right_propulsor_cmd;
+		// clang-format off
+		out <<   surface_inputs.elevator_cmd,
+		         surface_inputs.aileron_cmd,
+		         surface_inputs.rudder_cmd,
+		         propulsor_inputs.front_propulsor_cmd,
+		         propulsor_inputs.left_propulsor_cmd,
+		         propulsor_inputs.right_propulsor_cmd;
+		// clang-format on
 		return out;
 	}
 

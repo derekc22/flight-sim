@@ -12,11 +12,22 @@ namespace trim
 		const TrimSolveOptions& options)
 	{
 		TrimResidualVector_T<double> w;
-		w << 1.0 / options.linear_accel_scale, 1.0 / options.linear_accel_scale, 1.0 / options.linear_accel_scale,
-			1.0 / options.angular_accel_scale, 1.0 / options.angular_accel_scale, 1.0 / options.angular_accel_scale,
-			1.0 / options.angle_rate_scale, 1.0 / options.angle_rate_scale, 1.0 / options.angle_err_scale,
-			1.0 / options.angle_err_scale, 1.0 / options.angle_err_scale, 1.0 / options.vel_err_scale,
-			1.0 / options.vel_err_scale, 1.0 / options.angle_rate_scale;
+		// clang-format off
+		w <<   1.0 / options.linear_accel_scale,
+		       1.0 / options.linear_accel_scale,
+		       1.0 / options.linear_accel_scale,
+		       1.0 / options.angular_accel_scale,
+		       1.0 / options.angular_accel_scale,
+		       1.0 / options.angular_accel_scale,
+		       1.0 / options.angle_rate_scale,
+		       1.0 / options.angle_rate_scale,
+		       1.0 / options.angle_err_scale,
+		       1.0 / options.angle_err_scale,
+		       1.0 / options.angle_err_scale,
+		       1.0 / options.vel_err_scale,
+		       1.0 / options.vel_err_scale,
+		       1.0 / options.angle_rate_scale;
+		// clang-format on
 		return w;
 	}
 

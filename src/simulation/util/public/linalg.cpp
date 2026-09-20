@@ -13,7 +13,11 @@ namespace util
 		const Eigen::Vector3d& v)
 	{
 		Eigen::Matrix3d S;
-		S << 0, -v.z(), v.y(), v.z(), 0, -v.x(), -v.y(), v.x(), 0;
+		// clang-format off
+		S <<        0,  -v.z(),   v.y(),
+		        v.z(),       0,  -v.x(),
+		       -v.y(),   v.x(),       0;
+		// clang-format on
 		return S;
 	}
 

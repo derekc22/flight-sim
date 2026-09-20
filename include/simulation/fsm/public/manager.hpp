@@ -10,6 +10,12 @@ namespace fsm
 
 		FSMManager(const Settings& settings);
 
+		/**
+		 * @brief Applies an optional manual/autopilot mode toggle.
+		 *
+		 * @param[in] input Mode-toggle command.
+		 * @return Current mode after applying the command.
+		 */
 		FSMManagerOutput step(const FSMManagerInput& input);
 	};
 

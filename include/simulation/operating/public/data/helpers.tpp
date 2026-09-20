@@ -14,9 +14,22 @@ namespace operating
 		const actuators::SurfaceActuatorInputs_T<T>& surface_inputs = u.surface_inputs;
 		const actuators::PropulsorActuatorInputs_T<T>& propulsor_inputs = u.propulsor_inputs;
 		StateInputVector_T<T> out;
-		out << x.vx, x.vy, x.vz, x.p, x.q, x.r, x.phi, x.theta, surface_inputs.elevator_cmd, surface_inputs.aileron_cmd,
-			surface_inputs.rudder_cmd, propulsor_inputs.front_propulsor_cmd, propulsor_inputs.left_propulsor_cmd,
-			propulsor_inputs.right_propulsor_cmd;
+		// clang-format off
+		out <<   x.vx,
+		         x.vy,
+		         x.vz,
+		         x.p,
+		         x.q,
+		         x.r,
+		         x.phi,
+		         x.theta,
+		         surface_inputs.elevator_cmd,
+		         surface_inputs.aileron_cmd,
+		         surface_inputs.rudder_cmd,
+		         propulsor_inputs.front_propulsor_cmd,
+		         propulsor_inputs.left_propulsor_cmd,
+		         propulsor_inputs.right_propulsor_cmd;
+		// clang-format on
 		return out;
 	}
 
@@ -26,7 +39,18 @@ namespace operating
 		const dynamics::Wrench_T<T>& u)
 	{
 		VirtualStateInputVector_T<T> out;
-		out << x.vx, x.vy, x.vz, x.p, x.q, x.r, x.phi, x.theta, u.F, u.M;
+		// clang-format off
+		out <<   x.vx,
+		         x.vy,
+		         x.vz,
+		         x.p,
+		         x.q,
+		         x.r,
+		         x.phi,
+		         x.theta,
+		         u.F,
+		         u.M;
+		// clang-format on
 		return out;
 	}
 

@@ -6,7 +6,20 @@
 namespace qp
 {
 
+	/**
+	 * @brief Validates a quadratic-program decision dimension.
+	 *
+	 * @param[in] dimension Number of decision variables.
+	 * @return The validated dimension.
+	 */
 	std::size_t validate_dimension(std::size_t dimension);
+
+	/**
+	 * @brief Validates a quadratic problem against the solver dimension.
+	 *
+	 * @param[in] problem Quadratic problem to validate.
+	 * @param[in] dimension Expected number of decision variables.
+	 */
 	void validate_problem(const Problem& problem, std::size_t dimension);
 
 } // namespace qp

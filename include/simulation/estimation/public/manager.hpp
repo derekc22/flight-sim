@@ -13,6 +13,12 @@ namespace estimation
 		std::optional<LinearKalmanFilter> linear_kalman_filter;
 		std::optional<ExtendedKalmanFilter> extended_kalman_filter;
 
+		/**
+		 * @brief Advances the configured estimator and returns its state estimate.
+		 *
+		 * @param[in] input Measurement, trim, linearization, model, actuator, condition, and timing data.
+		 * @return Estimated rigid-body state.
+		 */
 		EstimationManagerOutput step(const EstimationManagerInput& input);
 	};
 

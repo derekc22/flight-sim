@@ -26,6 +26,12 @@ namespace runner
 		std::chrono::steady_clock::time_point next;
 
 		Scheduler(const ModuleRates& module_rates, int tf);
+
+		/**
+		 * @brief Advances module tick accumulators and wall-clock timing by one step.
+		 *
+		 * @param[in] input Current flight mode and timing options.
+		 */
 		void step(const SchedulerInput& input);
 	};
 

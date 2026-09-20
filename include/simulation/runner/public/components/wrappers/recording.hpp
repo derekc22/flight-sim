@@ -15,7 +15,19 @@ namespace runner
 		std::optional<io::AnalysisRecorder> analysis_recorder;
 
 		RecordingWrapper(const CLIOptions& cli_options, const JSONOptions& json_options);
+
+		/**
+		 * @brief Records and logs the current simulation context.
+		 *
+		 * @param[in,out] input Step index, simulation data, scheduler, and logging flags.
+		 */
 		void step(const RecordingWrapperInput& input);
+
+		/**
+		 * @brief Saves recorded outputs and configuration snapshots.
+		 *
+		 * @param[in] cli_options Output paths and enabled recorder options.
+		 */
 		void cleanup(const CLIOptions& cli_options);
 	};
 

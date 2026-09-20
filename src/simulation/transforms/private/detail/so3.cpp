@@ -19,7 +19,11 @@ namespace transforms
 		double phi)
 	{
 		Eigen::Matrix3d Rx;
-		Rx << 1, 0, 0, 0, util::cos(phi), -util::sin(phi), 0, util::sin(phi), util::cos(phi);
+		// clang-format off
+		Rx <<   1,               0,                0,
+		        0,  util::cos(phi),  -util::sin(phi),
+		        0,  util::sin(phi),   util::cos(phi);
+		// clang-format on
 		return Rx;
 	};
 
@@ -27,7 +31,11 @@ namespace transforms
 		double theta)
 	{
 		Eigen::Matrix3d Ry;
-		Ry << util::cos(theta), 0, util::sin(theta), 0, 1, 0, -util::sin(theta), 0, util::cos(theta);
+		// clang-format off
+		Ry <<    util::cos(theta),  0,  util::sin(theta),
+		                        0,  1,                 0,
+		        -util::sin(theta),  0,  util::cos(theta);
+		// clang-format on
 		return Ry;
 	};
 
@@ -35,7 +43,11 @@ namespace transforms
 		double psi)
 	{
 		Eigen::Matrix3d Rz;
-		Rz << util::cos(psi), -util::sin(psi), 0, util::sin(psi), util::cos(psi), 0, 0, 0, 1;
+		// clang-format off
+		Rz <<   util::cos(psi),  -util::sin(psi),  0,
+		        util::sin(psi),   util::cos(psi),  0,
+		                     0,                0,  1;
+		// clang-format on
 		return Rz;
 	};
 

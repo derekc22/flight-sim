@@ -185,6 +185,11 @@ namespace vehicles
 		std::optional<STABFrameFRDStepOptions> STABFrameFRDStepOpts;
 		std::optional<WINDFrameSTABStepOptions> WINDFrameSTABStepOpts;
 
+		/**
+		 * @brief Validates an aircraft frame-step request.
+		 *
+		 * @param[in] opts Aircraft frame-step options to validate.
+		 */
 		static void validate(const StepOptions& opts);
 	};
 
@@ -203,7 +208,18 @@ namespace vehicles
 		std::optional<geography::GeographicState> geo;
 		std::optional<aerodynamics::AerodynamicState> aero;
 
+		/**
+		 * @brief Validates unified frame-step options.
+		 *
+		 * @param[in] opts Unified frame-step options to validate.
+		 */
 		static void validate(const _StepOptions& opts);
+
+		/**
+		 * @brief Reports whether any unified frame-step field is populated.
+		 *
+		 * @return `true` when at least one field contains a value; otherwise `false`.
+		 */
 		explicit operator bool() const;
 	};
 

@@ -13,8 +13,11 @@ namespace dynamics
 		double phi)
 	{
 		Eigen::Matrix3d T_mat;
-		T_mat << 1.0, 0.0, -util::sin(theta), 0.0, util::cos(phi), util::sin(phi) * util::cos(theta), 0.0,
-			-util::sin(phi), util::cos(phi) * util::cos(theta);
+		// clang-format off
+		T_mat <<   1.0,              0.0,                  -util::sin(theta),
+		           0.0,   util::cos(phi),  util::sin(phi) * util::cos(theta),
+		           0.0,  -util::sin(phi),  util::cos(phi) * util::cos(theta);
+		// clang-format on
 		return T_mat;
 	}
 
@@ -53,8 +56,12 @@ namespace dynamics
 		const AngularVelocity& wB_BI)
 	{
 		Eigen::Matrix<double, 4, 3> Q;
-		Q << qIB.data.x(), qIB.data.y(), qIB.data.z(), -qIB.data.w(), -qIB.data.z(), qIB.data.y(), qIB.data.z(),
-			-qIB.data.w(), -qIB.data.x(), -qIB.data.y(), qIB.data.x(), -qIB.data.w();
+		// clang-format off
+		Q <<    qIB.data.x(),   qIB.data.y(),   qIB.data.z(),
+		       -qIB.data.w(),  -qIB.data.z(),   qIB.data.y(),
+		        qIB.data.z(),  -qIB.data.w(),  -qIB.data.x(),
+		       -qIB.data.y(),   qIB.data.x(),  -qIB.data.w();
+		// clang-format on
 		Eigen::Vector4d qIB_dot = 0.5 * Q * wB_BI.data;
 		return {Eigen::Quaterniond{qIB_dot[0], qIB_dot[1], qIB_dot[2], qIB_dot[3]}};
 	}
@@ -64,9 +71,12 @@ namespace dynamics
 		const AngularVelocity& wB_BI)
 	{
 		Eigen::Matrix4d W;
-		W << 0.0, wB_BI.data.x(), wB_BI.data.y(), wB_BI.data.z(), -wB_BI.data.x(), 0.0, wB_BI.data.z(), -wB_BI.data.y(),
-			-wB_BI.data.y(), -wB_BI.data.z(), 0.0, wB_BI.data.x(), -wB_BI.data.z(), wB_BI.data.y(), -wB_BI.data.x(),
-			0.0;
+		// clang-format off
+		W <<               0.0,   wB_BI.data.x(),   wB_BI.data.y(),   wB_BI.data.z(),
+		       -wB_BI.data.x(),              0.0,   wB_BI.data.z(),  -wB_BI.data.y(),
+		       -wB_BI.data.y(),  -wB_BI.data.z(),              0.0,   wB_BI.data.x(),
+		       -wB_BI.data.z(),   wB_BI.data.y(),  -wB_BI.data.x(),              0.0;
+		// clang-format on
 		Eigen::Vector4d qIB_data{qIB.data.w(), qIB.data.x(), qIB.data.y(), qIB.data.z()};
 		Eigen::Vector4d qIB_dot = 0.5 * W * qIB_data;
 		return {Eigen::Quaterniond{qIB_dot[0], qIB_dot[1], qIB_dot[2], qIB_dot[3]}};
