@@ -54,6 +54,7 @@ namespace trim
 
 		const actuators::ActuatorLimitsVector actuator_limits =
 			actuators::unpack_actuator_limits(model.actuator_limits);
+
 		xu.tail<constants::nu>() =
 			xu.tail<constants::nu>().cwiseMax(actuator_limits.col(0)).cwiseMin(actuator_limits.col(1));
 
@@ -78,6 +79,7 @@ namespace trim
 
 			const TrimResidualJacobian jac_raw =
 				compute_trim_residual_jac(xu, model, problem.target, problem.conditions);
+
 			const TrimResidualJacobian jac = weights.asDiagonal() * jac_raw;
 
 			const constants::MatrixX_T<double, constants::nxu, constants::nxu> hess =
@@ -87,8 +89,10 @@ namespace trim
 
 			constants::MatrixX_T<double, constants::nxu, 1> lower =
 				constants::MatrixX_T<double, constants::nxu, 1>::Constant(-std::numeric_limits<double>::infinity());
+
 			constants::MatrixX_T<double, constants::nxu, 1> upper =
 				constants::MatrixX_T<double, constants::nxu, 1>::Constant(std::numeric_limits<double>::infinity());
+
 			lower.tail<constants::nu>() = actuator_limits.col(0) - xu.tail<constants::nu>();
 			upper.tail<constants::nu>() = actuator_limits.col(1) - xu.tail<constants::nu>();
 
@@ -120,8 +124,10 @@ namespace trim
 
 			while (step_scale >= options.min_step_scale) {
 				const operating::StateInputVector_T<double> xu_trial = xu + step_scale * step;
+
 				const TrimResidualVector_T<double> residual_trial =
 					compute_trim_residual_vector_T<double>(xu_trial, model, problem.target, problem.conditions);
+
 				const double weighted_residual_trial_norm_2 = weights.cwiseProduct(residual_trial).norm();
 
 				if (weighted_residual_trial_norm_2 < weighted_residual_norm_2) {
