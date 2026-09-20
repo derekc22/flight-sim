@@ -61,7 +61,7 @@ namespace trim
 		TrimResidualVector_T<double> residual =
 			compute_trim_residual_vector_T<double>(xu, model, problem.target, problem.conditions);
 
-		const constants::MatrixX_T<double, constants::nr, 1> weights = fetch_trim_residual_weights(options);
+		const TrimResidualWeights weights = fetch_trim_residual_weights(options);
 		TrimResidualVector_T<double> weighted_residual = weights.cwiseProduct(residual);
 
 		double damping = options.initial_damping;
@@ -82,16 +82,13 @@ namespace trim
 
 			const TrimResidualJacobian jac = weights.asDiagonal() * jac_raw;
 
-			const constants::MatrixX_T<double, constants::nxu, constants::nxu> hess =
-				jac.transpose() * jac + damping * constants::I_T<double, constants::nxu>;
+			const TrimHessian hess = jac.transpose() * jac + damping * constants::I_T<double, constants::nxu>;
 
-			const constants::MatrixX_T<double, constants::nxu, 1> grad = jac.transpose() * weighted_residual;
+			const TrimGradient grad = jac.transpose() * weighted_residual;
 
-			constants::MatrixX_T<double, constants::nxu, 1> lower =
-				constants::MatrixX_T<double, constants::nxu, 1>::Constant(-std::numeric_limits<double>::infinity());
+			TrimStepVector lower = TrimStepVector::Constant(-std::numeric_limits<double>::infinity());
 
-			constants::MatrixX_T<double, constants::nxu, 1> upper =
-				constants::MatrixX_T<double, constants::nxu, 1>::Constant(std::numeric_limits<double>::infinity());
+			TrimStepVector upper = TrimStepVector::Constant(std::numeric_limits<double>::infinity());
 
 			lower.tail<constants::nu>() = actuator_limits.col(0) - xu.tail<constants::nu>();
 			upper.tail<constants::nu>() = actuator_limits.col(1) - xu.tail<constants::nu>();
@@ -106,7 +103,7 @@ namespace trim
 				break;
 			}
 
-			const constants::MatrixX_T<double, constants::nxu, 1> step = step_solution.x;
+			const TrimStepVector step = step_solution.x;
 
 			if (step.norm() <= options.step_tolerance) {
 				return build_trim_solution(xu,

@@ -13,6 +13,10 @@
 
 namespace estimation
 {
+	using StateEstimateErrorCovariance = constants::MatrixX_T<double, constants::nx, constants::nx>;
+	using MeasurementNoiseCovariance = constants::MatrixX_T<double, constants::nx, constants::nx>;
+	using ProcessNoiseCovariance = constants::MatrixX_T<double, constants::nx, constants::nx>;
+	using KalmanGain = constants::MatrixX_T<double, constants::nx, constants::nx>;
 
 	enum class EstimatorType {
 		None,
@@ -35,14 +39,14 @@ namespace estimation
 	};
 
 	struct KalmanState {
-		dynamics::StateVector_T<double> zt;							   // state estimate
-		constants::MatrixX_T<double, constants::nx, constants::nx> Pt; // state estimate error covariance matrix
+		dynamics::StateVector_T<double> zt; // state estimate
+		StateEstimateErrorCovariance Pt;	// state estimate error covariance matrix
 	};
 
 	struct KalmanFilterParameters {
-		constants::MatrixX_T<double, constants::nx, constants::nx> P0; // initial state estimate error covariance matrix
-		constants::MatrixX_T<double, constants::nx, constants::nx> Q;  // measurement noise covariance matrix
-		constants::MatrixX_T<double, constants::nx, constants::nx> R;  // process noise covariance matrix
+		StateEstimateErrorCovariance P0; // initial state estimate error covariance matrix
+		MeasurementNoiseCovariance Q;	 // measurement noise covariance matrix
+		ProcessNoiseCovariance R;		 // process noise covariance matrix
 	};
 
 	struct LinearKalmanFilterParameters : KalmanFilterParameters {};

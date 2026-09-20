@@ -1,5 +1,6 @@
 #pragma once
 #include "simulation/actuators/public/data/helpers.hpp"
+#include "simulation/allocator/private/data/types.hpp"
 #include "simulation/constants/public/dimensions.hpp"
 #include "simulation/constants/public/linalg.hpp"
 #include "simulation/control/public/data/types.hpp"
@@ -23,8 +24,8 @@ namespace allocator
 	 * @return Constrained actuator input, or @p u_0 if the solver fails.
 	 */
 	control::ControlOutput solve_qp_constrained(qp::Solver& solver,
-		const constants::MatrixX_T<double, constants::nu, constants::nu>& hessian,
-		const constants::MatrixX_T<double, constants::nu, 1>& gradient,
+		const AllocatorHessian& hessian,
+		const AllocatorGradient& gradient,
 		const actuators::ActuatorInputsVector_T<double>& u_0,
 		const actuators::ActuatorInputsVector_T<double>& actuator_target,
 		const actuators::ActuatorLimitsVector& limits,
@@ -41,9 +42,8 @@ namespace allocator
 	 * @param[in] actuator_mask Mask identifying actuators available to the allocator.
 	 * @return Unconstrained actuator input for active, nonfixed actuators.
 	 */
-	control::ControlOutput solve_qp_unconstrained(
-		const constants::MatrixX_T<double, constants::nu, constants::nu>& hessian,
-		const constants::MatrixX_T<double, constants::nu, 1>& gradient,
+	control::ControlOutput solve_qp_unconstrained(const AllocatorHessian& hessian,
+		const AllocatorGradient& gradient,
 		const actuators::ActuatorInputsVector_T<double>& u_0,
 		const actuators::ActuatorInputsVector_T<double>& actuator_target,
 		const actuators::ActuatorLimitsVector& limits,

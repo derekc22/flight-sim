@@ -8,10 +8,10 @@
 namespace trim
 {
 
-	constants::MatrixX_T<double, constants::nr, 1> fetch_trim_residual_weights(
+	TrimResidualWeights fetch_trim_residual_weights(
 		const TrimSolveOptions& options)
 	{
-		constants::MatrixX_T<double, constants::nr, 1> w;
+		TrimResidualWeights w;
 		// clang-format off
 		w <<   1.0 / options.linear_accel_scale,
 		       1.0 / options.linear_accel_scale,

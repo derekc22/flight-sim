@@ -45,10 +45,8 @@ namespace allocator
 			}
 		}
 
-		constants::MatrixX_T<double, constants::nu, constants::nu> trim_hessian =
-			constants::MatrixX_T<double, constants::nu, constants::nu>::Zero();
-		constants::MatrixX_T<double, constants::nu, 1> trim_gradient =
-			constants::MatrixX_T<double, constants::nu, 1>::Zero();
+		AllocatorHessian trim_hessian = AllocatorHessian::Zero();
+		AllocatorGradient trim_gradient = AllocatorGradient::Zero();
 		actuators::ActuatorInputsVector_T<double> actuator_target = u_0;
 		if (input.u_preferred.has_value()) {
 			const actuators::ActuatorInputsVector_T<double> u_preferred =
@@ -58,9 +56,8 @@ namespace allocator
 			actuator_target = u_preferred;
 		}
 
-		const constants::MatrixX_T<double, constants::nu, constants::nu> hessian =
-			E_active.transpose() * Q * E_active + R + trim_hessian;
-		const constants::MatrixX_T<double, constants::nu, 1> gradient = -E_active.transpose() * Q * err + trim_gradient;
+		const AllocatorHessian hessian = E_active.transpose() * Q * E_active + R + trim_hessian;
+		const AllocatorGradient gradient = -E_active.transpose() * Q * err + trim_gradient;
 		const actuators::ActuatorLimitsVector limits = actuators::unpack_actuator_limits(input.model.actuator_limits);
 
 		control::ControlOutput u_constrained =

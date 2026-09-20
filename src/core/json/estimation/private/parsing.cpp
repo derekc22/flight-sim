@@ -16,9 +16,9 @@
 namespace json
 {
 
-	std::tuple<constants::MatrixX_T<double, constants::nx, constants::nx>,
-		constants::MatrixX_T<double, constants::nx, constants::nx>,
-		constants::MatrixX_T<double, constants::nx, constants::nx>>
+	std::tuple<estimation::StateEstimateErrorCovariance,
+		estimation::MeasurementNoiseCovariance,
+		estimation::ProcessNoiseCovariance>
 	parse_kalman_filter_parameters(
 		const nlohmann::json& estimator_json)
 	{

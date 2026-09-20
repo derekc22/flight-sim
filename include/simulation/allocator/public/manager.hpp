@@ -8,8 +8,8 @@ namespace allocator
 {
 
 	struct AllocatorManager {
-		constants::MatrixX_T<double, constants::nv, constants::nv> Q;
-		constants::MatrixX_T<double, constants::nu, constants::nu> R;
+		AllocationErrorWeight Q;
+		ActuatorEffortWeight R;
 		qp::Solver solver{constants::nu};
 
 		/**

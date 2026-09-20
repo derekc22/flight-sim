@@ -42,8 +42,7 @@ namespace linearization
 
 		CppAD::ADFun<double> f(xu_tracked, x_dot_cppad); // end of autodiff tracking
 
-		const constants::MatrixX_T<double, constants::nx, constants::nxu> jac_full =
-			autodiff::compute_jac<constants::nx, constants::nxu>(f, xu);
+		const FullStateInputJacobian jac_full = autodiff::compute_jac<constants::nx, constants::nxu>(f, xu);
 
 		LocalLinearization out;
 		out.A = jac_full.leftCols<constants::nx>();
@@ -77,7 +76,7 @@ namespace linearization
 
 		CppAD::ADFun<double> f(xu_virtual_tracked, x_dot_cppad); // end of autodiff tracking
 
-		const constants::MatrixX_T<double, constants::nx, constants::nxv> jac_full =
+		const FullVirtualStateInputJacobian jac_full =
 			autodiff::compute_jac<constants::nx, constants::nxv>(f, xu_virtual);
 
 		VirtualLocalLinearization out;

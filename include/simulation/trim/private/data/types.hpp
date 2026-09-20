@@ -12,6 +12,10 @@ namespace trim
 	template <typename T> using TrimResidualVector_T = constants::MatrixX_T<T, constants::nr, 1>;
 
 	using TrimResidualJacobian = constants::MatrixX_T<double, constants::nr, constants::nxu>;
+	using TrimStepVector = constants::MatrixX_T<double, constants::nxu, 1>;
+	using TrimHessian = constants::MatrixX_T<double, constants::nxu, constants::nxu>;
+	using TrimGradient = constants::MatrixX_T<double, constants::nxu, 1>;
+	using TrimResidualWeights = constants::MatrixX_T<double, constants::nr, 1>;
 
 	struct TrimTarget {
 		double beta = 0.0;
