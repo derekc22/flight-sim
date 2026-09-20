@@ -34,11 +34,11 @@ namespace estimation
 		/**
 		 * @brief Corrects the predicted deviation state with a measurement.
 		 *
-		 * @param[in] C Output Jacobian mapping the state estimate to the measurement.
 		 * @param[in] yt Measured state deviation from the operating point.
+		 * @param[in] C Output Jacobian mapping the state estimate to the measurement.
 		 * @return Corrected deviation-state estimate and error covariance.
 		 */
-		KalmanState correct(const linearization::OutputJacobian& C, const dynamics::StateVector_T<double>& yt);
+		KalmanState correct(const dynamics::StateVector_T<double>& yt, const linearization::OutputJacobian& C);
 	};
 
 } // namespace estimation

@@ -2,6 +2,8 @@
 
 #include "simulation/actuators/public/data/helpers.hpp"
 #include "simulation/autodiff/public/detail/evaluation.hpp"
+#include "simulation/constants/public/dimensions.hpp"
+#include "simulation/constants/public/linalg.hpp"
 #include "simulation/dynamics/public/data/helpers.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/estimation/public/data/helpers.hpp"
@@ -86,7 +88,7 @@ namespace estimation
 
 		dynamics::StateVector_T<double> zt = pred.zt + Kt * Lt;
 
-		Eigen::MatrixXd I = Eigen::MatrixXd::Identity(pred.Pt.rows(), pred.Pt.cols());
+		Eigen::MatrixXd I = constants::I_T<double, constants::state_dim>;
 
 		Eigen::MatrixXd Pt = (I - Kt * Ht) * pred.Pt * (I - Kt * Ht).transpose() + Kt * params.Q * Kt.transpose();
 

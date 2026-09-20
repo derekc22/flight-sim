@@ -26,8 +26,9 @@ namespace avionics
 
 		integral += err * dt;
 		dynamics::AngularVelocity wB_BI_corrected{wB_BI.data + Kp * err + Ki * integral};
+		dynamics::OrientationQuaternion qIB_corrected = integrators::quat_kin(prev_qIB, wB_BI_corrected, dt);
 
-		return {integrators::quat_kin(prev_qIB, wB_BI_corrected, dt)};
+		return {qIB_corrected};
 	}
 
 } // namespace avionics

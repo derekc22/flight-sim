@@ -1,6 +1,8 @@
 #include "simulation/estimation/public/components/lkf.hpp"
 
 #include "simulation/actuators/public/data/helpers.hpp"
+#include "simulation/constants/public/dimensions.hpp"
+#include "simulation/constants/public/linalg.hpp"
 #include "simulation/dynamics/public/data/helpers.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/estimation/public/data/helpers.hpp"
@@ -34,7 +36,7 @@ namespace estimation
 			state = KalmanState{.zt = yt_deviation, .Pt = params.P0};
 		} else {
 			state = predict(lin_sol_k, ut_1_deviation);
-			state = correct(lin_sol_k.C, yt_deviation);
+			state = correct(yt_deviation, lin_sol_k.C);
 		}
 
 		dynamics::StateVector_T<double> x_trim = dynamics::unpack_state_T(input.operating_point.state);
@@ -60,8 +62,8 @@ namespace estimation
 	}
 
 	KalmanState LinearKalmanFilter::correct(
-		const linearization::OutputJacobian& C,
-		const dynamics::StateVector_T<double>& yt)
+		const dynamics::StateVector_T<double>& yt,
+		const linearization::OutputJacobian& C)
 	{
 		KalmanState pred = state.value();
 
@@ -73,9 +75,9 @@ namespace estimation
 
 		dynamics::StateVector_T<double> zt = pred.zt + Kt * Lt;
 
-		Eigen::MatrixXd Inxn = Eigen::MatrixXd::Identity(pred.Pt.rows(), pred.Pt.cols());
+		Eigen::MatrixXd I = constants::I_T<double, constants::state_dim>;
 
-		Eigen::MatrixXd Pt = (Inxn - Kt * C) * pred.Pt * (Inxn - Kt * C).transpose() + Kt * params.Q * Kt.transpose();
+		Eigen::MatrixXd Pt = (I - Kt * C) * pred.Pt * (I - Kt * C).transpose() + Kt * params.Q * Kt.transpose();
 
 		return {.zt = zt, .Pt = Pt};
 	}
