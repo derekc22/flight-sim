@@ -38,7 +38,9 @@ brew install pkgconf eigen cppad nlohmann-json slicot gcc googletest opencv sdl3
 - `plot/` contains plotting implementations
 - `analysis/` contains post-run analysis implementations
 - `scripts/bin/test.sh` runs unit tests
-- `.env` stores local machine paths for the repository and FlightGear
+- `.env` sets the project root from the working directory and stores the local FlightGear path
+
+Run project commands from the repository root.
 
 ## Setup
 
@@ -47,9 +49,7 @@ Enable the repository-managed pre-commit hook to format C++ files automatically:
 git config core.hooksPath .githooks
 ```
 
-Update the following environment variables in `.env` with the corresponding paths on your machine:
-- `PROJ_PATH`: Project root
-- `FG_PATH`: FlightGear executable
+Update `FG_PATH` in `.env` with the FlightGear executable path on your machine. `PROJ_PATH` is set automatically from the repository root.
 
 Customize the following JSON configuration file paths in `config/run.json`:
 - `initialization_config`: Initial conditions

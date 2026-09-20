@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-PROJ_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source .env
 
 cd "$PROJ_PATH"
 
