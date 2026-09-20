@@ -13,15 +13,15 @@ namespace allocator
 
 	control::ControlOutput solve_qp_constrained(
 		qp::Solver& solver,
-		const constants::MatrixX_T<double, constants::input_dim, constants::input_dim>& hessian,
-		const actuators::ActuatorInputsVector_T<double>& gradient,
+		const constants::MatrixX_T<double, constants::nu, constants::nu>& hessian,
+		const constants::MatrixX_T<double, constants::nu, 1>& gradient,
 		const actuators::ActuatorInputsVector_T<double>& u_0,
 		const actuators::ActuatorInputsVector_T<double>& actuator_target,
 		const actuators::ActuatorLimitsVector& limits,
-		const std::array<bool, constants::input_dim>& actuator_mask)
+		const std::array<bool, constants::nu>& actuator_mask)
 	{
-		Eigen::VectorXd lower = limits.col(0) - u_0;
-		Eigen::VectorXd upper = limits.col(1) - u_0;
+		constants::MatrixX_T<double, constants::nu, 1> lower = limits.col(0) - u_0;
+		constants::MatrixX_T<double, constants::nu, 1> upper = limits.col(1) - u_0;
 
 		for (Eigen::Index i = 0; i < lower.rows(); ++i) {
 			if (!actuator_mask[i]) {
@@ -46,15 +46,15 @@ namespace allocator
 	}
 
 	control::ControlOutput solve_qp_unconstrained(
-		const constants::MatrixX_T<double, constants::input_dim, constants::input_dim>& hessian,
-		const actuators::ActuatorInputsVector_T<double>& gradient,
+		const constants::MatrixX_T<double, constants::nu, constants::nu>& hessian,
+		const constants::MatrixX_T<double, constants::nu, 1>& gradient,
 		const actuators::ActuatorInputsVector_T<double>& u_0,
 		const actuators::ActuatorInputsVector_T<double>& actuator_target,
 		const actuators::ActuatorLimitsVector& limits,
-		const std::array<bool, constants::input_dim>& actuator_mask)
+		const std::array<bool, constants::nu>& actuator_mask)
 	{
 		std::vector<Eigen::Index> free_indices;
-		actuators::ActuatorInputsVector_T<double> x = actuators::ActuatorInputsVector_T<double>::Zero();
+		constants::MatrixX_T<double, constants::nu, 1> x = constants::MatrixX_T<double, constants::nu, 1>::Zero();
 
 		for (Eigen::Index i = 0; i < x.rows(); ++i) {
 			if (std::abs(limits(i, 1) - limits(i, 0)) <= constants::eps) {

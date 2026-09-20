@@ -54,19 +54,19 @@ namespace trim
 
 		const actuators::ActuatorLimitsVector actuator_limits =
 			actuators::unpack_actuator_limits(model.actuator_limits);
-		xu.tail<constants::input_dim>() =
-			xu.tail<constants::input_dim>().cwiseMax(actuator_limits.col(0)).cwiseMin(actuator_limits.col(1));
+		xu.tail<constants::nu>() =
+			xu.tail<constants::nu>().cwiseMax(actuator_limits.col(0)).cwiseMin(actuator_limits.col(1));
 
 		TrimResidualVector_T<double> residual =
 			compute_trim_residual_vector_T<double>(xu, model, problem.target, problem.conditions);
 
-		const TrimResidualVector_T<double> weights = fetch_trim_residual_weights(options);
+		const constants::MatrixX_T<double, constants::nr, 1> weights = fetch_trim_residual_weights(options);
 		TrimResidualVector_T<double> weighted_residual = weights.cwiseProduct(residual);
 
 		double damping = options.initial_damping;
 		std::size_t iterations_completed = 0;
 
-		qp::Solver solver(constants::state_input_dim);
+		qp::Solver solver(constants::nxu);
 
 		for (std::size_t iteration = 0; iteration < options.max_iterations; ++iteration) {
 			iterations_completed = iteration;
@@ -80,17 +80,17 @@ namespace trim
 				compute_trim_residual_jac(xu, model, problem.target, problem.conditions);
 			const TrimResidualJacobian jac = weights.asDiagonal() * jac_raw;
 
-			const constants::MatrixX_T<double, constants::state_input_dim, constants::state_input_dim> hess =
-				jac.transpose() * jac + damping * constants::I_T<double, constants::state_input_dim>;
+			const constants::MatrixX_T<double, constants::nxu, constants::nxu> hess =
+				jac.transpose() * jac + damping * constants::I_T<double, constants::nxu>;
 
-			const operating::StateInputVector_T<double> grad = jac.transpose() * weighted_residual;
+			const constants::MatrixX_T<double, constants::nxu, 1> grad = jac.transpose() * weighted_residual;
 
-			Eigen::VectorXd lower =
-				Eigen::VectorXd::Constant(constants::state_input_dim, -std::numeric_limits<double>::infinity());
-			Eigen::VectorXd upper =
-				Eigen::VectorXd::Constant(constants::state_input_dim, std::numeric_limits<double>::infinity());
-			lower.tail<constants::input_dim>() = actuator_limits.col(0) - xu.tail<constants::input_dim>();
-			upper.tail<constants::input_dim>() = actuator_limits.col(1) - xu.tail<constants::input_dim>();
+			constants::MatrixX_T<double, constants::nxu, 1> lower =
+				constants::MatrixX_T<double, constants::nxu, 1>::Constant(-std::numeric_limits<double>::infinity());
+			constants::MatrixX_T<double, constants::nxu, 1> upper =
+				constants::MatrixX_T<double, constants::nxu, 1>::Constant(std::numeric_limits<double>::infinity());
+			lower.tail<constants::nu>() = actuator_limits.col(0) - xu.tail<constants::nu>();
+			upper.tail<constants::nu>() = actuator_limits.col(1) - xu.tail<constants::nu>();
 
 			const qp::Problem step_problem{.hessian = hess, .gradient = grad, .lower = lower, .upper = upper};
 
@@ -102,7 +102,7 @@ namespace trim
 				break;
 			}
 
-			const operating::StateInputVector_T<double> step = step_solution.x;
+			const constants::MatrixX_T<double, constants::nxu, 1> step = step_solution.x;
 
 			if (step.norm() <= options.step_tolerance) {
 				return build_trim_solution(xu,

@@ -55,8 +55,8 @@ namespace runner
 		allocator::AllocatorManager& allocator_manager = input.aircraft.allocator_manager;
 
 		// initialize active mask
-		std::array<bool, constants::virtual_input_dim> active_mask;
-		std::array<bool, constants::input_dim> actuator_mask;
+		std::array<bool, constants::nv> active_mask;
+		std::array<bool, constants::nu> actuator_mask;
 
 		// initialize guidance setpoint
 		guidance::GuidanceSetpoint setpoint{};

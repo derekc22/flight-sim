@@ -5,6 +5,6 @@
 namespace allocator
 {
 
-	using EffectivenessMatrix = constants::MatrixX_T<double, constants::virtual_input_dim, constants::input_dim>;
+	using EffectivenessMatrix = constants::MatrixX_T<double, constants::nv, constants::nu>;
 
 }

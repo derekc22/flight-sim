@@ -27,7 +27,7 @@ namespace trim
 			autodiff::start_autodiff_tracking(xu); // start of autodiff tracking
 
 		const operating::StateInputVector_T<CppAD::AD<double>> xu_eigen =
-			autodiff::eigen_vector_from_cppad_vector<CppAD::AD<double>, constants::state_input_dim>(xu_tracked);
+			autodiff::eigen_vector_from_cppad_vector<CppAD::AD<double>, constants::nxu>(xu_tracked);
 
 		const TrimResidualVector_T<CppAD::AD<double>> residual_tracked =
 			compute_trim_residual_vector_T<CppAD::AD<double>>(xu_eigen, model, target, conditions);
@@ -36,7 +36,7 @@ namespace trim
 
 		CppAD::ADFun<double> f(xu_tracked, residual_tracked_cppad); // end of autodiff tracking
 
-		return autodiff::compute_jac<trim_residual_dim, constants::state_input_dim>(f, xu);
+		return autodiff::compute_jac<constants::nr, constants::nxu>(f, xu);
 	}
 
 } // namespace trim

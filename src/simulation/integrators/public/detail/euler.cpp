@@ -3,7 +3,6 @@
 #include "simulation/constants/public/scalars.hpp"
 #include "simulation/dynamics/public/detail/derivatives.hpp"
 #include "simulation/integrators/public/detail/euler.hpp"
-#include "simulation/structural/public/data/types.hpp"
 #include "simulation/transforms/public/detail/s3.hpp"
 #include "simulation/util/public/trig.hpp"
 
@@ -16,7 +15,7 @@ namespace integrators
 		const dynamics::Position& pt,
 		const dynamics::TranslationalVelocity& vt,
 		const dynamics::TranslationalAcceleration& at,
-		double dt)
+		const double dt)
 	{
 		const Eigen::Vector3d pt1 = pt.data + vt.data * dt + 0.5 * at.data * (dt * dt);
 
@@ -26,7 +25,7 @@ namespace integrators
 	dynamics::OrientationQuaternion quat_kin(
 		const dynamics::OrientationQuaternion& qIB_t,
 		const dynamics::AngularVelocity& wB_BI_t,
-		double dt)
+		const double dt)
 	{
 		const Eigen::Vector3d w = wB_BI_t.data;
 		const double Omega = w.norm();
@@ -48,7 +47,7 @@ namespace integrators
 	dynamics::TranslationalVelocity trans_kin_vel(
 		const dynamics::TranslationalVelocity& vt,
 		const dynamics::TranslationalAcceleration& at,
-		double dt)
+		const double dt)
 	{
 		const Eigen::Vector3d vt1 = vt.data + at.data * dt;
 
@@ -60,7 +59,7 @@ namespace integrators
 		const dynamics::Mass& mass,
 		const dynamics::InertiaTensor& JB_G,
 		const dynamics::Wrench& WB_net_t,
-		double dt)
+		const double dt)
 	{
 
 		// ddtB_vB_BI_t is the body derivative of body-expressed velocity,

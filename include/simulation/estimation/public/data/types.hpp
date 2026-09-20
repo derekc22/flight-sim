@@ -1,6 +1,8 @@
 #pragma once
 #include "simulation/actuators/public/data/types.hpp"
 #include "simulation/autodiff/public/data/types.hpp"
+#include "simulation/constants/public/dimensions.hpp"
+#include "simulation/constants/public/linalg.hpp"
 #include "simulation/control/public/data/types.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/linearization/public/data/types.hpp"
@@ -33,14 +35,14 @@ namespace estimation
 	};
 
 	struct KalmanState {
-		dynamics::StateVector_T<double> zt; // state estimate
-		Eigen::MatrixXd Pt;					// state estimate error covariance matrix
+		dynamics::StateVector_T<double> zt;							   // state estimate
+		constants::MatrixX_T<double, constants::nx, constants::nx> Pt; // state estimate error covariance matrix
 	};
 
 	struct KalmanFilterParameters {
-		Eigen::MatrixXd P0; // initial state estimate error covariance matrix
-		Eigen::MatrixXd Q;	// measurement noise covariance matrix
-		Eigen::MatrixXd R;	// process noise covariance matrix
+		constants::MatrixX_T<double, constants::nx, constants::nx> P0; // initial state estimate error covariance matrix
+		constants::MatrixX_T<double, constants::nx, constants::nx> Q;  // measurement noise covariance matrix
+		constants::MatrixX_T<double, constants::nx, constants::nx> R;  // process noise covariance matrix
 	};
 
 	struct LinearKalmanFilterParameters : KalmanFilterParameters {};

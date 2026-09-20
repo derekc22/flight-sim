@@ -19,12 +19,9 @@ namespace control
 		const LinearQuadraticIntegratorParameters& params)
 		: LinearQuadraticRegulator(params)
 	{
-		size_t n = constants::state_dim;
-		size_t i = integrated_state_dim;
-
-		Eigen::MatrixXd Q_aug = Eigen::MatrixXd::Zero(n + i, n + i);
-		Q_aug.block(0, 0, n, n) = params.Q;
-		Q_aug.block(n, n, i, i) = params.Qi;
+		Eigen::MatrixXd Q_aug = Eigen::MatrixXd::Zero(constants::nx + constants::nxi, constants::nx + constants::nxi);
+		Q_aug.block(0, 0, constants::nx, constants::nx) = params.Q;
+		Q_aug.block(constants::nx, constants::nx, constants::nxi, constants::nxi) = params.Qi;
 
 		policy = LinearQuadraticPolicy({
 			.Q = Q_aug,
@@ -58,22 +55,19 @@ namespace control
 		const LinearQuadraticControlInput& input,
 		const IntegratedStateVector& integral_new)
 	{
-		size_t n = constants::state_dim;
-		size_t m = constants::virtual_input_dim;
-		size_t i = integrated_state_dim;
-
-		Eigen::MatrixXd A_virtual_aug = Eigen::MatrixXd::Zero(n + i, n + i);
-		A_virtual_aug.block(0, 0, n, n) = input.virtual_linearization.A_virtual;
+		Eigen::MatrixXd A_virtual_aug =
+			Eigen::MatrixXd::Zero(constants::nx + constants::nxi, constants::nx + constants::nxi);
+		A_virtual_aug.block(0, 0, constants::nx, constants::nx) = input.virtual_linearization.A_virtual;
 
 		// Ci selects the integrated states phi, theta, r from the state vector for the LQI controller - it is not the canonical output matrix C
-		Eigen::MatrixXd Ci = Eigen::MatrixXd::Zero(integrated_state_dim, constants::state_dim);
+		Eigen::MatrixXd Ci = Eigen::MatrixXd::Zero(constants::nxi, constants::nx);
 		Ci(0, 6) = 1.0;
 		Ci(1, 7) = 1.0;
 		Ci(2, 5) = 1.0;
-		A_virtual_aug.block(n, 0, i, n) = -Ci;
+		A_virtual_aug.block(constants::nx, 0, constants::nxi, constants::nx) = -Ci;
 
-		Eigen::MatrixXd B_virtual_aug = Eigen::MatrixXd::Zero(n + i, m);
-		B_virtual_aug.block(0, 0, n, m) = input.virtual_linearization.B_virtual;
+		Eigen::MatrixXd B_virtual_aug = Eigen::MatrixXd::Zero(constants::nx + constants::nxi, constants::nv);
+		B_virtual_aug.block(0, 0, constants::nx, constants::nv) = input.virtual_linearization.B_virtual;
 
 		dynamics::StateVector_T<double> zt = dynamics::unpack_state(input.Zt);
 		dynamics::StateVector_T<double> zt_trim = dynamics::unpack_state_T(input.Z_sol_trim);

@@ -31,7 +31,7 @@ namespace analysis
 		const EigenAnalysis& eig)
 	{
 		std::ostringstream out;
-		for (int mode = 0; mode < constants::state_dim; ++mode) {
+		for (int mode = 0; mode < constants::nx; ++mode) {
 			out << "mode " << mode << ":\n";
 			out << "lambda: " << format_complex(eig.eigenvalues(mode)) << "\n";
 			out << "  vx: " << format_complex(eig.eigenvectors(0, mode)) << "\n";
@@ -42,7 +42,7 @@ namespace analysis
 			out << "  r: " << format_complex(eig.eigenvectors(5, mode)) << "\n";
 			out << "  phi: " << format_complex(eig.eigenvectors(6, mode)) << "\n";
 			out << "  theta: " << format_complex(eig.eigenvectors(7, mode)) << "\n";
-			if (mode + 1 < constants::state_dim)
+			if (mode + 1 < constants::nx)
 				out << "\n";
 		}
 		return out.str();

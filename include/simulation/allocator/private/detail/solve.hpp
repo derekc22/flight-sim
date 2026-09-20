@@ -23,12 +23,12 @@ namespace allocator
 	 * @return Constrained actuator input, or @p u_0 if the solver fails.
 	 */
 	control::ControlOutput solve_qp_constrained(qp::Solver& solver,
-		const constants::MatrixX_T<double, constants::input_dim, constants::input_dim>& hessian,
-		const actuators::ActuatorInputsVector_T<double>& gradient,
+		const constants::MatrixX_T<double, constants::nu, constants::nu>& hessian,
+		const constants::MatrixX_T<double, constants::nu, 1>& gradient,
 		const actuators::ActuatorInputsVector_T<double>& u_0,
 		const actuators::ActuatorInputsVector_T<double>& actuator_target,
 		const actuators::ActuatorLimitsVector& limits,
-		const std::array<bool, constants::input_dim>& actuator_mask);
+		const std::array<bool, constants::nu>& actuator_mask);
 
 	/**
 	 * @brief Solves the actuator-increment quadratic objective without active-actuator bounds.
@@ -42,11 +42,11 @@ namespace allocator
 	 * @return Unconstrained actuator input for active, nonfixed actuators.
 	 */
 	control::ControlOutput solve_qp_unconstrained(
-		const constants::MatrixX_T<double, constants::input_dim, constants::input_dim>& hessian,
-		const actuators::ActuatorInputsVector_T<double>& gradient,
+		const constants::MatrixX_T<double, constants::nu, constants::nu>& hessian,
+		const constants::MatrixX_T<double, constants::nu, 1>& gradient,
 		const actuators::ActuatorInputsVector_T<double>& u_0,
 		const actuators::ActuatorInputsVector_T<double>& actuator_target,
 		const actuators::ActuatorLimitsVector& limits,
-		const std::array<bool, constants::input_dim>& actuator_mask);
+		const std::array<bool, constants::nu>& actuator_mask);
 
 } // namespace allocator

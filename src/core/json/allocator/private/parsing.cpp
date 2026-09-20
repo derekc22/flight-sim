@@ -22,8 +22,8 @@ namespace json
 		Eigen::MatrixXd R = parse_MatrixXd(config.at("R"));
 
 		const std::string context = "json::parse_allocator_manager";
-		util::validate_shape(Q, constants::virtual_input_dim, constants::virtual_input_dim, context, "Q");
-		util::validate_shape(R, constants::input_dim, constants::input_dim, context, "R");
+		util::validate_shape(Q, constants::nv, constants::nv, context, "Q");
+		util::validate_shape(R, constants::nu, constants::nu, context, "R");
 
 		return {.Q = Q, .R = R};
 	}

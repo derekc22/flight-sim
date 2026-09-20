@@ -14,9 +14,9 @@ namespace actuators
 		Spoiler
 	};
 
-	template <typename T> using ActuatorInputsVector_T = constants::MatrixX_T<T, constants::input_dim, 1>;
+	template <typename T> using ActuatorInputsVector_T = constants::MatrixX_T<T, constants::nu, 1>;
 
-	using ActuatorLimitsVector = constants::MatrixX_T<double, constants::input_dim, 2>;
+	using ActuatorLimitsVector = constants::MatrixX_T<double, constants::nu, 2>;
 
 	struct FixedActuatorInputs {
 		double flap = 0.0;
@@ -61,8 +61,8 @@ namespace actuators
 		ActuatorInputs_T<double> u_actual;
 	};
 
-	using SurfaceActuatorInputsVector = constants::MatrixX_T<double, constants::full_surface_input_dim, 1>;
+	using SurfaceActuatorInputsVector = constants::MatrixX_T<double, constants::ns, 1>;
 
-	using PropulsorActuatorInputsVector = constants::MatrixX_T<double, constants::full_propulsor_input_dim, 1>;
+	using PropulsorActuatorInputsVector = constants::MatrixX_T<double, constants::np, 1>;
 
 } // namespace actuators

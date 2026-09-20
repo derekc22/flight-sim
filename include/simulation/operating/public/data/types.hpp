@@ -10,10 +10,9 @@
 namespace operating
 {
 
-	template <typename T> using StateInputVector_T = constants::MatrixX_T<T, constants::state_input_dim, 1>;
+	template <typename T> using StateInputVector_T = constants::MatrixX_T<T, constants::nxu, 1>;
 
-	template <typename T>
-	using VirtualStateInputVector_T = constants::MatrixX_T<T, constants::virtual_state_input_dim, 1>;
+	template <typename T> using VirtualStateInputVector_T = constants::MatrixX_T<T, constants::nxv, 1>;
 
 	struct OperatingConditions {
 		atmospheric::StaticAtmosphericState atm;

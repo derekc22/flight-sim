@@ -31,7 +31,7 @@ namespace allocator
 			autodiff::start_autodiff_tracking(u); // start of autodiff tracking
 
 		const actuators::ActuatorInputsVector_T<CppAD::AD<double>> u_eigen =
-			autodiff::eigen_vector_from_cppad_vector<CppAD::AD<double>, constants::input_dim>(u_tracked);
+			autodiff::eigen_vector_from_cppad_vector<CppAD::AD<double>, constants::nu>(u_tracked);
 
 		const dynamics::State_T<CppAD::AD<double>> xt = dynamics::pack_state_T(x_ad);
 		const actuators::ActuatorInputs_T<CppAD::AD<double>> ut = actuators::pack_actuator_inputs_T(u_eigen);
@@ -46,12 +46,12 @@ namespace allocator
 
 		CppAD::ADFun<double> f(u_tracked, W_net_cppad); // end of autodiff tracking
 
-		const constants::MatrixX_T<double, constants::virtual_input_dim, constants::input_dim> jac_full =
-			autodiff::compute_jac<constants::virtual_input_dim, constants::input_dim>(f, u);
+		const constants::MatrixX_T<double, constants::nv, constants::nu> jac_full =
+			autodiff::compute_jac<constants::nv, constants::nu>(f, u);
 
 		// evaluate W_net_vec
 		const dynamics::WrenchVector_T<double> W_net_vec_double =
-			autodiff::evaluate_tracked_vector<constants::virtual_input_dim, constants::input_dim>(f, u);
+			autodiff::evaluate_tracked_vector<constants::nv, constants::nu>(f, u);
 
 		return {jac_full, W_net_vec_double};
 	}

@@ -1,5 +1,7 @@
 #pragma once
 #include "simulation/autodiff/public/data/types.hpp"
+#include "simulation/constants/public/dimensions.hpp"
+#include "simulation/constants/public/linalg.hpp"
 #include "simulation/trim/private/data/types.hpp"
 #include "simulation/trim/public/data/types.hpp"
 
@@ -21,7 +23,7 @@ namespace trim
 	 * @param[in] options Solver options containing residual scales.
 	 * @return Residual weights in trim-residual vector order.
 	 */
-	TrimResidualVector_T<double> fetch_trim_residual_weights(const TrimSolveOptions& options);
+	constants::MatrixX_T<double, constants::nr, 1> fetch_trim_residual_weights(const TrimSolveOptions& options);
 
 	/**
 	 * @brief Builds a complete trim solution from the current solver state.

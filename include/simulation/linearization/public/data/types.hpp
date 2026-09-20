@@ -7,11 +7,11 @@
 namespace linearization
 {
 
-	using StateJacobian = constants::MatrixX_T<double, constants::state_dim, constants::state_dim>;
-	using InputJacobian = constants::MatrixX_T<double, constants::state_dim, constants::input_dim>;
+	using StateJacobian = constants::MatrixX_T<double, constants::nx, constants::nx>;
+	using InputJacobian = constants::MatrixX_T<double, constants::nx, constants::nu>;
 
-	using OutputJacobian = constants::MatrixX_T<double, constants::state_dim, constants::state_dim>;
-	using DirectFeedthroughJacobian = constants::MatrixX_T<double, constants::state_dim, constants::input_dim>;
+	using OutputJacobian = constants::MatrixX_T<double, constants::nx, constants::nx>;
+	using DirectFeedthroughJacobian = constants::MatrixX_T<double, constants::nx, constants::nu>;
 
 	struct LocalLinearization {
 		StateJacobian A = StateJacobian::Zero();
@@ -27,9 +27,8 @@ namespace linearization
 		DirectFeedthroughJacobian D = DirectFeedthroughJacobian::Zero();
 	};
 
-	using VirtualInputJacobian = constants::MatrixX_T<double, constants::state_dim, constants::virtual_input_dim>;
-	using VirtualDirectFeedthroughJacobian =
-		constants::MatrixX_T<double, constants::state_dim, constants::virtual_input_dim>;
+	using VirtualInputJacobian = constants::MatrixX_T<double, constants::nx, constants::nv>;
+	using VirtualDirectFeedthroughJacobian = constants::MatrixX_T<double, constants::nx, constants::nv>;
 
 	struct VirtualLocalLinearization {
 		StateJacobian A_virtual = StateJacobian::Zero();

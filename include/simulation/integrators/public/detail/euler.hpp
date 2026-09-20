@@ -16,7 +16,7 @@ namespace integrators
 	dynamics::Position trans_kin(const dynamics::Position& pt,
 		const dynamics::TranslationalVelocity& vt,
 		const dynamics::TranslationalAcceleration& at,
-		double dt);
+		const double dt);
 
 	/**
 	 * @brief Advances an inertial-to-body quaternion using constant body angular velocity.
@@ -27,7 +27,7 @@ namespace integrators
 	 * @return Inertial-to-body orientation quaternion after @p dt [-].
 	 */
 	dynamics::OrientationQuaternion
-	quat_kin(const dynamics::OrientationQuaternion& qIB_t, const dynamics::AngularVelocity& wB_BI_t, double dt);
+	quat_kin(const dynamics::OrientationQuaternion& qIB_t, const dynamics::AngularVelocity& wB_BI_t, const double dt);
 
 	/**
 	 * @brief Advances translational velocity using constant acceleration.
@@ -39,7 +39,7 @@ namespace integrators
 	 */
 	dynamics::TranslationalVelocity trans_kin_vel(const dynamics::TranslationalVelocity& xt_dot,
 		const dynamics::TranslationalAcceleration& xt_ddot,
-		double dt);
+		const double dt);
 
 	/**
 	 * @brief Advances a rigid-body state by one integration step.
@@ -55,6 +55,6 @@ namespace integrators
 		const dynamics::Mass& mass,
 		const dynamics::InertiaTensor& JB_G,
 		const dynamics::Wrench& WB_net_t,
-		double dt);
+		const double dt);
 
 } // namespace integrators
