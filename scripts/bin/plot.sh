@@ -7,8 +7,8 @@ CONDA_BASE_PATH=$(conda info --base)
 source "$CONDA_BASE_PATH/etc/profile.d/conda.sh"
 conda activate ame532
 
-PLOT_2D_PATH="$PROJ_PATH/scripts/lib/plot/plot_2d.py"
-PLOT_3D_PATH="$PROJ_PATH/scripts/lib/plot/plot_3d.py"
+PLOT_2D_PATH="$PROJ_PATH/plot/plot_2d.py"
+PLOT_3D_PATH="$PROJ_PATH/plot/plot_3d.py"
 
 if [ -z "$1" ]; then
 	echo "Usage: $0 <OUT_DIR>"
@@ -17,7 +17,7 @@ fi
 
 OUT_DIR="$1"
 DATA_DIR_PATH="$PROJ_PATH/results/$OUT_DIR/data"
-PLOT_DIR_PATH="$PROJ_PATH/results/$OUT_DIR/figures"
+PLOT_DIR_PATH="$PROJ_PATH/results/$OUT_DIR/figures/run"
 
 python "$PLOT_2D_PATH" -d "$DATA_DIR_PATH/p.csv" -s "$PLOT_DIR_PATH" \
 -l "x(t) [m]" "y(t) [m]" "z(t) [m]" \

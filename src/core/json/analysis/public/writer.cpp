@@ -10,7 +10,7 @@ namespace json
 {
 
 	void write_analysis_variables_to_json(
-		const io::MATLABContext& context,
+		const io::AnalysisExportContext& context,
 		const std::string& data_dir_path)
 	{
 		nlohmann::json variables = {
@@ -20,8 +20,6 @@ namespace json
 					{"hz", constants::hz},
 					{"control_hz", context.module_rates.control_hz},
 				}},
-			{"state_dim", context.state_dim},
-			{"input_dim", context.input_dim},
 			{"matrix_paths",
 				{
 					{"A", context.A_csv},
