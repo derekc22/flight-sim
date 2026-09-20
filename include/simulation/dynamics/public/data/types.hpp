@@ -327,11 +327,11 @@ namespace dynamics
 		Wrench net;
 	};
 
-	template <typename T> using StateVector_T = constants::MatrixX_T<T, constants::state_dim, 1>;
+	template <typename T> using StateVector_T = constants::MatrixX_T<T, constants::nx, 1>;
 
-	template <typename T> using StateDotVector_T = constants::MatrixX_T<T, constants::state_dim, 1>;
+	template <typename T> using StateDotVector_T = constants::MatrixX_T<T, constants::nx, 1>;
 
-	template <typename T> using WrenchVector_T = constants::MatrixX_T<T, constants::virtual_input_dim, 1>;
+	template <typename T> using WrenchVector_T = constants::MatrixX_T<T, constants::nv, 1>;
 
 	template <typename T> struct State_T {
 		T vx = T(0.0);

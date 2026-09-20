@@ -3,6 +3,7 @@
 #include "core/json/estimation/private/validation.hpp"
 #include "core/json/public/data/helpers.hpp"
 #include "simulation/constants/public/dimensions.hpp"
+#include "simulation/constants/public/linalg.hpp"
 #include "simulation/estimation/public/manager.hpp"
 #include "simulation/util/public/validation.hpp"
 
@@ -15,7 +16,10 @@
 namespace json
 {
 
-	std::tuple<Eigen::MatrixXd, Eigen::MatrixXd, Eigen::MatrixXd> parse_kalman_filter_parameters(
+	std::tuple<estimation::StateEstimateErrorCovariance,
+		estimation::MeasurementNoiseCovariance,
+		estimation::ProcessNoiseCovariance>
+	parse_kalman_filter_parameters(
 		const nlohmann::json& estimator_json)
 	{
 		const auto& parameters_json = estimator_json.at("parameters");
@@ -31,9 +35,9 @@ namespace json
 		Eigen::MatrixXd R = parse_MatrixXd(parameters_json.at("R"));
 
 		const std::string context = "json::parse_kalman_filter_parameters";
-		util::validate_shape(P0, constants::state_dim, constants::state_dim, context, "P0");
-		util::validate_shape(Q, constants::state_dim, constants::state_dim, context, "Q");
-		util::validate_shape(R, constants::state_dim, constants::state_dim, context, "R");
+		util::validate_shape(P0, constants::nx, constants::nx, context, "P0");
+		util::validate_shape(Q, constants::nx, constants::nx, context, "Q");
+		util::validate_shape(R, constants::nx, constants::nx, context, "R");
 
 		return {P0, Q, R};
 	}

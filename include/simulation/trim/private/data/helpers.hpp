@@ -21,7 +21,7 @@ namespace trim
 	 * @param[in] options Solver options containing residual scales.
 	 * @return Residual weights in trim-residual vector order.
 	 */
-	TrimResidualVector_T<double> fetch_trim_residual_weights(const TrimSolveOptions& options);
+	TrimResidualWeights fetch_trim_residual_weights(const TrimSolveOptions& options);
 
 	/**
 	 * @brief Builds a complete trim solution from the current solver state.

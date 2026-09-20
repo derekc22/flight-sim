@@ -25,7 +25,7 @@ namespace control
 	struct LinearQuadraticPolicyInput {
 		Eigen::VectorXd zt;
 		Eigen::MatrixXd A_virtual;
-		constants::MatrixX_T<double, Eigen::Dynamic, constants::virtual_input_dim> B_virtual;
+		constants::MatrixX_T<double, Eigen::Dynamic, constants::nv> B_virtual;
 	};
 
 	struct LinearQuadraticPolicyParameters {

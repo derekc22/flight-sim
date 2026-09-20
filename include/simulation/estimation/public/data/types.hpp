@@ -1,6 +1,8 @@
 #pragma once
 #include "simulation/actuators/public/data/types.hpp"
 #include "simulation/autodiff/public/data/types.hpp"
+#include "simulation/constants/public/dimensions.hpp"
+#include "simulation/constants/public/linalg.hpp"
 #include "simulation/control/public/data/types.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/linearization/public/data/types.hpp"
@@ -11,6 +13,10 @@
 
 namespace estimation
 {
+	using StateEstimateErrorCovariance = constants::MatrixX_T<double, constants::nx, constants::nx>;
+	using MeasurementNoiseCovariance = constants::MatrixX_T<double, constants::nx, constants::nx>;
+	using ProcessNoiseCovariance = constants::MatrixX_T<double, constants::nx, constants::nx>;
+	using KalmanGain = constants::MatrixX_T<double, constants::nx, constants::nx>;
 
 	enum class EstimatorType {
 		None,
@@ -34,13 +40,13 @@ namespace estimation
 
 	struct KalmanState {
 		dynamics::StateVector_T<double> zt; // state estimate
-		Eigen::MatrixXd Pt;					// state estimate error covariance matrix
+		StateEstimateErrorCovariance Pt;	// state estimate error covariance matrix
 	};
 
 	struct KalmanFilterParameters {
-		Eigen::MatrixXd P0; // initial state estimate error covariance matrix
-		Eigen::MatrixXd Q;	// measurement noise covariance matrix
-		Eigen::MatrixXd R;	// process noise covariance matrix
+		StateEstimateErrorCovariance P0; // initial state estimate error covariance matrix
+		MeasurementNoiseCovariance Q;	 // measurement noise covariance matrix
+		ProcessNoiseCovariance R;		 // process noise covariance matrix
 	};
 
 	struct LinearKalmanFilterParameters : KalmanFilterParameters {};

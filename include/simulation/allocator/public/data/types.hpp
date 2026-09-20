@@ -1,5 +1,6 @@
 #pragma once
 #include "simulation/constants/public/dimensions.hpp"
+#include "simulation/constants/public/linalg.hpp"
 #include "simulation/control/public/data/types.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
 #include "simulation/operating/public/data/types.hpp"
@@ -14,11 +15,13 @@ namespace autodiff
 
 namespace allocator
 {
+	using AllocationErrorWeight = constants::MatrixX_T<double, constants::nv, constants::nv>;
+	using ActuatorEffortWeight = constants::MatrixX_T<double, constants::nu, constants::nu>;
 
 	struct AllocatorManagerInput {
 		control::VirtualControlOutputVector_T<double> mu;
-		std::array<bool, constants::virtual_input_dim> active_mask;
-		std::array<bool, constants::input_dim> actuator_mask;
+		std::array<bool, constants::nv> active_mask;
+		std::array<bool, constants::nu> actuator_mask;
 		operating::OperatingPoint_T<double> operating_point; // (zt, ut_1)
 		std::optional<control::ControlOutput> u_preferred;
 		operating::OperatingConditions conditions;

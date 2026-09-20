@@ -9,9 +9,8 @@
 namespace control
 {
 
-	inline constexpr std::size_t integrated_state_dim = 3; // phi, theta, r are the integrated states
-	using IntegratedStateVector = constants::MatrixX_T<double, integrated_state_dim, 1>;
-	using AugmentedStateVector = constants::MatrixX_T<double, constants::state_dim + integrated_state_dim, 1>;
+	using IntegratedStateVector = constants::MatrixX_T<double, constants::nxi, 1>;
+	using AugmentedStateVector = constants::MatrixX_T<double, constants::nx + constants::nxi, 1>;
 
 	struct LinearQuadraticIntegrator : LinearQuadraticRegulator {
 		IntegratedStateVector integral = Eigen::Vector3d::Zero();

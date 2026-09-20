@@ -8,9 +8,9 @@ namespace allocator
 {
 
 	struct AllocatorManager {
-		constants::MatrixX_T<double, constants::virtual_input_dim, constants::virtual_input_dim> Q;
-		constants::MatrixX_T<double, constants::input_dim, constants::input_dim> R;
-		qp::Solver solver{constants::input_dim};
+		AllocationErrorWeight Q;
+		ActuatorEffortWeight R;
+		qp::Solver solver{constants::nu};
 
 		/**
 		 * @brief Allocates a virtual-wrench command to bounded actuator inputs.

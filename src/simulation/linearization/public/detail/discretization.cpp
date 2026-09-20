@@ -12,16 +12,16 @@ namespace linearization
 		const LocalLinearization& lin_sol,
 		double dt)
 	{
-		Eigen::MatrixXd M = Eigen::MatrixXd::Zero(
-			constants::state_dim + constants::input_dim, constants::state_dim + constants::input_dim);
+		constants::MatrixX_T<double, constants::nxu, constants::nxu> M =
+			constants::MatrixX_T<double, constants::nxu, constants::nxu>::Zero();
 
-		M.block(0, 0, constants::state_dim, constants::state_dim) = lin_sol.A;
-		M.block(0, constants::state_dim, constants::state_dim, constants::input_dim) = lin_sol.B;
+		M.block(0, 0, constants::nx, constants::nx) = lin_sol.A;
+		M.block(0, constants::nx, constants::nx, constants::nu) = lin_sol.B;
 
-		Eigen::MatrixXd Md = (M * dt).exp();
+		constants::MatrixX_T<double, constants::nxu, constants::nxu> Md = (M * dt).exp();
 
-		Eigen::MatrixXd Ak = Md.block(0, 0, constants::state_dim, constants::state_dim);
-		Eigen::MatrixXd Bk = Md.block(0, constants::state_dim, constants::state_dim, constants::input_dim);
+		StateJacobian Ak = Md.block(0, 0, constants::nx, constants::nx);
+		InputJacobian Bk = Md.block(0, constants::nx, constants::nx, constants::nu);
 
 		// C and D are pass-through
 		return {.A = Ak, .B = Bk, .C = lin_sol.C, .D = lin_sol.D};
@@ -31,8 +31,8 @@ namespace linearization
 		const LocalLinearization& lin_sol,
 		double dt)
 	{
-		Eigen::MatrixXd Ak = constants::I_T<double, constants::state_dim> + dt * lin_sol.A;
-		Eigen::MatrixXd Bk = dt * lin_sol.B;
+		StateJacobian Ak = constants::I_T<double, constants::nx> + dt * lin_sol.A;
+		InputJacobian Bk = dt * lin_sol.B;
 
 		// C and D are pass-through
 		return {.A = Ak, .B = Bk, .C = lin_sol.C, .D = lin_sol.D};

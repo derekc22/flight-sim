@@ -9,8 +9,8 @@
 
 namespace analysis
 {
-	using Eigenvalues = constants::MatrixX_T<std::complex<double>, constants::state_dim, 1>;
-	using Eigenvectors = constants::MatrixX_T<std::complex<double>, constants::state_dim, constants::state_dim>;
+	using Eigenvalues = constants::MatrixX_T<std::complex<double>, constants::nx, 1>;
+	using Eigenvectors = constants::MatrixX_T<std::complex<double>, constants::nx, constants::nx>;
 
 	struct EigenAnalysis {
 		Eigenvalues eigenvalues = Eigenvalues::Zero();

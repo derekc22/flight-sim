@@ -59,8 +59,8 @@ namespace operating
 		const StateInputVector_T<T>& xu)
 	{
 		return {
-			dynamics::StateVector_T<T>(xu.template head<constants::state_dim>()),
-			actuators::ActuatorInputsVector_T<T>(xu.template tail<constants::input_dim>())
+			dynamics::StateVector_T<T>(xu.template head<constants::nx>()),
+			actuators::ActuatorInputsVector_T<T>(xu.template tail<constants::nu>())
 		};
 	}
 

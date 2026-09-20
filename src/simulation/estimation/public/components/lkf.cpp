@@ -56,7 +56,7 @@ namespace estimation
 
 		dynamics::StateVector_T<double> zt_bar = lin_sol_k.A * prev.zt + lin_sol_k.B * ut_1;
 
-		Eigen::MatrixXd Pt_bar = lin_sol_k.A * prev.Pt * lin_sol_k.A.transpose() + params.R;
+		StateEstimateErrorCovariance Pt_bar = lin_sol_k.A * prev.Pt * lin_sol_k.A.transpose() + params.R;
 
 		return {.zt = zt_bar, .Pt = Pt_bar};
 	}
@@ -68,16 +68,17 @@ namespace estimation
 		KalmanState pred = state.value();
 
 		// Kalman gain
-		Eigen::MatrixXd Kt = pred.Pt * C.transpose() * (C * pred.Pt * C.transpose() + params.Q).inverse();
+		KalmanGain Kt = pred.Pt * C.transpose() * (C * pred.Pt * C.transpose() + params.Q).inverse();
 
 		// Innovation
 		dynamics::StateVector_T<double> Lt = yt - C * pred.zt;
 
 		dynamics::StateVector_T<double> zt = pred.zt + Kt * Lt;
 
-		Eigen::MatrixXd I = constants::I_T<double, constants::state_dim>;
+		constants::MatrixX_T<double, constants::nx, constants::nx> I = constants::I_T<double, constants::nx>;
 
-		Eigen::MatrixXd Pt = (I - Kt * C) * pred.Pt * (I - Kt * C).transpose() + Kt * params.Q * Kt.transpose();
+		StateEstimateErrorCovariance Pt =
+			(I - Kt * C) * pred.Pt * (I - Kt * C).transpose() + Kt * params.Q * Kt.transpose();
 
 		return {.zt = zt, .Pt = Pt};
 	}

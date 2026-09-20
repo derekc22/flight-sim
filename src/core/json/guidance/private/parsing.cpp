@@ -121,7 +121,7 @@ namespace json
 	guidance::Trajectory merge_trajectory_components(
 		const guidance::TrajectoryComponents& traj_components)
 	{
-		guidance::Trajectory traj{Eigen::MatrixXd::Zero(traj_components.n_rows, guidance::guidance_state_dim)};
+		guidance::Trajectory traj{Eigen::MatrixXd::Zero(traj_components.n_rows, constants::nxg)};
 
 		for (int i = 0; i < traj_components.n_rows; ++i) {
 			dynamics::RigidBodyState X;

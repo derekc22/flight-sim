@@ -65,7 +65,7 @@ namespace estimation
 			linearization::linearize_operating_point(input.model, operating_point, input.conditions);
 		linearization::StateJacobian Ft = linearization::discretize_euler(lin_sol, dt).A;
 
-		Eigen::MatrixXd Pt_bar = Ft * prev.Pt * Ft.transpose() + params.R;
+		StateEstimateErrorCovariance Pt_bar = Ft * prev.Pt * Ft.transpose() + params.R;
 
 		return {{.zt = zt_bar, .Pt = Pt_bar}, lin_sol.C};
 	}
@@ -80,7 +80,7 @@ namespace estimation
 		linearization::OutputJacobian Ht = C;
 
 		// Kalman gain
-		Eigen::MatrixXd Kt = pred.Pt * Ht.transpose() * (Ht * pred.Pt * Ht.transpose() + params.Q).inverse();
+		KalmanGain Kt = pred.Pt * Ht.transpose() * (Ht * pred.Pt * Ht.transpose() + params.Q).inverse();
 
 		// Innovation
 		// C @ zt_bar = I @ zt_bar -> h(zt_bar) = zt_bar
@@ -88,9 +88,10 @@ namespace estimation
 
 		dynamics::StateVector_T<double> zt = pred.zt + Kt * Lt;
 
-		Eigen::MatrixXd I = constants::I_T<double, constants::state_dim>;
+		constants::MatrixX_T<double, constants::nx, constants::nx> I = constants::I_T<double, constants::nx>;
 
-		Eigen::MatrixXd Pt = (I - Kt * Ht) * pred.Pt * (I - Kt * Ht).transpose() + Kt * params.Q * Kt.transpose();
+		StateEstimateErrorCovariance Pt =
+			(I - Kt * Ht) * pred.Pt * (I - Kt * Ht).transpose() + Kt * params.Q * Kt.transpose();
 
 		return {.zt = zt, .Pt = Pt};
 	}

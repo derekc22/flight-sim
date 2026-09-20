@@ -14,8 +14,8 @@ namespace guidance
 		eulIB.set(Xt.q);
 
 		GuidanceSetpointVector out;
-		out.head<constants::state_dim>() = dynamics::unpack_state(Xt);
-		out(constants::state_dim) = eulIB.psi();
+		out.head<constants::nx>() = dynamics::unpack_state(Xt);
+		out(constants::nx) = eulIB.psi();
 
 		return out;
 	}

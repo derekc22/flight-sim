@@ -29,7 +29,7 @@ namespace integrators
 	 */
 	dynamics::RigidBodyState add_scaled_rigid_body_state_dot(const dynamics::RigidBodyState& X,
 		const dynamics::RigidBodyStateDot& X_dot,
-		double scale);
+		const double scale);
 
 	/**
 	 * @brief Applies the RK4 weighted state derivative to a rigid-body state.
@@ -47,6 +47,6 @@ namespace integrators
 		const dynamics::RigidBodyStateDot& k2,
 		const dynamics::RigidBodyStateDot& k3,
 		const dynamics::RigidBodyStateDot& k4,
-		double dt);
+		const double dt);
 
 } // namespace integrators

@@ -29,7 +29,7 @@ namespace linearization
 			autodiff::start_autodiff_tracking(xu); // start of autodiff tracking
 
 		const operating::StateInputVector_T<CppAD::AD<double>> xu_eigen =
-			autodiff::eigen_vector_from_cppad_vector<CppAD::AD<double>, constants::state_input_dim>(xu_tracked);
+			autodiff::eigen_vector_from_cppad_vector<CppAD::AD<double>, constants::nxu>(xu_tracked);
 
 		const operating::OperatingPoint_T<CppAD::AD<double>> operating_point_cppad =
 			operating::pack_state_input_T(xu_eigen);
@@ -42,12 +42,11 @@ namespace linearization
 
 		CppAD::ADFun<double> f(xu_tracked, x_dot_cppad); // end of autodiff tracking
 
-		const constants::MatrixX_T<double, constants::state_dim, constants::state_input_dim> jac_full =
-			autodiff::compute_jac<constants::state_dim, constants::state_input_dim>(f, xu);
+		const FullStateInputJacobian jac_full = autodiff::compute_jac<constants::nx, constants::nxu>(f, xu);
 
 		LocalLinearization out;
-		out.A = jac_full.leftCols<constants::state_dim>();
-		out.B = jac_full.rightCols<constants::input_dim>();
+		out.A = jac_full.leftCols<constants::nx>();
+		out.B = jac_full.rightCols<constants::nu>();
 
 		return out;
 	}
@@ -64,8 +63,7 @@ namespace linearization
 			autodiff::start_autodiff_tracking(xu_virtual); // start of autodiff tracking
 
 		const operating::VirtualStateInputVector_T<CppAD::AD<double>> xu_virtual_eigen =
-			autodiff::eigen_vector_from_cppad_vector<CppAD::AD<double>, constants::virtual_state_input_dim>(
-				xu_virtual_tracked);
+			autodiff::eigen_vector_from_cppad_vector<CppAD::AD<double>, constants::nxv>(xu_virtual_tracked);
 
 		const operating::VirtualOperatingPoint_T<CppAD::AD<double>> virtual_operating_point_cppad =
 			operating::pack_virtual_state_input_T(xu_virtual_eigen);
@@ -78,12 +76,12 @@ namespace linearization
 
 		CppAD::ADFun<double> f(xu_virtual_tracked, x_dot_cppad); // end of autodiff tracking
 
-		const constants::MatrixX_T<double, constants::state_dim, constants::virtual_state_input_dim> jac_full =
-			autodiff::compute_jac<constants::state_dim, constants::virtual_state_input_dim>(f, xu_virtual);
+		const FullVirtualStateInputJacobian jac_full =
+			autodiff::compute_jac<constants::nx, constants::nxv>(f, xu_virtual);
 
 		VirtualLocalLinearization out;
-		out.A_virtual = jac_full.leftCols<constants::state_dim>();
-		out.B_virtual = jac_full.rightCols<constants::virtual_input_dim>();
+		out.A_virtual = jac_full.leftCols<constants::nx>();
+		out.B_virtual = jac_full.rightCols<constants::nv>();
 
 		return out;
 	}

@@ -9,11 +9,13 @@
 namespace trim
 {
 
-	inline constexpr std::size_t trim_residual_dim = constants::state_input_dim;
+	template <typename T> using TrimResidualVector_T = constants::MatrixX_T<T, constants::nr, 1>;
 
-	template <typename T> using TrimResidualVector_T = constants::MatrixX_T<T, trim_residual_dim, 1>;
-
-	using TrimResidualJacobian = constants::MatrixX_T<double, trim_residual_dim, constants::state_input_dim>;
+	using TrimResidualJacobian = constants::MatrixX_T<double, constants::nr, constants::nxu>;
+	using TrimStepVector = constants::MatrixX_T<double, constants::nxu, 1>;
+	using TrimHessian = constants::MatrixX_T<double, constants::nxu, constants::nxu>;
+	using TrimGradient = constants::MatrixX_T<double, constants::nxu, 1>;
+	using TrimResidualWeights = constants::MatrixX_T<double, constants::nr, 1>;
 
 	struct TrimTarget {
 		double beta = 0.0;

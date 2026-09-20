@@ -8,10 +8,10 @@
 namespace trim
 {
 
-	TrimResidualVector_T<double> fetch_trim_residual_weights(
+	TrimResidualWeights fetch_trim_residual_weights(
 		const TrimSolveOptions& options)
 	{
-		TrimResidualVector_T<double> w;
+		TrimResidualWeights w;
 		// clang-format off
 		w <<   1.0 / options.linear_accel_scale,
 		       1.0 / options.linear_accel_scale,
