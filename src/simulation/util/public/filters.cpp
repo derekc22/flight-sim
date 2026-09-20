@@ -1,6 +1,7 @@
 #include "simulation/util/public/filters.hpp"
 
 #include <cmath>
+#include <stdexcept>
 
 namespace util
 {
@@ -11,7 +12,10 @@ namespace util
 		double tau,
 		double dt)
 	{
-		if (tau <= 0.0) {
+		if (tau < 0.0) {
+			throw std::invalid_argument("tau must be nonnegative");
+		}
+		if (tau == 0.0) {
 			return val;
 		}
 
@@ -25,7 +29,10 @@ namespace util
 		double tau,
 		double dt)
 	{
-		if (tau <= 0.0) {
+		if (tau < 0.0) {
+			throw std::invalid_argument("tau must be nonnegative");
+		}
+		if (tau == 0.0) {
 			return val;
 		}
 
@@ -39,7 +46,10 @@ namespace util
 		double tau,
 		double dt)
 	{
-		if (tau <= 0.0) {
+		if (tau < 0.0) {
+			throw std::invalid_argument("tau must be nonnegative");
+		}
+		if (tau == 0.0) {
 			return val;
 		}
 

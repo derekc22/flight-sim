@@ -9,7 +9,7 @@ namespace util
 	 *
 	 * @param[in] val Current input value.
 	 * @param[in] prev_val Previous filtered value.
-	 * @param[in] tau Lag time constant; a nonpositive value bypasses the filter [s].
+	 * @param[in] tau Lag time constant; zero bypasses the filter and negative values throw [s].
 	 * @param[in] dt Time step [s].
 	 * @return Current filtered value.
 	 */
@@ -20,7 +20,7 @@ namespace util
 	 *
 	 * @param[in] val Current input vector.
 	 * @param[in] prev_val Previous filtered vector.
-	 * @param[in] tau Lag time constant; a nonpositive value bypasses the filter [s].
+	 * @param[in] tau Lag time constant; zero bypasses the filter and negative values throw [s].
 	 * @param[in] dt Time step [s].
 	 * @return Current filtered vector.
 	 */
@@ -30,11 +30,10 @@ namespace util
 	 * @brief Applies an exact discrete first-order lag between two quaternions.
 	 *
 	 * Uses shortest-path spherical interpolation from @p prev_val toward @p val.
-	 * A nonpositive time constant returns @p val unchanged.
 	 *
 	 * @param[in] val Current input quaternion [-].
 	 * @param[in] prev_val Previous filtered quaternion [-].
-	 * @param[in] tau Lag time constant [s].
+	 * @param[in] tau Lag time constant; zero bypasses the filter and negative values throw [s].
 	 * @param[in] dt Time step [s].
 	 * @return Current filtered quaternion [-].
 	 */
