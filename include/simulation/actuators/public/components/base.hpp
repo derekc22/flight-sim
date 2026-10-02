@@ -9,8 +9,10 @@ namespace actuators
 	struct Actuator {
 		double limit_max;
 		double limit_min;
-		double tau;
-		std::optional<double> lag_state;
+		double wn;
+		double zeta;
+		std::optional<double> val_state;
+		double rate_state = 0.0;
 
 		/**
 		 * @brief Advances the actuator response for one time step.
@@ -21,9 +23,7 @@ namespace actuators
 		 */
 		double step(double cmd, double dt);
 
-		Actuator(double limit_max, double limit_min, double tau);
-
-		Actuator();
+		Actuator(double limit_max, double limit_min, double wn, double zeta);
 	};
 
 	struct SurfaceActuator : Actuator {

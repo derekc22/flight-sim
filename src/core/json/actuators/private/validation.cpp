@@ -15,20 +15,27 @@ namespace json
 		if (!actuator_json.contains("limit_min")) {
 			throw std::runtime_error("json::validate_actuator_json: actuator minimum limit not present");
 		}
-		if (!actuator_json.contains("tau")) {
-			throw std::runtime_error("json::validate_actuator_json: actuator tau not present");
+		if (!actuator_json.contains("wn")) {
+			throw std::runtime_error("json::validate_actuator_json: actuator wn not present");
+		}
+		if (!actuator_json.contains("zeta")) {
+			throw std::runtime_error("json::validate_actuator_json: actuator zeta not present");
 		}
 
 		double limit_max = actuator_json.at("limit_max").get<double>();
 		double limit_min = actuator_json.at("limit_min").get<double>();
-		double tau = actuator_json.at("tau").get<double>();
+		double wn = actuator_json.at("wn").get<double>();
+		double zeta = actuator_json.at("zeta").get<double>();
 
 		if (limit_max < limit_min) {
 			throw std::runtime_error(
 				"json::validate_actuator_json: actuator maximum limit must be greater than or equal to minimum limit");
 		}
-		if (tau < 0.0) {
-			throw std::runtime_error("json::validate_actuator_json: actuator tau must be non-negative");
+		if (wn <= 0.0) {
+			throw std::runtime_error("json::validate_actuator_json: actuator wn must be positive");
+		}
+		if (zeta < 0.0) {
+			throw std::runtime_error("json::validate_actuator_json: actuator zeta must be non-negative");
 		}
 	}
 

@@ -15,7 +15,7 @@ namespace json
 		const std::string& key)
 	{
 		if (config.at(key).is_null()) {
-			return SurfaceActuatorType{};
+			return SurfaceActuatorType(0.0, 0.0, 0.0, 0.0);
 		}
 
 		const auto& surface_actuator_json = config.at(key);
@@ -23,7 +23,8 @@ namespace json
 
 		return SurfaceActuatorType(surface_actuator_json.at("limit_max").get<double>(),
 			surface_actuator_json.at("limit_min").get<double>(),
-			surface_actuator_json.at("tau").get<double>());
+			surface_actuator_json.at("wn").get<double>(),
+			surface_actuator_json.at("zeta").get<double>());
 	}
 
 	template <typename PropulsorActuatorType>
@@ -32,7 +33,7 @@ namespace json
 		const std::string& key)
 	{
 		if (config.at(key).is_null()) {
-			return PropulsorActuatorType{};
+			return PropulsorActuatorType(0.0, 0.0, 0.0, 0.0);
 		}
 
 		const auto& propulsor_actuator_json = config.at(key);
@@ -40,6 +41,7 @@ namespace json
 
 		return PropulsorActuatorType(propulsor_actuator_json.at("limit_max").get<double>(),
 			propulsor_actuator_json.at("limit_min").get<double>(),
-			propulsor_actuator_json.at("tau").get<double>());
+			propulsor_actuator_json.at("wn").get<double>(),
+			propulsor_actuator_json.at("zeta").get<double>());
 	}
 } // namespace json

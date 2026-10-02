@@ -3,22 +3,26 @@
 		"elevator": {
 			"limit_max": 0.401426,
 			"limit_min": -0.488692,
-			"tau": 0.1
+			"wn": 10.0,
+			"zeta": 1.0
 		},
 		"aileron": {
 			"limit_max": 0.261799,
 			"limit_min": -0.349066,
-			"tau": 0.05
+			"wn": 20.0,
+			"zeta": 1.0
 		},
 		"rudder": {
 			"limit_max": 0.279253,
 			"limit_min": -0.279253,
-			"tau": 0.05
+			"wn": 20.0,
+			"zeta": 1.0
 		},
 		"flap": {
 			"limit_max": 0.523599,
 			"limit_min": 0.0,
-			"tau": 1.3333333333333333
+			"wn": 0.75,
+			"zeta": 1.0
 		},
 		"spoiler": null
 	},
@@ -26,7 +30,8 @@
 		"front_propulsor": {
 			"limit_max": 2250.0,
 			"limit_min": 290.0,
-			"tau": 1.0
+			"wn": 1.0,
+			"zeta": 0.5
 		},
 		"left_propulsor": null,
 		"right_propulsor": null
