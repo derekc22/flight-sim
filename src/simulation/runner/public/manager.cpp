@@ -39,6 +39,8 @@ namespace runner
 			  aircraft.actuator_manager.surface_actuators,
 			  aircraft.actuator_manager.propulsor_actuators),
 
+		  actuator_wrapper(aircraft.actuator_manager.surface_actuators, aircraft.actuator_manager.propulsor_actuators),
+
 		  // initialize udp connections
 		  flight_gear_adapter{},
 
@@ -71,6 +73,7 @@ namespace runner
 		step_measurements(context);
 		step_estimation(context);
 		step_control(context);
+		step_actuators(context);
 		step_physics(context);
 		publish_step(input.t, context);
 		finish_step(context.current_mode);
@@ -186,7 +189,7 @@ namespace runner
 
 				// overwrite actuator lag state with trim controls
 				trim::update_actuators_lag_from_trim(surface_actuators, propulsor_actuators, trim_output.trim_sol);
-				control_wrapper.u_actual_t_1 = trim_output.trim_sol.operating_point.input;
+				actuator_wrapper.u_actual_t_1 = trim_output.trim_sol.operating_point.input;
 
 				LinearizationWrapperOutput linearization_output = linearization_wrapper.step(
 					{.autodiff_model = context.autodiff_model, .trim_sol = trim_output.trim_sol});
@@ -221,7 +224,7 @@ namespace runner
 				.context = context,
 				.trim_sol = trim_wrapper.trim_sol,
 				.lin_sol = linearization_wrapper.lin_sol,
-				.u_actual_t_1 = control_wrapper.u_actual_t_1,
+				.u_actual_t_1 = actuator_wrapper.u_actual_t_1,
 				.estimation_flag = json_options.flags.estimation_flag});
 		context.Zt = output.Zt;
 	}
@@ -229,7 +232,7 @@ namespace runner
 	void RunManager::step_control(
 		StepContext& context)
 	{
-		devices::JoystickOutput joystick_output = control_wrapper.poll_joystick();
+		devices::JoystickOutput joystick_output = control_wrapper.poll_joystick(actuator_wrapper.u_cmd_t_1);
 
 		// step state machine
 		context.current_mode = fsm_manager.step({.mode_toggled = joystick_output.mode_toggled}).current_mode;
@@ -241,8 +244,16 @@ namespace runner
 				.trim_sol = trim_wrapper.trim_sol,
 				.virtual_lin_sol = linearization_wrapper.virtual_lin_sol,
 				.joystick_output = joystick_output,
+				.u_actual_t_1 = actuator_wrapper.u_actual_t_1,
 				.current_mode = context.current_mode});
 		context.setpoint = output.setpoint;
+		context.u_cmd = output.u_cmd;
+	}
+
+	void RunManager::step_actuators(
+		StepContext& context)
+	{
+		ActuatorWrapperOutput output = actuator_wrapper.step({.aircraft = aircraft, .u_cmd = context.u_cmd});
 		context.u_cmd = output.u_cmd;
 		context.u_actual = output.u_actual;
 	}

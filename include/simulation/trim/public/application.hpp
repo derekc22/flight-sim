@@ -17,10 +17,10 @@ namespace trim
 		const dynamics::State_T<double>& trim_state);
 
 	/**
-	 * @brief Initializes actuator lag states from a trim solution.
+	 * @brief Initializes actuator response states from a trim solution.
 	 *
-	 * @param[in,out] surface_actuators Surface actuators whose lag states are updated.
-	 * @param[in,out] propulsor_actuators Propulsor actuators whose lag states are updated.
+	 * @param[in,out] surface_actuators Surface actuators whose response states are updated.
+	 * @param[in,out] propulsor_actuators Propulsor actuators whose response states are updated.
 	 * @param[in] trim_sol Trim solution containing the actuator commands.
 	 */
 	void update_actuators_lag_from_trim(actuators::SurfaceActuators& surface_actuators,

@@ -1,7 +1,6 @@
 #include "simulation/runner/public/components/wrappers/control.hpp"
 
 #include "simulation/actuators/public/data/helpers.hpp"
-#include "simulation/actuators/public/manager.hpp"
 #include "simulation/allocator/public/data/helpers.hpp"
 #include "simulation/allocator/public/manager.hpp"
 #include "simulation/constants/public/dimensions.hpp"
@@ -22,9 +21,6 @@ namespace runner
 		const actuators::SurfaceActuators& surface_actuators,
 		const actuators::PropulsorActuators& propulsor_actuators)
 	{
-		// set u_actual_t_1 to match actuators' neutral initialization
-		u_actual_t_1 = actuators::get_neutral_actuator_inputs(surface_actuators, propulsor_actuators);
-
 		// create joystick
 		if (joystick_flag) {
 			actuators::ActuatorLimits actuator_limits =
@@ -33,7 +29,8 @@ namespace runner
 		}
 	}
 
-	devices::JoystickOutput ControlWrapper::poll_joystick()
+	devices::JoystickOutput ControlWrapper::poll_joystick(
+		const control::ControlOutput& u_cmd_t_1)
 	{
 		// declare for state machine
 		devices::JoystickOutput joystick_output{};
@@ -50,7 +47,6 @@ namespace runner
 		const ControlWrapperInput& input)
 	{
 		control::ControlManager& control_manager = input.aircraft.control_manager;
-		actuators::ActuatorManager& actuator_manager = input.aircraft.actuator_manager;
 		guidance::GuidanceManager& guidance_manager = input.aircraft.guidance_manager;
 		allocator::AllocatorManager& allocator_manager = input.aircraft.allocator_manager;
 
@@ -121,7 +117,7 @@ namespace runner
 				active_mask,
 				actuator_mask,
 				input.context.Zt,
-				u_actual_t_1,
+				input.u_actual_t_1,
 				input.trim_sol.converged ? std::make_optional(input.trim_sol.operating_point.input) : std::nullopt,
 				input.context.transient_conditions,
 				input.context.autodiff_model));
@@ -129,21 +125,7 @@ namespace runner
 			delta_mu_vec_t_1 = ctrl_out.delta_mu_vec_t_1;
 		}
 
-		// apply fixed actuator inputs
-		// apply surface actuator dynamics
-		// apply propulsor actuator dynamics
-		actuators::ActuatorManagerOutput actuator_output = actuator_manager.step({.u_cmd = u_cmd, .dt = constants::dt});
-		u_cmd = actuator_output.u_cmd;
-
-		// update prior-step control command
-		u_cmd_t_1 = u_cmd;
-
-		actuators::ActuatorInputs_T<double> u_actual = actuator_output.u_actual;
-
-		// update prior-step actual control
-		u_actual_t_1 = u_actual;
-
-		return {.setpoint = setpoint, .u_cmd = u_cmd, .u_actual = u_actual};
+		return {.setpoint = setpoint, .u_cmd = u_cmd};
 	}
 
 } // namespace runner

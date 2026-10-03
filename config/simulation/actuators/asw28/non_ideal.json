@@ -3,23 +3,27 @@
         "elevator": {
             "limit_max": 0.872665,
             "limit_min": -0.872665,
-            "tau": 0.1
+            "wn": 10.0,
+            "zeta": 1.0
         },
         "aileron": {
             "limit_max": 0.349066,
             "limit_min": -0.349066,
-            "tau": 0.1
+            "wn": 10.0,
+            "zeta": 1.0
         },
         "rudder": {
             "limit_max": 0.541052,
             "limit_min": -0.541052,
-            "tau": 0.1
+            "wn": 10.0,
+            "zeta": 1.0
         },
         "flap": null,
         "spoiler": {
             "limit_max": 1.570796,
             "limit_min": 0.0,
-            "tau": 0.1
+            "wn": 10.0,
+            "zeta": 1.0
         }
     },
     "propulsors": {

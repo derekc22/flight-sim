@@ -35,14 +35,29 @@ namespace trim
 		const actuators::PropulsorActuatorInputs_T<double>& propulsor_inputs =
 			trim_sol.operating_point.input.propulsor_inputs;
 
-		surface_actuators.elevator.lag_state = surface_inputs.elevator_cmd;
-		surface_actuators.aileron.lag_state = surface_inputs.aileron_cmd;
-		surface_actuators.rudder.lag_state = surface_inputs.rudder_cmd;
-		surface_actuators.flap.lag_state = surface_inputs.flap_cmd;
-		surface_actuators.spoiler.lag_state = surface_inputs.spoiler_cmd;
-		propulsor_actuators.front_propulsor.lag_state = propulsor_inputs.front_propulsor_cmd;
-		propulsor_actuators.left_propulsor.lag_state = propulsor_inputs.left_propulsor_cmd;
-		propulsor_actuators.right_propulsor.lag_state = propulsor_inputs.right_propulsor_cmd;
+		surface_actuators.elevator.val_state = surface_inputs.elevator_cmd;
+		surface_actuators.elevator.rate_state = 0.0;
+
+		surface_actuators.aileron.val_state = surface_inputs.aileron_cmd;
+		surface_actuators.aileron.rate_state = 0.0;
+
+		surface_actuators.rudder.val_state = surface_inputs.rudder_cmd;
+		surface_actuators.rudder.rate_state = 0.0;
+
+		surface_actuators.flap.val_state = surface_inputs.flap_cmd;
+		surface_actuators.flap.rate_state = 0.0;
+
+		surface_actuators.spoiler.val_state = surface_inputs.spoiler_cmd;
+		surface_actuators.spoiler.rate_state = 0.0;
+
+		propulsor_actuators.front_propulsor.val_state = propulsor_inputs.front_propulsor_cmd;
+		propulsor_actuators.front_propulsor.rate_state = 0.0;
+
+		propulsor_actuators.left_propulsor.val_state = propulsor_inputs.left_propulsor_cmd;
+		propulsor_actuators.left_propulsor.rate_state = 0.0;
+
+		propulsor_actuators.right_propulsor.val_state = propulsor_inputs.right_propulsor_cmd;
+		propulsor_actuators.right_propulsor.rate_state = 0.0;
 	}
 
 } // namespace trim

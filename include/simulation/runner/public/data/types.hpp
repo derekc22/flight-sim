@@ -149,12 +149,22 @@ namespace runner
 		const trim::TrimSolution& trim_sol;
 		const linearization::VirtualLocalLinearization& virtual_lin_sol;
 		const devices::JoystickOutput& joystick_output;
+		const actuators::ActuatorInputs_T<double>& u_actual_t_1;
 		fsm::FiniteState current_mode;
 	};
 
 	struct ControlWrapperOutput {
 		guidance::GuidanceSetpoint setpoint;
 		control::ControlOutput u_cmd;
+	};
+
+	struct ActuatorWrapperInput {
+		vehicles::Aircraft& aircraft;
+		const control::ControlOutput& u_cmd;
+	};
+
+	struct ActuatorWrapperOutput {
+		actuators::ActuatorInputs_T<double> u_cmd;
 		actuators::ActuatorInputs_T<double> u_actual;
 	};
 

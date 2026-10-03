@@ -4,7 +4,7 @@ Components represent distinct functional responsibilities with their own behavio
 
 | Manager | Components | Boundary |
 |---|---|---|
-| `ActuatorManager` | `ElevatorActuator`<br>`AileronActuator`<br>`RudderActuator`<br>`FlapActuator`<br>`SpoilerActuator`<br>`FrontPropulsorActuator`<br>`LeftPropulsorActuator`<br>`RightPropulsorActuator` | Each actuator is independently configured and owns its own command limiting and lag state. |
+| `ActuatorManager` | `ElevatorActuator`<br>`AileronActuator`<br>`RudderActuator`<br>`FlapActuator`<br>`SpoilerActuator`<br>`FrontPropulsorActuator`<br>`LeftPropulsorActuator`<br>`RightPropulsorActuator` | Each actuator is independently configured and owns its own command limiting and second-order response states. |
 | `EstimationManager` | `LinearKalmanFilter`<br>`ExtendedKalmanFilter` | The filters have distinct inputs, algorithms, and persistent state. |
 | `ControlManager` | `AttitudeControl`<br>`VelocityControl`<br>`LinearQuadraticControl`<br>`NonlinearControl` (not implemented) | These are the major control responsibilities. Specific controller implementations are grouped under Control's private `components/controllers/` category, while their reusable policy components are grouped under `components/policies/`. |
 | `SensorManager` | `AngleOfAttackVane`<br>`Accelerometer`<br>`Gyroscope`<br>`PitotTube`<br>`StaticPort`<br>`TotalAirTemperatureProbe`<br>`GNSSReceiver`<br>`Magnetometer` | Each sensor independently owns its measurement behavior, noise, bias, and lag state. |
