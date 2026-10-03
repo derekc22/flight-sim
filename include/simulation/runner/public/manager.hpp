@@ -3,6 +3,7 @@
 #include "simulation/fsm/public/manager.hpp"
 #include "simulation/runner/public/components/flight_gear.hpp"
 #include "simulation/runner/public/components/scheduler.hpp"
+#include "simulation/runner/public/components/wrappers/actuator.hpp"
 #include "simulation/runner/public/components/wrappers/control.hpp"
 #include "simulation/runner/public/components/wrappers/estimation.hpp"
 #include "simulation/runner/public/components/wrappers/linearization.hpp"
@@ -36,6 +37,7 @@ namespace runner
 		MeasurementsWrapper measurements_wrapper;
 		EstimationWrapper estimation_wrapper;
 		ControlWrapper control_wrapper;
+		ActuatorWrapper actuator_wrapper;
 		PhysicsWrapper physics_wrapper;
 		FlightGearAdapter flight_gear_adapter;
 		RecordingWrapper recording_wrapper;
@@ -96,6 +98,13 @@ namespace runner
 		 * @param[in,out] context Step context updated with control-stage outputs.
 		 */
 		void step_control(StepContext& context);
+
+		/**
+		 * @brief Advances actuator dynamics and updates actuator inputs.
+		 *
+		 * @param[in,out] context Step context containing commanded and actual actuator inputs.
+		 */
+		void step_actuators(StepContext& context);
 
 		/**
 		 * @brief Integrates the aircraft dynamics and updates step-result wrenches.
