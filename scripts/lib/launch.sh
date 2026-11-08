@@ -18,4 +18,5 @@ exec "$FG_PATH" \
 --geometry=800x700 \
 --prop:/engines/engine[0]/rpm=2300 \
 --httpd=8080 \
---data="$PROJ_PATH"/schema
+--data="$PROJ_PATH"/schema \
+--disable-sound
