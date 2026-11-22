@@ -9,6 +9,7 @@
 #include "simulation/constants/public/linalg.hpp"
 #include "simulation/constants/public/scalars.hpp"
 #include "simulation/dynamics/public/data/helpers.hpp"
+#include "simulation/util/public/math.hpp"
 
 #include <cmath>
 
@@ -27,7 +28,7 @@ namespace allocator
 		dynamics::WrenchVector_T<double> mu_actuator_0 = mu_0;
 		if (input.u_preferred.has_value()) {
 			const operating::OperatingPoint_T<double> preferred_operating_point{
-				.state = input.operating_point.state, .input = input.u_preferred.value()
+				.state = input.operating_point.state, .input = *input.u_preferred
 			};
 			const dynamics::Wrench_T<double> mu_preferred = autodiff::compute_net_wrench_T<double>(
 				preferred_operating_point, input.model, input.conditions, constants::dt);
@@ -50,7 +51,7 @@ namespace allocator
 		actuators::ActuatorInputsVector_T<double> actuator_target = u_0;
 		if (input.u_preferred.has_value()) {
 			const actuators::ActuatorInputsVector_T<double> u_preferred =
-				actuators::unpack_actuator_inputs_T(input.u_preferred.value());
+				actuators::unpack_actuator_inputs_T(*input.u_preferred);
 			trim_hessian = R;
 			trim_gradient = R * (u_0 - u_preferred);
 			actuator_target = u_preferred;
@@ -72,11 +73,11 @@ namespace allocator
 
 		bool allocation_limited = false;
 		for (Eigen::Index i = 0; i < u_unconstrained_vec.rows(); ++i) {
-			if (!input.actuator_mask[i] || std::abs(limits(i, 1) - limits(i, 0)) <= constants::eps) {
+			if (!input.actuator_mask[i] || util::abs(limits(i, 1) - limits(i, 0)) <= constants::eps) {
 				continue;
 			}
 
-			const double tolerance = constants::eps * (1.0 + std::abs(limits(i, 0)) + std::abs(limits(i, 1)));
+			const double tolerance = constants::eps * (1.0 + util::abs(limits(i, 0)) + util::abs(limits(i, 1)));
 			if (u_unconstrained_vec(i) < limits(i, 0) - tolerance ||
 				u_unconstrained_vec(i) > limits(i, 1) + tolerance) {
 				allocation_limited = true;

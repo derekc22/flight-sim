@@ -135,14 +135,14 @@ namespace frames
 		ECEFFrame();
 		dynamics::HomogeneousTransformationMatrix H{constants::HI};
 		dynamics::OrientationQuaternion q{constants::qI};
-		dynamics::EulerAngles eul{constants::Zero3};
-		dynamics::OrientationMatrixRate C_dot{constants::Zero3x3};
+		dynamics::EulerAngles eul{constants::zero3};
+		dynamics::OrientationMatrixRate C_dot{constants::Zero3};
 		dynamics::OrientationQuaternionRate q_dot{constants::q0};
-		dynamics::AngularVelocity w{constants::Zero3};
-		dynamics::EulerAngleRates eul_dot{constants::Zero3};
+		dynamics::AngularVelocity w{constants::zero3};
+		dynamics::EulerAngleRates eul_dot{constants::zero3};
 		dynamics::AngularVelocityQuaternion wq{constants::q0};
-		dynamics::TranslationalVelocity v{constants::Zero3};
-		dynamics::Gravity g{constants::Zero3};
+		dynamics::TranslationalVelocity v{constants::zero3};
+		dynamics::Gravity g{constants::zero3};
 
 		MutableFrameView view() override;
 

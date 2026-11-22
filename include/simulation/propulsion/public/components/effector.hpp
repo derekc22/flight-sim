@@ -8,7 +8,7 @@ namespace propulsion
 {
 
 	struct PropulsorEffector {
-		Eigen::Vector3d pB_propB = constants::Zero3;
+		Eigen::Vector3d pB_propB = constants::zero3;
 		Eigen::Vector3d n_prop = constants::ei;
 		std::optional<PropellerAssembly> propellers;
 		std::optional<double> propeller_omega_t_1;

@@ -39,7 +39,7 @@ namespace estimation
 		}
 
 		// EKF predicts full state, so do not add back trim state
-		dynamics::RigidBodyState Zt = make_kalman_state_estimate(input.Yt, state.value().zt);
+		dynamics::RigidBodyState Zt = make_kalman_state_estimate(input.Yt, (*state).zt);
 
 		return Zt;
 	}
@@ -49,7 +49,7 @@ namespace estimation
 		const actuators::ActuatorInputsVector_T<double>& ut_1,
 		double dt)
 	{
-		KalmanState prev = state.value();
+		KalmanState prev = *state;
 
 		dynamics::State_T<double> zt_1 = dynamics::pack_state_T(prev.zt);
 		actuators::ActuatorInputs_T<double> u_actual_t_1 = actuators::pack_actuator_inputs_T(ut_1);
@@ -74,7 +74,7 @@ namespace estimation
 		const dynamics::StateVector_T<double>& yt,
 		const linearization::OutputJacobian& C)
 	{
-		KalmanState pred = state.value();
+		KalmanState pred = *state;
 
 		// C = I -> Ht = I
 		linearization::OutputJacobian Ht = C;

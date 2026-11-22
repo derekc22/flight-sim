@@ -3,6 +3,7 @@
 #include "simulation/constants/public/linalg.hpp"
 #include "simulation/constants/public/scalars.hpp"
 #include "simulation/dynamics/public/data/types.hpp"
+#include "simulation/util/public/math.hpp"
 
 #include <Eigen/Dense>
 #include <cmath>
@@ -47,7 +48,7 @@ namespace structural
 	Eigen::Vector3d StructuralManager::compute_CG(
 		const dynamics::Mass& mass)
 	{
-		Eigen::Vector3d pB_GB = constants::Zero3;
+		Eigen::Vector3d pB_GB = constants::zero3;
 		for (const Geometry& geom : geometries) {
 			pB_GB += geom.mass * geom.pB_geomB;
 		}
@@ -58,7 +59,7 @@ namespace structural
 	Eigen::Matrix3d StructuralManager::compute_JB_G(
 		const CenterOfGravity& pB_GB)
 	{
-		Eigen::Matrix3d J = constants::Zero3x3;
+		Eigen::Matrix3d J = constants::Zero3;
 
 		for (Geometry& geom : geometries) {
 			Eigen::Matrix3d j_localL = geom.compute_local_J();
@@ -73,7 +74,7 @@ namespace structural
 			J += j_localB + geom.mass * (d.squaredNorm() * Eigen::Matrix3d::Identity() - d * d.transpose());
 		}
 
-		if (std::abs(J.determinant()) < constants::eps) {
+		if (util::abs(J.determinant()) < constants::eps) {
 			throw std::runtime_error("structural::StructuralManager::compute_JB_G: Inertia tensor is singular");
 		}
 

@@ -32,7 +32,7 @@ namespace util
 	{
 		double n = v.norm();
 		if (n < constants::eps)
-			return constants::Zero3;
+			return constants::zero3;
 		return v / n;
 	}
 

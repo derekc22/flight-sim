@@ -25,7 +25,7 @@ namespace actuators
 	{
 		double cmd_clamped = util::clamp(cmd, limit_min, limit_max);
 		double init_val = util::clamp(0.0, limit_min, limit_max);
-		double val = val_state ? val_state.value() : init_val;
+		double val = val_state ? *val_state : init_val;
 		double rate = val_state ? rate_state : 0.0;
 
 		double err = val - cmd_clamped;

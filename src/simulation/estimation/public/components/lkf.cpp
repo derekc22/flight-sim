@@ -41,7 +41,7 @@ namespace estimation
 
 		dynamics::StateVector_T<double> x_trim = dynamics::unpack_state_T(input.operating_point.state);
 		dynamics::StateVector_T<double> zt_full =
-			state.value().zt + x_trim; // LKF predicts deviation state, so trim state is added back
+			(*state).zt + x_trim; // LKF predicts deviation state, so trim state is added back
 
 		dynamics::RigidBodyState Zt = make_kalman_state_estimate(input.Yt, zt_full);
 
@@ -52,7 +52,7 @@ namespace estimation
 		const linearization::DiscretizedLocalLinearization& lin_sol_k,
 		const actuators::ActuatorInputsVector_T<double>& ut_1)
 	{
-		KalmanState prev = state.value();
+		KalmanState prev = *state;
 
 		dynamics::StateVector_T<double> zt_bar = lin_sol_k.A * prev.zt + lin_sol_k.B * ut_1;
 
@@ -65,7 +65,7 @@ namespace estimation
 		const dynamics::StateVector_T<double>& yt,
 		const linearization::OutputJacobian& C)
 	{
-		KalmanState pred = state.value();
+		KalmanState pred = *state;
 
 		// Kalman gain
 		KalmanGain Kt = pred.Pt * C.transpose() * (C * pred.Pt * C.transpose() + params.Q).inverse();

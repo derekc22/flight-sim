@@ -10,9 +10,9 @@ namespace constants
 	inline const Eigen::Quaterniond qI = Eigen::Quaterniond::Identity(); // Identity quaternion
 
 	// Zero quantities
-	inline const Eigen::Matrix3d Zero3x3 = Eigen::Matrix3d::Zero();
+	inline const Eigen::Matrix3d Zero3 = Eigen::Matrix3d::Zero();
 	inline const Eigen::Quaterniond q0 = Eigen::Quaterniond(0.0, 0.0, 0.0, 0.0);
-	inline const Eigen::Vector3d Zero3 = Eigen::Vector3d::Zero();
+	inline const Eigen::Vector3d zero3 = Eigen::Vector3d::Zero();
 
 	// Special vectors
 	inline const Eigen::Vector3d ei = Eigen::Vector3d(1, 0, 0);
@@ -24,11 +24,11 @@ namespace constants
 
 	template <typename T> using Vector3_T = MatrixX_T<T, 3, 1>;
 
-	template <typename T> inline const Vector3_T<T> Zero3_T = Vector3_T<T>::Zero();
+	template <typename T> inline const Vector3_T<T> zero3_T = Vector3_T<T>::Zero();
 
 	template <typename T> using Matrix3_T = MatrixX_T<T, 3, 3>;
 
-	template <typename T> inline const Matrix3_T<T> Zero3x3_T = Matrix3_T<T>::Zero();
+	template <typename T> inline const Matrix3_T<T> Zero3_T = Matrix3_T<T>::Zero();
 
 	template <typename T, int dim> inline const MatrixX_T<T, dim, dim> I_T = MatrixX_T<T, dim, dim>::Identity();
 

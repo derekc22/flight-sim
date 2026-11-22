@@ -19,8 +19,7 @@ namespace control
 		VirtualControlOutput_T<double> mu{};
 
 		if (attitude_control.has_value() && inputs.attitude_input.has_value()) {
-			const ControlComponentOutput component_output =
-				attitude_control.value().step(inputs.attitude_input.value(), dt);
+			const ControlComponentOutput component_output = (*attitude_control).step(*inputs.attitude_input, dt);
 			mu.F += component_output.mu.F;
 			mu.M += component_output.mu.M;
 			for (std::size_t i = 0; i < output.active_mask.size(); ++i) {
@@ -31,8 +30,7 @@ namespace control
 			}
 		}
 		if (velocity_control.has_value() && inputs.velocity_input.has_value()) {
-			const ControlComponentOutput component_output =
-				velocity_control.value().step(inputs.velocity_input.value(), dt);
+			const ControlComponentOutput component_output = (*velocity_control).step(*inputs.velocity_input, dt);
 			mu.F += component_output.mu.F;
 			mu.M += component_output.mu.M;
 			for (std::size_t i = 0; i < output.active_mask.size(); ++i) {
@@ -44,7 +42,7 @@ namespace control
 		}
 		if (linear_quadratic_control.has_value() && inputs.linear_quadratic_input.has_value()) {
 			const ControlComponentOutput component_output =
-				linear_quadratic_control.value().step(inputs.linear_quadratic_input.value(), dt);
+				(*linear_quadratic_control).step(*inputs.linear_quadratic_input, dt);
 			mu.F += component_output.mu.F;
 			mu.M += component_output.mu.M;
 			for (std::size_t i = 0; i < output.active_mask.size(); ++i) {

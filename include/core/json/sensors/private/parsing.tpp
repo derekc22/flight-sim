@@ -21,7 +21,7 @@ namespace json
 
 		bool has_vector_bias = sensor_json.at("bias").is_array();
 		double bias = has_vector_bias ? 0.0 : sensor_json.at("bias").get<double>();
-		Eigen::Vector3d bias_3d = has_vector_bias ? parse_Vector3d(sensor_json.at("bias")) : constants::Zero3;
+		Eigen::Vector3d bias_3d = has_vector_bias ? parse_Vector3d(sensor_json.at("bias")) : constants::zero3;
 
 		SensorType sensor{sensors::Sensor(sensor_json.at("mean").get<double>(),
 			sensor_json.at("stddev").get<double>(),

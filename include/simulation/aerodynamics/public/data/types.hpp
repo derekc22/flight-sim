@@ -28,7 +28,7 @@ namespace aerodynamics
 	};
 
 	template <typename T> struct SurfaceKinematics_T {
-		constants::Vector3_T<T> vB_rel = constants::Zero3_T<T>;
+		constants::Vector3_T<T> vB_rel = constants::zero3_T<T>;
 		T V = T(0.0);
 		T qbar = T(0.0);
 		T alpha = T(0.0);

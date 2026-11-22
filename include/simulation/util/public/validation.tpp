@@ -1,5 +1,6 @@
 #pragma once
 #include "simulation/constants/public/scalars.hpp"
+#include "simulation/util/public/math.hpp"
 #include "simulation/util/public/validation.hpp"
 
 #include <Eigen/Dense>
@@ -44,7 +45,7 @@ namespace util
 		const std::string& name)
 	{
 		const double n = v.norm();
-		if (std::abs(n - 1.0) > constants::eps) {
+		if (abs(n - 1.0) > constants::eps) {
 			throw std::invalid_argument("util::validate_unit: " + context + ": " + name +
 				" must have unit norm. Got norm = " + std::to_string(n));
 		}
@@ -57,7 +58,7 @@ namespace util
 		const std::string& name)
 	{
 		validate_square(M, context, name);
-		if (!M.isUnitary(constants::eps) || std::abs(M.determinant() - 1.0) > constants::eps) {
+		if (!M.isUnitary(constants::eps) || abs(M.determinant() - 1.0) > constants::eps) {
 			throw std::invalid_argument(
 				"util::validate_orthonormal: " + context + ": " + name + " must be orthonormal with determinant +1");
 		}

@@ -133,7 +133,7 @@ namespace transforms
 			case EulerOrder::ZYX: {
 				b = util::asin(util::clamp_to_1(R(0, 2)));
 				double cb = util::cos(b);
-				if (std::abs(cb) > constants::eps) {
+				if (util::abs(cb) > constants::eps) {
 					a = util::atan2(-R(0, 1), R(0, 0));
 					c = util::atan2(-R(1, 2), R(2, 2));
 				} else {
@@ -145,7 +145,7 @@ namespace transforms
 			case EulerOrder::ZXY: {
 				b = util::asin(util::clamp_to_1(-R(1, 2)));
 				double cb = util::cos(b);
-				if (std::abs(cb) > constants::eps) {
+				if (util::abs(cb) > constants::eps) {
 					a = util::atan2(R(1, 0), R(1, 1));
 					c = util::atan2(R(0, 2), R(2, 2));
 				} else {
@@ -157,7 +157,7 @@ namespace transforms
 			case EulerOrder::YZX: {
 				b = util::asin(util::clamp_to_1(-R(0, 1)));
 				double cb = util::cos(b);
-				if (std::abs(cb) > constants::eps) {
+				if (util::abs(cb) > constants::eps) {
 					a = util::atan2(R(0, 2), R(0, 0));
 					c = util::atan2(R(2, 1), R(1, 1));
 				} else {
@@ -169,7 +169,7 @@ namespace transforms
 			case EulerOrder::YXZ: {
 				b = util::asin(util::clamp_to_1(R(2, 1)));
 				double cb = util::cos(b);
-				if (std::abs(cb) > constants::eps) {
+				if (util::abs(cb) > constants::eps) {
 					a = util::atan2(-R(2, 0), R(2, 2));
 					c = util::atan2(-R(0, 1), R(1, 1));
 				} else {
@@ -181,7 +181,7 @@ namespace transforms
 			case EulerOrder::XZY: {
 				b = util::asin(util::clamp_to_1(R(1, 0)));
 				double cb = util::cos(b);
-				if (std::abs(cb) > constants::eps) {
+				if (util::abs(cb) > constants::eps) {
 					a = util::atan2(-R(1, 2), R(1, 1));
 					c = util::atan2(-R(2, 0), R(0, 0));
 				} else {
@@ -193,7 +193,7 @@ namespace transforms
 			case EulerOrder::XYZ: {
 				b = util::asin(util::clamp_to_1(-R(2, 0)));
 				double cb = util::cos(b);
-				if (std::abs(cb) > constants::eps) {
+				if (util::abs(cb) > constants::eps) {
 					a = util::atan2(R(2, 1), R(2, 2));
 					c = util::atan2(R(1, 0), R(0, 0));
 				} else {
@@ -206,7 +206,7 @@ namespace transforms
 			case EulerOrder::ZYZ: {
 				b = -util::acos(util::clamp_to_1(R(2, 2)));
 				double sb = util::sin(b);
-				if (std::abs(sb) > constants::eps) {
+				if (util::abs(sb) > constants::eps) {
 					a = util::atan2(-R(2, 1), R(2, 0));
 					c = util::atan2(-R(1, 2), -R(0, 2));
 				} else {
@@ -218,7 +218,7 @@ namespace transforms
 			case EulerOrder::ZXZ: {
 				b = -util::acos(util::clamp_to_1(R(2, 2)));
 				double sb = util::sin(b);
-				if (std::abs(sb) > constants::eps) {
+				if (util::abs(sb) > constants::eps) {
 					a = util::atan2(-R(2, 0), -R(2, 1));
 					c = util::atan2(-R(0, 2), R(1, 2));
 				} else {
@@ -230,7 +230,7 @@ namespace transforms
 			case EulerOrder::YZY: {
 				b = -util::acos(util::clamp_to_1(R(1, 1)));
 				double sb = util::sin(b);
-				if (std::abs(sb) > constants::eps) {
+				if (util::abs(sb) > constants::eps) {
 					a = util::atan2(-R(1, 2), -R(1, 0));
 					c = util::atan2(-R(2, 1), R(0, 1));
 				} else {
@@ -242,7 +242,7 @@ namespace transforms
 			case EulerOrder::YXY: {
 				b = -util::acos(util::clamp_to_1(R(1, 1)));
 				double sb = util::sin(b);
-				if (std::abs(sb) > constants::eps) {
+				if (util::abs(sb) > constants::eps) {
 					a = util::atan2(-R(1, 0), R(1, 2));
 					c = util::atan2(-R(0, 1), -R(2, 1));
 				} else {
@@ -254,7 +254,7 @@ namespace transforms
 			case EulerOrder::XZX: {
 				b = -util::acos(util::clamp_to_1(R(0, 0)));
 				double sb = util::sin(b);
-				if (std::abs(sb) > constants::eps) {
+				if (util::abs(sb) > constants::eps) {
 					a = util::atan2(-R(0, 2), R(0, 1));
 					c = util::atan2(-R(2, 0), -R(1, 0));
 				} else {
@@ -266,7 +266,7 @@ namespace transforms
 			case EulerOrder::XYX: {
 				b = -util::acos(util::clamp_to_1(R(0, 0)));
 				double sb = util::sin(b);
-				if (std::abs(sb) > constants::eps) {
+				if (util::abs(sb) > constants::eps) {
 					a = util::atan2(-R(0, 1), -R(0, 2));
 					c = util::atan2(-R(1, 0), R(2, 0));
 				} else {

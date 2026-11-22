@@ -360,13 +360,13 @@ namespace dynamics
 	};
 
 	template <typename T> struct Twist_T {
-		constants::Vector3_T<T> v = constants::Zero3_T<T>;
-		constants::Vector3_T<T> w = constants::Zero3_T<T>;
+		constants::Vector3_T<T> v = constants::zero3_T<T>;
+		constants::Vector3_T<T> w = constants::zero3_T<T>;
 	};
 
 	template <typename T> struct Wrench_T {
-		constants::Vector3_T<T> F = constants::Zero3_T<T>;
-		constants::Vector3_T<T> M = constants::Zero3_T<T>;
+		constants::Vector3_T<T> F = constants::zero3_T<T>;
+		constants::Vector3_T<T> M = constants::zero3_T<T>;
 	};
 
 	template <typename T> struct WrenchSet_T {
