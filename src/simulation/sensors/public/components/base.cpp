@@ -25,7 +25,7 @@ namespace sensors
 		std::optional<double>& lag_state,
 		double dt)
 	{
-		double prev_meas = lag_state ? lag_state.value() : meas;
+		double prev_meas = lag_state ? *lag_state : meas;
 		double meas_lagged = util::first_order_lag(meas, prev_meas, tau, dt); // apply EMA
 		lag_state = meas_lagged;
 		double meas_biased = meas_lagged + bias; // apply bias
@@ -39,7 +39,7 @@ namespace sensors
 		std::optional<Eigen::Vector3d>& lag_state,
 		double dt)
 	{
-		Eigen::Vector3d prev_meas = lag_state ? lag_state.value() : meas;
+		Eigen::Vector3d prev_meas = lag_state ? *lag_state : meas;
 		Eigen::Vector3d meas_lagged = util::first_order_lag(meas, prev_meas, tau, dt); // apply EMA
 		lag_state = meas_lagged;
 		Eigen::Vector3d meas_biased = meas_lagged + bias_3d; // apply bias
@@ -53,7 +53,7 @@ namespace sensors
 		std::optional<Eigen::Quaterniond>& lag_state,
 		double dt)
 	{
-		Eigen::Quaterniond prev_meas = lag_state ? lag_state.value() : meas;
+		Eigen::Quaterniond prev_meas = lag_state ? *lag_state : meas;
 		Eigen::Quaterniond meas_lagged =
 			util::first_order_lag(meas, prev_meas, tau, dt); // apply EMA via quaternion SLERP
 		lag_state = meas_lagged;

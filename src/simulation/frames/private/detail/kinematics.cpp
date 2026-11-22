@@ -48,9 +48,9 @@ namespace frames
 	{
 		const Frame* pF = &F;
 
-		Eigen::Vector3d p_FNext = constants::Zero3;
-		Eigen::Vector3d v_FNextNext = constants::Zero3;
-		Eigen::Vector3d w_FNextNext = constants::Zero3;
+		Eigen::Vector3d p_FNext = constants::zero3;
+		Eigen::Vector3d v_FNextNext = constants::zero3;
+		Eigen::Vector3d w_FNextNext = constants::zero3;
 
 		while (pF->parent != nullptr) {
 			const FrameView fv = pF->view();

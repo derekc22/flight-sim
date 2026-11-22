@@ -22,7 +22,7 @@ namespace messages
 	};
 
 	struct ProcessedFlightGearMessageOut {
-		atmospheric::Wind wind{constants::Zero3};
+		atmospheric::Wind wind{constants::zero3};
 		geography::GroundElevation ground_elevation{0.0};
 	};
 

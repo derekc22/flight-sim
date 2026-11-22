@@ -22,7 +22,7 @@ namespace control
 			params.K = lqr_gain(input.B_virtual, params.R, care_sol.P);
 		}
 
-		VirtualControlOutputVector_T<double> mu_deviation = -params.K.value() * input.zt;
+		VirtualControlOutputVector_T<double> mu_deviation = -*params.K * input.zt;
 
 		return mu_deviation;
 	}

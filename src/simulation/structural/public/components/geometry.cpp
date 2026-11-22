@@ -12,7 +12,7 @@ namespace structural
 	Eigen::Matrix3d Geometry::compute_local_J()
 	{
 		// Moments of inertia of rectangular prism about its own center, expressed in its local frame
-		Eigen::Matrix3d j = constants::Zero3x3;
+		Eigen::Matrix3d j = constants::Zero3;
 		j(0, 0) = (1.0 / 12.0) * mass * (y_size * y_size + z_size * z_size); // Jxx
 		j(1, 1) = (1.0 / 12.0) * mass * (x_size * x_size + z_size * z_size); // Jyy
 		j(2, 2) = (1.0 / 12.0) * mass * (x_size * x_size + y_size * y_size); // Jzz

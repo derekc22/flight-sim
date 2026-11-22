@@ -1,6 +1,7 @@
 #include "core/json/propulsion/private/validation.hpp"
 
 #include "simulation/constants/public/scalars.hpp"
+#include "simulation/util/public/math.hpp"
 
 #include <Eigen/Dense>
 #include <cmath>
@@ -69,7 +70,7 @@ namespace json
 		double thrust_coeff = propellers_json.at("thrust_coeff").get<double>();
 		double torque_coeff = propellers_json.at("torque_coeff").get<double>();
 
-		if (std::abs(std::abs(spin_sign) - 1.0) > constants::eps) {
+		if (util::abs(util::abs(spin_sign) - 1.0) > constants::eps) {
 			throw std::runtime_error("json::validate_propellers_json: propellers spin_sign must be +1 or -1");
 		}
 		if (thrust_coeff <= 0.0) {

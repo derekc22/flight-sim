@@ -16,8 +16,8 @@ namespace operating
 
 	struct OperatingConditions {
 		atmospheric::StaticAtmosphericState atm;
-		atmospheric::Wind windB{constants::Zero3};
-		atmospheric::Wind windI{constants::Zero3};
+		atmospheric::Wind windB{constants::zero3};
+		atmospheric::Wind windI{constants::zero3};
 		bool steady_state;
 	};
 

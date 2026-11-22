@@ -3,6 +3,7 @@
 #include "simulation/constants/public/dimensions.hpp"
 #include "simulation/constants/public/linalg.hpp"
 #include "simulation/constants/public/scalars.hpp"
+#include "simulation/util/public/math.hpp"
 
 #include <cmath>
 #include <spdlog/spdlog.h>
@@ -57,7 +58,7 @@ namespace allocator
 		ActuatorIncrementVector x = ActuatorIncrementVector::Zero();
 
 		for (Eigen::Index i = 0; i < x.rows(); ++i) {
-			if (std::abs(limits(i, 1) - limits(i, 0)) <= constants::eps) {
+			if (util::abs(limits(i, 1) - limits(i, 0)) <= constants::eps) {
 				x(i) = limits(i, 0) - u_0(i);
 			} else if (!actuator_mask[i]) {
 				x(i) = actuator_target(i) - u_0(i);

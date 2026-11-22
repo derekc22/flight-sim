@@ -14,12 +14,12 @@ namespace runner
 	{
 		// fetch from FlightGear
 		if (auto out_msg = udp_out.try_receive()) {
-			cached_msg_out = messages::process_out_msg(out_msg.value());
+			cached_msg_out = messages::process_out_msg(*out_msg);
 		}
 
 		// apply wind
-		atmospheric::Wind windI{constants::Zero3};
-		atmospheric::Wind windB{constants::Zero3};
+		atmospheric::Wind windI{constants::zero3};
+		atmospheric::Wind windB{constants::zero3};
 		if (input.wind_flag) {
 			windI.data = cached_msg_out.wind.data;
 			windB.data = frames::transform_vec(windI.data, input.aircraft.NEDFrameECEF, input.aircraft.FRDFrameNED);

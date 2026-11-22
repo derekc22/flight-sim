@@ -1,6 +1,7 @@
 #include "core/devices/public/joystick.hpp"
 
 #include "simulation/constants/public/scalars.hpp"
+#include "simulation/util/public/math.hpp"
 
 #include <SDL3/SDL.h>
 #include <algorithm>
@@ -21,13 +22,13 @@ namespace devices
 	static double normalize_trigger(
 		Sint16 value)
 	{
-		return std::clamp(static_cast<double>(value) / SDL_JOYSTICK_AXIS_MAX, 0.0, 1.0);
+		return util::clamp(static_cast<double>(value) / SDL_JOYSTICK_AXIS_MAX, 0.0, 1.0);
 	}
 
 	static double apply_deadzone(
 		double value)
 	{
-		double magnitude = std::abs(value);
+		double magnitude = util::abs(value);
 		if (magnitude <= joystick_deadzone) {
 			return 0.0;
 		}
@@ -58,7 +59,7 @@ namespace devices
 		double limit_max)
 	{
 		double delta = rate * (limit_max - limit_min) * joystick_propulsor_rate * constants::dt;
-		return std::clamp(previous + delta, limit_min, limit_max);
+		return util::clamp(previous + delta, limit_min, limit_max);
 	}
 
 	Joystick::Joystick(

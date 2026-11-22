@@ -154,8 +154,8 @@ namespace vehicles
 		}
 
 		// Invariants
-		NEDFrameECEFSetOpts.C_dot = dynamics::OrientationMatrixRate{constants::Zero3x3};
-		NEDFrameECEFSetOpts.v = dynamics::TranslationalVelocity{constants::Zero3};
+		NEDFrameECEFSetOpts.C_dot = dynamics::OrientationMatrixRate{constants::Zero3};
+		NEDFrameECEFSetOpts.v = dynamics::TranslationalVelocity{constants::zero3};
 
 		F.set(NEDFrameECEFSetOpts);
 	}
@@ -370,8 +370,8 @@ namespace vehicles
 
 		// Invariants
 		CGFrameFRDSetOpts.C = dynamics::OrientationMatrix{constants::I3};
-		CGFrameFRDSetOpts.C_dot = dynamics::OrientationMatrixRate{constants::Zero3x3};
-		CGFrameFRDSetOpts.v = dynamics::TranslationalVelocity{constants::Zero3};
+		CGFrameFRDSetOpts.C_dot = dynamics::OrientationMatrixRate{constants::Zero3};
+		CGFrameFRDSetOpts.v = dynamics::TranslationalVelocity{constants::zero3};
 
 		F.set(CGFrameFRDSetOpts);
 	}
@@ -413,9 +413,9 @@ namespace vehicles
 		}
 
 		// Invariants
-		STABFrameFRDSetOpts.p = dynamics::Position{constants::Zero3};
-		STABFrameFRDSetOpts.C_dot = dynamics::OrientationMatrixRate{constants::Zero3x3};
-		STABFrameFRDSetOpts.v = dynamics::TranslationalVelocity{constants::Zero3};
+		STABFrameFRDSetOpts.p = dynamics::Position{constants::zero3};
+		STABFrameFRDSetOpts.C_dot = dynamics::OrientationMatrixRate{constants::Zero3};
+		STABFrameFRDSetOpts.v = dynamics::TranslationalVelocity{constants::zero3};
 
 		F.set(STABFrameFRDSetOpts);
 	}
@@ -457,9 +457,9 @@ namespace vehicles
 		}
 
 		// Invariants
-		WINDFrameSTABSetOpts.p = dynamics::Position{constants::Zero3};
-		WINDFrameSTABSetOpts.C_dot = dynamics::OrientationMatrixRate{constants::Zero3x3};
-		WINDFrameSTABSetOpts.v = dynamics::TranslationalVelocity{constants::Zero3};
+		WINDFrameSTABSetOpts.p = dynamics::Position{constants::zero3};
+		WINDFrameSTABSetOpts.C_dot = dynamics::OrientationMatrixRate{constants::Zero3};
+		WINDFrameSTABSetOpts.v = dynamics::TranslationalVelocity{constants::zero3};
 
 		F.set(WINDFrameSTABSetOpts);
 	}
@@ -553,9 +553,9 @@ namespace vehicles
 		// Set default values
 		frames::SetOptions init_step_options;
 		init_step_options.H = dynamics::HomogeneousTransformationMatrix{constants::HI};
-		init_step_options.w = dynamics::AngularVelocity{constants::Zero3};
-		init_step_options.v = dynamics::TranslationalVelocity{constants::Zero3};
-		init_step_options.g = dynamics::Gravity{constants::Zero3};
+		init_step_options.w = dynamics::AngularVelocity{constants::zero3};
+		init_step_options.v = dynamics::TranslationalVelocity{constants::zero3};
+		init_step_options.g = dynamics::Gravity{constants::zero3};
 
 		NEDFrameECEF.set(init_step_options);
 		FRDFrameECEF.set(init_step_options);

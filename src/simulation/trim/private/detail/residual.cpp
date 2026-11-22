@@ -31,6 +31,7 @@ namespace trim
 
 		const TrimResidualVector_T<CppAD::AD<double>> residual_tracked =
 			compute_trim_residual_vector_T<CppAD::AD<double>>(xu_eigen, model, target, conditions);
+
 		const CppAD::eigen_vector<CppAD::AD<double>> residual_tracked_cppad =
 			autodiff::cppad_vector_from_eigen_vector(residual_tracked);
 

@@ -7,7 +7,7 @@ namespace runner
 
 	struct PhysicsWrapper {
 		// initialize prior-step net wrench
-		dynamics::Wrench WB_net_t_1{.F = dynamics::Force{constants::Zero3}, .M = dynamics::Moment{constants::Zero3}};
+		dynamics::Wrench WB_net_t_1{.F = dynamics::Force{constants::zero3}, .M = dynamics::Moment{constants::zero3}};
 
 		/**
 		 * @brief Integrates the rigid-body dynamics for one base simulation step.

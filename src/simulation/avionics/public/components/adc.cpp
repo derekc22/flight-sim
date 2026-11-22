@@ -19,10 +19,10 @@ namespace avionics
 	PressureAltitudeMeasurement AirDataComputer::compute(
 		const sensors::StaticAirPressureMeasurement& P)
 	{
-		double pressure_alt = (constants::T_SL / std::abs(constants::lapse_rate)) *
+		double pressure_alt = (constants::T_SL / util::abs(constants::lapse_rate)) *
 			(1.0 -
 				std::pow(P.data / constants::P_SL,
-					(constants::R_air * std::abs(constants::lapse_rate)) / constants::g_earth));
+					(constants::R_air * util::abs(constants::lapse_rate)) / constants::g_earth));
 		return {pressure_alt};
 	}
 

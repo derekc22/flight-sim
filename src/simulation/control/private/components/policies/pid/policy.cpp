@@ -18,7 +18,7 @@ namespace control
 	{
 		double err = input.x_des - input.x;
 
-		double d_term = input.x_dot.has_value() ? input.x_dot.value()	 // PI-D
+		double d_term = input.x_dot.has_value() ? *input.x_dot			 // PI-D
 												: (prev_err - err) / dt; // PID
 
 		// filtered derivative

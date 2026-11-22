@@ -26,7 +26,7 @@ namespace avionics
 		double Ki;
 		double fB_tol_scale;
 
-		Eigen::Vector3d integral = constants::Zero3;
+		Eigen::Vector3d integral = constants::zero3;
 		double fB_tol = fB_tol_scale * constants::g_earth;
 	};
 
